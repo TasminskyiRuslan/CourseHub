@@ -1,17 +1,20 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Auth;
 
+use App\Exceptions\Auth\EmailVerificationFailedException;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class VerificationService {
+    /**
+     * @throws EmailVerificationFailedException
+     */
     public function verify(int $id, string $hash): User {
         $user = User::findOrFail($id);
 
         if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-            throw new AccessDeniedHttpException('Invalid verification link.');
+            throw new EmailVerificationFailedException('Invalid verification link.');
         }
 
         if (!$user->hasVerifiedEmail()) {

@@ -1,9 +1,10 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\VerificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\VerificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +40,9 @@ Route::prefix('auth')
         Route::post('/email/verification/resend', [VerificationController::class, 'resendVerificationEmail'])
             ->middleware('throttle:6,1')
             ->name('verification.resend');
+
+        Route::post('/password/forgot', [ResetPasswordController::class, 'sendResetLink']);
+        Route::post('/password/reset', [ResetPasswordController::class, 'reset']);
     });
 
 /*

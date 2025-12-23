@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Auth;
 
-use App\DTO\Auth\RegisterDTO;
 use App\DTO\Auth\LoginDTO;
+use App\DTO\Auth\RegisterDTO;
+use App\Exceptions\Auth\EmailVerificationFailedException;
 use App\Models\User;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
-    public function registerUser(RegisterDTO $dto): array
+    public function register(RegisterDTO $dto): array
     {
         $user = User::create([
             'name' => $dto->name,
@@ -27,11 +27,13 @@ class AuthService
         return [
             'user' => $user,
             'auth_token' => $authTokenData['auth_token'],
-            'expires_at' => $authTokenData['expires_at']
         ];
     }
 
-    public function loginUser(LoginDTO $dto): array
+    /**
+     * @throws EmailVerificationFailedException
+     */
+    public function login(LoginDTO $dto): array
     {
         $user = User::where('email', $dto->email)->first();
 
@@ -42,7 +44,7 @@ class AuthService
         }
 
         if (!$user->hasVerifiedEmail()) {
-            throw new AccessDeniedHttpException('Email address is not verified.');
+            throw new EmailVerificationFailedException('Email address is not verified.');
         }
 
         $authTokenData = $this->generateAuthToken($user, $dto->remember);
@@ -50,11 +52,10 @@ class AuthService
         return [
             'user' => $user,
             'auth_token' => $authTokenData['auth_token'],
-            'expires_at' => $authTokenData['expires_at']
         ];
     }
 
-    public function logoutUser(User $user, bool $allDevices = false): void
+    public function logout(User $user, bool $allDevices = false): void
     {
         if ($allDevices) {
             $user->tokens()->delete();
@@ -70,7 +71,6 @@ class AuthService
 
         return [
             'auth_token' => $authToken,
-            'expires_at' => $expiresAt
         ];
     }
 }

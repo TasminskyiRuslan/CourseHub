@@ -2,65 +2,42 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\DTO\Auth\LoginDTO;
+use App\DTO\Auth\RegisterDTO;
+use App\Http\Resources\AuthResource;
 use Illuminate\Http\Request;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use App\Services\AuthService;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
-    public function register(RegisterRequest $request)
+    public function register(RegisterRequest $request, AuthService $authService)
     {
-        $date = $request->validated();
-
-        $user = User::create([
-            'name' => $date['name'],
-            'email' => $date['email'],
-            'password' => Hash::make($date['password']),
-        ]);
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'status' => true,
-            'message' => 'User registered successfully',
-            'access_token' => $token,
-            'token_type' => 'Bearer'
-        ], 201);
+        $result = $authService->registerUser(RegisterDTO::fromRequest($request));
+        return (new AuthResource($result))
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
     }
 
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request, AuthService $authService)
     {
-        $credentials = $request->validated();
-
-        if(!Auth::attempt($credentials)){
-            return response()->json([
-                'status' => false,
-                'message' => 'Invalid login or password'
-            ], 401);
-        }
-
-        $user = User::where('email', $credentials['email'])->firstOrFail();
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'status' => true,
-            'message' => 'User logged in successfully',
-            'access_token' => $token,
-            'token_type' => 'Bearer'
-        ], 200);
+        $result = $authService->loginUser(LoginDTO::fromRequest($request));
+        return (new AuthResource($result))
+            ->response()
+            ->setStatusCode(Response::HTTP_OK);
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request, AuthService $authService)
     {
-        $request->user()->currentAccessToken()->delete();
+        $authService->logoutUser($request->user());
+        return response()->noContent();
+    }
 
-        return response()->json([
-            'status' => true,
-            'message' => 'User logged out successfully'
-        ], 200);
+    public function logoutAll(Request $request, AuthService $authService)
+    {
+        $authService->logoutUser($request->user(), true);
+        return response()->noContent();
     }
 }

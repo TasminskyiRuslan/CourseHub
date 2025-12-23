@@ -2,13 +2,52 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\VerificationController;
 
-Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
-Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
+/*
+|--------------------------------------------------------------------------
+| Public
+|--------------------------------------------------------------------------
+*/
+Route::prefix('auth')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+    // Email verification (link from email)
+    Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Authenticated
+|--------------------------------------------------------------------------
+*/
+Route::prefix('auth')
+    ->middleware('auth:sanctum')
+    ->group(function () {
+        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::delete('/tokens', [AuthController::class, 'logoutAll']);
+
+
+        Route::get('/me', function (Request $request) {
+            return $request->user();
+        });
+
+        Route::post('/email/verification/resend', [VerificationController::class, 'resendVerificationEmail'])
+            ->middleware('throttle:6,1')
+            ->name('verification.resend');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| Verified
+|--------------------------------------------------------------------------
+*/
+Route::prefix('auth')
+    ->middleware(['auth:sanctum', 'verified'])
+    ->group(function () {
+
+    });

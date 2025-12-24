@@ -13,7 +13,7 @@ class QueuedVerifyEmailNotification extends VerifyEmail implements ShouldQueue
 
     public function __construct()
     {
-        $this->onQueue('verification-emails');
+        $this->onQueue('high');
     }
 
     public function toMail($notifiable): MailMessage

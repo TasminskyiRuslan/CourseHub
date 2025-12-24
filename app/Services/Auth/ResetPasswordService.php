@@ -17,8 +17,8 @@ class ResetPasswordService
             throw ValidationException::withMessages(['email' => ['No user with this email was found.']]);
         }
 
-        $token = Password::createToken($user);
-        $user->sendPasswordResetNotification($token);
+        $reset_token = Password::createToken($user);
+        $user->sendPasswordResetNotification($reset_token);
     }
 
     public function reset(ResetPasswordDTO $dto): void {
@@ -26,7 +26,7 @@ class ResetPasswordService
             'email' => $dto->email,
             'password' => $dto->password,
             'password_confirmation' => $dto->password_confirmation,
-            'token' => $dto->token,
+            'token' => $dto->reset_token,
         ], function ($user, $password) {
             $user->forceFill([
                 'password' => Hash::make($password),

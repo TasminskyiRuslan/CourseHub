@@ -10,7 +10,7 @@ class ResetPasswordDTO
         public string $email,
         public string $password,
         public string $password_confirmation,
-        public string $token,
+        public string $reset_token,
 
     ) {}
 
@@ -20,7 +20,7 @@ class ResetPasswordDTO
             $request->email,
             $request->password,
             $request->password_confirmation,
-            $request->token,
+            $request->reset_token,
         );
     }
 }

@@ -11,11 +11,11 @@ class ResetPasswordNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public string $token;
-    public function __construct(string $token)
+    public string $reset_token;
+    public function __construct(string $reset_token)
     {
-        $this->token = $token;
-        $this->onQueue('password-reset-emails');
+        $this->reset_token = $reset_token;
+        $this->onQueue('high');
     }
 
     public function via($notifiable): array
@@ -28,6 +28,6 @@ class ResetPasswordNotification extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject('Reset Password Notification')
             ->line('They took away the sheet to reset the password.')
-            ->action('Reset Password', $this->token);
+            ->action('Reset Password', $this->reset_token);
     }
 }

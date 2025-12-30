@@ -17,6 +17,7 @@ class AuthService
         $user = User::create([
             'name' => $dto->name,
             'email' => $dto->email,
+            'role' => $dto->role,
             'password' => Hash::make($dto->password),
         ]);
 

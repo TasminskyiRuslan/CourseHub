@@ -27,7 +27,6 @@ class ResetPasswordNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject('Reset Password Notification')
-            ->line('They took away the sheet to reset the password.')
-            ->action('Reset Password', $this->reset_token);
+            ->action('Token for reset password', $this->reset_token);
     }
 }

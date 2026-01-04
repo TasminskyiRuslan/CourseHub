@@ -1,30 +1,30 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers\Api\Auth;
 
+use App\Http\Controllers\Controller;
 use App\DTO\Auth\ResetPasswordDTO;
-use App\Http\Controllers\ApiController;
-use App\Http\Requests\ForgotPasswordRequest;
-use App\Http\Requests\ResetPasswordRequest;
+use App\Http\Requests\Api\ForgotPasswordRequest;
+use App\Http\Requests\Api\ResetPasswordRequest;
 use App\Services\Auth\ResetPasswordService;
 
-class ResetPasswordController extends ApiController
+class ResetPasswordController extends Controller
 {
     public function sendResetLink(ForgotPasswordRequest $request, ResetPasswordService $service)
     {
         $service->sendResetLink($request->input('email'));
 
-        return $this->successResponse([
+        return response()->success('Password reset link sent', [
             'email_sent' => true,
-        ], 'Password reset link sent');
+        ]);
     }
 
     public function reset(ResetPasswordRequest $request, ResetPasswordService $service)
     {
         $service->reset(ResetPasswordDTO::fromRequest($request));
 
-        return $this->successResponse([
+        return response()->success('Password has been reset', [
             'password_reset' => true
-        ], 'Password has been reset');
+        ]);
     }
 }

@@ -1,31 +1,33 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers\Api\Auth;
 
-use App\Http\Controllers\ApiController;
-use App\Http\Resources\UserResource;
+use App\Http\Controllers\Controller;
+use App\Exceptions\Auth\EmailVerificationFailedException;
 use App\Services\Auth\VerificationService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class VerificationController extends ApiController
+class VerificationController extends Controller
 {
+    /**
+     * @throws EmailVerificationFailedException
+     */
     public function verify(Request $request, VerificationService $service, $id, $hash)
     {
         $service->verify($id, $hash);
 
-        return $this->successResponse([
+        return response()->success('Email verified.', [
             'verified' => true,
-        ], 'Email verified.');
+        ]);
     }
 
     public function resendVerificationEmail(Request $request, VerificationService $service)
     {
         $resent = $service->resendVerificationEmail($request->user());
 
-        return $this->successResponse([
+        return response()->success($resent ? 'Verification email resent.' : 'Email already verified.', [
             'resent' => $resent,
-        ], $resent ? 'Verification email resent.' : 'Email already verified.',
-            $resent ? Response::HTTP_ACCEPTED : Response::HTTP_CONFLICT);
+        ], $resent ? Response::HTTP_ACCEPTED : Response::HTTP_CONFLICT);
     }
 }

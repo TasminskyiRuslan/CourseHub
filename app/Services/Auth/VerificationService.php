@@ -13,7 +13,7 @@ class VerificationService {
     public function verify(int $id, string $hash): User {
         $user = User::findOrFail($id);
 
-        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+        if (!hash_equals($hash, sha1($user->getEmailForVerification()))) {
             throw new EmailVerificationFailedException('Invalid verification link.');
         }
 

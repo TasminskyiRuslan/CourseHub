@@ -3,7 +3,7 @@
 namespace App\DTO\Auth;
 
 use App\Enums\UserRole;
-use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\Api\RegisterRequest;
 
 class RegisterDTO
 {

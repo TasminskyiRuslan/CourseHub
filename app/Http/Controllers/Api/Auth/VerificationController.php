@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Exceptions\Auth\EmailVerificationFailedException;
 use App\Services\Auth\VerificationService;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class VerificationController extends Controller
 {
@@ -28,6 +28,6 @@ class VerificationController extends Controller
 
         return response()->success($resent ? 'Verification email resent.' : 'Email already verified.', [
             'resent' => $resent,
-        ], $resent ? Response::HTTP_ACCEPTED : Response::HTTP_CONFLICT);
+        ], $resent ? HttpResponse::HTTP_ACCEPTED : HttpResponse::HTTP_CONFLICT);
     }
 }

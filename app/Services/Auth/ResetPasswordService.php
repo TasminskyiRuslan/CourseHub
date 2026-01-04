@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
+use Str;
 
 class ResetPasswordService
 {
@@ -25,12 +26,13 @@ class ResetPasswordService
         $status = Password::reset([
             'email' => $dto->email,
             'password' => $dto->password,
-            'password_confirmation' => $dto->password_confirmation,
-            'token' => $dto->reset_token,
+            'password_confirmation' => $dto->password,
+            'token' => $dto->resetToken,
         ], function ($user, $password) {
             $user->forceFill([
                 'password' => Hash::make($password),
-            ])->save();
+            ])->setRememderToken(Str::random(60));
+            $user->save();
         });
 
         if ($status !== Password::PASSWORD_RESET) {

@@ -2,25 +2,23 @@
 
 namespace App\DTO\Auth;
 
-use App\Http\Requests\Api\ResetPasswordRequest;
+use Illuminate\Http\Request;
 
 class ResetPasswordDTO
 {
     public function __construct(
         public string $email,
         public string $password,
-        public string $password_confirmation,
-        public string $reset_token,
+        public string $resetToken,
 
     ) {}
 
-    public static function fromRequest(ResetPasswordRequest $request): self
+    public static function fromRequest(Request $request): self
     {
         return new self(
-            $request->email,
-            $request->password,
-            $request->password_confirmation,
-            $request->reset_token,
+            email: $request->string('email')->toString(),
+            password: $request->string('password')->toString(),
+            resetToken: $request->string('resetToken')->toString(),
         );
     }
 }

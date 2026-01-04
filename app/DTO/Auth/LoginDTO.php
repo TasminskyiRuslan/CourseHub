@@ -2,22 +2,22 @@
 
 namespace App\DTO\Auth;
 
-use App\Http\Requests\Api\LoginRequest;
+use Illuminate\Http\Request;
 
 class LoginDTO
 {
     public function __construct(
         public string $email,
         public string $password,
-        public bool $remember
+        public bool $remember = false,
     ) {}
 
-    public static function fromRequest(LoginRequest $request): self
+    public static function fromRequest(Request $request): self
     {
         return new self(
-            $request->email,
-            $request->password,
-            $request->boolean("remember", false),
+            email: $request->string('email')->toString(),
+            password: $request->string('password')->toString(),
+            remember: $request->boolean('remember'),
         );
     }
 }

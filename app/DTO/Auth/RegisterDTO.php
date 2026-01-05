@@ -3,7 +3,7 @@
 namespace App\DTO\Auth;
 
 use App\Enums\UserRole;
-use Illuminate\Http\Request;
+use App\Http\Requests\Api\RegisterRequest;
 
 readonly class RegisterDTO
 {
@@ -11,18 +11,20 @@ readonly class RegisterDTO
         public string $name,
         public string $email,
         public string $password,
-        public UserRole $role = UserRole::STUDENT,
-        public bool $remember = false,
+        public UserRole $role,
+        public bool     $remember,
     ) {}
 
-    public static function fromRequest(Request $request): self
+    public static function fromRequest(RegisterRequest $request): self
     {
+        $validated = $request->safe();
+
         return new self(
-            name: $request->string('name')->toString(),
-            email: $request->string('email')->toString(),
-            password: $request->string('password')->toString(),
-            role: $request->filled('role') ? UserRole::from($request->string('role')->toString()) : UserRole::STUDENT,
-            remember: $request->boolean('remember'),
+            name: $validated->name,
+            email: $validated->email,
+            password: $validated->password,
+            role: isset($validated->role) ? UserRole::from($validated->role) : UserRole::STUDENT,
+            remember: $validated->remember ?? false,
         );
     }
 }

@@ -4,10 +4,17 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Lesson;
+use App\Services\LessonService;
 use Illuminate\Http\Request;
 
 class LessonController extends Controller
 {
+    public function __construct(
+        protected LessonService $lessonService,
+    )
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */

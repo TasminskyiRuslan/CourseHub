@@ -14,6 +14,9 @@ class Course extends Model
         'price', 'type', 'image_url', 'is_published'
     ];
 
+    protected $casts = [
+        'price' => 'decimal:2',
+    ];
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()

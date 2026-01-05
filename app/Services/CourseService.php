@@ -2,8 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Course;
-use Illuminate\Http\Request;
+use App\DTO\CourseDTO;
 
 class CourseService
 {
@@ -12,9 +11,9 @@ class CourseService
         //
     }
 
-    public function store()
+    public function store(CourseDTO $dto)
     {
-        //
+
     }
 
     public function show()

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DTO\CourseDTO;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Services\CourseService;
@@ -9,43 +10,49 @@ use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
+    public function __construct(
+        protected CourseService $courseService,
+    )
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
-    public function index(CourseService $service)
+    public function index()
     {
-//        $service->index();
+//        $this->courseService->index();
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, CourseService $service)
+    public function store(Request $request)
     {
-//        $service->store();
+//        $this->courseService->store(CourseDTO::fromRequest($request));
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Course $course, CourseService $service)
+    public function show(Course $course)
     {
-//        $service->show();
+//        $this->courseService->show();
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Course $course, CourseService $service)
+    public function update(Request $request, Course $course)
     {
-//        $service->update();
+//        $this->courseService->update();
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Course $course, CourseService $service)
+    public function destroy(Course $course)
     {
-        $service->destroy();
+//        $this->courseService->destroy();
     }
 }

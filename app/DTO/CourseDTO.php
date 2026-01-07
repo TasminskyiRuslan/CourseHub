@@ -9,35 +9,41 @@ use Brick\Money\Exception\UnknownCurrencyException;
 use Brick\Money\Money;
 use Illuminate\Http\UploadedFile;
 
-readonly class CourseDTO
+final readonly class CourseDTO
 {
     public function __construct(
-        public int           $userId,
         public string        $title,
         public CourseType    $type,
         public ?string       $slug,
         public ?string       $description,
         public Money         $price,
         public ?UploadedFile $image,
-    )
-    {
-    }
+    ) {}
 
     /**
      * @throws UnknownCurrencyException
      */
     public static function fromRequest(StoreCourseRequest|UpdateCourseRequest $request): self
     {
-        $validated = $request->safe();
-
         return new self(
-            userId: $request->user()->id,
-            title: $validated->title,
-            type: CourseType::from($validated->type),
-            slug: $validated->slug,
-            description: $validated->description,
-            price: Money::of($validated->price ?? '0.00', 'USD'),
+            title: $request->string('title')->trim(),
+            type: $request->enum('type', CourseType::class),
+            slug: $request->string('slug')->trim() ?: null,
+            description: $request->string('description')->trim() ?: null,
+            price: Money::of($request->string('price', '0.00'), 'USD'),
             image: $request->file('image'),
         );
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'title'       => $this->title,
+            'type'        => $this->type->value,
+            'slug'        => $this->slug,
+            'description' => $this->description,
+            'price'       => $this->price->getAmount()->toScale(2),
+            'image'       => $this->image,
+        ];
     }
 }

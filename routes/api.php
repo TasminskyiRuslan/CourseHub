@@ -3,55 +3,65 @@
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\Auth\VerificationController;
+use App\Http\Controllers\Api\CourseController;
+use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Public
+| Public Routes
 |--------------------------------------------------------------------------
 */
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 
-    // Email verification (link from email)
+    Route::post('/password/forgot', [ResetPasswordController::class, 'sendResetLink']);
+    Route::post('/password/reset', [ResetPasswordController::class, 'reset']);
+
     Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
         ->middleware(['signed', 'throttle:6,1'])
         ->name('verification.verify');
 });
 
+Route::get('/courses', [CourseController::class, 'index']);
+Route::get('/courses/{course}', [CourseController::class, 'show']);
+
 /*
 |--------------------------------------------------------------------------
-| Authenticated
+| Authenticated Routes
 |--------------------------------------------------------------------------
 */
-Route::prefix('auth')
-    ->middleware('auth:sanctum')
-    ->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::prefix('auth')->group(function () {
+        Route::get('/me', fn (Request $request) => $request->user());
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::delete('/tokens', [AuthController::class, 'logoutAll']);
-
-
-        Route::get('/me', function (Request $request) {
-            return $request->user();
-        });
 
         Route::post('/email/verification/resend', [VerificationController::class, 'resendVerificationEmail'])
             ->middleware('throttle:6,1')
             ->name('verification.resend');
-
-        Route::post('/password/forgot', [ResetPasswordController::class, 'sendResetLink']);
-        Route::post('/password/reset', [ResetPasswordController::class, 'reset']);
     });
 
-/*
-|--------------------------------------------------------------------------
-| Verified
-|--------------------------------------------------------------------------
-*/
-Route::prefix('auth')
-    ->middleware(['auth:sanctum', 'verified'])
-    ->group(function () {
+    /*
+    |--------------------------------------------------------------------------
+    | Verified & Authorized Routes (Must be logged in, verified and teacher/admin)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('verified')->group(function () {
+
+        Route::prefix('courses')->group(function () {
+            Route::post('/', [CourseController::class, 'store'])
+                ->middleware('can:create,' . Course::class);
+
+            Route::put('/{course}', [CourseController::class, 'update'])
+                ->middleware('can:update,course');
+
+            Route::delete('/{course}', [CourseController::class, 'destroy'])
+                ->middleware('can:delete,course');
+        });
 
     });
+});

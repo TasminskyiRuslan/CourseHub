@@ -5,12 +5,15 @@ namespace App\Services\Auth;
 use App\Exceptions\Auth\EmailVerificationFailedException;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
-class VerificationService {
+class VerificationService
+{
     /**
      * @throws EmailVerificationFailedException
      */
-    public function verify(int $id, string $hash): User {
+    public function verify(int $id, string $hash): User
+    {
         $user = User::findOrFail($id);
 
         if (!hash_equals($hash, sha1($user->getEmailForVerification()))) {

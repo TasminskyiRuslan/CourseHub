@@ -5,26 +5,35 @@ namespace App\DTO\Auth;
 use App\Enums\UserRole;
 use App\Http\Requests\Api\RegisterRequest;
 
-readonly class RegisterDTO
+final readonly class RegisterDTO
 {
     public function __construct(
-        public string $name,
-        public string $email,
-        public string $password,
+        public string   $name,
+        public string   $email,
+        public string   $password,
         public UserRole $role,
         public bool     $remember,
     ) {}
 
     public static function fromRequest(RegisterRequest $request): self
     {
-        $validated = $request->safe();
-
         return new self(
-            name: $validated->name,
-            email: $validated->email,
-            password: $validated->password,
-            role: isset($validated->role) ? UserRole::from($validated->role) : UserRole::STUDENT,
-            remember: $validated->remember ?? false,
+            name: $request->string('name')->trim(),
+            email: $request->string('email')->trim(),
+            password: $request->string('password'),
+            role: $request->enum('role', UserRole::class) ?? UserRole::STUDENT,
+            remember: $request->boolean('remember'),
         );
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'name'     => $this->name,
+            'email'    => $this->email,
+            'password' => $this->password,
+            'role'     => $this->role->value,
+            'remember' => $this->remember,
+        ];
     }
 }

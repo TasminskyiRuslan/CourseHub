@@ -3,13 +3,23 @@
 namespace App\Http\Controllers\Api;
 
 use App\DTO\CourseDTO;
+use App\DTO\CourseFilterDTO;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\CourseListRequest;
+use App\Http\Requests\Api\StoreCourseRequest;
+use App\Http\Resources\CourseResource;
 use App\Models\Course;
 use App\Services\CourseService;
+use Brick\Money\Exception\UnknownCurrencyException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class CourseController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         protected CourseService $courseService,
     )
@@ -19,17 +29,26 @@ class CourseController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(CourseListRequest $request)
     {
-//        $this->courseService->index();
+        $this->authorize('viewAny', Course::class);
+        $result = $this->courseService->getList(CourseFilterDTO::fromRequest($request));
+        return CourseResource::collection($result);
     }
 
     /**
      * Store a newly created resource in storage.
+     * @throws UnknownCurrencyException
      */
-    public function store(Request $request)
+    public function store(StoreCourseRequest $request)
     {
-//        $this->courseService->store(CourseDTO::fromRequest($request));
+        $this->authorize('create', Course::class);
+        $result = $this->courseService->store(CourseDTO::fromRequest($request), $request->user());
+        return response()->success(
+            'Course created successfully.',
+            new CourseResource($result),
+            HttpResponse::HTTP_CREATED
+        );
     }
 
     /**
@@ -37,7 +56,8 @@ class CourseController extends Controller
      */
     public function show(Course $course)
     {
-//        $this->courseService->show();
+        $this->courseService->show($course);
+        return new CourseResource($course);
     }
 
     /**
@@ -45,6 +65,7 @@ class CourseController extends Controller
      */
     public function update(Request $request, Course $course)
     {
+        $this->authorize('update', Course::class);
 //        $this->courseService->update();
     }
 
@@ -53,6 +74,7 @@ class CourseController extends Controller
      */
     public function destroy(Course $course)
     {
+        $this->authorize('delete', Course::class);
 //        $this->courseService->destroy();
     }
 }

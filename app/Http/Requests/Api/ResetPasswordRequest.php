@@ -16,7 +16,7 @@ class ResetPasswordRequest extends FormRequest
         return [
             'email' => ['required', 'email', 'exists:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'reset_token' => ['required', 'string'],
+            'token' => ['required', 'string'],
         ];
     }
 }

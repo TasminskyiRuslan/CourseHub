@@ -13,6 +13,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Throwable;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class AuthService
 {
@@ -22,46 +23,12 @@ class AuthService
     public function register(RegisterDTO $dto): AuthDTO
     {
         return DB::transaction(function () use ($dto) {
-            $user = User::create([
-                'name' => $dto->name,
-                'email' => $dto->email,
-                'role' => $dto->role,
-                'password' => Hash::make($dto->password),
-            ]);
+            $user = User::create($dto->toArray());
 
             event(new Registered($user));
 
             return $this->issueToken($user, $dto->remember);
         });
-    }
-
-    /**
-     * @throws EmailVerificationFailedException
-     */
-    public function login(LoginDTO $dto): AuthDTO
-    {
-        $user = User::where('email', $dto->email)->first();
-
-        if (!$user || !Hash::check($dto->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Invalid email or password'],
-            ]);
-        }
-
-        if (!$user->hasVerifiedEmail()) {
-            throw new EmailVerificationFailedException('Email address is not verified.');
-        }
-
-        return $this->issueToken($user, $dto->remember);
-    }
-
-    public function logout(User $user, bool $allDevices = false): void
-    {
-        if ($allDevices) {
-            $user->tokens()->delete();
-        } else {
-            $user->currentAccessToken()?->delete();
-        }
     }
 
     protected function issueToken(User $user, bool $remember): AuthDTO
@@ -79,5 +46,34 @@ class AuthService
     protected function generateToken(User $user, DateTimeInterface $expiresAt): string
     {
         return $user->createToken('access_token', ['*'], $expiresAt)->plainTextToken;
+    }
+
+    /**
+     * @throws EmailVerificationFailedException
+     */
+    public function login(LoginDTO $dto): AuthDTO
+    {
+        $user = User::where('email', $dto->email)->first();
+
+        if (!$user || !Hash::check($dto->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => ['Invalid email or password'],
+            ]);
+        }
+
+        if (!$user->hasVerifiedEmail()) {
+            throw new EmailVerificationFailedException('Email address is not verified.', HttpResponse::HTTP_FORBIDDEN);
+        }
+
+        return $this->issueToken($user, $dto->remember);
+    }
+
+    public function logout(User $user, bool $allDevices = false): void
+    {
+        if ($allDevices) {
+            $user->tokens()->delete();
+        } else {
+            $user->currentAccessToken()?->delete();
+        }
     }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\ServiceProvider;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class MacroServiceProvider extends ServiceProvider
@@ -19,6 +19,7 @@ class MacroServiceProvider extends ServiceProvider
     /**
      * Bootstrap services.
      */
+
     public function boot(): void
     {
         Response::macro('success', function (string $message = '', mixed $data = [], int $status = HttpResponse::HTTP_OK) {
@@ -29,12 +30,13 @@ class MacroServiceProvider extends ServiceProvider
             ], $status);
         });
 
-        Response::macro('error', function (string $message = '', array $errors = [], int $status = HttpResponse::HTTP_BAD_REQUEST) {
+        Response::macro('error', function (string $message = '', array $details = [], int $status = HttpResponse::HTTP_BAD_REQUEST) {
             return response()->json([
                 'status' => 'error',
                 'message' => $message,
-                'errors' => $errors,
+                'details' => $details,
             ], $status);
         });
     }
+
 }

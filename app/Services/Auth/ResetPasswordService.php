@@ -11,7 +11,8 @@ use Str;
 
 class ResetPasswordService
 {
-    public function sendResetLink(string $email): void {
+    public function sendResetLink(string $email): void
+    {
         $user = User::where('email', $email)->first();
 
         if (!$user) {
@@ -22,7 +23,8 @@ class ResetPasswordService
         $user->sendPasswordResetNotification($token);
     }
 
-    public function reset(ResetPasswordDTO $dto): void {
+    public function reset(ResetPasswordDTO $dto): void
+    {
         $status = Password::reset([
             'email' => $dto->email,
             'password' => $dto->password,

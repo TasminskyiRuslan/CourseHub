@@ -43,15 +43,15 @@ class AuthController extends Controller
         );
     }
 
-    public function logout(Request $request)
-    {
-        $this->authService->logout($request->user());
-        return response()->noContent();
-    }
-
     public function logoutAll(Request $request)
     {
         $this->authService->logout($request->user(), true);
+        return response()->noContent();
+    }
+
+    public function logout(Request $request)
+    {
+        $this->authService->logout($request->user());
         return response()->noContent();
     }
 }

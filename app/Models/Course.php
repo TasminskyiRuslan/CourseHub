@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Contracts\Ownable;
 use App\DTO\CourseFilterDTO;
 use App\Enums\CourseSortField;
 use App\Enums\CourseType;
@@ -64,11 +63,16 @@ class Course extends Model
     public function scopeFilter(Builder $query, CourseFilterDTO $filters): void
     {
         $query
-            ->when($filters->type, fn(Builder $q, CourseType $type) => $q->where('type', $type)            )
+            ->when($filters->type, fn(Builder $q, CourseType $type) => $q->where('type', $type))
             ->when($filters->search, function (Builder $q, string $search) {
                 $q->where(function (Builder $sub) use ($search) {
                     $sub->where('title', 'like', "%{$search}%")
                         ->orWhere('description', 'like', "%{$search}%");
+                });
+            })
+            ->when($filters->author, function (Builder $q, string $slug) {
+                $q->whereHas('author', function (Builder $sub) use ($slug) {
+                    $sub->where('slug', $slug);
                 });
             });
     }
@@ -90,8 +94,8 @@ class Course extends Model
         return $this->is_published || ($user && ($user->isAdmin() || $user->isOwnerOf($this)));
     }
 
-    public function isPublished(): bool
-    {
-        return $this->is_published;
-    }
+//    public function isPublished(): bool
+//    {
+//        return $this->is_published;
+//    }
 }

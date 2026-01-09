@@ -27,6 +27,8 @@ class CourseListRequest extends FormRequest
     {
         return [
             'type' => ['nullable', 'string', Rule::enum(CourseType::class)],
+            'search' => ['nullable', 'string', 'max:255'],
+            'author' => ['nullable', 'string', 'max:255'],
             'sort' => ['nullable', 'string', Rule::enum(CourseSortField::class)],
             'order' => ['nullable', 'string', Rule::enum(SortOrder::class)],
         ];

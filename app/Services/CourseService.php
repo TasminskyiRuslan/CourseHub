@@ -8,13 +8,14 @@ use App\Models\Course;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\DB;
 
 class CourseService
 {
-    public function getList(CourseFilterDTO $filters): LengthAwarePaginator
+    public function find(CourseFilterDTO $filters): LengthAwarePaginator
     {
         return Course::query()
-            ->where('courses.is_published', true)
+//            ->where('courses.is_published', true)
             ->filter($filters)
             ->sort($filters)
             ->with(['author'])
@@ -22,16 +23,21 @@ class CourseService
     }
 
 
+    /**
+     * @throws \Throwable
+     */
     public function store(CourseDTO $dto, User $author): Course
     {
-        $data = $dto->toArray();
-        if ($dto->image) {
-            $data['image_url'] = $dto->image->store('courses', 'public');
-        }
-        return $author->courses()->create($data);
+        return DB::transaction(function () use ($dto, $author) {
+            $data = $dto->toArray();
+            if ($dto->image) {
+                $data['image_url'] = $dto->image->store('courses', 'public');
+            }
+            return $author->courses()->create($data);
+        });
     }
 
-    public function show(Course $course): Course
+    public function findOne(Course $course): Course
     {
         $user = auth('sanctum')->user();
         if (!$course->isVisibleFor($user)) {

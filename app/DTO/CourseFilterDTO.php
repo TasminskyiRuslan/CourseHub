@@ -12,6 +12,7 @@ final readonly class CourseFilterDTO
     public function __construct(
         public ?CourseType $type,
         public ?string     $search,
+        public ?string     $author,
         public ?CourseSortField $sort,
         public ?SortOrder  $order,
     ) {}
@@ -21,6 +22,7 @@ final readonly class CourseFilterDTO
         return new self(
             type: $request->enum('type', CourseType::class),
             search: $request->string('search')->trim() ?: null,
+            author: $request->string('author')->trim() ?: null,
             sort: $request->enum('sort', CourseSortField::class),
             order: $request->enum('order', SortOrder::class),
         );
@@ -31,6 +33,7 @@ final readonly class CourseFilterDTO
         return [
             'type'   => $this->type?->value,
             'search' => $this->search,
+            'author' => $this->author,
             'sort'   => $this->sort,
             'order'  => $this->order?->value,
         ];

@@ -32,7 +32,7 @@ class CourseController extends Controller
     public function index(CourseListRequest $request)
     {
         $this->authorize('viewAny', Course::class);
-        $result = $this->courseService->getList(CourseFilterDTO::fromRequest($request));
+        $result = $this->courseService->find(CourseFilterDTO::fromRequest($request));
         return CourseResource::collection($result);
     }
 
@@ -56,7 +56,8 @@ class CourseController extends Controller
      */
     public function show(Course $course)
     {
-        $this->courseService->show($course);
+        $this->authorize('view', Course::class);
+        $this->courseService->findOne($course);
         return new CourseResource($course);
     }
 

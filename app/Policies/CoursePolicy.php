@@ -12,6 +12,16 @@ class CoursePolicy
         return $user->isTeacher() && $user->hasVerifiedEmail();
     }
 
+    public function viewAny(?User $user): bool
+    {
+        return true;
+    }
+
+    public function view(?User $user, Course $course): bool
+    {
+        return true;
+    }
+
     public function create(User $user): bool {
         return $this->canUserPublish($user);
     }

@@ -8,6 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @property mixed $id
  * @property mixed $name
+ * @property mixed $slug
  * @property mixed $email
  * @property mixed $role
  * @property mixed $email_verified_at
@@ -26,6 +27,7 @@ class UserResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'slug' => $this->slug,
             'email' => $this->email,
             'role' => $this->role,
             'email_verified_at' => $this->email_verified_at,

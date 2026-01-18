@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DTO\CourseFilterDTO;
 use App\DTO\LessonDTO;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\CourseListRequest;
 use App\Http\Requests\Api\StoreLessonRequest;
 use App\Http\Resources\LessonResource;
 use App\Models\Course;
@@ -11,6 +13,7 @@ use App\Models\Lesson;
 use App\Services\LessonService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
+use Throwable;
 
 class LessonController extends Controller
 {
@@ -23,14 +26,15 @@ class LessonController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(CourseListRequest $request, Course $course)
     {
-        //
+        $result = $this->lessonService->search(CourseFilterDTO::fromRequest($request), $course);
+        return LessonResource::collection($result);
     }
 
     /**
      * Store a newly created resource in storage.
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function store(StoreLessonRequest $request, Course $course)
     {

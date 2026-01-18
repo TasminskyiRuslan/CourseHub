@@ -72,7 +72,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->role === UserRole::TEACHER;
     }
 
-    public function isOwnerOf(Course $course): bool {
+    public function canPublishContent(): bool
+    {
+        return $this->isTeacher() && $this->hasVerifiedEmail();
+    }
+    public function isAuthorOf(Course $course): bool {
         return $this->is($course->author);
     }
 }

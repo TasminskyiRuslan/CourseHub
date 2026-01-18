@@ -2,31 +2,32 @@
 
 namespace App\Services;
 
-use App\DTO\CourseDTO;
+use App\DTO\CreateCourseDTO;
 use App\DTO\CourseFilterDTO;
+use App\DTO\UpdateCourseDTO;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\DB;
+  use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class CourseService
 {
-    public function find(CourseFilterDTO $filters): LengthAwarePaginator
+    public function search(CourseFilterDTO $filters): LengthAwarePaginator
     {
         return Course::query()
             ->where('courses.is_published', true)
             ->filter($filters)
             ->sort($filters)
-            ->with(['author', 'lessons'])
+            ->with(['author', 'lessons.lessonable'])
             ->paginate(config('courses.per_page'));
     }
 
-
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
-    public function store(CourseDTO $dto, User $author): Course
+    public function create(CreateCourseDTO $dto, User $author): Course
     {
         return DB::transaction(function () use ($dto, $author) {
             $data = $dto->toArray();
@@ -37,22 +38,34 @@ class CourseService
         });
     }
 
-    public function findOne(Course $course): Course
+    /**
+     * @throws Throwable
+     */
+    public function update(UpdateCourseDTO $dto, Course $course): Course
     {
-        $user = auth('sanctum')->user();
-        if (!$course->isVisibleFor($user)) {
-            throw new ModelNotFoundException('Course not found.');
-        }
-        return $course->load('author', 'lessons.lessonable');
+        return DB::transaction(function () use ($dto, $course) {
+            $data = $dto->toArray();
+            if ($dto->image) {
+                if ($course->image_url) {
+                    Storage::disk('public')->delete($course->image_url);
+                }
+                $data['image_url'] = $dto->image->store('courses', 'public');
+            }
+            $course->update($data);
+            return $course;
+        });
     }
 
-    public function update()
+    /**
+     * @throws Throwable
+     */
+    public function delete(Course $course): void
     {
-        //
-    }
-
-    public function destroy()
-    {
-        //
+        DB::transaction(function () use ($course) {
+            if ($course->image_url) {
+                Storage::disk('public')->delete($course->image_url);
+            }
+            $course->delete();
+        });
     }
 }

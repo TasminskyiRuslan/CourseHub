@@ -29,11 +29,6 @@ class UpdateCourseRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'type' => [
-                'required',
-                'string',
-                Rule::enum(CourseType::class),
-            ],
             'slug' => [
                 'nullable',
                 'string',

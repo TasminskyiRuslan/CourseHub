@@ -4,36 +4,30 @@ namespace App\DTO;
 
 use App\Enums\CourseType;
 use App\Http\Requests\Api\StoreCourseRequest;
-use App\Http\Requests\Api\UpdateCourseRequest;
-use Brick\Money\Exception\UnknownCurrencyException;
 use Brick\Money\Money;
 use Illuminate\Http\UploadedFile;
 
-final readonly class CourseDTO
+final readonly class CreateCourseDTO
 {
     public function __construct(
         public string        $title,
-        public ?CourseType   $type,
+        public CourseType    $type,
         public ?string       $slug,
         public ?string       $description,
         public Money         $price,
         public ?UploadedFile $image,
-    ) {}
+    )
+    {
+    }
 
-    /**
-     * @throws UnknownCurrencyException
-     */
-    public static function fromRequest(StoreCourseRequest|UpdateCourseRequest $request): self
+    public static function fromRequest(StoreCourseRequest $request): self
     {
         return new self(
             title: $request->string('title')->trim()->toString(),
             type: $request->enum('type', CourseType::class),
             slug: $request->string('slug')->trim()->toString() ?: null,
             description: $request->string('description')->trim()->toString() ?: null,
-            price: Money::of(
-                $request->string('price', '0.00')->toString(),
-                'USD'
-            ),
+            price: Money::of($request->string('price', '0.00')->toString(), 'USD'),
             image: $request->file('image'),
         );
     }
@@ -41,12 +35,12 @@ final readonly class CourseDTO
     public function toArray(): array
     {
         return array_filter([
-            'title'       => $this->title,
-            'type'        => $this->type?->value,
-            'slug'        => $this->slug,
+            'title' => $this->title,
+            'type' => $this->type->value,
+            'slug' => $this->slug,
             'description' => $this->description,
-            'price'       => (string) $this->price->getAmount()->toScale(2),
-            'image'       => $this->image,
+            'price' => (string)$this->price->getAmount()->toScale(2),
+            'image' => $this->image,
         ], fn($value) => !is_null($value));
     }
 }

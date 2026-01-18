@@ -16,6 +16,8 @@ use Spatie\Sluggable\SlugOptions;
 /**
  * @property mixed|null $type
  * @property mixed $user_id
+ * @property mixed $image_url
+ * @method where(string $string, true $true)
  */
 class Course extends Model
 {
@@ -95,7 +97,7 @@ class Course extends Model
 
     public function isVisibleFor(?User $user): bool
     {
-        return $this->is_published || ($user && ($user->isAdmin() || $user->isOwnerOf($this)));
+        return $this->is_published || ($user && ($user->isAdmin() || $user->isAuthorOf($this)));
     }
 
 //    public function isPublished(): bool

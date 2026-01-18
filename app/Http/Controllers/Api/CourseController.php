@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\DTO\CourseDTO;
+use App\DTO\CreateCourseDTO;
 use App\DTO\CourseFilterDTO;
+use App\DTO\UpdateCourseDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\CourseListRequest;
 use App\Http\Requests\Api\StoreCourseRequest;
+use App\Http\Requests\Api\UpdateCourseRequest;
 use App\Http\Resources\CourseResource;
 use App\Models\Course;
 use App\Services\CourseService;
-use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Throwable;
 
 class CourseController extends Controller
 {
@@ -29,16 +31,18 @@ class CourseController extends Controller
      */
     public function index(CourseListRequest $request)
     {
-        $result = $this->courseService->find(CourseFilterDTO::fromRequest($request));
+        $this->authorize('viewAny', Course::class);
+        $result = $this->courseService->search(CourseFilterDTO::fromRequest($request));
         return CourseResource::collection($result);
     }
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function store(StoreCourseRequest $request)
     {
-        $result = $this->courseService->store(CourseDTO::fromRequest($request), $request->user());
+        $this->authorize('create', Course::class);
+        $result = $this->courseService->create(CreateCourseDTO::fromRequest($request), $request->user());
         return response()->success(
             'Course created successfully.',
             new CourseResource($result),
@@ -51,26 +55,34 @@ class CourseController extends Controller
      */
     public function show(Course $course)
     {
-//        $this->authorize('view', Course::class);
-        $this->courseService->findOne($course);
+        $this->authorize('view', $course);
+        $course->loadMissing(['author', 'lessons.lessonable']);
         return new CourseResource($course);
     }
 
     /**
      * Update the specified resource in storage.
+     * @throws Throwable
      */
-    public function update(Request $request, Course $course)
+    public function update(UpdateCourseRequest $request, Course $course)
     {
-        $this->authorize('update', Course::class);
-//        $this->courseService->update();
+        $this->authorize('update', $course);
+        $result = $this->courseService->update(UpdateCourseDTO::fromRequest($request), $course);
+        $result->loadMissing(['author', 'lessons.lessonable']);
+        return response()->success(
+            'Course updated successfully.',
+            new CourseResource($result)
+        );
     }
 
     /**
      * Remove the specified resource from storage.
+     * @throws Throwable
      */
     public function destroy(Course $course)
     {
-        $this->authorize('delete', Course::class);
-//        $this->courseService->destroy();
+        $this->authorize('delete', $course);
+        $this->courseService->delete($course);
+        return response()->noContent();
     }
 }

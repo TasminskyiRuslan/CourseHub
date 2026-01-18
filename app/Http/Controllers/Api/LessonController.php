@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DTO\LessonDTO;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\StoreLessonRequest;
+use App\Http\Resources\LessonResource;
+use App\Models\Course;
 use App\Models\Lesson;
 use App\Services\LessonService;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class LessonController extends Controller
 {
@@ -25,10 +30,17 @@ class LessonController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * @throws \Throwable
      */
-    public function store(Request $request)
+    public function store(StoreLessonRequest $request, Course $course)
     {
-        //
+        $result = $this->lessonService->create($course, LessonDTO::fromRequest($request));
+
+        return response()->success(
+            'Lesson created successfully',
+            new LessonResource($result),
+            HttpResponse::HTTP_CREATED
+        );
     }
 
     /**

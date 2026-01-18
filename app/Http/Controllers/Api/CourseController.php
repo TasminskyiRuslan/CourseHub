@@ -10,9 +10,7 @@ use App\Http\Requests\Api\StoreCourseRequest;
 use App\Http\Resources\CourseResource;
 use App\Models\Course;
 use App\Services\CourseService;
-use Brick\Money\Exception\UnknownCurrencyException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -31,18 +29,15 @@ class CourseController extends Controller
      */
     public function index(CourseListRequest $request)
     {
-        $this->authorize('viewAny', Course::class);
         $result = $this->courseService->find(CourseFilterDTO::fromRequest($request));
         return CourseResource::collection($result);
     }
 
     /**
-     * Store a newly created resource in storage.
-     * @throws UnknownCurrencyException
+     * @throws \Throwable
      */
     public function store(StoreCourseRequest $request)
     {
-        $this->authorize('create', Course::class);
         $result = $this->courseService->store(CourseDTO::fromRequest($request), $request->user());
         return response()->success(
             'Course created successfully.',
@@ -56,7 +51,7 @@ class CourseController extends Controller
      */
     public function show(Course $course)
     {
-        $this->authorize('view', Course::class);
+//        $this->authorize('view', Course::class);
         $this->courseService->findOne($course);
         return new CourseResource($course);
     }

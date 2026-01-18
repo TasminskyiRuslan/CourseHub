@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('course_id')->constrained('courses')->cascadeOnDelete();
             $table->string('title');
+            $table->string('slug')->unique()->index();
             $table->integer('position')->default(0);
-            $table->unsignedBigInteger('contentable_id');
-            $table->string('contentable_type');
+            $table->morphs('lessonable');
             $table->timestamps();
         });
     }

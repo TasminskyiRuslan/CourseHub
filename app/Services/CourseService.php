@@ -15,10 +15,10 @@ class CourseService
     public function find(CourseFilterDTO $filters): LengthAwarePaginator
     {
         return Course::query()
-//            ->where('courses.is_published', true)
+            ->where('courses.is_published', true)
             ->filter($filters)
             ->sort($filters)
-            ->with(['author'])
+            ->with(['author', 'lessons'])
             ->paginate(config('courses.per_page'));
     }
 
@@ -43,7 +43,7 @@ class CourseService
         if (!$course->isVisibleFor($user)) {
             throw new ModelNotFoundException('Course not found.');
         }
-        return $course->load('author', 'lessons');
+        return $course->load('author', 'lessons.lessonable');
     }
 
     public function update()

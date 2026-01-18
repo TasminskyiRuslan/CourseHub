@@ -13,7 +13,7 @@ final readonly class CourseDTO
 {
     public function __construct(
         public string        $title,
-        public CourseType    $type,
+        public ?CourseType   $type,
         public ?string       $slug,
         public ?string       $description,
         public Money         $price,
@@ -26,24 +26,27 @@ final readonly class CourseDTO
     public static function fromRequest(StoreCourseRequest|UpdateCourseRequest $request): self
     {
         return new self(
-            title: $request->string('title')->trim(),
+            title: $request->string('title')->trim()->toString(),
             type: $request->enum('type', CourseType::class),
-            slug: $request->string('slug')->trim() ?: null,
-            description: $request->string('description')->trim() ?: null,
-            price: Money::of($request->string('price', '0.00'), 'USD'),
+            slug: $request->string('slug')->trim()->toString() ?: null,
+            description: $request->string('description')->trim()->toString() ?: null,
+            price: Money::of(
+                $request->string('price', '0.00')->toString(),
+                'USD'
+            ),
             image: $request->file('image'),
         );
     }
 
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'title'       => $this->title,
-            'type'        => $this->type->value,
+            'type'        => $this->type?->value,
             'slug'        => $this->slug,
             'description' => $this->description,
-            'price'       => $this->price->getAmount()->toScale(2),
+            'price'       => (string) $this->price->getAmount()->toScale(2),
             'image'       => $this->image,
-        ];
+        ], fn($value) => !is_null($value));
     }
 }

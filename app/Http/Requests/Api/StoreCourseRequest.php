@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api;
 
 use App\Enums\CourseType;
+use App\Models\Course;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -14,8 +15,7 @@ class StoreCourseRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
-    }
+        return $this->user()->can('create', Course::class);    }
 
     /**
      * Get the validation rules that apply to the request.

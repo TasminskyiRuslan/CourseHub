@@ -36,6 +36,8 @@ class CourseResource extends JsonResource
             'description' => $this->description,
             'price' => $this->price,
             'image_url' => $this->image_url,
+            'author' => new UserResource($this->whenLoaded('author')),
+            'lessons' => LessonResource::collection($this->whenLoaded('lessons')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

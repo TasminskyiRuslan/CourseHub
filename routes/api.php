@@ -4,7 +4,9 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\Auth\VerificationController;
 use App\Http\Controllers\Api\CourseController;
+use App\Http\Controllers\Api\LessonController; // <--- 1. Не забудьте імпортувати контролер
 use App\Models\Course;
+use App\Models\Lesson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -47,7 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Verified & Authorized Routes (Must be logged in, verified and teacher/admin)
+    | Verified & Authorized Routes
     |--------------------------------------------------------------------------
     */
     Route::middleware('verified')->group(function () {
@@ -61,6 +63,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
             Route::delete('/{course}', [CourseController::class, 'destroy'])
                 ->middleware('can:delete,course');
+
+            Route::post('/{course}/lessons', [LessonController::class, 'store'])
+                ->middleware('can:create,' . Lesson::class . ',course');
         });
 
     });

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('video_lessons', function (Blueprint $table) {
             $table->id();
             $table->string('video_url');
+            $table->string('provider')->default('youtube');
             $table->timestamps();
         });
     }

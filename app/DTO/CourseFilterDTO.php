@@ -21,8 +21,8 @@ final readonly class CourseFilterDTO
     {
         return new self(
             type: $request->enum('type', CourseType::class),
-            search: $request->string('search')->trim() ?: null,
-            author: $request->string('author')->trim() ?: null,
+            search: $request->string('search')->trim()->toString() ?: null,
+            author: $request->string('author')->trim()->toString() ?: null,
             sort: $request->enum('sort', CourseSortField::class),
             order: $request->enum('order', SortOrder::class),
         );
@@ -30,12 +30,12 @@ final readonly class CourseFilterDTO
 
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'type'   => $this->type?->value,
             'search' => $this->search,
             'author' => $this->author,
             'sort'   => $this->sort,
             'order'  => $this->order?->value,
-        ];
+        ], fn($value) => !is_null($value));
     }
 }

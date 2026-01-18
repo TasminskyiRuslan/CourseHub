@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class VideoLesson extends Model
 {
-    protected $fillable = ['video_url'];
+    protected $fillable = ['video_url', 'provider'];
 
     public function lesson(): MorphOne
     {
-        return $this->morphOne(Lesson::class, 'contentable');
+        return $this->morphOne(Lesson::class, 'lessonable');
     }
 }

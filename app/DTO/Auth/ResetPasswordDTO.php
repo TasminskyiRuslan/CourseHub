@@ -15,18 +15,18 @@ final readonly class ResetPasswordDTO
     public static function fromRequest(ResetPasswordRequest $request): self
     {
         return new self(
-            email: $request->string('email')->trim(),
-            password: $request->string('password'),
-            token: $request->string('token'),
+            email: $request->string('email')->trim()->toString(),
+            password: $request->string('password')->toString(),
+            token: $request->string('token')->toString(),
         );
     }
 
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'email'    => $this->email,
             'password' => $this->password,
             'token'    => $this->token,
-        ];
+        ], fn($value) => !is_null($value));
     }
 }

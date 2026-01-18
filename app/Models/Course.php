@@ -13,6 +13,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
+/**
+ * @property mixed|null $type
+ * @property mixed $user_id
+ */
 class Course extends Model
 {
     use HasSlug;
@@ -31,12 +35,12 @@ class Course extends Model
     protected function casts(): array
     {
         return [
-            'author_id' => 'integer',
             'price' => 'decimal:2',
             'type' => CourseType::class,
             'is_published' => 'boolean',
         ];
     }
+
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()

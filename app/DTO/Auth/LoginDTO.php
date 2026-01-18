@@ -15,18 +15,18 @@ final readonly class LoginDTO
     public static function fromRequest(LoginRequest $request): self
     {
         return new self(
-            email: $request->string('email')->trim(),
-            password: $request->string('password'),
+            email: $request->string('email')->trim()->toString(),
+            password: $request->string('password')->toString(),
             remember: $request->boolean('remember'),
         );
     }
 
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'email'    => $this->email,
             'password' => $this->password,
             'remember' => $this->remember,
-        ];
+        ], fn($value) => !is_null($value));
     }
 }

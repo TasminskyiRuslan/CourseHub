@@ -18,9 +18,9 @@ final readonly class RegisterDTO
     public static function fromRequest(RegisterRequest $request): self
     {
         return new self(
-            name: $request->string('name')->trim(),
-            email: $request->string('email')->trim(),
-            password: $request->string('password'),
+            name: $request->string('name')->trim()->toString(),
+            email: $request->string('email')->trim()->toString(),
+            password: $request->string('password')->toString(),
             role: $request->enum('role', UserRole::class) ?? UserRole::STUDENT,
             remember: $request->boolean('remember'),
         );
@@ -28,12 +28,12 @@ final readonly class RegisterDTO
 
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'name'     => $this->name,
             'email'    => $this->email,
             'password' => $this->password,
             'role'     => $this->role->value,
             'remember' => $this->remember,
-        ];
+        ], fn($value) => !is_null($value));
     }
 }

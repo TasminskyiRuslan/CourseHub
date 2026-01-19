@@ -2,6 +2,11 @@
 
 namespace App\Models;
 
+use App\DTO\CourseFilterDTO;
+use App\Enums\CourseSortField;
+use App\Enums\CourseType;
+use App\Enums\SortOrder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -56,5 +61,34 @@ class Lesson extends Model
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
+    }
+
+    public function scopeFilter(Builder $query, CourseFilterDTO $filters): void
+    {
+        $query
+            ->when($filters->type, fn(Builder $q, CourseType $type) => $q->where('type', $type))
+            ->when($filters->search, function (Builder $q, string $search) {
+                $q->where(function (Builder $sub) use ($search) {
+                    $sub->where('title', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
+            })
+            ->when($filters->author, function (Builder $q, string $slug) {
+                $q->whereHas('author', function (Builder $sub) use ($slug) {
+                    $sub->where('slug', $slug);
+                });
+            });
+    }
+
+    public function scopeSort(Builder $query, CourseFilterDTO $filters): void
+    {
+        if ($filters->sort instanceof CourseSortField) {
+            $query->orderBy(
+                $filters->sort->value,
+                $filters->order?->value ?? SortOrder::ASC->value
+            );
+        } else {
+            $query->latest();
+        }
     }
 }

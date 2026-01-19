@@ -8,21 +8,38 @@ use App\DTO\UpdateCourseDTO;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-  use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 use Throwable;
 
 class CourseService
 {
-    public function search(CourseFilterDTO $filters): LengthAwarePaginator
+    public function search(): LengthAwarePaginator
     {
-        return Course::query()
-            ->where('courses.is_published', true)
-            ->filter($filters)
-            ->sort($filters)
+        return QueryBuilder::for(Course::class)
+            ->allowedFilters([
+                'type',
+                AllowedFilter::callback('search', function ($query, $value) {
+                    $query->where(function ($q) use ($value) {
+                        $q->where('title', 'like', "%{$value}%")
+                            ->orWhere('description', 'like', "%{$value}%");
+                    });
+                }),
+                AllowedFilter::callback('author', function ($query, $value) {
+                    $query->whereHas('author', function ($q) use ($value) {
+                        $q->where('slug', $value);
+                    });
+                }),
+            ])
+            ->allowedSorts(['title', 'price', 'created_at'])
+            ->defaultSort('-created_at')
+            ->where('is_published', true)
             ->with(['author', 'lessons.lessonable'])
-            ->paginate(config('courses.per_page'));
+            ->paginate(config('pagination.courses_per_page'));
     }
+
 
     /**
      * @throws Throwable

@@ -3,15 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\DTO\CreateCourseDTO;
-use App\DTO\CourseFilterDTO;
 use App\DTO\UpdateCourseDTO;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\CourseListRequest;
 use App\Http\Requests\Api\StoreCourseRequest;
 use App\Http\Requests\Api\UpdateCourseRequest;
 use App\Http\Resources\CourseResource;
 use App\Models\Course;
 use App\Services\CourseService;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Throwable;
@@ -29,10 +28,10 @@ class CourseController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(CourseListRequest $request)
+    public function index(Request $request)
     {
         $this->authorize('viewAny', Course::class);
-        $result = $this->courseService->search(CourseFilterDTO::fromRequest($request));
+        $result = $this->courseService->search();
         return CourseResource::collection($result);
     }
 

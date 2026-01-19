@@ -66,42 +66,8 @@ class Course extends Model
         return $this->belongsTo(User::class, 'author_id');
     }
 
-    public function scopeFilter(Builder $query, CourseFilterDTO $filters): void
-    {
-        $query
-            ->when($filters->type, fn(Builder $q, CourseType $type) => $q->where('type', $type))
-            ->when($filters->search, function (Builder $q, string $search) {
-                $q->where(function (Builder $sub) use ($search) {
-                    $sub->where('title', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%");
-                });
-            })
-            ->when($filters->author, function (Builder $q, string $slug) {
-                $q->whereHas('author', function (Builder $sub) use ($slug) {
-                    $sub->where('slug', $slug);
-                });
-            });
-    }
-
-    public function scopeSort(Builder $query, CourseFilterDTO $filters): void
-    {
-        if ($filters->sort instanceof CourseSortField) {
-            $query->orderBy(
-                $filters->sort->value,
-                $filters->order?->value ?? SortOrder::ASC->value
-            );
-        } else {
-            $query->latest();
-        }
-    }
-
     public function isVisibleFor(?User $user): bool
     {
         return $this->is_published || ($user && ($user->isAdmin() || $user->isAuthorOf($this)));
     }
-
-//    public function isPublished(): bool
-//    {
-//        return $this->is_published;
-//    }
 }

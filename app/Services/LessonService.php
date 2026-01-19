@@ -9,15 +9,24 @@ use App\Models\Lesson;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\DB;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class LessonService
 {
-    public function search(CourseFilterDTO $filters, Course $course): LengthAwarePaginator
+    public function search(Course $course): LengthAwarePaginator
     {
-        return $course
-            ->lessons()
+        return QueryBuilder::for($course->lessons())
+            ->allowedFilters([
+                'type',
+                AllowedFilter::callback('search', function ($query, $value) {
+                    $query->orWhere('description', 'like', "%{$value}%");
+                }),
+            ])
+            ->allowedSorts(['title', 'position', 'created_at'])
+            ->defaultSort('position')
             ->with('lessonable')
-            ->paginate(config('courses.per_page'));
+            ->paginate(config('pagination.lessons_per_page'));
     }
 
     /**

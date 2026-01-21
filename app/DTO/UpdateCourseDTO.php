@@ -3,41 +3,39 @@
 namespace App\DTO;
 
 use App\Http\Requests\Api\UpdateCourseRequest; // Тільки UpdateRequest!
+use Brick\Money\Exception\UnknownCurrencyException;
 use Brick\Money\Money;
 use Illuminate\Http\UploadedFile;
 
 final readonly class UpdateCourseDTO
 {
     public function __construct(
-        public ?string       $title,
+        public string        $title,
         public ?string       $slug,
         public ?string       $description,
-        public ?Money        $price,
-        public ?UploadedFile $image,
+        public Money         $price,
     ) {}
 
+    /**
+     * @throws UnknownCurrencyException
+     */
     public static function fromRequest(UpdateCourseRequest $request): self
     {
         return new self(
-            title: $request->has('title') ? $request->string('title')->trim()->toString() : null,
-            slug: $request->has('slug') ? $request->string('slug')->trim()->toString() : null,
-            description: $request->has('description') ? $request->string('description')->trim()->toString() : null,
-            price: $request->has('price')
-                ? Money::of($request->string('price')->toString(), 'USD')
-                : null,
-            image: $request->file('image'),
+            title: $request->input('title'),
+            slug: $request->input('slug'),
+            description: $request->input('description'),
+            price: Money::of($request->input('price'), 'USD'),
         );
     }
 
     public function toArray(): array
     {
-
-        return array_filter([
+        return [
             'title'       => $this->title,
             'slug'        => $this->slug,
             'description' => $this->description,
-            'price'       => $this->price?->getAmount()->toScale(2),
-            'image'       => $this->image,
-        ], fn($value) => !is_null($value));
+            'price'       => $this->price->getAmount()->toScale(2),
+        ];
     }
 }

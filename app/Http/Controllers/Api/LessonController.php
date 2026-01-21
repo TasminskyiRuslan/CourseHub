@@ -53,16 +53,17 @@ class LessonController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Lesson $lesson)
+    public function show(Course $course, Lesson $lesson)
     {
         $this->authorize('view', $lesson);
-        //
+        $lesson->loadMissing('lessonable');
+        return new LessonResource($lesson);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Lesson $lesson)
+    public function update(Request $request, Course $course, Lesson $lesson)
     {
         $this->authorize('update', $lesson);
         //

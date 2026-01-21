@@ -55,7 +55,7 @@ class CourseController extends Controller
     public function show(Course $course)
     {
         $this->authorize('view', $course);
-        $course->loadMissing(['author', 'lessons.lessonable']);
+        $course->loadMissing(['author']);
         return new CourseResource($course);
     }
 
@@ -67,7 +67,7 @@ class CourseController extends Controller
     {
         $this->authorize('update', $course);
         $result = $this->courseService->update(UpdateCourseDTO::fromRequest($request), $course);
-        $result->loadMissing(['author', 'lessons.lessonable']);
+        $result->loadMissing(['author']);
         return response()->success(
             'Course updated successfully.',
             new CourseResource($result)

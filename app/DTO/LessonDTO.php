@@ -11,34 +11,34 @@ final readonly class LessonDTO
         public string $title,
         public ?string $slug,
         public ?int $position,
-        public ?DateTimeInterface $start_time = null,
-        public ?DateTimeInterface $end_time = null,
-        public ?string $address = null,
-        public ?string $room_number = null,
-        public ?string $meeting_link = null,
-        public ?string $video_url = null,
-        public ?string $provider = null,
+        public ?DateTimeInterface $start_time,
+        public ?DateTimeInterface $end_time,
+        public ?string $address,
+        public ?string $room_number,
+        public ?string $meeting_link,
+        public ?string $video_url,
+        public ?string $provider,
     ) {}
 
     public static function fromRequest(StoreLessonRequest $request): self
     {
         return new self(
-            title: $request->string('title')->trim()->toString(),
-            slug: $request->string('slug')->trim()->toString() ?: null,
-            position: $request->has('position') ? $request->integer('position') : null,
+            title: $request->input('title'),
+            slug: $request->input('slug'),
+            position: $request->input('position'),
             start_time: $request->date('start_time'),
             end_time:   $request->date('end_time'),
-            address:      $request->string('address')->trim()->toString() ?: null,
-            room_number:  $request->string('room_number')->trim()->toString() ?: null,
-            meeting_link: $request->string('meeting_link')->trim()->toString() ?: null,
-            video_url:    $request->string('video_url')->trim()->toString() ?: null,
-            provider:     $request->string('provider')->trim()->toString() ?: null,
+            address:      $request->input('address'),
+            room_number:  $request->input('room_number'),
+            meeting_link: $request->input('meeting_link'),
+            video_url:    $request->input('video_url'),
+            provider:     $request->input('provider'),
         );
     }
 
     public function toArray(): array
     {
-        return array_filter([
+        return [
             'title'       => $this->title,
             'slug'        => $this->slug,
             'position'    => $this->position,
@@ -49,6 +49,6 @@ final readonly class LessonDTO
             'meeting_link'=> $this->meeting_link,
             'video_url'   => $this->video_url,
             'provider'    => $this->provider,
-        ], fn($value) => !is_null($value));
+        ];
     }
 }

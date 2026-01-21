@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
+use Throwable;
 
 class LessonService
 {
@@ -30,7 +31,7 @@ class LessonService
     }
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function create(Course $course, LessonDTO $dto): Lesson
     {

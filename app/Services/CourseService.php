@@ -36,7 +36,7 @@ class CourseService
             ->allowedSorts(['title', 'price', 'created_at'])
             ->defaultSort('-created_at')
             ->where('is_published', true)
-            ->with(['author', 'lessons.lessonable'])
+            ->with(['author'])
             ->paginate(config('pagination.courses_per_page'));
     }
 
@@ -48,9 +48,9 @@ class CourseService
     {
         return DB::transaction(function () use ($dto, $author) {
             $data = $dto->toArray();
-            if ($dto->image) {
-                $data['image_url'] = $dto->image->store('courses', 'public');
-            }
+//            if ($dto->image) {
+//                $data['image_url'] = $dto->image->store('courses', 'public');
+//            }
             return $author->courses()->create($data);
         });
     }
@@ -62,12 +62,12 @@ class CourseService
     {
         return DB::transaction(function () use ($dto, $course) {
             $data = $dto->toArray();
-            if ($dto->image) {
-                if ($course->image_url) {
-                    Storage::disk('public')->delete($course->image_url);
-                }
-                $data['image_url'] = $dto->image->store('courses', 'public');
-            }
+//            if ($dto->image) {
+//                if ($course->image_url) {
+//                    Storage::disk('public')->delete($course->image_url);
+//                }
+//                $data['image_url'] = $dto->image->store('courses', 'public');
+//            }
             $course->update($data);
             return $course;
         });

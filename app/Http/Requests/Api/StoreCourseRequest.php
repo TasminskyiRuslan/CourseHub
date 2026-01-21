@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Api;
 
 use App\Enums\CourseType;
-use App\Models\Course;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -18,6 +17,25 @@ class StoreCourseRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $data = [];
+
+        if ($this->has('title')) {
+            $data['title'] = $this->string('title')->trim()->toString();
+        }
+
+        if ($this->has('slug')) {
+            $data['slug'] = $this->string('slug')->trim()->toString() ?: null;
+        }
+
+        if ($this->has('description')) {
+            $data['description'] = $this->string('description')->trim()->toString() ?: null;
+        }
+
+        $this->merge($data);
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -30,8 +48,7 @@ class StoreCourseRequest extends FormRequest
             'type' => ['required', 'string', Rule::enum(CourseType::class)],
             'slug' => ['nullable', 'string', 'max:255', 'unique:courses,slug'],
             'description' => ['nullable', 'string'],
-            'price' => ['nullable', 'numeric', 'min:0', 'max:99999999.99', 'decimal:0,2'],
-            'image' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'price' => ['required', 'numeric', 'min:0', 'max:99999999.99', 'decimal:0,2'],
         ];
     }
 }

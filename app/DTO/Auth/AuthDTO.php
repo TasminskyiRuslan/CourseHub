@@ -15,10 +15,10 @@ final readonly class AuthDTO
 
     public function toArray(): array
     {
-        return array_filter([
+        return [
             'user'       => $this->user,
             'token'      => $this->token,
             'expires_at' => $this->expiresAt,
-        ], fn($value) => !is_null($value));
+        ];
     }
 }

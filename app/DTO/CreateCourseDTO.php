@@ -4,8 +4,8 @@ namespace App\DTO;
 
 use App\Enums\CourseType;
 use App\Http\Requests\Api\StoreCourseRequest;
+use Brick\Money\Exception\UnknownCurrencyException;
 use Brick\Money\Money;
-use Illuminate\Http\UploadedFile;
 
 final readonly class CreateCourseDTO
 {
@@ -15,32 +15,32 @@ final readonly class CreateCourseDTO
         public ?string       $slug,
         public ?string       $description,
         public Money         $price,
-        public ?UploadedFile $image,
     )
     {
     }
 
+    /**
+     * @throws UnknownCurrencyException
+     */
     public static function fromRequest(StoreCourseRequest $request): self
     {
         return new self(
-            title: $request->string('title')->trim()->toString(),
+            title: $request->input('title'),
             type: $request->enum('type', CourseType::class),
-            slug: $request->string('slug')->trim()->toString() ?: null,
-            description: $request->string('description')->trim()->toString() ?: null,
-            price: Money::of($request->string('price', '0.00')->toString(), 'USD'),
-            image: $request->file('image'),
+            slug: $request->input('slug'),
+            description: $request->input('description'),
+            price: Money::of($request->input('price'), 'USD'),
         );
     }
 
     public function toArray(): array
     {
-        return array_filter([
-            'title' => $this->title,
-            'type' => $this->type->value,
-            'slug' => $this->slug,
+        return [
+            'title'       => $this->title,
+            'type'        => $this->type->value,
+            'slug'        => $this->slug,
             'description' => $this->description,
-            'price' => (string)$this->price->getAmount()->toScale(2),
-            'image' => $this->image,
-        ], fn($value) => !is_null($value));
+            'price'       => $this->price->getAmount()->toScale(2),
+        ];
     }
 }

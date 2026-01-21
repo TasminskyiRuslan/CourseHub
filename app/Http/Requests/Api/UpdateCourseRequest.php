@@ -7,9 +7,6 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-/**
- * @property mixed $course
- */
 class UpdateCourseRequest extends FormRequest
 {
     /**
@@ -20,6 +17,24 @@ class UpdateCourseRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $data = [];
+
+        if ($this->has('title')) {
+            $data['title'] = $this->string('title')->trim()->toString();
+        }
+
+        if ($this->has('slug')) {
+            $data['slug'] = $this->string('slug')->trim()->toString() ?: null;
+        }
+
+        if ($this->has('description')) {
+            $data['description'] = $this->string('description')->trim()->toString() ?: null;
+        }
+
+        $this->merge($data);
+    }
     /**
      * Get the validation rules that apply to the request.
      *
@@ -30,14 +45,14 @@ class UpdateCourseRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'slug' => [
+                'present',
                 'nullable',
                 'string',
                 'max:255',
-                Rule::unique('courses', 'slug')->ignore($this->course),
+                Rule::unique('courses', 'slug')->ignore($this->route('course')),
             ],
-            'description' => ['nullable', 'string'],
-            'price' => ['nullable', 'numeric', 'min:0', 'max:99999999.99', 'decimal:0,2'],
-            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'description' => ['present', 'nullable', 'string'],
+            'price' => ['required', 'numeric', 'min:0', 'max:99999999.99', 'decimal:0,2'],
         ];
     }
 }

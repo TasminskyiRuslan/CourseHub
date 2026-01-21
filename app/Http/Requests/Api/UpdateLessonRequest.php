@@ -3,13 +3,11 @@
 namespace App\Http\Requests\Api;
 
 use App\Enums\CourseType;
-use App\Models\Course;
-use App\Models\Lesson;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreLessonRequest extends FormRequest
+class UpdateLessonRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -65,54 +63,69 @@ class StoreLessonRequest extends FormRequest
      */
     public function rules(): array
     {
-        $course = $this->route('course');
+        $lesson = $this->route('lesson');
+        $course = $lesson->course;
 
         $isOffline = $course->type === CourseType::OFFLINE;
-        $isOnline  = $course->type === CourseType::ONLINE;
-        $isVideo   = $course->type === CourseType::VIDEO;
+        $isOnline = $course->type === CourseType::ONLINE;
+        $isVideo = $course->type === CourseType::VIDEO;
 
         return [
             'title' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', Rule::unique('lessons', 'slug')->where('course_id', $course->id)],
-            'position' => ['nullable', 'integer', 'min:0'],
+            'slug' => [
+                'present',
+                'nullable',
+                'string',
+                'max:255',
+                Rule::unique('lessons', 'slug')
+                    ->where('course_id', $lesson->course_id)
+                    ->ignore($lesson)
+            ],
+            'position' => ['present', 'nullable', 'integer', 'min:0'],
             'start_time' => [
                 Rule::prohibitedIf(!($isOffline || $isOnline)),
+                'present',
                 'nullable',
                 'date',
-                'after_or_equal:today',
             ],
             'end_time' => [
                 Rule::prohibitedIf(!($isOffline || $isOnline)),
+                'present',
                 'nullable',
                 'date',
                 'after:start_time',
             ],
             'address' => [
                 Rule::prohibitedIf(!$isOffline),
+                'present',
                 'nullable',
                 'string',
                 'max:255',
             ],
             'room_number' => [
                 Rule::prohibitedIf(!$isOffline),
+                'present',
                 'nullable',
                 'string',
                 'max:50',
             ],
             'meeting_link' => [
                 Rule::prohibitedIf(!$isOnline),
+                'present',
                 'nullable',
                 'url',
                 'max:2048',
             ],
             'video_url' => [
                 Rule::prohibitedIf(!$isVideo),
+                'present',
                 'nullable',
                 'url',
                 'max:2048',
             ],
             'provider' => [
-                Rule::prohibitedIf(! $isVideo),
+                Rule::prohibitedIf(!$isVideo),
+                'present',
                 'nullable',
                 'string',
                 'max:50',

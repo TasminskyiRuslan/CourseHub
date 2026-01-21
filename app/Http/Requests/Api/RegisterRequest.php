@@ -15,7 +15,30 @@ class RegisterRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return !$this->user('sanctum');
+        return true;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $data = [];
+
+        if ($this->has('name')) {
+            $data['name'] = $this->string('name')->trim()->toString();
+        }
+
+        if ($this->has('email')) {
+            $data['email'] = $this->string('email')->trim()->toString();
+        }
+
+        if ($this->has('role')) {
+            $data['role'] = $this->string('role')->trim()->toString();
+        }
+
+        if ($this->has('remember')) {
+            $data['remember'] = $this->boolean('remember');
+        }
+
+        $this->merge($data);
     }
 
     /**
@@ -30,11 +53,10 @@ class RegisterRequest extends FormRequest
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'confirmed', Password::min(8)],
             'role' => [
-                'nullable',
-                'string',
+                'required',
                 Rule::enum(UserRole::class)->only([UserRole::STUDENT, UserRole::TEACHER]),
             ],
-            'remember' => ['sometimes', 'boolean'],
+            'remember' => ['required', 'boolean'],
         ];
     }
 }

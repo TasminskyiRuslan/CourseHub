@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\DTO\LessonDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\StoreLessonRequest;
+use App\Http\Requests\Api\UpdateLessonRequest;
 use App\Http\Resources\LessonResource;
 use App\Models\Course;
 use App\Models\Lesson;
@@ -56,17 +57,21 @@ class LessonController extends Controller
     public function show(Course $course, Lesson $lesson)
     {
         $this->authorize('view', $lesson);
-        $lesson->loadMissing('lessonable');
-        return new LessonResource($lesson);
+        return new LessonResource($lesson->loadMissing('lessonable'));
     }
 
     /**
      * Update the specified resource in storage.
+     * @throws Throwable
      */
-    public function update(Request $request, Course $course, Lesson $lesson)
+    public function update(UpdateLessonRequest $request, Course $course, Lesson $lesson)
     {
         $this->authorize('update', $lesson);
-        //
+        $result = $this->lessonService->update($lesson, LessonDTO::fromRequest($request));
+        return response()->success(
+            'Lesson updated successfully',
+            new LessonResource($result)
+        );
     }
 
     /**

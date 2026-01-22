@@ -28,7 +28,7 @@ class CourseController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
         $this->authorize('viewAny', Course::class);
         $result = $this->courseService->search();
@@ -55,8 +55,7 @@ class CourseController extends Controller
     public function show(Course $course)
     {
         $this->authorize('view', $course);
-        $course->loadMissing(['author']);
-        return new CourseResource($course);
+        return new CourseResource($course->loadMissing('author'));
     }
 
     /**
@@ -67,7 +66,6 @@ class CourseController extends Controller
     {
         $this->authorize('update', $course);
         $result = $this->courseService->update(UpdateCourseDTO::fromRequest($request), $course);
-        $result->loadMissing(['author']);
         return response()->success(
             'Course updated successfully.',
             new CourseResource($result)

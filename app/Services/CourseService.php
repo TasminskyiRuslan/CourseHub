@@ -40,7 +40,7 @@ class CourseService
             ->allowedSorts(['title', 'price', 'created_at'])
             ->defaultSort('-created_at')
             ->where('is_published', true)
-            ->with(['author'])
+            ->with('author')
             ->paginate(config('pagination.courses_per_page'));
     }
 
@@ -50,7 +50,8 @@ class CourseService
      */
     public function create(CreateCourseDTO $dto, User $author): Course
     {
-        return $author->courses()->create($dto->toArray());
+        $course = $author->courses()->create($dto->toArray());
+        return $course->load('author');
     }
 
     /**
@@ -59,7 +60,7 @@ class CourseService
     public function update(UpdateCourseDTO $dto, Course $course): Course
     {
         $course->update($dto->toArray());
-        return $course;
+        return $course->fresh('author');
     }
 
     /**

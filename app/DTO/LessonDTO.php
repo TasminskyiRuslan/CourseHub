@@ -3,6 +3,7 @@
 namespace App\DTO;
 
 use App\Http\Requests\Api\StoreLessonRequest;
+use App\Http\Requests\Api\UpdateLessonRequest;
 use DateTimeInterface;
 
 final readonly class LessonDTO
@@ -20,7 +21,7 @@ final readonly class LessonDTO
         public ?string $provider,
     ) {}
 
-    public static function fromRequest(StoreLessonRequest $request): self
+    public static function fromRequest(StoreLessonRequest|UpdateLessonRequest $request): self
     {
         return new self(
             title: $request->input('title'),

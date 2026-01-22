@@ -2,11 +2,6 @@
 
 namespace App\Models;
 
-use App\DTO\CourseFilterDTO;
-use App\Enums\CourseSortField;
-use App\Enums\CourseType;
-use App\Enums\SortOrder;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -15,6 +10,7 @@ use Spatie\Sluggable\SlugOptions;
 
 /**
  * @property mixed $course
+ * @property mixed $lessonable
  */
 class Lesson extends Model
 {

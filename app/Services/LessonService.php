@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\DTO\CourseFilterDTO;
 use App\DTO\LessonDTO;
 use App\Models\Course;
 use App\Models\Lesson;
@@ -42,7 +41,20 @@ class LessonService
             $lesson = $course->lessons()->make($data);
             $lesson->lessonable()->associate($lessonContent);
             $lesson->save();
-            return $lesson;
+            return $lesson->load('lessonable');
+        });
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function update(Lesson $lesson, LessonDTO $dto): Lesson
+    {
+        return DB::transaction(function () use ($lesson, $dto) {
+            $data = $dto->toArray();
+            $lesson->update($data);
+            $lesson->lessonable->update($data);
+            return $lesson->fresh('lessonable');
         });
     }
 }

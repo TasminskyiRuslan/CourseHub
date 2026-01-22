@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\Auth\VerificationController;
 use App\Http\Controllers\Api\CourseController;
+use App\Http\Controllers\Api\CourseImageController;
 use App\Http\Controllers\Api\LessonController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -58,6 +59,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [CourseController::class, 'store']);
         Route::put('/{course}', [CourseController::class, 'update']);
         Route::delete('/{course}', [CourseController::class, 'destroy']);
+
+        Route::post('/{course}/image', [CourseImageController::class, 'store']);
+        Route::delete('/{course}/image', [CourseImageController::class, 'destroy']);
 
         Route::prefix('/{course}/lessons')->group(function () {
             Route::post('/', [LessonController::class, 'store']);

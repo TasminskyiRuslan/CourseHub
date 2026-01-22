@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @property mixed $id
@@ -13,7 +14,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $slug
  * @property mixed $description
  * @property mixed $price
- * @property mixed $image_url
+ * @property mixed $image_path
  * @property mixed $created_at
  * @property mixed $updated_at
  */
@@ -35,9 +36,8 @@ class CourseResource extends JsonResource
             'slug' => $this->slug,
             'description' => $this->description,
             'price' => $this->price,
-            'image_url' => $this->image_url,
+            'image_path' => $this->image_path ? Storage::disk('public')->url($this->image_path) : null,
             'author' => new UserResource($this->whenLoaded('author')),
-            'lessons' => LessonResource::collection($this->whenLoaded('lessons')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

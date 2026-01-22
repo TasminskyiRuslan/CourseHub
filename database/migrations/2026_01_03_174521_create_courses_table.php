@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('slug')->unique()->index();
             $table->string('description')->nullable();
             $table->decimal('price', 10, 2)->default(0);
-            $table->string('image_url')->nullable();
+            $table->string('image_path')->nullable();
             $table->string('type')->index();
             $table->boolean('is_published')->default(false);
             $table->timestamps();

@@ -3,19 +3,23 @@
 namespace App\Services;
 
 use App\DTO\CreateCourseDTO;
-use App\DTO\CourseFilterDTO;
 use App\DTO\UpdateCourseDTO;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Throwable;
 
 class CourseService
 {
+    public function __construct(
+        protected CourseImageService $imageService,
+    )
+    {
+    }
+
     public function search(): LengthAwarePaginator
     {
         return QueryBuilder::for(Course::class)
@@ -46,13 +50,7 @@ class CourseService
      */
     public function create(CreateCourseDTO $dto, User $author): Course
     {
-        return DB::transaction(function () use ($dto, $author) {
-            $data = $dto->toArray();
-//            if ($dto->image) {
-//                $data['image_url'] = $dto->image->store('courses', 'public');
-//            }
-            return $author->courses()->create($data);
-        });
+        return $author->courses()->create($dto->toArray());
     }
 
     /**
@@ -60,17 +58,8 @@ class CourseService
      */
     public function update(UpdateCourseDTO $dto, Course $course): Course
     {
-        return DB::transaction(function () use ($dto, $course) {
-            $data = $dto->toArray();
-//            if ($dto->image) {
-//                if ($course->image_url) {
-//                    Storage::disk('public')->delete($course->image_url);
-//                }
-//                $data['image_url'] = $dto->image->store('courses', 'public');
-//            }
-            $course->update($data);
-            return $course;
-        });
+        $course->update($dto->toArray());
+        return $course;
     }
 
     /**
@@ -79,9 +68,7 @@ class CourseService
     public function delete(Course $course): void
     {
         DB::transaction(function () use ($course) {
-            if ($course->image_url) {
-                Storage::disk('public')->delete($course->image_url);
-            }
+            $this->imageService->delete($course);
             $course->delete();
         });
     }

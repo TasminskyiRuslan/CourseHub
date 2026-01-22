@@ -2,11 +2,7 @@
 
 namespace App\Models;
 
-use App\DTO\CourseFilterDTO;
-use App\Enums\CourseSortField;
 use App\Enums\CourseType;
-use App\Enums\SortOrder;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,7 +12,7 @@ use Spatie\Sluggable\SlugOptions;
 /**
  * @property mixed|null $type
  * @property mixed $user_id
- * @property mixed $image_url
+ * @property mixed $image_path
  * @method where(string $string, true $true)
  */
 class Course extends Model
@@ -30,7 +26,7 @@ class Course extends Model
         'description',
         'price',
         'type',
-        'image_url',
+        'image_path',
         'is_published'
     ];
 

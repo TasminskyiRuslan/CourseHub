@@ -16,11 +16,11 @@ class LessonService
 {
     public function search(Course $course): LengthAwarePaginator
     {
-        return QueryBuilder::for($course->lessons())
+        return QueryBuilder::for(Lesson::class)
+            ->where('course_id', $course->id)
             ->allowedFilters([
-                'type',
                 AllowedFilter::callback('search', function ($query, $value) {
-                    $query->orWhere('description', 'like', "%{$value}%");
+                    $query->where('title', 'like', "%{$value}%");
                 }),
             ])
             ->allowedSorts(['title', 'position', 'created_at'])
@@ -55,6 +55,17 @@ class LessonService
             $lesson->update($data);
             $lesson->lessonable->update($data);
             return $lesson->fresh('lessonable');
+        });
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function delete(Lesson $lesson): void
+    {
+        DB::transaction(function () use ($lesson) {
+            $lesson->lessonable()->delete();
+            $lesson->delete();
         });
     }
 }

@@ -13,6 +13,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property mixed|null $type
  * @property mixed $user_id
  * @property mixed $image_path
+ * @property mixed $id
  * @method where(string $string, true $true)
  */
 class Course extends Model

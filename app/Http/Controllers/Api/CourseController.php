@@ -10,7 +10,6 @@ use App\Http\Requests\Api\UpdateCourseRequest;
 use App\Http\Resources\CourseResource;
 use App\Models\Course;
 use App\Services\CourseService;
-use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Throwable;

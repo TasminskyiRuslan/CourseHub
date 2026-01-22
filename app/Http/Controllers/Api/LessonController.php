@@ -76,10 +76,12 @@ class LessonController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     * @throws Throwable
      */
-    public function destroy(Lesson $lesson)
+    public function destroy(Course $course, Lesson $lesson)
     {
         $this->authorize('delete', $lesson);
-        //
+        $this->lessonService->delete($lesson);
+        return response()->noContent();
     }
 }

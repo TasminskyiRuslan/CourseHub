@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\Auth\VerificationController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\CourseImageController;
+use App\Http\Controllers\Api\CoursePublishController;
 use App\Http\Controllers\Api\LessonController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('auth')->group(function () {
+Route::prefix('/auth')->group(function () {
     Route::middleware('guest:sanctum')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login', [AuthController::class, 'login']);
@@ -28,7 +29,7 @@ Route::prefix('auth')->group(function () {
         ->name('verification.verify');
 });
 
-Route::prefix('courses')->group(function () {
+Route::prefix('/courses')->group(function () {
     Route::get('/', [CourseController::class, 'index']);
     Route::get('/{course}', [CourseController::class, 'show']);
 
@@ -45,8 +46,8 @@ Route::prefix('courses')->group(function () {
 */
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::prefix('auth')->group(function () {
-        Route::get('/me', fn (Request $request) => $request->user());
+    Route::prefix('/auth')->group(function () {
+        Route::get('/me', fn(Request $request) => $request->user());
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::delete('/tokens', [AuthController::class, 'logoutAll']);
 
@@ -57,16 +58,22 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('verified')->prefix('courses')->group(function () {
         Route::post('/', [CourseController::class, 'store']);
-        Route::put('/{course}', [CourseController::class, 'update']);
-        Route::delete('/{course}', [CourseController::class, 'destroy']);
+        Route::prefix('/{course}')->group(function () {
+            Route::put('/', [CourseController::class, 'update']);
+            Route::delete('/', [CourseController::class, 'destroy']);
 
-        Route::post('/{course}/image', [CourseImageController::class, 'store']);
-        Route::delete('/{course}/image', [CourseImageController::class, 'destroy']);
+            Route::post('/image', [CourseImageController::class, 'store']);
+            Route::delete('/image', [CourseImageController::class, 'destroy']);
 
-        Route::prefix('/{course}/lessons')->group(function () {
-            Route::post('/', [LessonController::class, 'store']);
+            Route::patch('/publish', [CoursePublishController::class, 'publish']);
+            Route::patch('/unpublish', [CoursePublishController::class, 'unpublish']);
+
+            Route::prefix('/lessons')->group(function () {
+                Route::post('/', [LessonController::class, 'store']);
                 Route::put('/{lesson}', [LessonController::class, 'update'])->scopeBindings();
                 Route::delete('/{lesson}', [LessonController::class, 'destroy'])->scopeBindings();
+            });
         });
+
     });
 });

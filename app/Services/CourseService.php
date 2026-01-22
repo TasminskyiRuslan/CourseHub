@@ -73,4 +73,14 @@ class CourseService
             $course->delete();
         });
     }
+
+    public function publish(Course $course): void
+    {
+        $course->update(['is_published' => true]);
+    }
+
+    public function unpublish(Course $course): void
+    {
+        $course->update(['is_published' => false]);
+    }
 }

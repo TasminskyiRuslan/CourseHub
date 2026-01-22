@@ -15,9 +15,10 @@ use Illuminate\Support\Facades\Storage;
  * @property mixed $description
  * @property mixed $price
  * @property mixed $image_path
+ * @property mixed $author
+ * @property mixed $is_published
  * @property mixed $created_at
  * @property mixed $updated_at
- * @property mixed $author
  */
 class CourseResource extends JsonResource
 {
@@ -41,6 +42,7 @@ class CourseResource extends JsonResource
             'author' => $this->whenLoaded('author', function () {
                 return $this->author->toResource();
             }),
+            'is_published' => $this->is_published,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

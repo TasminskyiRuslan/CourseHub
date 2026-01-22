@@ -11,7 +11,6 @@ use App\Models\Course;
 use App\Models\Lesson;
 use App\Services\LessonService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Throwable;
 

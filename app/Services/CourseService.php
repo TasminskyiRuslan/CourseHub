@@ -7,7 +7,9 @@ use App\DTO\UpdateCourseDTO;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Throwable;
@@ -69,9 +71,44 @@ class CourseService
     public function delete(Course $course): void
     {
         DB::transaction(function () use ($course) {
-            $this->imageService->delete($course);
+            $this->deleteImage($course);
             $course->delete();
         });
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function uploadImage(Course $course, UploadedFile $image): Course
+    {
+        $oldImagePath = $course->image_path;
+        $path = $image->store('courses', 'public');
+
+        try {
+            DB::transaction(function () use ($course, $path) {
+                $course->update(['image_path' => $path]);
+            });
+        } catch (Throwable $exception) {
+            Storage::disk('public')->delete($path);
+            throw $exception;
+        }
+
+        if ($oldImagePath) {
+            Storage::disk('public')->delete($oldImagePath);
+        }
+
+        return $course;
+    }
+
+    public function deleteImage(Course $course): void
+    {
+        $imagePath = $course->image_path;
+        if(!$imagePath) {
+            return;
+        }
+
+        $course->update(['image_path' => null]);
+        Storage::disk('public')->delete($imagePath);
     }
 
     public function publish(Course $course): void

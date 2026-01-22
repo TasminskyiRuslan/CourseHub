@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Contracts\HasResource;
 use App\Http\Resources\VideoLessonResource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;

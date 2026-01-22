@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
+use App\Http\Resources\UserResource;
 use App\Notifications\QueuedVerifyEmailNotification;
 use App\Notifications\ResetPasswordNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Sluggable\HasSlug;
@@ -78,5 +80,12 @@ class User extends Authenticatable implements MustVerifyEmail
     }
     public function isAuthorOf(Course $course): bool {
         return $this->is($course->author);
+    }
+
+    public function toResource(?string $resourceClass = null): JsonResource
+    {
+        return $resourceClass
+            ? new $resourceClass($this)
+            : new UserResource($this);
     }
 }

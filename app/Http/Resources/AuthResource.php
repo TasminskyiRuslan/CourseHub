@@ -20,7 +20,7 @@ class AuthResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'user' => new UserResource($this->user),
+            'user' => $this->user->toResource(),
             'access_token' => $this->token,
             'token_type' => 'Bearer',
             'expires_at' => $this->expiresAt,

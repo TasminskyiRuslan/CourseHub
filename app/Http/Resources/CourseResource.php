@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Storage;
  * @property mixed $image_path
  * @property mixed $created_at
  * @property mixed $updated_at
+ * @property mixed $author
  */
 class CourseResource extends JsonResource
 {
@@ -37,7 +38,9 @@ class CourseResource extends JsonResource
             'description' => $this->description,
             'price' => $this->price,
             'image_path' => $this->image_path ? Storage::disk('public')->url($this->image_path) : null,
-            'author' => new UserResource($this->whenLoaded('author')),
+            'author' => $this->whenLoaded('author', function () {
+                return $this->author->toResource();
+            }),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

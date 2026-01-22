@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use App\Enums\CourseType;
+use App\Http\Resources\CourseResource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
@@ -66,5 +68,12 @@ class Course extends Model
     public function isVisibleFor(?User $user): bool
     {
         return $this->is_published || ($user && ($user->isAdmin() || $user->isAuthorOf($this)));
+    }
+
+    public function toResource(?string $resourceClass = null): JsonResource
+    {
+        return $resourceClass
+            ? new $resourceClass($this)
+            : new CourseResource($this);
     }
 }

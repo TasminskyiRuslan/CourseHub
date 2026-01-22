@@ -43,7 +43,7 @@ class CourseController extends Controller
         $result = $this->courseService->create(CreateCourseDTO::fromRequest($request), $request->user());
         return response()->success(
             'Course created successfully.',
-            new CourseResource($result),
+            $result->toResource(),
             HttpResponse::HTTP_CREATED
         );
     }
@@ -54,7 +54,7 @@ class CourseController extends Controller
     public function show(Course $course)
     {
         $this->authorize('view', $course);
-        return new CourseResource($course->loadMissing('author'));
+        return $course->loadMissing('author')->toResource();
     }
 
     /**
@@ -67,7 +67,7 @@ class CourseController extends Controller
         $result = $this->courseService->update(UpdateCourseDTO::fromRequest($request), $course);
         return response()->success(
             'Course updated successfully.',
-            new CourseResource($result)
+            $result->toResource()
         );
     }
 

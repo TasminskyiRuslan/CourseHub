@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Contracts\HasResource;
+use App\Http\Resources\LessonResource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
@@ -58,5 +61,12 @@ class Lesson extends Model
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
+    }
+
+    public function toResource(?string $resourceClass = null): JsonResource
+    {
+        return $resourceClass
+            ? new $resourceClass($this)
+            : new LessonResource($this);
     }
 }

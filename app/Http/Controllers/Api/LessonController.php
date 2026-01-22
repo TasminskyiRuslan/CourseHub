@@ -46,7 +46,7 @@ class LessonController extends Controller
 
         return response()->success(
             'Lesson created successfully',
-            new LessonResource($result),
+            $result->toResource(),
             HttpResponse::HTTP_CREATED
         );
     }
@@ -57,7 +57,7 @@ class LessonController extends Controller
     public function show(Course $course, Lesson $lesson)
     {
         $this->authorize('view', $lesson);
-        return new LessonResource($lesson->loadMissing('lessonable'));
+        return $lesson->loadMissing('lessonable')->toResource();
     }
 
     /**
@@ -70,7 +70,7 @@ class LessonController extends Controller
         $result = $this->lessonService->update($lesson, LessonDTO::fromRequest($request));
         return response()->success(
             'Lesson updated successfully',
-            new LessonResource($result)
+            $result->toResource()
         );
     }
 

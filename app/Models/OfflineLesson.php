@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Contracts\HasResource;
+use App\Http\Resources\OfflineLessonResource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class OfflineLesson extends Model
 {
@@ -20,4 +23,12 @@ class OfflineLesson extends Model
     {
         return $this->morphOne(Lesson::class, 'lessonable');
     }
+
+    public function toResource(?string $resourceClass = null): JsonResource
+    {
+        return $resourceClass
+            ? new $resourceClass($this)
+            : new OfflineLessonResource($this);
+    }
+
 }

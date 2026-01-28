@@ -2,7 +2,7 @@
 
 namespace App\DTO\Auth;
 
-use App\Http\Requests\Api\LoginRequest;
+use App\Http\Requests\Api\Auth\LoginRequest;
 
 final readonly class LoginDTO
 {
@@ -17,7 +17,7 @@ final readonly class LoginDTO
         return new self(
             email: $request->input('email'),
             password: $request->input('password'),
-            remember: $request->input('remember'),
+            remember: $request->boolean('remember'),
         );
     }
 

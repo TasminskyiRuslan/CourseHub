@@ -3,11 +3,9 @@
 namespace App\Models;
 
 use App\Enums\CourseType;
-use App\Http\Resources\CourseResource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
@@ -42,6 +40,18 @@ class Course extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::deleting(function (Course $course) {
+            $course->lessons->each->delete();
+        });
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
@@ -50,14 +60,9 @@ class Course extends Model
             ->doNotGenerateSlugsOnUpdate();
     }
 
-    public function getRouteKeyName(): string
-    {
-        return 'slug';
-    }
-
     public function lessons(): HasMany
     {
-        return $this->hasMany(Lesson::class)->orderBy('position');
+        return $this->hasMany(Lesson::class);
     }
 
     public function author(): BelongsTo
@@ -70,10 +75,13 @@ class Course extends Model
         return $this->is_published || ($user && ($user->isAdmin() || $user->isAuthorOf($this)));
     }
 
-    public function toResource(?string $resourceClass = null): JsonResource
+    public function publish(): void
     {
-        return $resourceClass
-            ? new $resourceClass($this)
-            : new CourseResource($this);
+        $this->is_published = true;
+    }
+
+    public function unpublish(): void
+    {
+        $this->is_published = false;
     }
 }

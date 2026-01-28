@@ -2,7 +2,7 @@
 
 namespace App\DTO\Auth;
 
-use App\Http\Requests\Api\ResetPasswordRequest;
+use App\Http\Requests\Api\Auth\ResetPasswordRequest;
 
 final readonly class ResetPasswordDTO
 {

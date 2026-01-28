@@ -3,7 +3,7 @@
 namespace App\DTO\Auth;
 
 use App\Enums\UserRole;
-use App\Http\Requests\Api\RegisterRequest;
+use App\Http\Requests\Api\Auth\RegisterRequest;
 
 final readonly class RegisterDTO
 {
@@ -22,7 +22,7 @@ final readonly class RegisterDTO
             email: $request->input('email'),
             password: $request->input('password'),
             role: $request->enum('role', UserRole::class),
-            remember: $request->input('remember'),
+            remember: $request->boolean('remember'),
         );
     }
 

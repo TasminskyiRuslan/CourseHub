@@ -2,6 +2,5 @@
 
 return [
     App\Providers\AppServiceProvider::class,
-    App\Providers\EloquentServiceProvider::class,
-    App\Providers\MacroServiceProvider::class,
+    App\Providers\EloquentServiceProvider::class
 ];

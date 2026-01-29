@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Actions\Auth\SendResetLinkAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Auth\ForgotPasswordRequest;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class ForgotPasswordController extends Controller
 {
+    use AuthorizesRequests;
+
     #[OA\Post(
         path: '/auth/password/forgot',
         description: 'Sends an email with a link to reset the password.',

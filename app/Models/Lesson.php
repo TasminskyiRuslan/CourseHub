@@ -16,7 +16,11 @@ class Lesson extends Model
 {
     use HasSlug;
 
-    protected $fillable = ['title', 'slug', 'position'];
+    protected $fillable = [
+        'title',
+        'slug',
+        'position'
+    ];
 
     protected function casts(): array
     {

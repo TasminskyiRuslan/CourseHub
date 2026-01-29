@@ -23,11 +23,6 @@ class LoginController extends Controller
         tags: ['Auth'],
         responses: [
             new OA\Response(
-                response: SymfonyResponse::HTTP_OK,
-                description: 'User logged in',
-                content: new OA\JsonContent(ref: '#/components/schemas/Auth')
-            ),
-            new OA\Response(
                 response: SymfonyResponse::HTTP_UNAUTHORIZED,
                 description: 'Invalid credentials'
             ),

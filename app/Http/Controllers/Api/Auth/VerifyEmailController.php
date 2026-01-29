@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\VerifyEmailAction;
-use App\Exceptions\Api\Auth\EmailVerificationFailedException;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -58,9 +57,6 @@ class VerifyEmailController extends Controller
             ),
         ]
     )]
-    /**
-     * @throws EmailVerificationFailedException
-     */
     public function __invoke(Request $request, string $id, string $hash, VerifyEmailAction $action): Response
     {
         $action->handle($id, $hash);

@@ -238,6 +238,9 @@
                     "204": {
                         "description": "Password reset"
                     },
+                    "403": {
+                        "description": "Access denied"
+                    },
                     "422": {
                         "description": "Validation error"
                     }
@@ -444,6 +447,9 @@
                                 }
                             }
                         }
+                    },
+                    "403": {
+                        "description": "Access denied"
                     },
                     "404": {
                         "description": "Course not found"
@@ -808,6 +814,9 @@
                             }
                         }
                     },
+                    "403": {
+                        "description": "Access denied"
+                    },
                     "404": {
                         "description": "Course not found"
                     }
@@ -916,6 +925,9 @@
                                 }
                             }
                         }
+                    },
+                    "403": {
+                        "description": "Access denied"
                     },
                     "404": {
                         "description": "Course or Lesson not found"
@@ -1228,8 +1240,8 @@
                     },
                     "price": {
                         "description": "The price of the new course",
-                        "type": "number",
-                        "format": "double",
+                        "type": "string",
+                        "format": "float",
                         "maximum": 99999999.99,
                         "minimum": 0,
                         "example": 199.99
@@ -1239,7 +1251,7 @@
             },
             "UpdateCourseImageRequest": {
                 "title": "Update course image request schema",
-                "description": "Schema for updating a course image. Supports common image formats up to 2MB.",
+                "description": "Schema for updating a course image. Supports common image formats up to 2MB",
                 "required": [
                     "image"
                 ],
@@ -1282,8 +1294,8 @@
                     },
                     "price": {
                         "description": "The price of the course",
-                        "type": "number",
-                        "format": "double",
+                        "type": "string",
+                        "format": "float",
                         "maximum": 99999999.99,
                         "minimum": 0,
                         "example": 199.99
@@ -1607,6 +1619,7 @@
                     "price": {
                         "description": "The price of the lesson",
                         "type": "string",
+                        "format": "float",
                         "example": 99.99
                     },
                     "image_url": {
@@ -1644,6 +1657,7 @@
                     "course_id",
                     "title",
                     "slug",
+                    "content",
                     "created_at",
                     "updated_at"
                 ],
@@ -1673,51 +1687,19 @@
                         "type": "integer",
                         "example": 1
                     },
-                    "start_time": {
-                        "description": "The start time of the lesson (offline, online)",
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2027-02-01T10:00:00Z",
-                        "nullable": true
-                    },
-                    "end_time": {
-                        "description": "The end time of the lesson (offline, online)",
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2027-02-01T12:00:00Z",
-                        "nullable": true
-                    },
-                    "address": {
-                        "description": "The address of the lesson (offline)",
-                        "type": "string",
-                        "example": "123 Main St, Springfield",
-                        "nullable": true
-                    },
-                    "room_number": {
-                        "description": "The number of the lesson (offline)",
-                        "type": "string",
-                        "example": "Room 101",
-                        "nullable": true
-                    },
-                    "meeting_link": {
-                        "description": "The link of the lesson (online)",
-                        "type": "string",
-                        "format": "uri",
-                        "example": "https://meet.example.com/lesson123",
-                        "nullable": true
-                    },
-                    "video_url": {
-                        "description": "The video of the lesson (video)",
-                        "type": "string",
-                        "format": "uri",
-                        "example": "https://videos.example.com/lesson123.mp4",
-                        "nullable": true
-                    },
-                    "provider": {
-                        "description": "The provider of the lesson (video)",
-                        "type": "string",
-                        "example": "YouTube",
-                        "nullable": true
+                    "content": {
+                        "description": "The content of the lesson",
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/OfflineLesson"
+                            },
+                            {
+                                "$ref": "#/components/schemas/OnlineLesson"
+                            },
+                            {
+                                "$ref": "#/components/schemas/VideoLesson"
+                            }
+                        ]
                     },
                     "created_at": {
                         "description": "The creation date of the lesson",
@@ -1730,6 +1712,93 @@
                         "type": "string",
                         "format": "date-time",
                         "example": "2026-01-10T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "OfflineLesson": {
+                "title": "Offline lesson schema",
+                "description": "Offline content of a lesson returned by the API",
+                "required": [
+                    "start_time",
+                    "end_time",
+                    "address",
+                    "room_number"
+                ],
+                "properties": {
+                    "start_time": {
+                        "description": "The start time of the lesson",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2027-02-01T10:00:00Z"
+                    },
+                    "end_time": {
+                        "description": "The end time of the lesson",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2027-02-01T12:00:00Z"
+                    },
+                    "address": {
+                        "description": "The address of the lesson",
+                        "type": "string",
+                        "example": "123 Main St, Springfield"
+                    },
+                    "room_number": {
+                        "description": "The room number of the lesson",
+                        "type": "string",
+                        "example": "Room 101"
+                    }
+                },
+                "type": "object"
+            },
+            "OnlineLesson": {
+                "title": "Online lesson schema",
+                "description": "Online content of a lesson returned by the API",
+                "required": [
+                    "start_time",
+                    "end_time",
+                    "meeting_link"
+                ],
+                "properties": {
+                    "start_time": {
+                        "description": "The start time of the lesson",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2027-02-01T10:00:00Z"
+                    },
+                    "end_time": {
+                        "description": "The end time of the lesson",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2027-02-01T12:00:00Z"
+                    },
+                    "meeting_link": {
+                        "description": "The link of the lesson",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "https://meet.example.com/lesson123"
+                    }
+                },
+                "type": "object"
+            },
+            "VideoLesson": {
+                "title": "Video lesson schema",
+                "description": "Video content of a lesson returned by the API",
+                "required": [
+                    "video_url",
+                    "provider"
+                ],
+                "properties": {
+                    "video_url": {
+                        "description": "The link of the video",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "https://videos.example.com/lesson123.mp4"
+                    },
+                    "provider": {
+                        "description": "The provider of the video",
+                        "type": "string",
+                        "example": "YouTube"
                     }
                 },
                 "type": "object"

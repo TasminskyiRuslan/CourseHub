@@ -27,8 +27,8 @@ class CourseService
                 'type',
                 AllowedFilter::callback('search', function ($query, $value) {
                     $query->where(function ($q) use ($value) {
-                        $q->where('title', 'like', "%{$value}%")
-                            ->orWhere('description', 'like', "%{$value}%");
+                        $q->where('title', 'like', "%$value%")
+                            ->orWhere('description', 'like', "%$value%");
                     });
                 }),
                 AllowedFilter::callback('author', function ($query, $value) {

@@ -6,12 +6,16 @@ use App\Actions\Auth\ResetPasswordAction;
 use App\DTO\Auth\ResetPasswordDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Auth\ResetPasswordRequest;
+use App\Models\User;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class ResetPasswordController extends Controller
 {
+    use AuthorizesRequests;
+
     #[OA\Post(
         path: '/auth/password/reset',
         description: 'Resets the user\'s password using a valid reset token.',
@@ -27,6 +31,10 @@ class ResetPasswordController extends Controller
                 description: 'Password reset',
             ),
             new OA\Response(
+                response: SymfonyResponse::HTTP_FORBIDDEN,
+                description: 'Access denied'
+            ),
+            new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
                 description: 'Validation error'
             ),
@@ -34,6 +42,8 @@ class ResetPasswordController extends Controller
     )]
     public function __invoke(ResetPasswordRequest $request, ResetPasswordAction $action): Response
     {
+        $user = User::where('email', $request->input('email'))->firstOrFail();
+        $this->authorize('resetPassword', $user);
         $action->handle(ResetPasswordDTO::fromRequest($request));
         return response()->noContent();
     }

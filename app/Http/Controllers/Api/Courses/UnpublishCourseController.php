@@ -51,7 +51,7 @@ class UnpublishCourseController extends Controller
     )]
     public function __invoke(Request $request, Course $course, CourseService $service): Response
     {
-        $this->authorize('update', $course);
+        $this->authorize('unpublish', $course);
         $service->unpublish($course);
         return response()->noContent();
     }

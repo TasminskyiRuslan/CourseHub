@@ -58,6 +58,7 @@ use OpenApi\Attributes as OA;
             property: 'price',
             description: 'The price of the lesson',
             type: 'string',
+            format: 'float',
             example: 99.99
         ),
         new OA\Property(

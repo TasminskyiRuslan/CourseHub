@@ -148,6 +148,10 @@ class CourseController extends Controller
                 content: new OA\JsonContent(ref: '#/components/schemas/Course')
             ),
             new OA\Response(
+                response: SymfonyResponse::HTTP_FORBIDDEN,
+                description: 'Access denied'
+            ),
+            new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
                 description: 'Course not found'
             ),

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api\Lessons;
 
 use App\Enums\CourseType;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -23,6 +24,9 @@ class UpdateLessonRequest extends FormRequest
         }
     }
 
+    /**
+     * @return array<string, ValidationRule|array|string>
+     */
     public function rules(): array
     {
         return array_merge($this->commonRules(), $this->typeRules());

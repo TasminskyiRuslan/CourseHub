@@ -20,7 +20,7 @@ class LessonService
             ->where('course_id', $course->id)
             ->allowedFilters([
                 AllowedFilter::callback('search', function ($query, $value) {
-                    $query->where('title', 'like', "%{$value}%");
+                    $query->where('title', 'like', "%$value%");
                 }),
             ])
             ->allowedSorts(['title', 'position', 'created_at'])

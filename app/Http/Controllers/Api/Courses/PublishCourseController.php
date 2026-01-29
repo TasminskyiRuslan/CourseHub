@@ -51,7 +51,7 @@ class PublishCourseController extends Controller
     )]
     public function __invoke(Request $request, Course $course, CourseService $service): Response
     {
-        $this->authorize('update', $course);
+        $this->authorize('publish', $course);
         $service->publish($course);
         return response()->noContent();
     }

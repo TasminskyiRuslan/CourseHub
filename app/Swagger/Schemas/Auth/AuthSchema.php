@@ -16,7 +16,7 @@ use OpenApi\Attributes as OA;
             description: 'Authenticated user data'
         ),
         new OA\Property(
-            property: 'token',
+            property: 'access_token',
             description: 'Access token',
             type: 'string',
             example: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...'

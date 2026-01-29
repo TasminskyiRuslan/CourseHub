@@ -2,12 +2,19 @@
 
 namespace App\Models;
 
+use App\Http\Resources\Api\Lessons\OfflineLessonResource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class OfflineLesson extends Model
 {
-    protected $fillable = ['start_time', 'end_time', 'address', 'room_number'];
+    protected $fillable = [
+        'start_time',
+        'end_time',
+        'address',
+        'room_number'
+    ];
 
     protected function casts(): array
     {
@@ -20,5 +27,12 @@ class OfflineLesson extends Model
     public function lesson(): MorphOne
     {
         return $this->morphOne(Lesson::class, 'lessonable');
+    }
+
+    public function toResource(?string $resourceClass = null): JsonResource
+    {
+        return $resourceClass
+            ? new $resourceClass($this)
+            : new OfflineLessonResource($this);
     }
 }

@@ -34,8 +34,8 @@ use OpenApi\Attributes as OA;
         new OA\Property(
             property: 'price',
             description: 'The price of the course',
-            type: 'number',
-            format: 'double',
+            type: 'string',
+            format: 'float',
             maximum: 99999999.99,
             minimum: 0,
             example: 199.99

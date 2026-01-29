@@ -86,6 +86,10 @@ class LessonController extends Controller
                 )
             ),
             new OA\Response(
+                response: SymfonyResponse::HTTP_FORBIDDEN,
+                description: 'Access denied'
+            ),
+            new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
                 description: 'Course not found'
             ),
@@ -178,6 +182,10 @@ class LessonController extends Controller
                 response: SymfonyResponse::HTTP_OK,
                 description: 'Lesson details',
                 content: new OA\JsonContent(ref: '#/components/schemas/Lesson')
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_FORBIDDEN,
+                description: 'Access denied'
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,

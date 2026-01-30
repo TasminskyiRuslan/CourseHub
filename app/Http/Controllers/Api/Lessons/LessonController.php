@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\Api\Lessons;
 
-use App\DTO\Lessons\LessonDTO;
+use App\Data\Lessons\CreateLessonData;
+use App\Data\Lessons\UpdateLessonData;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Lessons\StoreLessonRequest;
-use App\Http\Requests\Api\Lessons\UpdateLessonRequest;
 use App\Http\Resources\Api\Lessons\LessonResource;
 use App\Models\Course;
 use App\Models\Lesson;
@@ -148,10 +147,10 @@ class LessonController extends Controller
     /**
      * @throws Throwable
      */
-    public function store(StoreLessonRequest $request, Course $course): LessonResource
+    public function store(CreateLessonData $data, Course $course): LessonResource
     {
         $this->authorize('create', [Lesson::class, $course]);
-        $newLesson = $this->lessonService->create($course, LessonDTO::fromRequest($request));
+        $newLesson = $this->lessonService->create($data, $course);
         return new LessonResource($newLesson);
     }
 
@@ -252,10 +251,10 @@ class LessonController extends Controller
     /**
      * @throws Throwable
      */
-    public function update(UpdateLessonRequest $request, Course $course, Lesson $lesson): LessonResource
+    public function update(UpdateLessonData $data, Course $course, Lesson $lesson): LessonResource
     {
         $this->authorize('update', $lesson);
-        $updatedLesson = $this->lessonService->update($lesson, LessonDTO::fromRequest($request));
+        $updatedLesson = $this->lessonService->update($data, $lesson);
         return new LessonResource($updatedLesson);
     }
 

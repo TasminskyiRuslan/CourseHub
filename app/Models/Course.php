@@ -30,6 +30,10 @@ class Course extends Model
         'is_published'
     ];
 
+    protected $attributes = [
+        'is_published' => false,
+    ];
+
     protected function casts(): array
     {
         return [

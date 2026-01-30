@@ -2,8 +2,8 @@
 
 namespace App\Actions\Auth;
 
-use App\DTO\Auth\AuthDTO;
-use App\DTO\Auth\RegisterDTO;
+use App\Data\Auth\AuthData;
+use App\Data\Auth\RegisterData;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\DB;
@@ -20,16 +20,14 @@ class RegisterUserAction
     /**
      * @throws Throwable
      */
-    public function handle(RegisterDTO $dto): AuthDTO
+    public function handle(RegisterData $data): AuthData
     {
-        return DB::transaction(function () use ($dto) {
-            $user = User::create($dto->toArray());
+        return DB::transaction(function () use ($data) {
+            $user = User::create($data->toArray());
 
             event(new Registered($user));
 
-            $remember = $dto->remember ?? false;
-
-            return $this->issueTokenAction->handle($user, $remember);
+            return $this->issueTokenAction->handle($user, $data->remember);
         });
     }
 }

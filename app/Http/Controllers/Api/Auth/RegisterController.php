@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\RegisterUserAction;
-use App\DTO\Auth\RegisterDTO;
+use App\Data\Auth\RegisterData;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Http\Resources\Api\Auth\AuthResource;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -37,9 +36,9 @@ class RegisterController extends Controller
     /**
      * @throws Throwable
      */
-    public function __invoke(RegisterRequest $request, RegisterUserAction $action): AuthResource
+    public function __invoke(RegisterData $data, RegisterUserAction $action): AuthResource
     {
-        $result = $action->handle(RegisterDTO::fromRequest($request));
+        $result = $action->handle($data);
         return new AuthResource($result);
     }
 }

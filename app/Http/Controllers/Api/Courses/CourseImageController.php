@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api\Courses;
 
+use App\Data\Courses\UpdateCourseImageData;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Courses\UpdateCourseImageRequest;
 use App\Http\Resources\Api\Courses\CourseResource;
 use App\Models\Course;
 use App\Services\Courses\CourseService;
@@ -72,10 +72,10 @@ class CourseImageController extends Controller
     /**
      * @throws Throwable
      */
-    public function update(UpdateCourseImageRequest $request, Course $course): CourseResource
+    public function update(UpdateCourseImageData $data, Course $course): CourseResource
     {
         $this->authorize('update', $course);
-        $updatedCourse = $this->courseService->updateImage($course, $request->file('image'));
+        $updatedCourse = $this->courseService->updateImage($course, $data->image);
         return new CourseResource($updatedCourse);
     }
 

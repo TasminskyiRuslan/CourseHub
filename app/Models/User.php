@@ -16,6 +16,8 @@ use Spatie\Sluggable\SlugOptions;
 
 /**
  * @property mixed $slug
+ * @method static where(string $string, string $email)
+ * @method static create(array $toArray)
  */
 class User extends Authenticatable implements MustVerifyEmail
 {

@@ -2,6 +2,8 @@
 
 namespace App\Services\Courses;
 
+use App\Data\Courses\CreateCourseData;
+use App\Data\Courses\UpdateCourseData;
 use App\DTO\Courses\CreateCourseDTO;
 use App\DTO\Courses\UpdateCourseDTO;
 use App\Models\Course;
@@ -48,18 +50,18 @@ class CourseService
     /**
      * @throws Throwable
      */
-    public function create(CreateCourseDTO $dto, User $author): Course
+    public function create(CreateCourseData $data, User $author): Course
     {
-        $course = $author->courses()->create($dto->toArray());
+        $course = $author->courses()->create($data->toArray());
         return $course->load('author');
     }
 
     /**
      * @throws Throwable
      */
-    public function update(UpdateCourseDTO $dto, Course $course): Course
+    public function update(UpdateCourseData $data, Course $course): Course
     {
-        $course->update($dto->toArray());
+        $course->update($data->toArray());
         return $course->fresh('author');
     }
 

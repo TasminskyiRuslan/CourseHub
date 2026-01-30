@@ -2,8 +2,8 @@
 
 namespace App\Actions\Auth;
 
-use App\DTO\Auth\AuthDTO;
-use App\DTO\Auth\LoginDTO;
+use App\Data\Auth\AuthData;
+use App\Data\Auth\LoginData;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -16,18 +16,16 @@ class LoginUserAction
     {
     }
 
-    public function handle(LoginDTO $dto): AuthDTO
+    public function handle(LoginData $data): AuthData
     {
-        $user = User::where('email', $dto->email)->first();
+        $user = User::where('email', $data->email)->first();
 
-        if (!$user || !Hash::check($dto->password, $user->password)) {
+        if (!$user || !Hash::check($data->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Invalid email or password'],
             ]);
         }
 
-        $remember = $dto->remember ?? false;
-
-        return $this->issueTokenAction->handle($user, $remember);
+        return $this->issueTokenAction->handle($user, $data->remember);
     }
 }

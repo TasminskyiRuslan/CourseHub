@@ -18,8 +18,8 @@ class OnlineLessonResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'start_time' => $this->start_time?->toIso8601String(),
-            'end_time' => $this->end_time?->toIso8601String(),
+            'start_time' => $this->start_time,
+            'end_time' => $this->end_time,
             'meeting_link' => $this->meeting_link,
         ];
     }

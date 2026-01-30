@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\ResetPasswordAction;
-use App\DTO\Auth\ResetPasswordDTO;
+use App\Data\Auth\ResetPasswordData;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Auth\ResetPasswordRequest;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Response;
@@ -40,11 +39,11 @@ class ResetPasswordController extends Controller
             ),
         ]
     )]
-    public function __invoke(ResetPasswordRequest $request, ResetPasswordAction $action): Response
+    public function __invoke(ResetPasswordData $data, ResetPasswordAction $action): Response
     {
-        $user = User::where('email', $request->input('email'))->firstOrFail();
+        $user = User::where('email', $data->email)->firstOrFail();
         $this->authorize('resetPassword', $user);
-        $action->handle(ResetPasswordDTO::fromRequest($request));
+        $action->handle($data);
         return response()->noContent();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Actions\Auth;
 
+use App\Data\Auth\ResetPasswordData;
 use App\DTO\Auth\ResetPasswordDTO;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -10,13 +11,13 @@ use Str;
 
 class ResetPasswordAction
 {
-    public function handle(ResetPasswordDTO $dto): void
+    public function handle(ResetPasswordData $data): void
     {
         $status = Password::reset([
-            'email' => $dto->email,
-            'password' => $dto->password,
-            'password_confirmation' => $dto->password,
-            'token' => $dto->token,
+            'email' => $data->email,
+            'password' => $data->password,
+            'password_confirmation' => $data->password,
+            'token' => $data->token,
         ], function ($user, $password) {
             $user->forceFill([
                 'password' => Hash::make($password),

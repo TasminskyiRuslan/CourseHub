@@ -40,8 +40,8 @@ class CourseResource extends JsonResource
             'price' => $this->price,
             'image_url' => $this->image_path ? Storage::disk('public')->url($this->image_path) : null,
             'is_published' => $this->is_published,
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

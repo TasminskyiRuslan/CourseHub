@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\LoginUserAction;
-use App\DTO\Auth\LoginDTO;
+use App\Data\Auth\LoginData;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Resources\Api\Auth\AuthResource;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -32,9 +31,9 @@ class LoginController extends Controller
             ),
         ]
     )]
-    public function __invoke(LoginRequest $request, LoginUserAction $action): AuthResource
+    public function __invoke(LoginData $data, LoginUserAction $action): AuthResource
     {
-        $result = $action->handle(LoginDTO::fromRequest($request));
+        $result = $action->handle($data);
         return new AuthResource($result);
     }
 }

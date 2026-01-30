@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers\Api\Courses;
 
-use App\DTO\Courses\CreateCourseDTO;
-use App\DTO\Courses\UpdateCourseDTO;
+use App\Data\Courses\CreateCourseData;
+use App\Data\Courses\UpdateCourseData;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Courses\StoreCourseRequest;
-use App\Http\Requests\Api\Courses\UpdateCourseRequest;
 use App\Http\Resources\Api\Courses\CourseResource;
 use App\Models\Course;
 use App\Services\Courses\CourseService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
@@ -119,10 +118,10 @@ class CourseController extends Controller
     /**
      * @throws Throwable
      */
-    public function store(StoreCourseRequest $request): CourseResource
+    public function store(Request $request, CreateCourseData $data): CourseResource
     {
         $this->authorize('create', Course::class);
-        $newCourse = $this->courseService->create(CreateCourseDTO::fromRequest($request), $request->user());
+        $newCourse = $this->courseService->create($data, $request->user());
         return new CourseResource($newCourse);
     }
 
@@ -209,10 +208,10 @@ class CourseController extends Controller
     /**
      * @throws Throwable
      */
-    public function update(UpdateCourseRequest $request, Course $course): CourseResource
+    public function update(UpdateCourseData $data, Course $course): CourseResource
     {
         $this->authorize('update', $course);
-        $updatedCourse = $this->courseService->update(UpdateCourseDTO::fromRequest($request), $course);
+        $updatedCourse = $this->courseService->update($data, $course);
         return new CourseResource($updatedCourse);
     }
 

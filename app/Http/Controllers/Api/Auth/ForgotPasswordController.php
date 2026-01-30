@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\SendResetLinkAction;
+use App\Data\Auth\ForgotPasswordData;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Auth\ForgotPasswordRequest;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
@@ -34,9 +34,9 @@ class ForgotPasswordController extends Controller
             ),
         ]
     )]
-    public function __invoke(ForgotPasswordRequest $request, SendResetLinkAction $action): Response
+    public function __invoke(ForgotPasswordData $data, SendResetLinkAction $action): Response
     {
-        $action->handle($request->input('email'));
+        $action->handle($data->email);
         return response()->noContent();
     }
 }

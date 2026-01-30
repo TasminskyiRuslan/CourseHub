@@ -2,6 +2,8 @@
 
 namespace App\Services\Lessons;
 
+use App\Data\Lessons\CreateLessonData;
+use App\Data\Lessons\UpdateLessonData;
 use App\DTO\Lessons\LessonDTO;
 use App\Models\Course;
 use App\Models\Lesson;
@@ -32,10 +34,10 @@ class LessonService
     /**
      * @throws Throwable
      */
-    public function create(Course $course, LessonDTO $dto): Lesson
+    public function create(CreateLessonData $data, Course $course): Lesson
     {
-        return DB::transaction(function () use ($course, $dto) {
-            $data = $dto->toArray();
+        return DB::transaction(function () use ($data, $course) {
+            $data = $data->toArray();
             $lessonContentClass = Relation::getMorphedModel($course->type->value);
             $lessonContent = $lessonContentClass::create($data);
             $lesson = $course->lessons()->make($data);
@@ -48,10 +50,10 @@ class LessonService
     /**
      * @throws Throwable
      */
-    public function update(Lesson $lesson, LessonDTO $dto): Lesson
+    public function update(UpdateLessonData $data, Lesson $lesson): Lesson
     {
-        return DB::transaction(function () use ($lesson, $dto) {
-            $data = $dto->toArray();
+        return DB::transaction(function () use ($data, $lesson) {
+            $data = $data->toArray();
             $lesson->update($data);
             $lesson->lessonable->update($data);
             return $lesson->fresh('lessonable');

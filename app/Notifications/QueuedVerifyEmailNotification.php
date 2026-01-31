@@ -16,6 +16,11 @@ class QueuedVerifyEmailNotification extends VerifyEmail implements ShouldQueue
         $this->onQueue('high');
     }
 
+    public function via($notifiable): array
+    {
+        return ['mail'];
+    }
+
     public function toMail($notifiable): MailMessage
     {
         $url = $this->verificationUrl($notifiable);

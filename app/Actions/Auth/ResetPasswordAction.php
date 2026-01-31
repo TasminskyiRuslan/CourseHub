@@ -3,7 +3,6 @@
 namespace App\Actions\Auth;
 
 use App\Data\Auth\ResetPasswordData;
-use App\DTO\Auth\ResetPasswordDTO;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;

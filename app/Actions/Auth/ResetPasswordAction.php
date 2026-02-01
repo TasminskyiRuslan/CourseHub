@@ -25,7 +25,7 @@ class ResetPasswordAction
         });
 
         if ($status !== Password::PASSWORD_RESET) {
-            throw ValidationException::withMessages(['email' => [__($status)]]);
+            throw ValidationException::withMessages(['email' => [trans($status)]]);
         }
     }
 }

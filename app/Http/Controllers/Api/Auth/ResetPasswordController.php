@@ -41,8 +41,10 @@ class ResetPasswordController extends Controller
     )]
     public function __invoke(ResetPasswordData $data, ResetPasswordAction $action): Response
     {
-        $user = User::where('email', $data->email)->firstOrFail();
-        $this->authorize('resetPassword', $user);
+        $user = User::where('email', $data->email)->first();
+        if ($user) {
+            $this->authorize('resetPassword', $user);
+        }
         $action->handle($data);
         return response()->noContent();
     }

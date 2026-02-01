@@ -10,13 +10,11 @@ class SendResetLinkAction
 {
     public function handle(string $email): void
     {
-        $user = User::where('email', $email)->first();
-
-        if (!$user) {
-            throw ValidationException::withMessages(['email' => ['No user with this email was found.']]);
+        $status = Password::sendResetLink(['email' => $email]);
+        if ($status === Password::RESET_THROTTLED) {
+            throw ValidationException::withMessages([
+                'email' => [trans($status)],
+            ]);
         }
-
-        $token = Password::createToken($user);
-        $user->sendPasswordResetNotification($token);
     }
 }

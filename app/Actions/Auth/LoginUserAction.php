@@ -22,7 +22,7 @@ class LoginUserAction
 
         if (!$user || !Hash::check($data->password, $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['Invalid email or password'],
+                'email' => [trans('auth.failed')],
             ]);
         }
 

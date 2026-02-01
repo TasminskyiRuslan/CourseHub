@@ -10,9 +10,9 @@ class VerifyEmailAction
 {
     public function handle(string $id, string $hash): void
     {
-        $user = User::findOrFail($id);
+        $user = User::find($id);
 
-        if (!hash_equals($hash, sha1($user->getEmailForVerification()))) {
+        if (!$user || !hash_equals($hash, sha1($user->getEmailForVerification()))) {
             throw new AccessDeniedHttpException();
         }
 

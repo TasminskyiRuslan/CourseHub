@@ -74,7 +74,7 @@ describe('LoginController', function () {
         expect($expiresAt)->toBeLessThanOrEqual($expected);
     });
 
-    it('fails when credentials is missing', function () {
+    it('fails when credentials are missing', function () {
         postJson(route('auth.login'), [])
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['email', 'password']);

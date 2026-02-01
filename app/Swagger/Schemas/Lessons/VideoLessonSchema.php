@@ -21,7 +21,7 @@ use OpenApi\Attributes as OA;
             property: 'provider',
             description: 'The provider of the video',
             type: 'string',
-            example: 'YouTube'
+            example: 'youtube'
         ),
     ],
     type: 'object'

@@ -88,7 +88,7 @@ use OpenApi\Attributes as OA;
             description: 'The provider of the new lesson (video)',
             type: 'string',
             maxLength: 50,
-            example: 'YouTube',
+            example: 'youtube',
             nullable: true
         ),
     ],

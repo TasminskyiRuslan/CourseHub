@@ -3,50 +3,53 @@
 namespace App\Models;
 
 use App\Enums\CourseType;
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
 /**
- * @property mixed $id
- * @property mixed|null $type
- * @property mixed $image_path
- * @method where(string $string, true $true)
+ * @property int $id
  * @property int $author_id
  * @property string $title
  * @property string|null $slug
  * @property string|null $description
  * @property numeric $price
+ * @property string|null $image_path
+ * @property CourseType $type
  * @property bool $is_published
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User $author
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Lesson> $lessons
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User $author
+ * @property-read Collection<int, Lesson> $lessons
  * @property-read int|null $lessons_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereAuthorId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereImagePath($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereIsPublished($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course wherePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @method static Builder<static>|Course newModelQuery()
+ * @method static Builder<static>|Course newQuery()
+ * @method static Builder<static>|Course query()
+ * @method static Builder<static>|Course whereAuthorId($value)
+ * @method static Builder<static>|Course whereCreatedAt($value)
+ * @method static Builder<static>|Course whereDescription($value)
+ * @method static Builder<static>|Course whereId($value)
+ * @method static Builder<static>|Course whereImagePath($value)
+ * @method static Builder<static>|Course whereIsPublished($value)
+ * @method static Builder<static>|Course wherePrice($value)
+ * @method static Builder<static>|Course whereSlug($value)
+ * @method static Builder<static>|Course whereTitle($value)
+ * @method static Builder<static>|Course whereType($value)
+ * @method static Builder<static>|Course whereUpdatedAt($value)
+ * @mixin Eloquent
  */
 class Course extends Model
 {
-    use HasSlug;
+    use HasSlug, HasFactory;
 
     protected $fillable = [
-        'author_id',
         'title',
         'slug',
         'description',

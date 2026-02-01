@@ -2,7 +2,6 @@
 
 namespace App\Actions\Auth;
 
-use App\Models\User;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 

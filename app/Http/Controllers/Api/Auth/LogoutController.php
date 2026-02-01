@@ -13,7 +13,7 @@ class LogoutController extends Controller
 {
     #[OA\Post(
         path: '/auth/logout',
-        description: 'Logout the current device by revoking the current access token.',
+        description: 'Revoke  only the current authentication token for the authenticated user.',
         summary: 'Logout current device',
         security: [['sanctum' => []]],
         tags: ['Auth'],

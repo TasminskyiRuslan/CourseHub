@@ -23,7 +23,7 @@ class CourseFactory extends Factory
             'author_id' => User::factory()->lazy(),
             'title' => fake()->sentence(3),
             'slug' => null,
-            'description' => fake()->paragraph(),
+            'description' => fake()->sentence(10),
             'price' => fake()->randomFloat(2, 0, 500),
             'type' => fake()->randomElement(CourseType::cases()),
             'image_path' => null,
@@ -31,7 +31,7 @@ class CourseFactory extends Factory
         ];
     }
 
-    public function published(): static
+    public function published(): CourseFactory|Factory
     {
         return $this->state(fn () => ['is_published' => true]);
     }

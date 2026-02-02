@@ -4,8 +4,6 @@ namespace App\Services\Courses;
 
 use App\Data\Courses\CreateCourseData;
 use App\Data\Courses\UpdateCourseData;
-use App\DTO\Courses\CreateCourseDTO;
-use App\DTO\Courses\UpdateCourseDTO;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -45,7 +43,6 @@ class CourseService
             ->with('author')
             ->paginate(config('pagination.courses_per_page'));
     }
-
 
     /**
      * @throws Throwable

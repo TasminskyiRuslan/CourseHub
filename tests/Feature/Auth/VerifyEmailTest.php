@@ -10,7 +10,6 @@ use function Pest\Laravel\getJson;
 uses(RefreshDatabase::class);
 
 describe('VerifyEmailController', function () {
-
     beforeEach(function () {
         Event::fake();
 
@@ -26,9 +25,8 @@ describe('VerifyEmailController', function () {
         );
     });
 
-    describe('verification process', function () {
-
-        it('verifies the email successfully', function () {
+    describe('success', function () {
+        it('verifies the email', function () {
             getJson(($this->signedUrl)())
                 ->assertNoContent();
 
@@ -55,7 +53,6 @@ describe('VerifyEmailController', function () {
     });
 
     describe('validation', function () {
-
         it('fails when the user ID does not exist', function () {
             getJson(($this->signedUrl)(['id' => 99999]))
                 ->assertForbidden();
@@ -76,4 +73,4 @@ describe('VerifyEmailController', function () {
                 ->assertForbidden();
         });
     });
-});
+})->group('auth');

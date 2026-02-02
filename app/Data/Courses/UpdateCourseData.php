@@ -26,7 +26,7 @@ class UpdateCourseData extends Data
         #[StringType]
         #[Max(255)]
         #[WithCast(SlugCast::class)]
-        #[Unique('courses', 'slug', 'course')]
+        #[Unique('courses', 'slug', ignore: 'course', ignoreColumn: 'slug')]
         public string $slug,
 
         #[Nullable]

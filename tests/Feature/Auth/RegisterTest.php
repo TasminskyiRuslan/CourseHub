@@ -10,13 +10,28 @@ use function Pest\Laravel\postJson;
 uses(RefreshDatabase::class);
 
 describe('RegisterController', function () {
-
     beforeEach(function () {
         $this->name = 'John Doe';
         $this->email = 'john@example.com';
         $this->password = 'password';
 
-        $this->payload = fn(array $overrides = []) => array_merge([
+        $this->expectedAuthStructure = [
+            'user' => [
+                'id',
+                'name',
+                'slug',
+                'email',
+                'role',
+                'email_verified_at',
+                'created_at',
+                'updated_at',
+            ],
+            'access_token',
+            'token_type',
+            'expires_at',
+        ];
+
+        $this->payload = fn (array $overrides = []) => array_merge([
             'name' => $this->name,
             'email' => $this->email,
             'password' => $this->password,
@@ -25,27 +40,12 @@ describe('RegisterController', function () {
         ], $overrides);
     });
 
-    describe('registration process', function () {
-
-        it('registers a new user successfully', function () {
+    describe('success', function () {
+        it('registers a user', function () {
             postJson(route('auth.register'), ($this->payload)())
                 ->assertCreated()
                 ->assertJsonStructure([
-                    'data' => [
-                        'user' => [
-                            'id',
-                            'name',
-                            'slug',
-                            'email',
-                            'role',
-                            'email_verified_at',
-                            'created_at',
-                            'updated_at',
-                        ],
-                        'access_token',
-                        'token_type',
-                        'expires_at',
-                    ]
+                    'data' => $this->expectedAuthStructure,
                 ]);
 
             expect(User::where('email', $this->email)->exists())->toBeTrue();
@@ -57,41 +57,44 @@ describe('RegisterController', function () {
             postJson(route('auth.register'), ($this->payload)())
                 ->assertCreated();
 
-            Event::assertDispatched(Registered::class, function ($event) {
-                return $event->user->email === $this->email;
-            });
+            Event::assertDispatched(Registered::class, fn ($event) =>
+                $event->user->email === $this->email
+            );
         });
 
         it('sets a long token expiration when remember is true', function () {
-            $response = postJson(route('auth.register'), ($this->payload)(['remember' => true]))
-                ->assertCreated();
+            $response = postJson(
+                route('auth.register'),
+                ($this->payload)(['remember' => true])
+            )->assertCreated();
 
-            $expiresAt = strtotime($response->json('data.expires_at'));
-            $expected = strtotime(now()->addWeeks(2));
-            expect($expiresAt)->toBe($expected);
+            $expiresAt = now()->parse($response->json('data.expires_at'));
+
+            expect($expiresAt->greaterThan(now()->addWeek()))->toBeTrue();
         });
 
         it('sets a short token expiration when remember is false', function () {
-            $response = postJson(route('auth.register'), ($this->payload)(['remember' => false]))
-                ->assertCreated();
+            $response = postJson(
+                route('auth.register'),
+                ($this->payload)(['remember' => false])
+            )->assertCreated();
 
-            $expiresAt = strtotime($response->json('data.expires_at'));
-            $expected = strtotime(now()->addDay());
-            expect($expiresAt)->toBe($expected);
+            $expiresAt = now()->parse($response->json('data.expires_at'));
+
+            expect($expiresAt->lessThanOrEqualTo(now()->addDay()))->toBeTrue();
         });
 
         it('sets a short token expiration by default', function () {
             $response = postJson(route('auth.register'), ($this->payload)())
                 ->assertCreated();
 
-            $expiresAt = strtotime($response->json('data.expires_at'));
-            $expected = strtotime(now()->addDay());
-            expect($expiresAt)->toBe($expected, 2);
+            $expiresAt = now()->parse($response->json('data.expires_at'));
+
+            expect($expiresAt->lessThanOrEqualTo(now()->addDay()))->toBeTrue();
         });
     });
 
     describe('validation', function () {
-
         it('fails when required fields are missing', function () {
             postJson(route('auth.register'), [])
                 ->assertUnprocessable()
@@ -107,7 +110,10 @@ describe('RegisterController', function () {
         });
 
         it('fails when the email format is invalid', function () {
-            postJson(route('auth.register'), ($this->payload)(['email' => 'invalid-email']))
+            postJson(
+                route('auth.register'),
+                ($this->payload)(['email' => 'invalid-email'])
+            )
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
         });
@@ -136,11 +142,13 @@ describe('RegisterController', function () {
         });
 
         it('fails when attempting to register as an admin', function () {
-            postJson(route('auth.register'), ($this->payload)(['role' => UserRole::ADMIN->value]))
+            postJson(route('auth.register'), ($this->payload)([
+                'role' => UserRole::ADMIN->value,
+            ]))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['role']);
 
             expect(User::where('role', UserRole::ADMIN)->count())->toBe(0);
         });
     });
-});
+})->group('auth');

@@ -9,34 +9,35 @@ use function Pest\Laravel\postJson;
 uses(RefreshDatabase::class);
 
 describe('ResetPasswordController', function () {
+    beforeEach(function () {
+        $this->user = User::factory()->create([
+            'password' => 'old-password',
+        ]);
 
-    describe('as a regular user', function () {
-        beforeEach(function () {
-            $this->user = User::factory()->create([
-                'password' => 'old-password',
-            ]);
+        $this->token = Password::createToken($this->user);
 
-            $this->token = Password::createToken($this->user);
+        $this->payload = [
+            'email' => $this->user->email,
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+            'token' => $this->token,
+        ];
+    });
 
-            $this->payload = [
-                'email' => $this->user->email,
-                'password' => 'new-password',
-                'password_confirmation' => 'new-password',
-                'token' => $this->token,
-            ];
-        });
-
-        it('resets the password successfully', function () {
+    describe('success', function () {
+        it('resets the password', function () {
             postJson(route('auth.password.reset'), $this->payload)
                 ->assertNoContent();
 
             $this->user->refresh();
-            expect(Hash::check($this->payload['password'], $this->user->password))->toBeTrue();
+            expect(Hash::check('new-password', $this->user->password))->toBeTrue();
         });
+    });
 
-        it('fails when the token is invalid', function () {
+    describe('validation', function () {
+        it('fails when token is invalid', function () {
             postJson(route('auth.password.reset'), array_merge($this->payload, [
-                'token' => 'invalid-token'
+                'token' => 'invalid-token',
             ]))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors('email');
@@ -48,25 +49,25 @@ describe('ResetPasswordController', function () {
                 ->assertJsonValidationErrors(['email', 'password', 'token']);
         });
 
-        it('fails when the password confirmation does not match', function () {
+        it('fails when password confirmation does not match', function () {
             postJson(route('auth.password.reset'), array_merge($this->payload, [
-                'password_confirmation' => 'different'
+                'password_confirmation' => 'different',
             ]))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['password']);
         });
 
-        it('fails when the email format is invalid', function () {
+        it('fails when email format is invalid', function () {
             postJson(route('auth.password.reset'), array_merge($this->payload, [
-                'email' => 'invalid-email'
+                'email' => 'invalid-email',
             ]))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
         });
 
-        it('fails when the email does not exist', function () {
+        it('fails when email does not exist', function () {
             postJson(route('auth.password.reset'), array_merge($this->payload, [
-                'email' => 'non-existent@example.com'
+                'email' => 'nonexistent@example.com',
             ]))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
@@ -75,14 +76,14 @@ describe('ResetPasswordController', function () {
         it('fails when the new password is too short', function () {
             postJson(route('auth.password.reset'), array_merge($this->payload, [
                 'password' => '123',
-                'password_confirmation' => '123'
+                'password_confirmation' => '123',
             ]))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['password']);
         });
     });
 
-    describe('as an admin', function () {
+    describe('permissions', function () {
         beforeEach(function () {
             $this->admin = User::factory()->admin()->create();
 
@@ -94,9 +95,9 @@ describe('ResetPasswordController', function () {
             ];
         });
 
-        it('forbids the password reset', function () {
+        it('forbids admin', function () {
             postJson(route('auth.password.reset'), $this->payload)
                 ->assertForbidden();
         });
     });
-});
+})->group('auth');

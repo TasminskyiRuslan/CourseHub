@@ -25,7 +25,7 @@ describe('LogoutAllController', function () {
     });
 
     it('returns unauthorized if user is not authenticated', function () {
-        deleteJson(route('auth.tokens.destroy',))
+        deleteJson(route('auth.tokens.destroy'))
             ->assertUnauthorized();
     });
 });

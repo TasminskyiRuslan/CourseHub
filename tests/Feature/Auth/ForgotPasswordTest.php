@@ -22,9 +22,12 @@ describe('ForgotPasswordController', function () {
         ])
             ->assertNoContent();
 
-        Notification::assertSentTo($this->user, QueuedResetPasswordNotification::class, function ($notification) {
-            return !empty($notification->token);
-        });
+        Notification::assertSentTo(
+            $this->user,
+            QueuedResetPasswordNotification::class,
+            function ($notification) {
+                return !empty($notification->token);
+            });
 
         $this->assertDatabaseHas('password_reset_tokens', [
             'email' => $this->user->email,
@@ -46,10 +49,17 @@ describe('ForgotPasswordController', function () {
     });
 
     it('does not send a password reset link for non-existent email', function () {
+        $email = 'non-existent-email@example.com';
+
         postJson(route('auth.password.forgot'), [
-            'email' => 'non-existent-email@example.com'
+            'email' => $email
         ])
             ->assertNoContent();
+
         Notification::assertNothingSent();
+
+        $this->assertDatabaseMissing('password_reset_tokens', [
+            'email' => $email,
+        ]);
     });
 });

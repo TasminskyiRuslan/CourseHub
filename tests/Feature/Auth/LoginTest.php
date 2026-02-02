@@ -60,7 +60,7 @@ describe('LoginController', function () {
 
         $expiresAt = strtotime($response->json('data.expires_at'));
         $expected = strtotime(now()->addDay());
-        expect($expiresAt)->toBeLessThanOrEqual($expected);
+        expect($expiresAt)->toBe($expected);
     });
 
     it('sets a short expiration when remember is missing', function () {
@@ -71,7 +71,7 @@ describe('LoginController', function () {
 
         $expiresAt = strtotime($response->json('data.expires_at'));
         $expected = strtotime(now()->addDay());
-        expect($expiresAt)->toBeLessThanOrEqual($expected);
+        expect($expiresAt)->toBe($expected);
     });
 
     it('fails when credentials are missing', function () {

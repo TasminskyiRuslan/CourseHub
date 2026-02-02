@@ -4,6 +4,7 @@ namespace App\Data\Auth;
 
 use App\Data\Casts\LowercaseCast;
 use App\Enums\UserRole;
+use Spatie\LaravelData\Attributes\Validation\BooleanType;
 use Spatie\LaravelData\Attributes\Validation\Confirmed;
 use Spatie\LaravelData\Attributes\Validation\Email;
 use Spatie\LaravelData\Attributes\Validation\Enum;
@@ -42,6 +43,7 @@ class RegisterData extends Data
         #[In([UserRole::STUDENT->value, UserRole::TEACHER->value])]
         public UserRole $role,
 
+        #[BooleanType]
         public bool $remember = false,
     ) {}
 }

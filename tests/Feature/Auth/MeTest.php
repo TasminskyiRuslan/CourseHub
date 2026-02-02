@@ -12,27 +12,33 @@ describe('MeController', function () {
         $this->user = User::factory()->create();
     });
 
-    it('returns the authenticated user data', function () {
-        Sanctum::actingAs($this->user);
+    describe('when authenticated', function () {
+        beforeEach(function () {
+            Sanctum::actingAs($this->user);
+        });
 
-        getJson(route('auth.me'))
-            ->assertOk()
-            ->assertJsonStructure([
-                'data' => [
-                    'id',
-                    'name',
-                    'slug',
-                    'email',
-                    'role',
-                    'email_verified_at',
-                    'created_at',
-                    'updated_at',
-                ]
-            ]);
+        it('returns the authenticated user details', function () {
+            getJson(route('auth.me'))
+                ->assertOk()
+                ->assertJsonStructure([
+                    'data' => [
+                        'id',
+                        'name',
+                        'slug',
+                        'email',
+                        'role',
+                        'email_verified_at',
+                        'created_at',
+                        'updated_at',
+                    ]
+                ]);
+        });
     });
 
-    it('returns unauthorized if user is not authenticated', function () {
-        getJson(route('auth.me'))
-            ->assertUnauthorized();
+    describe('when not authenticated', function () {
+        it('fails when the user is not authenticated', function () {
+            getJson(route('auth.me'))
+                ->assertUnauthorized();
+        });
     });
 });

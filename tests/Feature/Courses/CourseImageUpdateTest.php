@@ -3,14 +3,18 @@
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
-use function Pest\Laravel\putJson;
+use function Pest\Laravel\patchJson;
 
 uses(RefreshDatabase::class);
 
-describe('CourseController -> update', function () {
+describe('CourseImageController -> update', function () {
 
     beforeEach(function () {
+        Storage::fake('public');
+
         $this->teacher = User::factory()->teacher()->create();
         $this->otherTeacher = User::factory()->teacher()->create();
         $this->student = User::factory()->create();
@@ -41,13 +45,6 @@ describe('CourseController -> update', function () {
             'created_at',
             'updated_at',
         ];
-
-        $this->payload = fn(array $overrides = []) => array_merge([
-            'title' => 'Updated course title',
-            'slug' => 'updated-course-title',
-            'description' => 'Updated description',
-            'price' => '299.99',
-        ], $overrides);
     });
 
     /*
@@ -57,22 +54,18 @@ describe('CourseController -> update', function () {
     */
 
     describe('success', function () {
-
-        it('author updates a course', function () {
+        it('author updates course image', function () {
             Sanctum::actingAs($this->teacher);
 
-            $data = ($this->payload)();
+            $file = UploadedFile::fake()->image('image.jpg');
 
-            putJson(route('courses.update', $this->course), $data)
+            patchJson(route('courses.image.update', $this->course), ['image' => $file])
                 ->assertOk()
                 ->assertJsonStructure(['data' => $this->expectedCourseStructure]);
 
-            $this->assertDatabaseHas('courses', [
-                'id' => $this->course->id,
-                'title' => $data['title'],
-                'slug' => $data['slug'],
-                'price' => $data['price'],
-            ]);
+            $course = $this->course->fresh();
+            expect($course->image_path)->not->toBeNull();
+            Storage::disk('public')->assertExists($course->image_path);
         });
     });
 
@@ -83,27 +76,23 @@ describe('CourseController -> update', function () {
     */
 
     describe('validation', function () {
-
-        beforeEach(function () {
+        it('fails when image is missing', function () {
             Sanctum::actingAs($this->teacher);
-        });
 
-        it('fails when required fields are missing', function () {
-            putJson(route('courses.update', $this->course), [])
+            patchJson(route('courses.image.update', $this->course), [])
                 ->assertUnprocessable()
-                ->assertJsonValidationErrors(['title', 'slug', 'price']);
+                ->assertJsonValidationErrors(['image']);
         });
 
-        it('fails when price is invalid', function () {
-            putJson(route('courses.update', $this->course), ($this->payload)(['price' => '-1']))
+        it('fails when file is not image', function () {
+            Sanctum::actingAs($this->teacher);
+
+            $file = UploadedFile::fake()->create('file.pdf');
+
+            patchJson(route('courses.image.update', $this->course), ['image' => $file])
                 ->assertUnprocessable()
-                ->assertJsonValidationErrors(['price']);
+                ->assertJsonValidationErrors(['image']);
         });
-
-//        it('returns 404 for non-existing course', function () {
-//            putJson(route('courses.update', 'non-existing-slug'), ($this->payload)())
-//                ->assertNotFound();
-//        });
     });
 
     /*
@@ -113,18 +102,19 @@ describe('CourseController -> update', function () {
     */
 
     describe('permissions', function () {
-
         it('forbids non-author teacher', function () {
             Sanctum::actingAs($this->otherTeacher);
 
-            putJson(route('courses.update', $this->course), ($this->payload)())
+            $file = UploadedFile::fake()->image('image.jpg');
+            patchJson(route('courses.image.update', $this->course), ['image' => $file])
                 ->assertForbidden();
         });
 
         it('forbids student', function () {
             Sanctum::actingAs($this->student);
 
-            putJson(route('courses.update', $this->course), ($this->payload)())
+            $file = UploadedFile::fake()->image('image.jpg');
+            patchJson(route('courses.image.update', $this->course), ['image' => $file])
                 ->assertForbidden();
         });
 
@@ -132,14 +122,15 @@ describe('CourseController -> update', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            putJson(route('courses.update', $this->course), ($this->payload)())
+            $file = UploadedFile::fake()->image('image.jpg');
+            patchJson(route('courses.image.update', $this->course), ['image' => $file])
                 ->assertForbidden();
         });
 
         it('forbids unauthenticated user', function () {
-            putJson(route('courses.update', $this->course), ($this->payload)())
+            $file = UploadedFile::fake()->image('image.jpg');
+            patchJson(route('courses.image.update', $this->course), ['image' => $file])
                 ->assertUnauthorized();
         });
     });
-
 })->group('courses');

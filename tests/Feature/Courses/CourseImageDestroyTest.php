@@ -9,7 +9,7 @@ use function Pest\Laravel\deleteJson;
 
 uses(RefreshDatabase::class);
 
-describe('CourseController -> destroy', function () {
+describe('CourseImageController -> destroy', function () {
 
     beforeEach(function () {
         $this->teacher = User::factory()->teacher()->create();
@@ -35,72 +35,68 @@ describe('CourseController -> destroy', function () {
     | success
     |--------------------------------------------------------------------------
     */
-
     describe('success', function () {
 
-        it('author deletes course with image', function () {
+        it('author deletes course image', function () {
             Sanctum::actingAs($this->teacher);
 
-            deleteJson(route('courses.destroy', $this->course))
+            deleteJson(route('courses.image.destroy', $this->course))
                 ->assertNoContent();
 
-            $this->assertDatabaseMissing('courses', ['id' => $this->course->id]);
+            $this->assertDatabaseHas('courses', [
+                'id' => $this->course->id,
+                'image_path' => null,
+            ]);
+
             Storage::disk('public')->assertMissing($this->imagePath);
         });
 
-        it('admin deletes course with image', function () {
-            Sanctum::actingAs($this->admin);
+        it('does nothing if image does not exist', function () {
+            Sanctum::actingAs($this->teacher);
 
-            deleteJson(route('courses.destroy', $this->course))
+            $this->course->update(['image_path' => null]);
+
+            deleteJson(route('courses.image.destroy', $this->course))
                 ->assertNoContent();
-
-            $this->assertDatabaseMissing('courses', ['id' => $this->course->id]);
-            Storage::disk('public')->assertMissing($this->imagePath);
         });
     });
-
-    /*
-    |--------------------------------------------------------------------------
-    | validation
-    |--------------------------------------------------------------------------
-    */
-
-//    describe('validation', function () {
-//
-//        it('returns 404 for non-existing course', function () {
-//            Sanctum::actingAs($this->teacher);
-//
-//            deleteJson(route('courses.destroy', 'non-existing-slug'))
-//                ->assertNotFound();
-//        });
-//    });
 
     /*
     |--------------------------------------------------------------------------
     | permissions
     |--------------------------------------------------------------------------
     */
-
     describe('permissions', function () {
+
+        it('forbids admin', function () {
+            Sanctum::actingAs($this->admin);
+
+            deleteJson(route('courses.image.destroy', $this->course))
+                ->assertForbidden();
+
+            $this->assertDatabaseHas('courses', [
+                'id' => $this->course->id,
+                'image_path' => $this->imagePath,
+            ]);
+        });
 
         it('forbids non-author teacher', function () {
             Sanctum::actingAs($this->otherTeacher);
 
-            deleteJson(route('courses.destroy', $this->course))
+            deleteJson(route('courses.image.destroy', $this->course))
                 ->assertForbidden();
         });
 
         it('forbids student', function () {
             Sanctum::actingAs($this->student);
 
-            deleteJson(route('courses.destroy', $this->course))
+            deleteJson(route('courses.image.destroy', $this->course))
                 ->assertForbidden();
         });
 
         it('forbids unauthenticated user', function () {
-            deleteJson(route('courses.destroy', $this->course))
+            deleteJson(route('courses.image.destroy', $this->course))
                 ->assertUnauthorized();
         });
     });
-
 })->group('courses');

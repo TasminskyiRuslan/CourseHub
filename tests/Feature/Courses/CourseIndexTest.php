@@ -37,7 +37,14 @@ describe('CourseController -> index', function () {
         ];
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | success
+    |--------------------------------------------------------------------------
+    */
+
     describe('success', function () {
+
         it('returns only published courses', function () {
             Course::factory()
                 ->count(3)
@@ -58,7 +65,7 @@ describe('CourseController -> index', function () {
                         '*' => $this->expectedCourseStructure,
                     ]
                 ]);
-        })->group('courses');
+        });
 
         it('filters courses by search', function () {
             Course::factory()
@@ -79,7 +86,7 @@ describe('CourseController -> index', function () {
                         '*' => $this->expectedCourseStructure,
                     ]
                 ]);
-        })->group('courses');
+        });
 
         it('sorts courses by price desc', function () {
             Course::factory()
@@ -103,7 +110,7 @@ describe('CourseController -> index', function () {
                         '*' => $this->expectedCourseStructure,
                     ]
                 ]);
-        })->group('courses');
+        });
 
         it('filters courses by author slug', function () {
             Course::factory()
@@ -123,6 +130,26 @@ describe('CourseController -> index', function () {
                         '*' => $this->expectedCourseStructure,
                     ]
                 ]);
-        })->group('courses');
+        });
     });
-});
+
+    /*
+    |--------------------------------------------------------------------------
+    | validation
+    |--------------------------------------------------------------------------
+    */
+
+    describe('validation', function () {
+        it('returns empty for non-existing author slug', function () {
+            getJson(route('courses.index', ['filter[author]' => 'non-existing-slug']))
+                ->assertOk()
+                ->assertJsonCount(0, 'data');
+        });
+
+        it('returns empty for unmatched search', function () {
+            getJson(route('courses.index', ['filter[search]' => 'NonExistingCourse']))
+                ->assertOk()
+                ->assertJsonCount(0, 'data');
+        });
+    });
+})->group('courses');

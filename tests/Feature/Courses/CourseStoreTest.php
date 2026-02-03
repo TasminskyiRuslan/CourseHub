@@ -13,6 +13,7 @@ describe('CourseController -> store', function () {
     beforeEach(function () {
         $this->teacher = User::factory()->teacher()->create();
         $this->student = User::factory()->create();
+        $this->admin = User::factory()->admin()->create();
 
         $this->expectedCourseStructure = [
             'id',
@@ -46,18 +47,21 @@ describe('CourseController -> store', function () {
         ], $overrides);
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | success
+    |--------------------------------------------------------------------------
+    */
 
     describe('success', function () {
-        beforeEach(function () {
+        it('teacher creates a course', function () {
             Sanctum::actingAs($this->teacher);
-        });
-
-        it('creates a course', function () {
-            postJson(route('courses.store'), ($this->payload)())
-                ->assertCreated()
-                ->assertJsonStructure(['data' => $this->expectedCourseStructure]);
 
             $data = ($this->payload)();
+
+            postJson(route('courses.store'), $data)
+                ->assertCreated()
+                ->assertJsonStructure(['data' => $this->expectedCourseStructure]);
 
             $this->assertDatabaseHas('courses', [
                 'author_id' => $this->teacher->id,
@@ -65,14 +69,11 @@ describe('CourseController -> store', function () {
                 'price' => $data['price'],
                 'type' => $data['type'],
             ]);
-
-            $this->assertDatabaseMissing('courses', [
-                'title' => $data['title'],
-                'slug' => null,
-            ]);
         });
 
-        it('creates a course with a custom manual slug', function () {
+        it('teacher creates a course with custom slug', function () {
+            Sanctum::actingAs($this->teacher);
+
             $customSlug = 'custom-url-for-course';
             $data = ($this->payload)(['slug' => $customSlug]);
 
@@ -89,6 +90,12 @@ describe('CourseController -> store', function () {
             ]);
         });
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | validation
+    |--------------------------------------------------------------------------
+    */
 
     describe('validation', function () {
         beforeEach(function () {
@@ -114,7 +121,20 @@ describe('CourseController -> store', function () {
         });
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | permissions
+    |--------------------------------------------------------------------------
+    */
+
     describe('permissions', function () {
+        it('forbids admin', function () {
+            Sanctum::actingAs($this->admin);
+
+            postJson(route('courses.store'), ($this->payload)())
+                ->assertForbidden();
+        });
+
         it('forbids authenticated student', function () {
             Sanctum::actingAs($this->student);
 

@@ -23,7 +23,7 @@ class CourseImageController extends Controller
     {
     }
 
-    #[OA\Put(
+    #[OA\Patch(
         path: '/courses/{course}/image',
         description: 'Update the image of a specific course.',
         summary: 'Update course image',

@@ -17,7 +17,7 @@ describe('PublishCourseController', function () {
             ->teacher()
             ->create();
         $this->student = User::factory()
-            ->verified()
+            ->student()
             ->create();
         $this->admin = User::factory()
             ->admin()
@@ -42,6 +42,20 @@ describe('PublishCourseController', function () {
                 ->assertNoContent();
 
             $this->assertTrue($this->course->fresh()->is_published);
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | validation
+    |--------------------------------------------------------------------------
+    */
+    describe('validation', function () {
+        it('returns not found for non-existing course', function () {
+            Sanctum::actingAs($this->teacher);
+
+            patchJson(route('courses.publish', 'non-existing-slug'))
+                ->assertNotFound();
         });
     });
 

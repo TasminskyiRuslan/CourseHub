@@ -21,7 +21,7 @@ describe('CourseController -> show', function () {
             ->admin()
             ->create();
         $this->student = User::factory()
-            ->verified()
+            ->student()
             ->create();
 
         $this->unpublishedCourse = Course::factory()
@@ -69,12 +69,12 @@ describe('CourseController -> show', function () {
     | validation
     |--------------------------------------------------------------------------
     */
-//    describe('validation', function () {
-//        it('returns not found for non-existing course', function () {
-//            getJson(route('courses.show', 'non-existing-slug'))
-//                ->assertNotFound();
-//        });
-//    });
+    describe('validation', function () {
+        it('returns not found for non-existing course', function () {
+            getJson(route('courses.show', 'non-existing-slug'))
+                ->assertNotFound();
+        });
+    });
 
     /*
     |--------------------------------------------------------------------------

@@ -21,7 +21,7 @@ describe('CourseController -> update', function () {
             ->admin()
             ->create();
         $this->student = User::factory()
-            ->verified()
+            ->student()
             ->create();
 
         $this->course = Course::factory()
@@ -84,10 +84,10 @@ describe('CourseController -> update', function () {
                 ->assertJsonValidationErrors(['price']);
         });
 
-//        it('returns 404 for non-existing course', function () {
-//            putJson(route('courses.update', 'non-existing-slug'), ($this->payload)())
-//                ->assertNotFound();
-//        });
+        it('returns not found for non-existing course', function () {
+            putJson(route('courses.update', 'non-existing-slug'), ($this->payload)())
+                ->assertNotFound();
+        });
     });
 
     /*

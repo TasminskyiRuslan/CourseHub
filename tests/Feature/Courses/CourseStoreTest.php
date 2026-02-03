@@ -15,7 +15,7 @@ describe('CourseController -> store', function () {
             ->teacher()
             ->create();
         $this->student = User::factory()
-            ->verified()
+            ->student()
             ->create();
         $this->admin = User::factory()
             ->admin()

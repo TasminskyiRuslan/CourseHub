@@ -18,7 +18,7 @@ describe('CourseController -> destroy', function () {
             ->teacher()
             ->create();
         $this->student = User::factory()
-            ->verified()
+            ->student()
             ->create();
         $this->admin = User::factory()
             ->admin()
@@ -69,16 +69,15 @@ describe('CourseController -> destroy', function () {
     | validation
     |--------------------------------------------------------------------------
     */
+    describe('validation', function () {
 
-//    describe('validation', function () {
-//
-//        it('returns 404 for non-existing course', function () {
-//            Sanctum::actingAs($this->teacher);
-//
-//            deleteJson(route('courses.destroy', 'non-existing-slug'))
-//                ->assertNotFound();
-//        });
-//    });
+        it('returns not found for non-existing course', function () {
+            Sanctum::actingAs($this->teacher);
+
+            deleteJson(route('courses.destroy', 'non-existing-slug'))
+                ->assertNotFound();
+        });
+    });
 
     /*
     |--------------------------------------------------------------------------

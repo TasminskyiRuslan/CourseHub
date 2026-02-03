@@ -22,7 +22,7 @@ describe('CourseImageController -> update', function () {
             ->teacher()
             ->create();
         $this->student = User::factory()
-            ->verified()
+            ->student()
             ->create();
         $this->admin = User::factory()
             ->admin()
@@ -77,6 +77,11 @@ describe('CourseImageController -> update', function () {
             patchJson(route('courses.image.update', $this->course), ['image' => $file])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['image']);
+        });
+
+        it('returns not found for non-existing course', function () {
+            patchJson(route('courses.image.update', 'non-existing-slug'))
+                ->assertNotFound();
         });
     });
 

@@ -9,12 +9,19 @@ use function Pest\Laravel\patchJson;
 uses(RefreshDatabase::class);
 
 describe('UnpublishCourseController', function () {
-
     beforeEach(function () {
-        $this->teacher = User::factory()->teacher()->create();
-        $this->otherTeacher = User::factory()->teacher()->create();
-        $this->student = User::factory()->create();
-        $this->admin = User::factory()->admin()->create();
+        $this->teacher = User::factory()
+            ->teacher()
+            ->create();
+        $this->otherTeacher = User::factory()
+            ->teacher()
+            ->create();
+        $this->student = User::factory()
+            ->verified()
+            ->create();
+        $this->admin = User::factory()
+            ->admin()
+            ->create();
 
         $this->course = Course::factory()
             ->published()
@@ -28,7 +35,6 @@ describe('UnpublishCourseController', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-
         it('author unpublishes course', function () {
             Sanctum::actingAs($this->teacher);
 
@@ -54,7 +60,6 @@ describe('UnpublishCourseController', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-
         it('forbids non-author teacher', function () {
             Sanctum::actingAs($this->otherTeacher);
 

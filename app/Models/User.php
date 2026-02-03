@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
-use App\Notifications\QueuedVerifyEmailNotification;
 use App\Notifications\QueuedResetPasswordNotification;
+use App\Notifications\QueuedVerifyEmailNotification;
 use Database\Factories\UserFactory;
 use Eloquent;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -70,15 +70,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'password' => 'hashed',
-            'role' => UserRole::class,
-            'email_verified_at' => 'datetime',
-        ];
-    }
-
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
@@ -107,17 +98,27 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->role === UserRole::ADMIN;
     }
 
-    public function isTeacher(): bool
-    {
-        return $this->role === UserRole::TEACHER;
-    }
-
     public function canPublishContent(): bool
     {
         return $this->isTeacher() && $this->hasVerifiedEmail();
     }
 
-    public function isAuthorOf(Course $course): bool {
+    public function isTeacher(): bool
+    {
+        return $this->role === UserRole::TEACHER;
+    }
+
+    public function isAuthorOf(Course $course): bool
+    {
         return $this->is($course->author);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+            'role' => UserRole::class,
+            'email_verified_at' => 'datetime',
+        ];
     }
 }

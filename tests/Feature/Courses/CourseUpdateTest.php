@@ -4,43 +4,30 @@ use App\Models\Course;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Tests\Support\CourseJsonStructure;
 use function Pest\Laravel\putJson;
 
 uses(RefreshDatabase::class);
 
 describe('CourseController -> update', function () {
-
     beforeEach(function () {
-        $this->teacher = User::factory()->teacher()->create();
-        $this->otherTeacher = User::factory()->teacher()->create();
-        $this->student = User::factory()->create();
-
-        $this->course = Course::factory()
-            ->for($this->teacher, 'author')
+        $this->teacher = User::factory()
+            ->teacher()
+            ->create();
+        $this->otherTeacher = User::factory()
+            ->teacher()
+            ->create();
+        $this->admin = User::factory()
+            ->admin()
+            ->create();
+        $this->student = User::factory()
+            ->verified()
             ->create();
 
-        $this->expectedCourseStructure = [
-            'id',
-            'author_id',
-            'author' => [
-                'id',
-                'name',
-                'slug',
-                'email',
-                'email_verified_at',
-                'created_at',
-                'updated_at',
-            ],
-            'title',
-            'slug',
-            'description',
-            'type',
-            'price',
-            'image_url',
-            'is_published',
-            'created_at',
-            'updated_at',
-        ];
+        $this->course = Course::factory()
+            ->unpublished()
+            ->for($this->teacher, 'author')
+            ->create();
 
         $this->payload = fn(array $overrides = []) => array_merge([
             'title' => 'Updated course title',
@@ -55,9 +42,7 @@ describe('CourseController -> update', function () {
     | success
     |--------------------------------------------------------------------------
     */
-
     describe('success', function () {
-
         it('author updates a course', function () {
             Sanctum::actingAs($this->teacher);
 
@@ -65,12 +50,13 @@ describe('CourseController -> update', function () {
 
             putJson(route('courses.update', $this->course), $data)
                 ->assertOk()
-                ->assertJsonStructure(['data' => $this->expectedCourseStructure]);
+                ->assertJsonStructure(['data' => CourseJsonStructure::get()]);
 
             $this->assertDatabaseHas('courses', [
                 'id' => $this->course->id,
                 'title' => $data['title'],
                 'slug' => $data['slug'],
+                'description' => $data['description'],
                 'price' => $data['price'],
             ]);
         });
@@ -81,9 +67,7 @@ describe('CourseController -> update', function () {
     | validation
     |--------------------------------------------------------------------------
     */
-
     describe('validation', function () {
-
         beforeEach(function () {
             Sanctum::actingAs($this->teacher);
         });
@@ -111,9 +95,7 @@ describe('CourseController -> update', function () {
     | permissions
     |--------------------------------------------------------------------------
     */
-
     describe('permissions', function () {
-
         it('forbids non-author teacher', function () {
             Sanctum::actingAs($this->otherTeacher);
 
@@ -129,8 +111,7 @@ describe('CourseController -> update', function () {
         });
 
         it('forbids admin', function () {
-            $admin = User::factory()->admin()->create();
-            Sanctum::actingAs($admin);
+            Sanctum::actingAs($this->admin);
 
             putJson(route('courses.update', $this->course), ($this->payload)())
                 ->assertForbidden();

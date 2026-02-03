@@ -47,13 +47,6 @@ class Lesson extends Model
         'position'
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'position' => 'integer',
-        ];
-    }
-
     protected static function booted(): void
     {
         static::creating(function (Lesson $lesson) {
@@ -79,7 +72,7 @@ class Lesson extends Model
             ->generateSlugsFrom('title')
             ->saveSlugsTo('slug')
             ->doNotGenerateSlugsOnUpdate()
-            ->extraScope(fn ($builder) => $builder->where('course_id', $this->course_id));
+            ->extraScope(fn($builder) => $builder->where('course_id', $this->course_id));
     }
 
     public function lessonable(): MorphTo
@@ -90,5 +83,12 @@ class Lesson extends Model
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'position' => 'integer',
+        ];
     }
 }

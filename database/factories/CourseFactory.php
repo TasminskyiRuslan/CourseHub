@@ -21,7 +21,7 @@ class CourseFactory extends Factory
     {
         return [
             'author_id' => User::factory()->lazy(),
-            'title' => fake()->sentence(3),
+            'title' => fake()->words(3, true),
             'slug' => null,
             'description' => fake()->sentence(10),
             'price' => fake()->randomFloat(2, 0, 500),
@@ -31,8 +31,28 @@ class CourseFactory extends Factory
         ];
     }
 
-    public function published(): CourseFactory|Factory
+    public function published(): static
     {
-        return $this->state(fn () => ['is_published' => true]);
+        return $this->state(fn() => ['is_published' => true]);
+    }
+
+    public function unpublished(): static
+    {
+        return $this->state(fn() => ['is_published' => false]);
+    }
+
+    public function free(): static
+    {
+        return $this->state(fn() => ['price' => 0]);
+    }
+
+    public function withImage(string $path): static
+    {
+        return $this->state(fn() => ['image_path' => $path]);
+    }
+
+    public function type(CourseType $courseType): static
+    {
+        return $this->state(fn() => ['type' => $courseType]);
     }
 }

@@ -11,16 +11,23 @@ uses(RefreshDatabase::class);
 
 describe('ForgotPasswordController', function () {
     beforeEach(function () {
-        $this->user = User::factory()->create();
+        $this->user = User::factory()
+            ->verified()
+            ->create();
 
         Notification::fake();
         $this->withoutMiddleware(ThrottleRequests::class);
 
-        $this->payload = fn (array $overrides = []) => array_merge([
+        $this->payload = fn(array $overrides = []) => array_merge([
             'email' => $this->user->email,
         ], $overrides);
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | success
+    |--------------------------------------------------------------------------
+    */
     describe('success', function () {
         it('sends a reset link to an existing user', function () {
             postJson(route('auth.password.forgot'), ($this->payload)())
@@ -29,12 +36,10 @@ describe('ForgotPasswordController', function () {
             Notification::assertSentTo(
                 $this->user,
                 QueuedResetPasswordNotification::class,
-                fn ($notification) => ! empty($notification->token)
+                fn($notification) => !empty($notification->token)
             );
 
-            $this->assertDatabaseHas('password_reset_tokens', [
-                'email' => $this->user->email,
-            ]);
+            $this->assertDatabaseHas('password_reset_tokens', ($this->payload)());
         });
 
         it('silently succeeds when the email does not exist', function () {
@@ -49,6 +54,11 @@ describe('ForgotPasswordController', function () {
         });
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | validation
+    |--------------------------------------------------------------------------
+    */
     describe('validation', function () {
         it('fails when email is missing', function () {
             postJson(route('auth.password.forgot'), [])

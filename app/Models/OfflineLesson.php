@@ -43,14 +43,6 @@ class OfflineLesson extends Model
         'room_number'
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'start_time' => 'datetime',
-            'end_time' => 'datetime',
-        ];
-    }
-
     public function lesson(): MorphOne
     {
         return $this->morphOne(Lesson::class, 'lessonable');
@@ -61,5 +53,13 @@ class OfflineLesson extends Model
         return $resourceClass
             ? new $resourceClass($this)
             : new OfflineLessonResource($this);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'start_time' => 'datetime',
+            'end_time' => 'datetime',
+        ];
     }
 }

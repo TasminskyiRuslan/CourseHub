@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\Api\Courses;
 
-use App\Http\Resources\Api\Auth\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
@@ -32,7 +31,7 @@ class CourseResource extends JsonResource
         return [
             'id' => $this->id,
             'author_id' => $this->author_id,
-            'author' => new UserResource($this->whenLoaded('author')),
+            'author' => new AuthorResource($this->whenLoaded('author')),
             'title' => $this->title,
             'slug' => $this->slug,
             'description' => $this->description,

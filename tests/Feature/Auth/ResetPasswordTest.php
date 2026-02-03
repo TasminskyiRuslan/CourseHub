@@ -10,33 +10,55 @@ uses(RefreshDatabase::class);
 
 describe('ResetPasswordController', function () {
     beforeEach(function () {
-        $this->user = User::factory()->create([
-            'password' => 'old-password',
-        ]);
+        $this->oldPassword = 'old-password';
+        $this->newPassword = 'new-password';
 
-        $this->token = Password::createToken($this->user);
+        $this->user = User::factory()
+            ->verified()
+            ->create([
+                'password' => $this->oldPassword,
+            ]);
 
-        $this->payload = [
+        $this->admin = User::factory()
+            ->admin()
+            ->create([
+                'password' => $this->oldPassword,
+            ]);
+
+        $this->userToken = Password::createToken($this->user);
+        $this->adminToken = Password::createToken($this->admin);
+
+        $this->payload = fn(array $overrides = []) => array_merge([
             'email' => $this->user->email,
-            'password' => 'new-password',
-            'password_confirmation' => 'new-password',
-            'token' => $this->token,
-        ];
+            'password' => $this->newPassword,
+            'password_confirmation' => $this->newPassword,
+            'token' => $this->userToken,
+        ], $overrides);
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | success
+    |--------------------------------------------------------------------------
+    */
     describe('success', function () {
         it('resets the password', function () {
-            postJson(route('auth.password.reset'), $this->payload)
+            postJson(route('auth.password.reset'), ($this->payload)())
                 ->assertNoContent();
 
             $this->user->refresh();
-            expect(Hash::check('new-password', $this->user->password))->toBeTrue();
+            expect(Hash::check($this->newPassword, $this->user->password))->toBeTrue();
         });
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | validation
+    |--------------------------------------------------------------------------
+    */
     describe('validation', function () {
         it('fails when token is invalid', function () {
-            postJson(route('auth.password.reset'), array_merge($this->payload, [
+            postJson(route('auth.password.reset'), ($this->payload)([
                 'token' => 'invalid-token',
             ]))
                 ->assertUnprocessable()
@@ -50,7 +72,7 @@ describe('ResetPasswordController', function () {
         });
 
         it('fails when password confirmation does not match', function () {
-            postJson(route('auth.password.reset'), array_merge($this->payload, [
+            postJson(route('auth.password.reset'), ($this->payload)([
                 'password_confirmation' => 'different',
             ]))
                 ->assertUnprocessable()
@@ -58,7 +80,7 @@ describe('ResetPasswordController', function () {
         });
 
         it('fails when email format is invalid', function () {
-            postJson(route('auth.password.reset'), array_merge($this->payload, [
+            postJson(route('auth.password.reset'), ($this->payload)([
                 'email' => 'invalid-email',
             ]))
                 ->assertUnprocessable()
@@ -66,7 +88,7 @@ describe('ResetPasswordController', function () {
         });
 
         it('fails when email does not exist', function () {
-            postJson(route('auth.password.reset'), array_merge($this->payload, [
+            postJson(route('auth.password.reset'), ($this->payload)([
                 'email' => 'nonexistent@example.com',
             ]))
                 ->assertUnprocessable()
@@ -74,7 +96,7 @@ describe('ResetPasswordController', function () {
         });
 
         it('fails when the new password is too short', function () {
-            postJson(route('auth.password.reset'), array_merge($this->payload, [
+            postJson(route('auth.password.reset'), ($this->payload)([
                 'password' => '123',
                 'password_confirmation' => '123',
             ]))
@@ -83,20 +105,17 @@ describe('ResetPasswordController', function () {
         });
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | permissions
+    |--------------------------------------------------------------------------
+    */
     describe('permissions', function () {
-        beforeEach(function () {
-            $this->admin = User::factory()->admin()->create();
-
-            $this->payload = [
-                'email' => $this->admin->email,
-                'password' => 'new-admin-password',
-                'password_confirmation' => 'new-admin-password',
-                'token' => 'dummy-token',
-            ];
-        });
-
         it('forbids admin', function () {
-            postJson(route('auth.password.reset'), $this->payload)
+            postJson(route('auth.password.reset'), ($this->payload)([
+                'email' => $this->admin->email,
+                'token' => $this->adminToken,
+            ]))
                 ->assertForbidden();
         });
     });

@@ -4,39 +4,22 @@ use App\Enums\CourseType;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Tests\Support\CourseJsonStructure;
 use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class);
 
 describe('CourseController -> store', function () {
-
     beforeEach(function () {
-        $this->teacher = User::factory()->teacher()->create();
-        $this->student = User::factory()->create();
-        $this->admin = User::factory()->admin()->create();
-
-        $this->expectedCourseStructure = [
-            'id',
-            'author_id',
-            'author' => [
-                'id',
-                'name',
-                'slug',
-                'email',
-                'email_verified_at',
-                'created_at',
-                'updated_at',
-            ],
-            'title',
-            'slug',
-            'description',
-            'type',
-            'price',
-            'image_url',
-            'is_published',
-            'created_at',
-            'updated_at',
-        ];
+        $this->teacher = User::factory()
+            ->teacher()
+            ->create();
+        $this->student = User::factory()
+            ->verified()
+            ->create();
+        $this->admin = User::factory()
+            ->admin()
+            ->create();
 
         $this->payload = fn(array $overrides = []) => array_merge([
             'title' => 'New Laravel Course',
@@ -52,16 +35,17 @@ describe('CourseController -> store', function () {
     | success
     |--------------------------------------------------------------------------
     */
-
     describe('success', function () {
-        it('teacher creates a course', function () {
+        beforeEach(function () {
             Sanctum::actingAs($this->teacher);
+        });
 
+        it('teacher creates a course', function () {
             $data = ($this->payload)();
 
             postJson(route('courses.store'), $data)
                 ->assertCreated()
-                ->assertJsonStructure(['data' => $this->expectedCourseStructure]);
+                ->assertJsonStructure(['data' => CourseJsonStructure::get()]);
 
             $this->assertDatabaseHas('courses', [
                 'author_id' => $this->teacher->id,
@@ -72,14 +56,13 @@ describe('CourseController -> store', function () {
         });
 
         it('teacher creates a course with custom slug', function () {
-            Sanctum::actingAs($this->teacher);
-
-            $customSlug = 'custom-url-for-course';
+            $customSlug = 'custom-slug-for-course';
             $data = ($this->payload)(['slug' => $customSlug]);
 
             postJson(route('courses.store'), $data)
                 ->assertCreated()
-                ->assertJsonPath('data.slug', $customSlug);
+                ->assertJsonPath('data.slug', $customSlug)
+                ->assertJsonStructure(['data' => CourseJsonStructure::get()]);
 
             $this->assertDatabaseHas('courses', [
                 'author_id' => $this->teacher->id,
@@ -96,7 +79,6 @@ describe('CourseController -> store', function () {
     | validation
     |--------------------------------------------------------------------------
     */
-
     describe('validation', function () {
         beforeEach(function () {
             Sanctum::actingAs($this->teacher);
@@ -126,7 +108,6 @@ describe('CourseController -> store', function () {
     | permissions
     |--------------------------------------------------------------------------
     */
-
     describe('permissions', function () {
         it('forbids admin', function () {
             Sanctum::actingAs($this->admin);

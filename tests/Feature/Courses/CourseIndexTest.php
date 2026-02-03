@@ -4,37 +4,14 @@ use App\Models\Course;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\CourseJsonStructure;
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class);
 
 describe('CourseController -> index', function () {
-
     beforeEach(function () {
         $this->author = User::factory()->teacher()->create();
-
-        $this->expectedCourseStructure = [
-            'id',
-            'author_id',
-            'author' => [
-                'id',
-                'name',
-                'slug',
-                'email',
-                'email_verified_at',
-                'created_at',
-                'updated_at',
-            ],
-            'title',
-            'slug',
-            'description',
-            'type',
-            'price',
-            'image_url',
-            'is_published',
-            'created_at',
-            'updated_at',
-        ];
     });
 
     /*
@@ -42,9 +19,7 @@ describe('CourseController -> index', function () {
     | success
     |--------------------------------------------------------------------------
     */
-
     describe('success', function () {
-
         it('returns only published courses', function () {
             Course::factory()
                 ->count(3)
@@ -54,6 +29,7 @@ describe('CourseController -> index', function () {
 
             Course::factory()
                 ->count(2)
+                ->unpublished()
                 ->for($this->author, 'author')
                 ->create();
 
@@ -62,52 +38,52 @@ describe('CourseController -> index', function () {
                 ->assertJsonCount(3, 'data')
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => $this->expectedCourseStructure,
+                        '*' => CourseJsonStructure::get(),
                     ]
                 ]);
         });
 
         it('filters courses by search', function () {
+            $firstTitle = 'Laravel Advanced';
             Course::factory()
                 ->published()
                 ->for($this->author, 'author')
-                ->create(['title' => 'Laravel Advanced']);
+                ->create(['title' => $firstTitle]);
 
+            $secondTitle = 'Vue Basics';
             Course::factory()
                 ->published()
                 ->for($this->author, 'author')
-                ->create(['title' => 'Vue Basics']);
+                ->create(['title' => $secondTitle]);
 
-            getJson(route('courses.index', ['filter[search]' => 'Laravel']))
+            getJson(route('courses.index', ['filter[search]' => $firstTitle]))
                 ->assertOk()
                 ->assertJsonCount(1, 'data')
+                ->assertJsonPath('data.0.title', $firstTitle)
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => $this->expectedCourseStructure,
+                        '*' => CourseJsonStructure::get(),
                     ]
                 ]);
         });
 
         it('sorts courses by price desc', function () {
+            $prices = ['100.00', '200.00', '300.00'];
             Course::factory()
                 ->count(3)
                 ->published()
                 ->for($this->author, 'author')
                 ->state(new Sequence(
-                    ['price' => '100.00'],
-                    ['price' => '300.00'],
-                    ['price' => '200.00'],
+                    ...array_map(fn($price) => ['price' => $price], $prices)
                 ))
                 ->create();
 
             getJson(route('courses.index', ['sort' => '-price']))
                 ->assertOk()
-                ->assertJsonPath('data.0.price', '300.00')
-                ->assertJsonPath('data.1.price', '200.00')
-                ->assertJsonPath('data.2.price', '100.00')
+                ->assertJsonPath('data.*.price', array_reverse($prices))
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => $this->expectedCourseStructure,
+                        '*' => CourseJsonStructure::get(),
                     ]
                 ]);
         });
@@ -127,7 +103,7 @@ describe('CourseController -> index', function () {
                 ->assertJsonCount(1, 'data')
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => $this->expectedCourseStructure,
+                        '*' => CourseJsonStructure::get(),
                     ]
                 ]);
         });
@@ -138,7 +114,6 @@ describe('CourseController -> index', function () {
     | validation
     |--------------------------------------------------------------------------
     */
-
     describe('validation', function () {
         it('returns empty for non-existing author slug', function () {
             getJson(route('courses.index', ['filter[author]' => 'non-existing-slug']))

@@ -8,7 +8,7 @@ use OpenApi\Attributes as OA;
     schema: 'Auth',
     title: 'Auth schema',
     description: 'Authentication data returned by the API',
-    required: ['user', 'token', 'token_type', 'expires_at'],
+    required: ['user', 'access_token', 'token_type', 'expires_at'],
     properties: [
         new OA\Property(
             property: 'user',

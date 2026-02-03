@@ -8,7 +8,7 @@ use OpenApi\Attributes as OA;
     schema: 'Lesson',
     title: 'Lesson schema',
     description: 'Details of a lesson returned by the API',
-    required: ['id', 'course_id', 'title', 'slug', 'content', 'created_at', 'updated_at'],
+    required: ['id', 'course_id', 'title', 'slug', 'position', 'content', 'created_at', 'updated_at'],
     properties: [
         new OA\Property(
             property: 'id',

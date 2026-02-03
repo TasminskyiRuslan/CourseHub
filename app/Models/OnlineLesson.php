@@ -40,13 +40,6 @@ class OnlineLesson extends Model
         'meeting_link'
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'start_time' => 'datetime',
-            'end_time' => 'datetime',
-        ];
-    }
     public function lesson(): MorphOne
     {
         return $this->morphOne(Lesson::class, 'lessonable');
@@ -57,5 +50,13 @@ class OnlineLesson extends Model
         return $resourceClass
             ? new $resourceClass($this)
             : new OnlineLessonResource($this);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'start_time' => 'datetime',
+            'end_time' => 'datetime',
+        ];
     }
 }

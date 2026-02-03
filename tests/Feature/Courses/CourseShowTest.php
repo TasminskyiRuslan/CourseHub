@@ -4,44 +4,35 @@ use App\Models\Course;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Tests\Support\CourseJsonStructure;
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class);
 
 describe('CourseController -> show', function () {
-
     beforeEach(function () {
-        $this->author = User::factory()->teacher()->create();
-        $this->otherTeacher = User::factory()->teacher()->create();
-        $this->admin = User::factory()->admin()->create();
-        $this->student = User::factory()->create();
+        $this->author = User::factory()
+            ->teacher()
+            ->create();
+        $this->otherTeacher = User::factory()
+            ->teacher()
+            ->create();
+        $this->admin = User::factory()
+            ->admin()
+            ->create();
+        $this->student = User::factory()
+            ->verified()
+            ->create();
 
-        $this->course = Course::factory()
+        $this->unpublishedCourse = Course::factory()
+            ->unpublished()
             ->for($this->author, 'author')
             ->create();
 
-        $this->expectedCourseStructure = [
-            'id',
-            'author_id',
-            'author' => [
-                'id',
-                'name',
-                'slug',
-                'email',
-                'email_verified_at',
-                'created_at',
-                'updated_at',
-            ],
-            'title',
-            'slug',
-            'description',
-            'type',
-            'price',
-            'image_url',
-            'is_published',
-            'created_at',
-            'updated_at',
-        ];
+        $this->publishedCourse = Course::factory()
+            ->published()
+            ->for($this->author, 'author')
+            ->create();
     });
 
     /*
@@ -50,32 +41,26 @@ describe('CourseController -> show', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-
         it('shows published course for unauthenticated user', function () {
-            $course = Course::factory()
-                ->published()
-                ->for($this->author, 'author')
-                ->create();
-
-            getJson(route('courses.show', $course))
+            getJson(route('courses.show', $this->publishedCourse))
                 ->assertOk()
-                ->assertJsonStructure(['data' => $this->expectedCourseStructure]);
+                ->assertJsonStructure(['data' => CourseJsonStructure::get()]);
         });
 
         it('shows unpublished course for the author', function () {
             Sanctum::actingAs($this->author);
 
-            getJson(route('courses.show', $this->course))
+            getJson(route('courses.show', $this->unpublishedCourse))
                 ->assertOk()
-                ->assertJsonStructure(['data' => $this->expectedCourseStructure]);
+                ->assertJsonStructure(['data' => CourseJsonStructure::get()]);
         });
 
         it('shows unpublished course for admin', function () {
             Sanctum::actingAs($this->admin);
 
-            getJson(route('courses.show', $this->course))
+            getJson(route('courses.show', $this->unpublishedCourse))
                 ->assertOk()
-                ->assertJsonStructure(['data' => $this->expectedCourseStructure]);
+                ->assertJsonStructure(['data' => CourseJsonStructure::get()]);
         });
     });
 
@@ -97,23 +82,22 @@ describe('CourseController -> show', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-
         it('forbids unpublished course for non-author teacher', function () {
             Sanctum::actingAs($this->otherTeacher);
 
-            getJson(route('courses.show', $this->course))
+            getJson(route('courses.show', $this->unpublishedCourse))
                 ->assertForbidden();
         });
 
         it('forbids unpublished course for student', function () {
             Sanctum::actingAs($this->student);
 
-            getJson(route('courses.show', $this->course))
+            getJson(route('courses.show', $this->unpublishedCourse))
                 ->assertForbidden();
         });
 
         it('forbids unpublished course for unauthenticated user', function () {
-            getJson(route('courses.show', $this->course))
+            getJson(route('courses.show', $this->unpublishedCourse))
                 ->assertForbidden();
         });
     });

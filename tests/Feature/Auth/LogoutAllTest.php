@@ -9,18 +9,23 @@ uses(RefreshDatabase::class);
 
 describe('LogoutAllController', function () {
     beforeEach(function () {
-        $this->user = User::factory()->create();
+        $this->user = User::factory()
+            ->verified()
+            ->create();
 
         collect(range(1, 5))
-            ->map(fn () => $this->user->createToken('access_token'));
+            ->map(fn() => $this->user->createToken('access_token'));
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | success
+    |--------------------------------------------------------------------------
+    */
     describe('success', function () {
-        beforeEach(function () {
-            Sanctum::actingAs($this->user);
-        });
-
         it('revokes all authentication tokens for the user', function () {
+            Sanctum::actingAs($this->user);
+
             deleteJson(route('auth.tokens.destroy'))
                 ->assertNoContent();
 
@@ -28,6 +33,11 @@ describe('LogoutAllController', function () {
         });
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | permissions
+    |--------------------------------------------------------------------------
+    */
     describe('permissions', function () {
         it('fails for unauthenticated user', function () {
             deleteJson(route('auth.tokens.destroy'))

@@ -29,27 +29,24 @@ class LessonFactory extends Factory
         ];
     }
 
-    public function offline(): Factory|LessonFactory
+    public function offline(): static
     {
         return $this->afterCreating(function (Lesson $lesson) {
-            $offlineContent = OfflineLesson::factory()->create();
-            $lesson->lessonable()->save($offlineContent);
+            $lesson->lessonable()->save(OfflineLesson::factory()->create());
         });
     }
 
-    public function online(): Factory|LessonFactory
+    public function online(): static
     {
         return $this->afterCreating(function (Lesson $lesson) {
-            $onlineContent = OnlineLesson::factory()->create();
-            $lesson->lessonable()->save($onlineContent);
+            $lesson->lessonable()->save(OnlineLesson::factory()->create());
         });
     }
 
-    public function video(): Factory|LessonFactory
+    public function video(): static
     {
         return $this->afterCreating(function (Lesson $lesson) {
-            $videoContent = VideoLesson::factory()->create();
-            $lesson->lessonable()->save($videoContent);
+            $lesson->lessonable()->save(VideoLesson::factory()->create());
         });
     }
 }

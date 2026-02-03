@@ -12,20 +12,28 @@ uses(RefreshDatabase::class);
 describe('CourseImageController -> destroy', function () {
 
     beforeEach(function () {
-        $this->teacher = User::factory()->teacher()->create();
-        $this->otherTeacher = User::factory()->teacher()->create();
-        $this->student = User::factory()->create();
-        $this->admin = User::factory()->admin()->create();
+        $this->teacher = User::factory()
+            ->teacher()
+            ->create();
+        $this->otherTeacher = User::factory()
+            ->teacher()
+            ->create();
+        $this->student = User::factory()
+            ->verified()
+            ->create();
+        $this->admin = User::factory()
+            ->admin()
+            ->create();
 
         Storage::fake('public');
 
         $this->imagePath = 'courses/test-image.jpg';
 
         $this->course = Course::factory()
+            ->unpublished()
+            ->withImage($this->imagePath)
             ->for($this->teacher, 'author')
-            ->create([
-                'image_path' => $this->imagePath,
-            ]);
+            ->create();
 
         Storage::disk('public')->put($this->course->image_path, 'fake');
     });
@@ -36,10 +44,11 @@ describe('CourseImageController -> destroy', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
+        beforeEach(function () {
+            Sanctum::actingAs($this->teacher);
+        });
 
         it('author deletes course image', function () {
-            Sanctum::actingAs($this->teacher);
-
             deleteJson(route('courses.image.destroy', $this->course))
                 ->assertNoContent();
 
@@ -52,8 +61,6 @@ describe('CourseImageController -> destroy', function () {
         });
 
         it('does nothing if image does not exist', function () {
-            Sanctum::actingAs($this->teacher);
-
             $this->course->update(['image_path' => null]);
 
             deleteJson(route('courses.image.destroy', $this->course))
@@ -67,7 +74,6 @@ describe('CourseImageController -> destroy', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-
         it('forbids admin', function () {
             Sanctum::actingAs($this->admin);
 

@@ -10,22 +10,29 @@ use function Pest\Laravel\deleteJson;
 uses(RefreshDatabase::class);
 
 describe('CourseController -> destroy', function () {
-
     beforeEach(function () {
-        $this->teacher = User::factory()->teacher()->create();
-        $this->otherTeacher = User::factory()->teacher()->create();
-        $this->student = User::factory()->create();
-        $this->admin = User::factory()->admin()->create();
+        $this->teacher = User::factory()
+            ->teacher()
+            ->create();
+        $this->otherTeacher = User::factory()
+            ->teacher()
+            ->create();
+        $this->student = User::factory()
+            ->verified()
+            ->create();
+        $this->admin = User::factory()
+            ->admin()
+            ->create();
 
         Storage::fake('public');
 
         $this->imagePath = 'courses/test-image.jpg';
 
         $this->course = Course::factory()
+            ->unpublished()
+            ->withImage($this->imagePath)
             ->for($this->teacher, 'author')
-            ->create([
-                'image_path' => $this->imagePath,
-            ]);
+            ->create();
 
         Storage::disk('public')->put($this->course->image_path, 'fake');
     });
@@ -35,9 +42,7 @@ describe('CourseController -> destroy', function () {
     | success
     |--------------------------------------------------------------------------
     */
-
     describe('success', function () {
-
         it('author deletes course with image', function () {
             Sanctum::actingAs($this->teacher);
 
@@ -80,9 +85,7 @@ describe('CourseController -> destroy', function () {
     | permissions
     |--------------------------------------------------------------------------
     */
-
     describe('permissions', function () {
-
         it('forbids non-author teacher', function () {
             Sanctum::actingAs($this->otherTeacher);
 

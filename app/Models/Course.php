@@ -63,15 +63,6 @@ class Course extends Model
         'is_published' => false,
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'price' => 'decimal:2',
-            'type' => CourseType::class,
-            'is_published' => 'boolean',
-        ];
-    }
-
     protected static function booted(): void
     {
         static::deleting(function (Course $course) {
@@ -115,5 +106,14 @@ class Course extends Model
     public function unpublish(): void
     {
         $this->is_published = false;
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'price' => 'decimal:2',
+            'type' => CourseType::class,
+            'is_published' => 'boolean',
+        ];
     }
 }

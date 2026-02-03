@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\AuthJsonStructure;
 use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class);
@@ -10,37 +11,29 @@ describe('LoginController', function () {
     beforeEach(function () {
         $this->password = 'password';
 
-        $this->user = User::factory()->create([
-            'password' => $this->password,
-        ]);
+        $this->user = User::factory()
+            ->verified()
+            ->create([
+                'password' => $this->password,
+            ]);
 
-        $this->expectedAuthStructure = [
-            'user' => [
-                'id',
-                'name',
-                'slug',
-                'email',
-                'role',
-                'email_verified_at',
-                'created_at',
-                'updated_at',
-            ],
-            'access_token',
-            'token_type',
-            'expires_at',
-        ];
-        $this->payload = fn (array $overrides = []) => array_merge([
+        $this->payload = fn(array $overrides = []) => array_merge([
             'email' => $this->user->email,
             'password' => $this->password,
         ], $overrides);
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | success
+    |--------------------------------------------------------------------------
+    */
     describe('success', function () {
         it('authenticates the user', function () {
             postJson(route('auth.login'), ($this->payload)())
                 ->assertOk()
                 ->assertJsonStructure([
-                    'data' => $this->expectedAuthStructure,
+                    'data' => AuthJsonStructure::get(),
                 ]);
         });
 
@@ -51,7 +44,6 @@ describe('LoginController', function () {
             )->assertOk();
 
             $expiresAt = now()->parse($response->json('data.expires_at'));
-
             expect($expiresAt->greaterThan(now()->addWeek()))
                 ->toBeTrue();
         });
@@ -63,7 +55,6 @@ describe('LoginController', function () {
             )->assertOk();
 
             $expiresAt = now()->parse($response->json('data.expires_at'));
-
             expect($expiresAt->lessThanOrEqualTo(now()->addDay()))
                 ->toBeTrue();
         });
@@ -73,12 +64,16 @@ describe('LoginController', function () {
                 ->assertOk();
 
             $expiresAt = now()->parse($response->json('data.expires_at'));
-
             expect($expiresAt->lessThanOrEqualTo(now()->addDay()))
                 ->toBeTrue();
         });
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | validation
+    |--------------------------------------------------------------------------
+    */
     describe('validation', function () {
         it('fails when required fields are missing', function () {
             postJson(route('auth.login'), [])

@@ -16,9 +16,17 @@ describe('ResendVerificationController', function () {
         $this->withoutMiddleware(ThrottleRequests::class);
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | success
+    |--------------------------------------------------------------------------
+    */
     describe('success', function () {
         it('sends verification email if email is unverified', function () {
-            $user = User::factory()->unverified()->create();
+            $user = User::factory()
+                ->unverified()
+                ->create();
+
             Sanctum::actingAs($user);
 
             postJson(route('auth.verification.resend'))
@@ -28,7 +36,9 @@ describe('ResendVerificationController', function () {
         });
 
         it('does nothing if email is already verified', function () {
-            $user = User::factory()->create();
+            $user = User::factory()
+                ->verified()
+                ->create();
             Sanctum::actingAs($user);
 
             postJson(route('auth.verification.resend'))
@@ -38,6 +48,11 @@ describe('ResendVerificationController', function () {
         });
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | permissions
+    |--------------------------------------------------------------------------
+    */
     describe('permissions', function () {
         it('fails for unauthenticated user', function () {
             postJson(route('auth.verification.resend'))

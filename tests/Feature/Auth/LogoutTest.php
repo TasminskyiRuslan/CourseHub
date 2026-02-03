@@ -8,14 +8,21 @@ uses(RefreshDatabase::class);
 
 describe('LogoutController', function () {
     beforeEach(function () {
-        $this->user = User::factory()->create();
+        $this->user = User::factory()
+            ->verified()
+            ->create();
 
         $this->tokens = collect(range(1, 5))
-            ->map(fn () => $this->user->createToken('access_token'));
+            ->map(fn() => $this->user->createToken('access_token'));
 
         $this->currentToken = $this->tokens->first();
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | success
+    |--------------------------------------------------------------------------
+    */
     describe('success', function () {
         it('revokes the current access token only', function () {
             postJson(
@@ -34,6 +41,11 @@ describe('LogoutController', function () {
         });
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | permissions
+    |--------------------------------------------------------------------------
+    */
     describe('permissions', function () {
         it('fails for unauthenticated user', function () {
             postJson(route('auth.logout'))

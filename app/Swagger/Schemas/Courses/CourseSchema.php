@@ -9,7 +9,7 @@ use OpenApi\Attributes as OA;
     schema: 'Course',
     title: 'Course schema',
     description: 'Details of a course returned by the API',
-    required: ['id', 'author_id', 'author', 'title', 'slug', 'type', 'price', 'is_published', 'created_at', 'updated_at'],
+    required: ['id', 'author_id', 'author', 'title', 'slug', 'description', 'type', 'price', 'image_url', 'is_published', 'created_at', 'updated_at'],
     properties: [
         new OA\Property(
             property: 'id',
@@ -25,7 +25,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'author',
-            ref: '#/components/schemas/User',
+            ref: '#/components/schemas/Author',
             description: 'The author of the lesson',
         ),
         new OA\Property(

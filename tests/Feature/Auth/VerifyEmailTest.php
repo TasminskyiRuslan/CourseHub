@@ -13,7 +13,9 @@ describe('VerifyEmailController', function () {
     beforeEach(function () {
         Event::fake();
 
-        $this->user = User::factory()->unverified()->create();
+        $this->user = User::factory()
+            ->unverified()
+            ->create();
 
         $this->signedUrl = fn(array $overrides = []) => URL::temporarySignedRoute(
             'auth.verification.verify',
@@ -25,6 +27,11 @@ describe('VerifyEmailController', function () {
         );
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | success
+    |--------------------------------------------------------------------------
+    */
     describe('success', function () {
         it('verifies the email', function () {
             getJson(($this->signedUrl)())
@@ -52,6 +59,11 @@ describe('VerifyEmailController', function () {
         });
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | validation
+    |--------------------------------------------------------------------------
+    */
     describe('validation', function () {
         it('fails when the user ID does not exist', function () {
             getJson(($this->signedUrl)(['id' => 99999]))

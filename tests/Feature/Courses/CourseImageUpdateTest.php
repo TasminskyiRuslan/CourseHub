@@ -6,45 +6,32 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
+use Tests\Support\CourseJsonStructure;
 use function Pest\Laravel\patchJson;
 
 uses(RefreshDatabase::class);
 
 describe('CourseImageController -> update', function () {
-
     beforeEach(function () {
         Storage::fake('public');
 
-        $this->teacher = User::factory()->teacher()->create();
-        $this->otherTeacher = User::factory()->teacher()->create();
-        $this->student = User::factory()->create();
-
-        $this->course = Course::factory()
-            ->for($this->teacher, 'author')
+        $this->teacher = User::factory()
+            ->teacher()
+            ->create();
+        $this->otherTeacher = User::factory()
+            ->teacher()
+            ->create();
+        $this->student = User::factory()
+            ->verified()
+            ->create();
+        $this->admin = User::factory()
+            ->admin()
             ->create();
 
-        $this->expectedCourseStructure = [
-            'id',
-            'author_id',
-            'author' => [
-                'id',
-                'name',
-                'slug',
-                'email',
-                'email_verified_at',
-                'created_at',
-                'updated_at',
-            ],
-            'title',
-            'slug',
-            'description',
-            'type',
-            'price',
-            'image_url',
-            'is_published',
-            'created_at',
-            'updated_at',
-        ];
+        $this->course = Course::factory()
+            ->unpublished()
+            ->for($this->teacher, 'author')
+            ->create();
     });
 
     /*
@@ -52,7 +39,6 @@ describe('CourseImageController -> update', function () {
     | success
     |--------------------------------------------------------------------------
     */
-
     describe('success', function () {
         it('author updates course image', function () {
             Sanctum::actingAs($this->teacher);
@@ -61,7 +47,7 @@ describe('CourseImageController -> update', function () {
 
             patchJson(route('courses.image.update', $this->course), ['image' => $file])
                 ->assertOk()
-                ->assertJsonStructure(['data' => $this->expectedCourseStructure]);
+                ->assertJsonStructure(['data' => CourseJsonStructure::get()]);
 
             $course = $this->course->fresh();
             expect($course->image_path)->not->toBeNull();
@@ -74,19 +60,18 @@ describe('CourseImageController -> update', function () {
     | validation
     |--------------------------------------------------------------------------
     */
-
     describe('validation', function () {
-        it('fails when image is missing', function () {
+        beforeEach(function () {
             Sanctum::actingAs($this->teacher);
+        });
 
+        it('fails when image is missing', function () {
             patchJson(route('courses.image.update', $this->course), [])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['image']);
         });
 
         it('fails when file is not image', function () {
-            Sanctum::actingAs($this->teacher);
-
             $file = UploadedFile::fake()->create('file.pdf');
 
             patchJson(route('courses.image.update', $this->course), ['image' => $file])
@@ -100,7 +85,6 @@ describe('CourseImageController -> update', function () {
     | permissions
     |--------------------------------------------------------------------------
     */
-
     describe('permissions', function () {
         it('forbids non-author teacher', function () {
             Sanctum::actingAs($this->otherTeacher);
@@ -119,8 +103,7 @@ describe('CourseImageController -> update', function () {
         });
 
         it('forbids admin', function () {
-            $admin = User::factory()->admin()->create();
-            Sanctum::actingAs($admin);
+            Sanctum::actingAs($this->admin);
 
             $file = UploadedFile::fake()->image('image.jpg');
             patchJson(route('courses.image.update', $this->course), ['image' => $file])

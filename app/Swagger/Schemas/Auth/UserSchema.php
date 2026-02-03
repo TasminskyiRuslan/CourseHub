@@ -9,7 +9,7 @@ use OpenApi\Attributes as OA;
     schema: 'User',
     title: 'User Schema',
     description: 'Details of a user returned by the API',
-    required: ['id', 'name', 'email', 'role', 'created_at', 'updated_at'],
+    required: ['id', 'name', 'slug', 'email', 'role', 'email_verified_at', 'created_at', 'updated_at'],
     properties: [
         new OA\Property(
             property: 'id',

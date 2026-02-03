@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\CourseType;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\OfflineLesson;
@@ -28,6 +29,22 @@ class LessonFactory extends Factory
             'position' => null,
         ];
     }
+
+    public function configure(): static
+    {
+        return $this->afterMaking(function (Lesson $lesson) {
+            if (!$lesson->lessonable_id) {
+                $lessonable = match ($lesson->course->type) {
+                    CourseType::OFFLINE => OfflineLesson::factory()->create(),
+                    CourseType::ONLINE  => OnlineLesson::factory()->create(),
+                    CourseType::VIDEO   => VideoLesson::factory()->create(),
+                };
+
+                $lesson->lessonable()->associate($lessonable);
+            }
+        });
+    }
+
 
     public function offline(): static
     {

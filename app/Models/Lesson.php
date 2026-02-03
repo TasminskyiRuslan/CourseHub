@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -39,7 +40,7 @@ use Spatie\Sluggable\SlugOptions;
  */
 class Lesson extends Model
 {
-    use HasSlug;
+    use HasSlug, HasFactory;
 
     protected $fillable = [
         'title',

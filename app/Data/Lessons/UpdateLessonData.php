@@ -59,6 +59,9 @@ class UpdateLessonData extends Data
 
         $rules = [
             'slug' => [
+                'required',
+                'string',
+                'max:255',
                 Rule::unique('lessons', 'slug')
                     ->where('course_id', $lesson->course_id)
                     ->ignore($lesson),

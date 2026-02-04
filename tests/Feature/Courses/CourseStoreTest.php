@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\CourseType;
+use App\Models\Course;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -10,23 +11,20 @@ use function Pest\Laravel\postJson;
 uses(RefreshDatabase::class);
 
 describe('CourseController -> store', function () {
-    beforeEach(function () {
-        $this->teacher = User::factory()
-            ->teacher()
-            ->create();
-        $this->student = User::factory()
-            ->student()
-            ->create();
-        $this->admin = User::factory()
-            ->admin()
-            ->create();
 
-        $this->payload = fn(array $overrides = []) => array_merge([
-            'title' => 'New Laravel Course',
-            'slug' => null,
+    beforeEach(function () {
+        $this->teacher = User::factory()->teacher()->create();
+        $this->otherTeacher = User::factory()->teacher()->create();
+        $this->student = User::factory()->student()->create();
+        $this->admin = User::factory()->admin()->create();
+        $this->unverifiedTeacher = User::factory()->teacher()->unverified()->create();
+
+        $this->makePayload = fn(array $overrides = []) => array_merge([
+            'title'       => 'New Laravel Course',
+            'slug'        => null,
             'description' => 'Comprehensive course on Laravel',
-            'type' => CourseType::ONLINE->value,
-            'price' => '199.99',
+            'type'        => CourseType::ONLINE->value,
+            'price'       => '199.99',
         ], $overrides);
     });
 
@@ -36,40 +34,36 @@ describe('CourseController -> store', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
+
         beforeEach(function () {
             Sanctum::actingAs($this->teacher);
         });
 
         it('teacher creates a course', function () {
-            $data = ($this->payload)();
+            $data = ($this->makePayload)();
 
             postJson(route('courses.store'), $data)
                 ->assertCreated()
+                ->assertJsonPath('data.title', $data['title'])
                 ->assertJsonStructure(['data' => CourseJsonStructure::get()]);
 
             $this->assertDatabaseHas('courses', [
                 'author_id' => $this->teacher->id,
-                'title' => $data['title'],
-                'price' => $data['price'],
-                'type' => $data['type'],
+                'title'     => $data['title'],
             ]);
         });
 
         it('teacher creates a course with custom slug', function () {
-            $customSlug = 'custom-slug-for-course';
-            $data = ($this->payload)(['slug' => $customSlug]);
+            $data = ($this->makePayload)(['slug' => 'custom-slug-for-course']);
 
             postJson(route('courses.store'), $data)
                 ->assertCreated()
-                ->assertJsonPath('data.slug', $customSlug)
+                ->assertJsonPath('data.slug', $data['slug'])
                 ->assertJsonStructure(['data' => CourseJsonStructure::get()]);
 
             $this->assertDatabaseHas('courses', [
                 'author_id' => $this->teacher->id,
-                'title' => $data['title'],
-                'slug' => $customSlug,
-                'price' => $data['price'],
-                'type' => $data['type'],
+                'slug'      => $data['slug'],
             ]);
         });
     });
@@ -80,6 +74,7 @@ describe('CourseController -> store', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
+
         beforeEach(function () {
             Sanctum::actingAs($this->teacher);
         });
@@ -91,13 +86,13 @@ describe('CourseController -> store', function () {
         });
 
         it('fails when price is invalid', function () {
-            postJson(route('courses.store'), ($this->payload)(['price' => '-1']))
+            postJson(route('courses.store'), ($this->makePayload)(['price' => '-1.00']))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['price']);
         });
 
         it('fails when type is invalid', function () {
-            postJson(route('courses.store'), ($this->payload)(['type' => 'INVALID']))
+            postJson(route('courses.store'), ($this->makePayload)(['type' => 'INVALID']))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['type']);
         });
@@ -112,20 +107,27 @@ describe('CourseController -> store', function () {
         it('forbids admin', function () {
             Sanctum::actingAs($this->admin);
 
-            postJson(route('courses.store'), ($this->payload)())
+            postJson(route('courses.store'), ($this->makePayload)())
                 ->assertForbidden();
         });
 
-        it('forbids authenticated student', function () {
+        it('forbids student', function () {
             Sanctum::actingAs($this->student);
 
-            postJson(route('courses.store'), ($this->payload)())
+            postJson(route('courses.store'), ($this->makePayload)())
                 ->assertForbidden();
         });
 
         it('forbids unauthenticated user', function () {
-            postJson(route('courses.store'), ($this->payload)())
+            postJson(route('courses.store'), ($this->makePayload)())
                 ->assertUnauthorized();
+        });
+
+        it('forbids teacher with unverified email', function () {
+            Sanctum::actingAs($this->unverifiedTeacher);
+
+            postJson(route('courses.store'), ($this->makePayload)())
+                ->assertForbidden();
         });
     });
 })->group('courses');

@@ -8,13 +8,14 @@ use function Pest\Laravel\deleteJson;
 uses(RefreshDatabase::class);
 
 describe('LogoutAllController', function () {
+
     beforeEach(function () {
         $this->user = User::factory()
             ->verified()
             ->create();
 
         collect(range(1, 5))
-            ->map(fn() => $this->user->createToken('access_token'));
+            ->each(fn() => $this->user->createToken('access_token'));
     });
 
     /*
@@ -23,9 +24,12 @@ describe('LogoutAllController', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-        it('revokes all authentication tokens for the user', function () {
-            Sanctum::actingAs($this->user);
 
+        beforeEach(function () {
+            Sanctum::actingAs($this->user);
+        });
+
+        it('revokes all authentication tokens for the user', function () {
             deleteJson(route('auth.tokens.destroy'))
                 ->assertNoContent();
 
@@ -39,6 +43,7 @@ describe('LogoutAllController', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
+
         it('fails for unauthenticated user', function () {
             deleteJson(route('auth.tokens.destroy'))
                 ->assertUnauthorized();

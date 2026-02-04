@@ -10,6 +10,7 @@ use function Pest\Laravel\getJson;
 uses(RefreshDatabase::class);
 
 describe('VerifyEmailController', function () {
+
     beforeEach(function () {
         Event::fake();
 
@@ -17,7 +18,7 @@ describe('VerifyEmailController', function () {
             ->unverified()
             ->create();
 
-        $this->signedUrl = fn(array $overrides = []) => URL::temporarySignedRoute(
+        $this->makeSignedUrl = fn(array $overrides = []) => URL::temporarySignedRoute(
             'auth.verification.verify',
             now()->addMinutes(60),
             array_merge([
@@ -33,27 +34,29 @@ describe('VerifyEmailController', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
+
         it('verifies the email', function () {
-            getJson(($this->signedUrl)())
-                ->assertNoContent();
+            $url = ($this->makeSignedUrl)();
+
+            getJson($url)->assertNoContent();
 
             expect($this->user->fresh()->hasVerifiedEmail())->toBeTrue();
         });
 
         it('dispatches the verified event', function () {
-            getJson(($this->signedUrl)())
-                ->assertNoContent();
+            $url = ($this->makeSignedUrl)();
 
-            Event::assertDispatched(Verified::class, function ($event) {
-                return $event->user->id === $this->user->id;
-            });
+            getJson($url)->assertNoContent();
+
+            Event::assertDispatched(Verified::class, fn($event) => $event->user->id === $this->user->id);
         });
 
         it('does nothing if the email is already verified', function () {
             $this->user->markEmailAsVerified();
 
-            getJson(($this->signedUrl)())
-                ->assertNoContent();
+            $url = ($this->makeSignedUrl)();
+
+            getJson($url)->assertNoContent();
 
             Event::assertNotDispatched(Verified::class);
         });
@@ -65,14 +68,17 @@ describe('VerifyEmailController', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
+
         it('fails when the user ID does not exist', function () {
-            getJson(($this->signedUrl)(['id' => 99999]))
-                ->assertForbidden();
+            $url = ($this->makeSignedUrl)(['id' => 99999]);
+
+            getJson($url)->assertForbidden();
         });
 
         it('fails when the hash is incorrect', function () {
-            getJson(($this->signedUrl)(['hash' => 'wrong-hash']))
-                ->assertForbidden();
+            $url = ($this->makeSignedUrl)(['hash' => 'wrong-hash']);
+
+            getJson($url)->assertForbidden();
         });
 
         it('fails when the signature is missing', function () {
@@ -81,8 +87,8 @@ describe('VerifyEmailController', function () {
                 'hash' => sha1($this->user->getEmailForVerification()),
             ]);
 
-            getJson($url)
-                ->assertForbidden();
+            getJson($url)->assertForbidden();
         });
     });
+
 })->group('auth');

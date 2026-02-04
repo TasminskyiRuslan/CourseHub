@@ -7,6 +7,7 @@ use function Pest\Laravel\postJson;
 uses(RefreshDatabase::class);
 
 describe('LogoutController', function () {
+
     beforeEach(function () {
         $this->user = User::factory()
             ->verified()
@@ -24,12 +25,17 @@ describe('LogoutController', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
+
+        beforeEach(function () {
+            // Поточний токен авторизації
+            $this->authHeader = [
+                'Authorization' => 'Bearer ' . $this->currentToken->plainTextToken
+            ];
+        });
+
         it('revokes the current access token only', function () {
-            postJson(
-                route('auth.logout'),
-                [],
-                ['Authorization' => 'Bearer ' . $this->currentToken->plainTextToken]
-            )->assertNoContent();
+            postJson(route('auth.logout'), [], $this->authHeader)
+                ->assertNoContent();
 
             expect(
                 $this->user->tokens()
@@ -37,7 +43,6 @@ describe('LogoutController', function () {
                     ->exists()
             )->toBeFalse()
                 ->and($this->user->tokens()->count())->toBe(4);
-
         });
     });
 
@@ -47,6 +52,7 @@ describe('LogoutController', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
+
         it('fails for unauthenticated user', function () {
             postJson(route('auth.logout'))
                 ->assertUnauthorized();

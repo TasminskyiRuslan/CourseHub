@@ -8,6 +8,7 @@ use function Pest\Laravel\postJson;
 uses(RefreshDatabase::class);
 
 describe('LoginController', function () {
+
     beforeEach(function () {
         $this->password = 'password';
 
@@ -17,7 +18,7 @@ describe('LoginController', function () {
                 'password' => $this->password,
             ]);
 
-        $this->payload = fn(array $overrides = []) => array_merge([
+        $this->makePayload = fn(array $overrides = []) => array_merge([
             'email' => $this->user->email,
             'password' => $this->password,
         ], $overrides);
@@ -29,43 +30,46 @@ describe('LoginController', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
+
         it('authenticates the user', function () {
-            postJson(route('auth.login'), ($this->payload)())
+            $data = ($this->makePayload)();
+
+            postJson(route('auth.login'), $data)
                 ->assertOk()
+                ->assertJsonPath('data.user.email', $data['email'])
                 ->assertJsonStructure([
                     'data' => AuthJsonStructure::get(),
                 ]);
         });
 
         it('sets a long token expiration when remember is true', function () {
-            $response = postJson(
-                route('auth.login'),
-                ($this->payload)(['remember' => true])
-            )->assertOk();
+            $data = ($this->makePayload)(['remember' => true]);
 
-            $expiresAt = now()->parse($response->json('data.expires_at'));
-            expect($expiresAt->greaterThan(now()->addWeek()))
-                ->toBeTrue();
-        });
-
-        it('sets a short token expiration when remember is false', function () {
-            $response = postJson(
-                route('auth.login'),
-                ($this->payload)(['remember' => false])
-            )->assertOk();
-
-            $expiresAt = now()->parse($response->json('data.expires_at'));
-            expect($expiresAt->lessThanOrEqualTo(now()->addDay()))
-                ->toBeTrue();
-        });
-
-        it('sets a short token expiration by default', function () {
-            $response = postJson(route('auth.login'), ($this->payload)())
+            $response = postJson(route('auth.login'), $data)
                 ->assertOk();
 
             $expiresAt = now()->parse($response->json('data.expires_at'));
-            expect($expiresAt->lessThanOrEqualTo(now()->addDay()))
-                ->toBeTrue();
+            expect($expiresAt->greaterThan(now()->addWeek()))->toBeTrue();
+        });
+
+        it('sets a short token expiration when remember is false', function () {
+            $data = ($this->makePayload)(['remember' => false]);
+
+            $response = postJson(route('auth.login'), $data)
+                ->assertOk();
+
+            $expiresAt = now()->parse($response->json('data.expires_at'));
+            expect($expiresAt->lessThanOrEqualTo(now()->addDay()))->toBeTrue();
+        });
+
+        it('sets a short token expiration by default', function () {
+            $data = ($this->makePayload)();
+
+            $response = postJson(route('auth.login'), $data)
+                ->assertOk();
+
+            $expiresAt = now()->parse($response->json('data.expires_at'));
+            expect($expiresAt->lessThanOrEqualTo(now()->addDay()))->toBeTrue();
         });
     });
 
@@ -75,6 +79,7 @@ describe('LoginController', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
+
         it('fails when required fields are missing', function () {
             postJson(route('auth.login'), [])
                 ->assertUnprocessable()
@@ -82,27 +87,25 @@ describe('LoginController', function () {
         });
 
         it('fails when the email does not exist', function () {
-            postJson(route('auth.login'), ($this->payload)([
-                'email' => 'nonexistent@example.com',
-            ]))
+            $data = ($this->makePayload)(['email' => 'nonexistent@example.com']);
+
+            postJson(route('auth.login'), $data)
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors('email');
         });
 
         it('fails when email format is invalid', function () {
-            postJson(
-                route('auth.login'),
-                ($this->payload)(['email' => 'invalid-email'])
-            )
+            $data = ($this->makePayload)(['email' => 'invalid-email']);
+
+            postJson(route('auth.login'), $data)
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors('email');
         });
 
         it('fails when credentials are incorrect', function () {
-            postJson(
-                route('auth.login'),
-                ($this->payload)(['password' => 'wrong-password'])
-            )
+            $data = ($this->makePayload)(['password' => 'wrong-password']);
+
+            postJson(route('auth.login'), $data)
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors('email');
         });

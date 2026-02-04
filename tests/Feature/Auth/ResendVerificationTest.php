@@ -11,6 +11,7 @@ use function Pest\Laravel\postJson;
 uses(RefreshDatabase::class);
 
 describe('ResendVerificationController', function () {
+
     beforeEach(function () {
         Notification::fake();
         $this->withoutMiddleware(ThrottleRequests::class);
@@ -22,6 +23,7 @@ describe('ResendVerificationController', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
+
         it('sends verification email if email is unverified', function () {
             $user = User::factory()
                 ->unverified()
@@ -39,6 +41,7 @@ describe('ResendVerificationController', function () {
             $user = User::factory()
                 ->verified()
                 ->create();
+
             Sanctum::actingAs($user);
 
             postJson(route('auth.verification.resend'))
@@ -54,6 +57,7 @@ describe('ResendVerificationController', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
+
         it('fails for unauthenticated user', function () {
             postJson(route('auth.verification.resend'))
                 ->assertUnauthorized();

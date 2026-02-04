@@ -10,19 +10,12 @@ use function Pest\Laravel\deleteJson;
 uses(RefreshDatabase::class);
 
 describe('CourseController -> destroy', function () {
+
     beforeEach(function () {
-        $this->teacher = User::factory()
-            ->teacher()
-            ->create();
-        $this->otherTeacher = User::factory()
-            ->teacher()
-            ->create();
-        $this->student = User::factory()
-            ->student()
-            ->create();
-        $this->admin = User::factory()
-            ->admin()
-            ->create();
+        $this->teacher      = User::factory()->teacher()->create();
+        $this->otherTeacher = User::factory()->teacher()->create();
+        $this->student      = User::factory()->student()->create();
+        $this->admin        = User::factory()->admin()->create();
 
         Storage::fake('public');
 
@@ -43,23 +36,32 @@ describe('CourseController -> destroy', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
+
         it('author deletes course with image', function () {
+
             Sanctum::actingAs($this->teacher);
 
             deleteJson(route('courses.destroy', $this->course))
                 ->assertNoContent();
 
-            $this->assertDatabaseMissing('courses', ['id' => $this->course->id]);
+            $this->assertDatabaseMissing('courses', [
+                'id' => $this->course->id,
+            ]);
+
             Storage::disk('public')->assertMissing($this->imagePath);
         });
 
         it('admin deletes course with image', function () {
+
             Sanctum::actingAs($this->admin);
 
             deleteJson(route('courses.destroy', $this->course))
                 ->assertNoContent();
 
-            $this->assertDatabaseMissing('courses', ['id' => $this->course->id]);
+            $this->assertDatabaseMissing('courses', [
+                'id' => $this->course->id,
+            ]);
+
             Storage::disk('public')->assertMissing($this->imagePath);
         });
     });
@@ -72,6 +74,7 @@ describe('CourseController -> destroy', function () {
     describe('validation', function () {
 
         it('returns not found for non-existing course', function () {
+
             Sanctum::actingAs($this->teacher);
 
             deleteJson(route('courses.destroy', 'non-existing-slug'))
@@ -85,7 +88,9 @@ describe('CourseController -> destroy', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
+
         it('forbids non-author teacher', function () {
+
             Sanctum::actingAs($this->otherTeacher);
 
             deleteJson(route('courses.destroy', $this->course))
@@ -93,6 +98,7 @@ describe('CourseController -> destroy', function () {
         });
 
         it('forbids student', function () {
+
             Sanctum::actingAs($this->student);
 
             deleteJson(route('courses.destroy', $this->course))
@@ -100,6 +106,7 @@ describe('CourseController -> destroy', function () {
         });
 
         it('forbids unauthenticated user', function () {
+
             deleteJson(route('courses.destroy', $this->course))
                 ->assertUnauthorized();
         });

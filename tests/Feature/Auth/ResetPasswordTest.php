@@ -9,6 +9,7 @@ use function Pest\Laravel\postJson;
 uses(RefreshDatabase::class);
 
 describe('ResetPasswordController', function () {
+
     beforeEach(function () {
         $this->oldPassword = 'old-password';
         $this->newPassword = 'new-password';
@@ -28,7 +29,7 @@ describe('ResetPasswordController', function () {
         $this->userToken = Password::createToken($this->user);
         $this->adminToken = Password::createToken($this->admin);
 
-        $this->payload = fn(array $overrides = []) => array_merge([
+        $this->makePayload = fn(array $overrides = []) => array_merge([
             'email' => $this->user->email,
             'password' => $this->newPassword,
             'password_confirmation' => $this->newPassword,
@@ -43,7 +44,9 @@ describe('ResetPasswordController', function () {
     */
     describe('success', function () {
         it('resets the password', function () {
-            postJson(route('auth.password.reset'), ($this->payload)())
+            $data = ($this->makePayload)();
+
+            postJson(route('auth.password.reset'), $data)
                 ->assertNoContent();
 
             $this->user->refresh();
@@ -57,10 +60,11 @@ describe('ResetPasswordController', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
+
         it('fails when token is invalid', function () {
-            postJson(route('auth.password.reset'), ($this->payload)([
-                'token' => 'invalid-token',
-            ]))
+            $data = ($this->makePayload)(['token' => 'invalid-token']);
+
+            postJson(route('auth.password.reset'), $data)
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors('email');
         });
@@ -72,34 +76,36 @@ describe('ResetPasswordController', function () {
         });
 
         it('fails when password confirmation does not match', function () {
-            postJson(route('auth.password.reset'), ($this->payload)([
-                'password_confirmation' => 'different',
-            ]))
+            $data = ($this->makePayload)(['password_confirmation' => 'different']);
+
+            postJson(route('auth.password.reset'), $data)
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['password']);
         });
 
         it('fails when email format is invalid', function () {
-            postJson(route('auth.password.reset'), ($this->payload)([
-                'email' => 'invalid-email',
-            ]))
+            $data = ($this->makePayload)(['email' => 'invalid-email']);
+
+            postJson(route('auth.password.reset'), $data)
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
         });
 
         it('fails when email does not exist', function () {
-            postJson(route('auth.password.reset'), ($this->payload)([
-                'email' => 'nonexistent@example.com',
-            ]))
+            $data = ($this->makePayload)(['email' => 'nonexistent@example.com']);
+
+            postJson(route('auth.password.reset'), $data)
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
         });
 
         it('fails when the new password is too short', function () {
-            postJson(route('auth.password.reset'), ($this->payload)([
+            $data = ($this->makePayload)([
                 'password' => '123',
                 'password_confirmation' => '123',
-            ]))
+            ]);
+
+            postJson(route('auth.password.reset'), $data)
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['password']);
         });
@@ -112,11 +118,14 @@ describe('ResetPasswordController', function () {
     */
     describe('permissions', function () {
         it('forbids admin', function () {
-            postJson(route('auth.password.reset'), ($this->payload)([
+            $data = ($this->makePayload)([
                 'email' => $this->admin->email,
                 'token' => $this->adminToken,
-            ]))
+            ]);
+
+            postJson(route('auth.password.reset'), $data)
                 ->assertForbidden();
         });
     });
+
 })->group('auth');

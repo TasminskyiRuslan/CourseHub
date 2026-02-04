@@ -4,7 +4,6 @@ namespace App\Services\Lessons;
 
 use App\Data\Lessons\CreateLessonData;
 use App\Data\Lessons\UpdateLessonData;
-use App\DTO\Lessons\LessonDTO;
 use App\Models\Course;
 use App\Models\Lesson;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;

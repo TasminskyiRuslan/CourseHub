@@ -9,19 +9,12 @@ use function Pest\Laravel\patchJson;
 uses(RefreshDatabase::class);
 
 describe('PublishCourseController', function () {
+
     beforeEach(function () {
-        $this->teacher = User::factory()
-            ->teacher()
-            ->create();
-        $this->otherTeacher = User::factory()
-            ->teacher()
-            ->create();
-        $this->student = User::factory()
-            ->student()
-            ->create();
-        $this->admin = User::factory()
-            ->admin()
-            ->create();
+        $this->teacher      = User::factory()->teacher()->create();
+        $this->otherTeacher = User::factory()->teacher()->create();
+        $this->student      = User::factory()->student()->create();
+        $this->admin        = User::factory()->admin()->create();
 
         $this->course = Course::factory()
             ->unpublished()
@@ -35,6 +28,7 @@ describe('PublishCourseController', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
+
         it('author publishes course', function () {
             Sanctum::actingAs($this->teacher);
 
@@ -51,6 +45,7 @@ describe('PublishCourseController', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
+
         it('returns not found for non-existing course', function () {
             Sanctum::actingAs($this->teacher);
 
@@ -65,6 +60,7 @@ describe('PublishCourseController', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
+
         it('forbids non-author teacher', function () {
             Sanctum::actingAs($this->otherTeacher);
 
@@ -101,4 +97,3 @@ describe('PublishCourseController', function () {
     });
 
 })->group('courses');
-

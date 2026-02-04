@@ -11,22 +11,16 @@ use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class);
 
-describe('CourseLessonsController -> index', function () {
+describe('LessonsController -> index', function () {
+
     beforeEach(function () {
-        $this->author = User::factory()->teacher()->create();
+        $this->author       = User::factory()->teacher()->create();
         $this->otherTeacher = User::factory()->teacher()->create();
-        $this->admin = User::factory()->admin()->create();
-        $this->student = User::factory()->student()->create();
+        $this->admin        = User::factory()->admin()->create();
+        $this->student      = User::factory()->student()->create();
 
-        $this->publishedCourse = Course::factory()
-            ->published()
-            ->for($this->author, 'author')
-            ->create();
-
-        $this->unpublishedCourse = Course::factory()
-            ->unpublished()
-            ->for($this->author, 'author')
-            ->create();
+        $this->publishedCourse   = Course::factory()->published()->for($this->author, 'author')->create();
+        $this->unpublishedCourse = Course::factory()->unpublished()->for($this->author, 'author')->create();
 
         Lesson::factory()->count(3)->for($this->publishedCourse, 'course')->create();
         Lesson::factory()->count(2)->for($this->unpublishedCourse, 'course')->create();
@@ -38,13 +32,14 @@ describe('CourseLessonsController -> index', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
+
         it('lists lessons for published course for unauthenticated user', function () {
             getJson(route('courses.lessons.index', $this->publishedCourse))
                 ->assertOk()
                 ->assertJsonCount(3, 'data')
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => LessonJsonStructure::get(),
+                        '*' => LessonJsonStructure::get($this->publishedCourse->type),
                     ]
                 ]);
         });
@@ -72,35 +67,27 @@ describe('CourseLessonsController -> index', function () {
     |--------------------------------------------------------------------------
     */
     describe('filters & sorting', function () {
+
         beforeEach(function () {
-            $this->course = Course::factory()->published()->for($this->author, 'author')->create();
-
-            $this->titles = [
-                'Introduction in Laravel',
-                'Advanced Vue Concepts',
-                'Testing with PestPHP'
-            ];
-
+            $this->course    = Course::factory()->published()->for($this->author, 'author')->create();
+            $this->titles    = ['Introduction in Laravel', 'Advanced Vue Concepts', 'Testing with PestPHP'];
             $this->positions = [1, 2, 3];
 
             Lesson::factory()
                 ->count(3)
                 ->for($this->course, 'course')
                 ->state(new Sequence(
-                    ...array_map(fn($title, $position) => [
-                        'title' => $title,
-                        'position' => $position
-                    ], $this->titles, $this->positions)
+                    ...array_map(fn($title, $position) => ['title' => $title, 'position' => $position], $this->titles, $this->positions)
                 ))
                 ->create();
         });
 
         it('filters lessons by search', function () {
-            $partialFirst = substr($this->titles[0], 0, 12);
+            $partial = substr($this->titles[0], 0, 12);
 
             getJson(route('courses.lessons.index', [
-                'course' => $this->course,
-                'filter[search]' => $partialFirst
+                'course'       => $this->course,
+                'filter[search]' => $partial
             ]))
                 ->assertOk()
                 ->assertJsonCount(1, 'data')
@@ -110,7 +97,7 @@ describe('CourseLessonsController -> index', function () {
         it('sorts lessons by position desc', function () {
             getJson(route('courses.lessons.index', [
                 'course' => $this->course,
-                'sort' => '-position'
+                'sort'   => '-position'
             ]))
                 ->assertOk()
                 ->assertJsonPath('data.*.position', array_reverse($this->positions));
@@ -119,7 +106,7 @@ describe('CourseLessonsController -> index', function () {
         it('sorts lessons by position asc', function () {
             getJson(route('courses.lessons.index', [
                 'course' => $this->course,
-                'sort' => 'position'
+                'sort'   => 'position'
             ]))
                 ->assertOk()
                 ->assertJsonPath('data.*.position', $this->positions);
@@ -132,6 +119,7 @@ describe('CourseLessonsController -> index', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
+
         it('returns not found for non-existing course slug', function () {
             getJson(route('courses.lessons.index', 'non-existing-slug'))
                 ->assertNotFound();
@@ -152,6 +140,7 @@ describe('CourseLessonsController -> index', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
+
         it('forbids unpublished course for other teacher', function () {
             Sanctum::actingAs($this->otherTeacher);
 
@@ -171,4 +160,5 @@ describe('CourseLessonsController -> index', function () {
                 ->assertForbidden();
         });
     });
+
 })->group('lessons');

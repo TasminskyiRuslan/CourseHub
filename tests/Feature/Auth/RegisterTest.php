@@ -11,12 +11,13 @@ use function Pest\Laravel\postJson;
 uses(RefreshDatabase::class);
 
 describe('RegisterController', function () {
+
     beforeEach(function () {
         $this->name = 'John Doe';
         $this->email = 'john@example.com';
         $this->password = 'password';
 
-        $this->payload = fn(array $overrides = []) => array_merge([
+        $this->makePayload = fn(array $overrides = []) => array_merge([
             'name' => $this->name,
             'email' => $this->email,
             'password' => $this->password,
@@ -31,9 +32,13 @@ describe('RegisterController', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
+
         it('registers a user', function () {
-            postJson(route('auth.register'), ($this->payload)())
+            $data = ($this->makePayload)();
+
+            postJson(route('auth.register'), $data)
                 ->assertCreated()
+                ->assertJsonPath('data.user.email', $data['email'])
                 ->assertJsonStructure([
                     'data' => AuthJsonStructure::get(),
                 ]);
@@ -44,35 +49,38 @@ describe('RegisterController', function () {
         it('dispatches the registered event', function () {
             Event::fake();
 
-            postJson(route('auth.register'), ($this->payload)())
+            $data = ($this->makePayload)();
+
+            postJson(route('auth.register'), $data)
                 ->assertCreated();
 
-            Event::assertDispatched(Registered::class, fn($event) => $event->user->email === $this->email
-            );
+            Event::assertDispatched(Registered::class, fn($event) => $event->user->email === $this->email);
         });
 
         it('sets a long token expiration when remember is true', function () {
-            $response = postJson(
-                route('auth.register'),
-                ($this->payload)(['remember' => true])
-            )->assertCreated();
+            $data = ($this->makePayload)(['remember' => true]);
+
+            $response = postJson(route('auth.register'), $data)
+                ->assertCreated();
 
             $expiresAt = now()->parse($response->json('data.expires_at'));
             expect($expiresAt->greaterThan(now()->addWeek()))->toBeTrue();
         });
 
         it('sets a short token expiration when remember is false', function () {
-            $response = postJson(
-                route('auth.register'),
-                ($this->payload)(['remember' => false])
-            )->assertCreated();
+            $data = ($this->makePayload)(['remember' => false]);
+
+            $response = postJson(route('auth.register'), $data)
+                ->assertCreated();
 
             $expiresAt = now()->parse($response->json('data.expires_at'));
             expect($expiresAt->lessThanOrEqualTo(now()->addDay()))->toBeTrue();
         });
 
         it('sets a short token expiration by default', function () {
-            $response = postJson(route('auth.register'), ($this->payload)())
+            $data = ($this->makePayload)();
+
+            $response = postJson(route('auth.register'), $data)
                 ->assertCreated();
 
             $expiresAt = now()->parse($response->json('data.expires_at'));
@@ -86,6 +94,7 @@ describe('RegisterController', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
+
         it('fails when required fields are missing', function () {
             postJson(route('auth.register'), [])
                 ->assertUnprocessable()
@@ -93,51 +102,56 @@ describe('RegisterController', function () {
         });
 
         it('fails when the email is already taken', function () {
-            User::factory()
-                ->verified()
-                ->create(['email' => $this->email]);
+            User::factory()->verified()->create(['email' => $this->email]);
 
-            postJson(route('auth.register'), ($this->payload)())
+            $data = ($this->makePayload)();
+
+            postJson(route('auth.register'), $data)
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
         });
 
         it('fails when the email format is invalid', function () {
-            postJson(
-                route('auth.register'),
-                ($this->payload)(['email' => 'invalid-email'])
-            )
+            $data = ($this->makePayload)(['email' => 'invalid-email']);
+
+            postJson(route('auth.register'), $data)
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
         });
 
         it('fails when the password is too short', function () {
-            postJson(route('auth.register'), ($this->payload)([
+            $data = ($this->makePayload)([
                 'password' => '123',
                 'password_confirmation' => '123',
-            ]))
+            ]);
+
+            postJson(route('auth.register'), $data)
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['password']);
         });
 
         it('fails when the password confirmation does not match', function () {
-            postJson(route('auth.register'), ($this->payload)([
+            $data = ($this->makePayload)([
                 'password_confirmation' => 'different',
-            ]))
+            ]);
+
+            postJson(route('auth.register'), $data)
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['password']);
         });
 
         it('fails when the role is invalid', function () {
-            postJson(route('auth.register'), ($this->payload)(['role' => 'invalid-role']))
+            $data = ($this->makePayload)(['role' => 'invalid-role']);
+
+            postJson(route('auth.register'), $data)
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['role']);
         });
 
         it('fails when attempting to register as an admin', function () {
-            postJson(route('auth.register'), ($this->payload)([
-                'role' => UserRole::ADMIN->value,
-            ]))
+            $data = ($this->makePayload)(['role' => UserRole::ADMIN->value]);
+
+            postJson(route('auth.register'), $data)
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['role']);
 

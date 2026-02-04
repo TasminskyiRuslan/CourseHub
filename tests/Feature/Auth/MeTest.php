@@ -9,6 +9,7 @@ use function Pest\Laravel\getJson;
 uses(RefreshDatabase::class);
 
 describe('MeController', function () {
+
     beforeEach(function () {
         $this->user = User::factory()
             ->verified()
@@ -21,9 +22,12 @@ describe('MeController', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-        it('returns authenticated user data', function () {
-            Sanctum::actingAs($this->user);
 
+        beforeEach(function () {
+            Sanctum::actingAs($this->user);
+        });
+
+        it('returns authenticated user data', function () {
             getJson(route('auth.me'))
                 ->assertOk()
                 ->assertJsonStructure(['data' => UserJsonStructure::get()]);
@@ -36,6 +40,7 @@ describe('MeController', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
+
         it('fails for unauthenticated user', function () {
             getJson(route('auth.me'))
                 ->assertUnauthorized();

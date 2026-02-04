@@ -10,6 +10,7 @@ use function Pest\Laravel\getJson;
 uses(RefreshDatabase::class);
 
 describe('CourseController -> index', function () {
+
     beforeEach(function () {
         $this->author = User::factory()->teacher()->create();
     });
@@ -20,7 +21,9 @@ describe('CourseController -> index', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
+
         it('returns only published courses', function () {
+
             Course::factory()
                 ->count(3)
                 ->published()
@@ -39,27 +42,38 @@ describe('CourseController -> index', function () {
                 ->assertJsonStructure([
                     'data' => [
                         '*' => CourseJsonStructure::get(),
-                    ]
+                    ],
                 ]);
         });
     });
 
     /*
     |--------------------------------------------------------------------------
-    | filtering & sorting
+    | filters & sorting
     |--------------------------------------------------------------------------
     */
     describe('filters & sorting', function () {
+
         it('filters courses by search', function () {
-            $firstTitle = 'Laravel Advanced';
+
+            $firstTitle  = 'Laravel Advanced';
             $secondTitle = 'Vue Basics';
 
-            Course::factory()->published()->for($this->author, 'author')->create(['title' => $firstTitle]);
-            Course::factory()->published()->for($this->author, 'author')->create(['title' => $secondTitle]);
+            Course::factory()
+                ->published()
+                ->for($this->author, 'author')
+                ->create(['title' => $firstTitle]);
 
-            $partialFirst = substr($firstTitle, 0, 6);
+            Course::factory()
+                ->published()
+                ->for($this->author, 'author')
+                ->create(['title' => $secondTitle]);
 
-            getJson(route('courses.index', ['filter[search]' => $partialFirst]))
+            $partial = substr($firstTitle, 0, 6);
+
+            getJson(route('courses.index', [
+                'filter[search]' => $partial,
+            ]))
                 ->assertOk()
                 ->assertJsonCount(1, 'data')
                 ->assertJsonPath('data.0.title', $firstTitle)
@@ -71,6 +85,7 @@ describe('CourseController -> index', function () {
         });
 
         it('filters courses by author slug', function () {
+
             Course::factory()
                 ->published()
                 ->for($this->author, 'author')
@@ -80,17 +95,20 @@ describe('CourseController -> index', function () {
                 ->published()
                 ->create();
 
-            getJson(route('courses.index', ['filter[author]' => $this->author->slug]))
+            getJson(route('courses.index', [
+                'filter[author]' => $this->author->slug,
+            ]))
                 ->assertOk()
                 ->assertJsonCount(1, 'data')
                 ->assertJsonStructure([
                     'data' => [
                         '*' => CourseJsonStructure::get(),
-                    ]
+                    ],
                 ]);
         });
 
         it('sorts courses by price desc', function () {
+
             $prices = ['100.00', '200.00', '300.00'];
 
             Course::factory()
@@ -98,17 +116,22 @@ describe('CourseController -> index', function () {
                 ->published()
                 ->for($this->author, 'author')
                 ->state(new Sequence(
-                    ...array_map(fn($price) => ['price' => $price], $prices)
+                    ...array_map(
+                        fn ($price) => ['price' => $price],
+                        $prices
+                    )
                 ))
                 ->create();
 
-            getJson(route('courses.index', ['sort' => '-price']))
+            getJson(route('courses.index', [
+                'sort' => '-price',
+            ]))
                 ->assertOk()
                 ->assertJsonPath('data.*.price', array_reverse($prices))
                 ->assertJsonStructure([
                     'data' => [
                         '*' => CourseJsonStructure::get(),
-                    ]
+                    ],
                 ]);
         });
     });
@@ -119,16 +142,24 @@ describe('CourseController -> index', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
+
         it('returns empty for non-existing author slug', function () {
-            getJson(route('courses.index', ['filter[author]' => 'non-existing-slug']))
+
+            getJson(route('courses.index', [
+                'filter[author]' => 'non-existing-slug',
+            ]))
                 ->assertOk()
                 ->assertJsonCount(0, 'data');
         });
 
         it('returns empty for unmatched search', function () {
-            getJson(route('courses.index', ['filter[search]' => 'NonExistingCourse']))
+
+            getJson(route('courses.index', [
+                'filter[search]' => 'NonExistingCourse',
+            ]))
                 ->assertOk()
                 ->assertJsonCount(0, 'data');
         });
     });
+
 })->group('courses');

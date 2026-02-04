@@ -1,6 +1,8 @@
 <?php
 
+use App\Enums\CourseType;
 use App\Models\Course;
+use App\Models\Lesson;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
@@ -27,6 +29,8 @@ describe('CourseController -> destroy', function () {
             ->for($this->teacher, 'author')
             ->create();
 
+        $this->lessons = Lesson::factory()->for($this->course)->count(8)->create();
+
         Storage::disk('public')->put($this->course->image_path, 'fake');
     });
 
@@ -47,6 +51,20 @@ describe('CourseController -> destroy', function () {
             $this->assertDatabaseMissing('courses', [
                 'id' => $this->course->id,
             ]);
+
+            foreach ($this->lessons as $lesson) {
+                $this->assertDatabaseMissing('lessons', ['id' => $lesson->id]);
+
+                $lessonableTable = match ($this->course->type) {
+                    CourseType::OFFLINE => 'offline_lessons',
+                    CourseType::ONLINE => 'online_lessons',
+                    CourseType::VIDEO => 'video_lessons',
+                };
+
+                $this->assertDatabaseMissing($lessonableTable, [
+                    'id' => $lesson->lessonable->id,
+                ]);
+            }
 
             Storage::disk('public')->assertMissing($this->imagePath);
         });

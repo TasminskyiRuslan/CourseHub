@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\AuthJsonStructure;
 use function Pest\Laravel\postJson;
@@ -43,33 +44,42 @@ describe('LoginController', function () {
         });
 
         it('sets a long token expiration when remember is true', function () {
+            Carbon::setTestNow(now());
             $data = ($this->makePayload)(['remember' => true]);
 
             $response = postJson(route('auth.login'), $data)
                 ->assertOk();
 
-            $expiresAt = now()->parse($response->json('data.expires_at'));
-            expect($expiresAt->greaterThan(now()->addWeek()))->toBeTrue();
+            $expiresAt = Carbon::parse($response->json('data.expires_at'));
+            expect($expiresAt->greaterThan(Carbon::now()->copy()->addWeek()))->toBeTrue();
+
+            Carbon::setTestNow();
         });
 
         it('sets a short token expiration when remember is false', function () {
+            Carbon::setTestNow(now());
             $data = ($this->makePayload)(['remember' => false]);
 
             $response = postJson(route('auth.login'), $data)
                 ->assertOk();
 
-            $expiresAt = now()->parse($response->json('data.expires_at'));
-            expect($expiresAt->lessThanOrEqualTo(now()->addDay()))->toBeTrue();
+            $expiresAt = Carbon::parse($response->json('data.expires_at'));
+            expect($expiresAt->lessThanOrEqualTo(Carbon::now()->copy()->addDay()))->toBeTrue();
+
+            Carbon::setTestNow();
         });
 
         it('sets a short token expiration by default', function () {
+            Carbon::setTestNow(now());
             $data = ($this->makePayload)();
 
             $response = postJson(route('auth.login'), $data)
                 ->assertOk();
 
-            $expiresAt = now()->parse($response->json('data.expires_at'));
-            expect($expiresAt->lessThanOrEqualTo(now()->addDay()))->toBeTrue();
+            $expiresAt = Carbon::parse($response->json('data.expires_at'));
+            expect($expiresAt->lessThanOrEqualTo(Carbon::now()->copy()->addDay()))->toBeTrue();
+
+            Carbon::setTestNow();
         });
     });
 

@@ -12,19 +12,19 @@ uses(RefreshDatabase::class);
 describe('CourseController -> show', function () {
 
     beforeEach(function () {
-        $this->author       = User::factory()->teacher()->create();
+        $this->teacher       = User::factory()->teacher()->create();
         $this->otherTeacher = User::factory()->teacher()->create();
         $this->admin        = User::factory()->admin()->create();
         $this->student      = User::factory()->student()->create();
 
         $this->unpublishedCourse = Course::factory()
             ->unpublished()
-            ->for($this->author, 'author')
+            ->for($this->teacher, 'author')
             ->create();
 
         $this->publishedCourse = Course::factory()
             ->published()
-            ->for($this->author, 'author')
+            ->for($this->teacher, 'author')
             ->create();
     });
 
@@ -46,7 +46,7 @@ describe('CourseController -> show', function () {
 
         it('author sees unpublished course', function () {
 
-            Sanctum::actingAs($this->author);
+            Sanctum::actingAs($this->teacher);
 
             getJson(route('courses.show', $this->unpublishedCourse))
                 ->assertOk()

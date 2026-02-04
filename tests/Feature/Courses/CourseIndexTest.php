@@ -12,7 +12,7 @@ uses(RefreshDatabase::class);
 describe('CourseController -> index', function () {
 
     beforeEach(function () {
-        $this->author = User::factory()->teacher()->create();
+        $this->teacher = User::factory()->teacher()->create();
     });
 
     /*
@@ -27,13 +27,13 @@ describe('CourseController -> index', function () {
             Course::factory()
                 ->count(3)
                 ->published()
-                ->for($this->author, 'author')
+                ->for($this->teacher, 'author')
                 ->create();
 
             Course::factory()
                 ->count(2)
                 ->unpublished()
-                ->for($this->author, 'author')
+                ->for($this->teacher, 'author')
                 ->create();
 
             getJson(route('courses.index'))
@@ -61,12 +61,12 @@ describe('CourseController -> index', function () {
 
             Course::factory()
                 ->published()
-                ->for($this->author, 'author')
+                ->for($this->teacher, 'author')
                 ->create(['title' => $firstTitle]);
 
             Course::factory()
                 ->published()
-                ->for($this->author, 'author')
+                ->for($this->teacher, 'author')
                 ->create(['title' => $secondTitle]);
 
             $partial = substr($firstTitle, 0, 6);
@@ -88,7 +88,7 @@ describe('CourseController -> index', function () {
 
             Course::factory()
                 ->published()
-                ->for($this->author, 'author')
+                ->for($this->teacher, 'author')
                 ->create();
 
             Course::factory()
@@ -96,7 +96,7 @@ describe('CourseController -> index', function () {
                 ->create();
 
             getJson(route('courses.index', [
-                'filter[author]' => $this->author->slug,
+                'filter[author]' => $this->teacher->slug,
             ]))
                 ->assertOk()
                 ->assertJsonCount(1, 'data')
@@ -114,7 +114,7 @@ describe('CourseController -> index', function () {
             Course::factory()
                 ->count(3)
                 ->published()
-                ->for($this->author, 'author')
+                ->for($this->teacher, 'author')
                 ->state(new Sequence(
                     ...array_map(
                         fn ($price) => ['price' => $price],

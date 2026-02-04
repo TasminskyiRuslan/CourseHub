@@ -14,13 +14,13 @@ uses(RefreshDatabase::class);
 describe('LessonsController -> index', function () {
 
     beforeEach(function () {
-        $this->author       = User::factory()->teacher()->create();
+        $this->teacher       = User::factory()->teacher()->create();
         $this->otherTeacher = User::factory()->teacher()->create();
         $this->admin        = User::factory()->admin()->create();
         $this->student      = User::factory()->student()->create();
 
-        $this->publishedCourse   = Course::factory()->published()->for($this->author, 'author')->create();
-        $this->unpublishedCourse = Course::factory()->unpublished()->for($this->author, 'author')->create();
+        $this->publishedCourse   = Course::factory()->published()->for($this->teacher, 'author')->create();
+        $this->unpublishedCourse = Course::factory()->unpublished()->for($this->teacher, 'author')->create();
 
         Lesson::factory()->count(3)->for($this->publishedCourse, 'course')->create();
         Lesson::factory()->count(2)->for($this->unpublishedCourse, 'course')->create();
@@ -45,7 +45,7 @@ describe('LessonsController -> index', function () {
         });
 
         it('lists lessons for unpublished course for author', function () {
-            Sanctum::actingAs($this->author);
+            Sanctum::actingAs($this->teacher);
 
             getJson(route('courses.lessons.index', $this->unpublishedCourse))
                 ->assertOk()
@@ -69,7 +69,7 @@ describe('LessonsController -> index', function () {
     describe('filters & sorting', function () {
 
         beforeEach(function () {
-            $this->course    = Course::factory()->published()->for($this->author, 'author')->create();
+            $this->course    = Course::factory()->published()->for($this->teacher, 'author')->create();
             $this->titles    = ['Introduction in Laravel', 'Advanced Vue Concepts', 'Testing with PestPHP'];
             $this->positions = [1, 2, 3];
 
@@ -126,7 +126,7 @@ describe('LessonsController -> index', function () {
         });
 
         it('returns empty for unmatched search', function () {
-            $course = Course::factory()->published()->for($this->author, 'author')->create();
+            $course = Course::factory()->published()->for($this->teacher, 'author')->create();
 
             getJson(route('courses.lessons.index', $course, ['filter[search]' => 'NonExistingLesson']))
                 ->assertOk()

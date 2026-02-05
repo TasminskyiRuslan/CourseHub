@@ -22,24 +22,24 @@ describe('LessonsController -> store', function () {
             $typeSpecific = $course ? match ($course->type) {
                 CourseType::OFFLINE => [
                     'start_time' => now()->addDay()->toIso8601String(),
-                    'end_time'   => now()->addDay()->addHours(2)->toIso8601String(),
-                    'address'    => 'Main Street 123',
-                    'room_number'=> '101A',
+                    'end_time' => now()->addDay()->addHours(2)->toIso8601String(),
+                    'address' => 'Main Street 123',
+                    'room_number' => '101A',
                 ],
                 CourseType::ONLINE => [
-                    'start_time'   => now()->addDay()->toIso8601String(),
-                    'end_time'     => now()->addDay()->addHours(2)->toIso8601String(),
+                    'start_time' => now()->addDay()->toIso8601String(),
+                    'end_time' => now()->addDay()->addHours(2)->toIso8601String(),
                     'meeting_link' => 'https://zoom.us/j/123456',
                 ],
                 CourseType::VIDEO => [
                     'video_url' => 'https://vimeo.com/123456',
-                    'provider'  => 'vimeo',
+                    'provider' => 'vimeo',
                 ],
             } : [];
 
             return array_merge([
-                'title'    => 'New Lesson Title',
-                'slug'     => null,
+                'title' => 'New Lesson Title',
+                'slug' => null,
                 'position' => null,
             ], $typeSpecific, $overrides);
         };
@@ -72,7 +72,7 @@ describe('LessonsController -> store', function () {
 
             $this->assertDatabaseMissing('lessons', [
                 'course_id' => $course->id,
-                'title'     => $data['title'],
+                'title' => $data['title'],
                 'slug' => null,
                 'position' => null
             ]);
@@ -100,7 +100,7 @@ describe('LessonsController -> store', function () {
 
             $this->assertDatabaseMissing('lessons', [
                 'course_id' => $course->id,
-                'title'     => $data['title'],
+                'title' => $data['title'],
                 'slug' => null,
                 'position' => null
             ]);
@@ -127,7 +127,7 @@ describe('LessonsController -> store', function () {
 
             $this->assertDatabaseMissing('lessons', [
                 'course_id' => $course->id,
-                'title'     => $data['title'],
+                'title' => $data['title'],
                 'slug' => null,
                 'position' => null
             ]);

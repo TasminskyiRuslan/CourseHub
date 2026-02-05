@@ -14,4 +14,6 @@ use OpenApi\Attributes as OA;
         new OA\Schema(ref: '#/components/schemas/StoreVideoLessonRequest'),
     ]
 )]
-class StoreLessonRequestSchema {}
+class StoreLessonRequestSchema
+{
+}

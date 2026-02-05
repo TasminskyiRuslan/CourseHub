@@ -22,7 +22,7 @@ describe('LogoutController', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-       it('revokes the current access token only', function () {
+        it('revokes the current access token only', function () {
             postJson(route('auth.logout'), [], ['Authorization' => 'Bearer ' . $this->currentToken->plainTextToken])
                 ->assertNoContent();
 

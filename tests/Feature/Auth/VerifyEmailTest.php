@@ -17,7 +17,7 @@ describe('VerifyEmailController', function () {
         $this->user = User::factory()->unverified()->create();
 
         $this->makeSignedUrl = fn(array $overrides = []) => URL::temporarySignedRoute(
-            'auth.verification.verify',
+            'verification.verify',
             now()->addMinutes(60),
             array_merge([
                 'id' => $this->user->id,
@@ -60,15 +60,15 @@ describe('VerifyEmailController', function () {
     */
     describe('validation', function () {
         it('fails when the user ID does not exist', function () {
-               getJson(($this->makeSignedUrl)(['id' => 99999]))->assertForbidden();
+            getJson(($this->makeSignedUrl)(['id' => 99999]))->assertForbidden();
         });
 
         it('fails when the hash is incorrect', function () {
-               getJson(($this->makeSignedUrl)(['hash' => 'wrong-hash']))->assertForbidden();
+            getJson(($this->makeSignedUrl)(['hash' => 'wrong-hash']))->assertForbidden();
         });
 
         it('fails when the signature is missing', function () {
-            getJson(route('auth.verification.verify', [
+            getJson(route('verification.verify', [
                 'id' => $this->user->id,
                 'hash' => sha1($this->user->getEmailForVerification()),
             ]))->assertForbidden();

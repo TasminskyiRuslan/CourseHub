@@ -11,19 +11,26 @@ use OpenApi\Attributes as OA;
     required: ['video_url', 'provider'],
     properties: [
         new OA\Property(
-            property: 'video_url',
-            description: 'The link of the video',
-            type: 'string',
-            format: 'uri',
-            example: 'https://videos.example.com/lesson123.mp4'
-        ),
-        new OA\Property(
-            property: 'provider',
-            description: 'The provider of the video',
-            type: 'string',
-            example: 'youtube'
-        ),
+            property: 'data',
+            properties: [
+                new OA\Property(
+                    property: 'video_url',
+                    description: 'The link of the video',
+                    type: 'string',
+                    format: 'uri',
+                    example: 'https://videos.example.com/lesson123.mp4'
+                ),
+                new OA\Property(
+                    property: 'provider',
+                    description: 'The provider of the video',
+                    type: 'string',
+                    example: 'youtube'
+                ),
+            ]
+        )
     ],
     type: 'object'
 )]
-class VideoLessonSchema {}
+class VideoLessonSchema
+{
+}

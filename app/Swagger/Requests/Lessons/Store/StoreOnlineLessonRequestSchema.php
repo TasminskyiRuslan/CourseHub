@@ -36,4 +36,6 @@ use OpenApi\Attributes as OA;
         )
     ]
 )]
-class StoreOnlineLessonRequestSchema {}
+class StoreOnlineLessonRequestSchema
+{
+}

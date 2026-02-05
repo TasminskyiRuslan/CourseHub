@@ -56,26 +56,6 @@ class CourseService
     /**
      * @throws Throwable
      */
-    public function update(UpdateCourseData $data, Course $course): Course
-    {
-        $course->update($data->toArray());
-        return $course->fresh('author');
-    }
-
-    /**
-     * @throws Throwable
-     */
-    public function delete(Course $course): void
-    {
-        DB::transaction(function () use ($course) {
-            $this->deleteImage($course);
-            $course->delete();
-        });
-    }
-
-    /**
-     * @throws Throwable
-     */
     public function updateImage(Course $course, UploadedFile $image): Course
     {
         $oldImagePath = $course->image_path;
@@ -97,10 +77,30 @@ class CourseService
         return $course->fresh('author');
     }
 
+    /**
+     * @throws Throwable
+     */
+    public function update(UpdateCourseData $data, Course $course): Course
+    {
+        $course->update($data->toArray());
+        return $course->fresh('author');
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function delete(Course $course): void
+    {
+        DB::transaction(function () use ($course) {
+            $this->deleteImage($course);
+            $course->delete();
+        });
+    }
+
     public function deleteImage(Course $course): void
     {
         $imagePath = $course->image_path;
-        if(!$imagePath) {
+        if (!$imagePath) {
             return;
         }
 

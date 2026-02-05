@@ -17,5 +17,7 @@ class UpdateCourseImageData extends Data
         #[Mimes(['jpg', 'jpeg', 'png', 'webp'])]
         #[Max(2048)]
         public UploadedFile $image,
-    ) {}
+    )
+    {
+    }
 }

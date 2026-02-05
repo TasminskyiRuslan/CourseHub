@@ -21,18 +21,18 @@ class CreateCourseData extends Data
         #[Required]
         #[StringType]
         #[Max(255)]
-        public string $title,
+        public string     $title,
 
         #[Nullable]
         #[StringType]
         #[Max(255)]
         #[WithCast(SlugCast::class)]
         #[Unique('courses', 'slug')]
-        public ?string $slug,
+        public ?string    $slug,
 
         #[Nullable]
         #[StringType]
-        public ?string $description,
+        public ?string    $description,
 
         #[Required]
         #[Enum(CourseType::class)]
@@ -42,6 +42,8 @@ class CreateCourseData extends Data
         #[Numeric]
         #[Min(0)]
         #[Max(99999999.99)]
-        public string $price,
-    ) {}
+        public string     $price,
+    )
+    {
+    }
 }

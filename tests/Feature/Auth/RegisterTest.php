@@ -2,10 +2,10 @@
 
 use App\Enums\UserRole;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
-use Carbon\Carbon;
 use Tests\Support\AuthJsonStructure;
 use function Pest\Laravel\postJson;
 
@@ -135,7 +135,7 @@ describe('RegisterController', function () {
         });
 
         it('fails when the role is invalid', function () {
-           postJson(route('auth.register'), ($this->makePayload)(['role' => 'invalid-role']))
+            postJson(route('auth.register'), ($this->makePayload)(['role' => 'invalid-role']))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['role']);
         });

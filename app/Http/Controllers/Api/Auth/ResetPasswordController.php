@@ -17,7 +17,7 @@ class ResetPasswordController extends Controller
 
     #[OA\Post(
         path: '/auth/password/reset',
-        description: 'Resets the user\'s password using a valid reset token.',
+        description: 'Resets the user\'s password.',
         summary: 'Reset password',
         requestBody: new OA\RequestBody(
             required: true,

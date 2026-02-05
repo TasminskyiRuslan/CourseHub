@@ -6,14 +6,14 @@ use App\Actions\Auth\RevokeCurrentTokenAction;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class LogoutController extends Controller
 {
     #[OA\Post(
         path: '/auth/logout',
-        description: 'Revoke  only the current authentication token for the authenticated user.',
+        description: 'Revoke only the current authentication token for the authenticated user.',
         summary: 'Logout current device',
         security: [['sanctum' => []]],
         tags: ['Auth'],

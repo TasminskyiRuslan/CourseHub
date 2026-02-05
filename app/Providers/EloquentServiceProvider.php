@@ -25,8 +25,8 @@ class EloquentServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Relation::morphMap([
-            CourseType::VIDEO->value   => VideoLesson::class,
-            CourseType::ONLINE->value  => OnlineLesson::class,
+            CourseType::VIDEO->value => VideoLesson::class,
+            CourseType::ONLINE->value => OnlineLesson::class,
             CourseType::OFFLINE->value => OfflineLesson::class,
         ]);
     }

@@ -28,7 +28,7 @@ class CourseController extends Controller
 
     #[OA\Get(
         path: '/courses',
-        description: 'Retrieve a list of courses with optional filtering, sorting, and pagination.',
+        description: 'Retrieve a list of courses.',
         summary: 'List courses',
         tags: ['Courses'],
         parameters: [
@@ -61,20 +61,7 @@ class CourseController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_OK,
                 description: 'Courses list',
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(
-                            property: 'data',
-                            type: 'array',
-                            items: new OA\Items(ref: '#/components/schemas/Course')
-                        ),
-                        new OA\Property(
-                            property: 'meta',
-                            ref: '#/components/schemas/PaginationMeta'
-                        ),
-                    ],
-                    type: 'object'
-                )
+                content: new OA\JsonContent(ref: '#/components/schemas/CourseCollection')
             ),
         ]
     )]
@@ -87,7 +74,7 @@ class CourseController extends Controller
 
     #[OA\Post(
         path: '/courses',
-        description: 'Create a new course with the provided details.',
+        description: 'Create a new course.',
         summary: 'Create course',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
@@ -127,7 +114,7 @@ class CourseController extends Controller
 
     #[OA\Get(
         path: '/courses/{course}',
-        description: 'Get details of a specific course by its identifier.',
+        description: 'Retrieve a specific course.',
         summary: 'Get course',
         security: [['sanctum' => []], []],
         tags: ['Courses'],
@@ -164,7 +151,7 @@ class CourseController extends Controller
 
     #[OA\Put(
         path: '/courses/{course}',
-        description: 'Update the specified course by its identifier.',
+        description: 'Update a specific course.',
         summary: 'Update course',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
@@ -217,7 +204,7 @@ class CourseController extends Controller
 
     #[OA\Delete(
         path: '/courses/{course}',
-        description: 'Delete the specified course by its identifier.',
+        description: 'Delete a specific course.',
         summary: 'Delete course',
         security: [['sanctum' => []]],
         tags: ['Courses'],

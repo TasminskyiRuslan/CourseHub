@@ -12,18 +12,18 @@ uses(RefreshDatabase::class);
 
 describe('LessonsController -> destroy', function () {
     beforeEach(function () {
-        $this->teacher       = User::factory()->teacher()->create();
-        $this->otherTeacher  = User::factory()->teacher()->create();
-        $this->student       = User::factory()->student()->create();
-        $this->admin         = User::factory()->admin()->create();
+        $this->teacher = User::factory()->teacher()->create();
+        $this->otherTeacher = User::factory()->teacher()->create();
+        $this->student = User::factory()->student()->create();
+        $this->admin = User::factory()->admin()->create();
 
         $this->offlineCourse = Course::factory()->type(CourseType::OFFLINE)->for($this->teacher, 'author')->create();
         $this->onlineCourse = Course::factory()->type(CourseType::ONLINE)->for($this->teacher, 'author')->create();
         $this->videoCourse = Course::factory()->type(CourseType::VIDEO)->for($this->teacher, 'author')->create();
 
         $this->offlineLesson = Lesson::factory()->for($this->offlineCourse)->create();
-        $this->onlineLesson  = Lesson::factory()->for($this->onlineCourse)->create();
-        $this->videoLesson   = Lesson::factory()->for($this->videoCourse)->create();
+        $this->onlineLesson = Lesson::factory()->for($this->onlineCourse)->create();
+        $this->videoLesson = Lesson::factory()->for($this->videoCourse)->create();
     });
 
     /*

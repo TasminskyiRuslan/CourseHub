@@ -25,6 +25,8 @@ class LoginData extends Data
         public string $password,
 
         #[BooleanType]
-        public bool $remember = false,
-    ) {}
+        public bool   $remember = false,
+    )
+    {
+    }
 }

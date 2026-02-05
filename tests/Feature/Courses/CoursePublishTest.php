@@ -10,10 +10,10 @@ uses(RefreshDatabase::class);
 
 describe('PublishCourseController', function () {
     beforeEach(function () {
-        $this->author      = User::factory()->teacher()->create();
+        $this->author = User::factory()->teacher()->create();
         $this->otherTeacher = User::factory()->teacher()->create();
-        $this->student      = User::factory()->student()->create();
-        $this->admin        = User::factory()->admin()->create();
+        $this->student = User::factory()->student()->create();
+        $this->admin = User::factory()->admin()->create();
 
         $this->course = Course::factory()->unpublished()->for($this->author, 'author')->create();
     });

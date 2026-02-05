@@ -30,4 +30,6 @@ use OpenApi\Attributes as OA;
         )
     ]
 )]
-class UpdateVideoLessonRequestSchema {}
+class UpdateVideoLessonRequestSchema
+{
+}

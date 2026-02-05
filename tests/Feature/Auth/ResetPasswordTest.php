@@ -34,7 +34,7 @@ describe('ResetPasswordController', function () {
     */
     describe('success', function () {
         it('resets the password', function () {
-            postJson(route('auth.password.reset'), ($this->makePayload)())
+            postJson(route('password.reset'), ($this->makePayload)())
                 ->assertNoContent();
 
             $this->user->refresh();
@@ -49,37 +49,37 @@ describe('ResetPasswordController', function () {
     */
     describe('validation', function () {
         it('fails when token is invalid', function () {
-        postJson(route('auth.password.reset'), ($this->makePayload)(['token' => 'invalid-token']))
+            postJson(route('password.reset'), ($this->makePayload)(['token' => 'invalid-token']))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors('email');
         });
 
         it('fails when required fields are missing', function () {
-            postJson(route('auth.password.reset'), [])
+            postJson(route('password.reset'), [])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email', 'password', 'token']);
         });
 
         it('fails when password confirmation does not match', function () {
-            postJson(route('auth.password.reset'), ($this->makePayload)(['password_confirmation' => 'different']))
+            postJson(route('password.reset'), ($this->makePayload)(['password_confirmation' => 'different']))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['password']);
         });
 
         it('fails when email format is invalid', function () {
-            postJson(route('auth.password.reset'), ($this->makePayload)(['email' => 'invalid-email']))
+            postJson(route('password.reset'), ($this->makePayload)(['email' => 'invalid-email']))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
         });
 
         it('fails when email does not exist', function () {
-            postJson(route('auth.password.reset'), ($this->makePayload)(['email' => 'nonexistent@example.com']))
+            postJson(route('password.reset'), ($this->makePayload)(['email' => 'nonexistent@example.com']))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
         });
 
         it('fails when the new password is too short', function () {
-            postJson(route('auth.password.reset'), ($this->makePayload)([
+            postJson(route('password.reset'), ($this->makePayload)([
                 'password' => '123',
                 'password_confirmation' => '123',
             ]))
@@ -95,7 +95,7 @@ describe('ResetPasswordController', function () {
     */
     describe('permissions', function () {
         it('forbids admin', function () {
-            postJson(route('auth.password.reset'), ($this->makePayload)([
+            postJson(route('password.reset'), ($this->makePayload)([
                 'email' => $this->admin->email,
                 'token' => $this->adminToken,
             ]))

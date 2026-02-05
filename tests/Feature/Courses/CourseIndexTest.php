@@ -42,7 +42,7 @@ describe('CourseController -> index', function () {
     */
     describe('filters & sorting', function () {
         it('filters courses by search', function () {
-            $firstTitle  = 'Laravel Advanced';
+            $firstTitle = 'Laravel Advanced';
             $secondTitle = 'Vue Basics';
 
             Course::factory()->published()->for($this->author, 'author')->create(['title' => $firstTitle]);

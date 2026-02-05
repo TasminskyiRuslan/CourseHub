@@ -36,8 +36,8 @@ class LessonFactory extends Factory
             if (!$lesson->lessonable_id) {
                 $lessonable = match ($lesson->course->type) {
                     CourseType::OFFLINE => OfflineLesson::factory()->create(),
-                    CourseType::ONLINE  => OnlineLesson::factory()->create(),
-                    CourseType::VIDEO   => VideoLesson::factory()->create(),
+                    CourseType::ONLINE => OnlineLesson::factory()->create(),
+                    CourseType::VIDEO => VideoLesson::factory()->create(),
                 };
 
                 $lesson->lessonable()->associate($lessonable);

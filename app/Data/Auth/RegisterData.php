@@ -23,20 +23,20 @@ class RegisterData extends Data
         #[Required]
         #[StringType]
         #[Max(255)]
-        public string $name,
+        public string   $name,
 
         #[Required]
         #[Email]
         #[Max(255)]
         #[WithCast(LowercaseCast::class)]
         #[Unique('users', 'email')]
-        public string $email,
+        public string   $email,
 
         #[Required]
         #[StringType]
         #[Confirmed]
         #[Password(min: 8)]
-        public string $password,
+        public string   $password,
 
         #[Required]
         #[Enum(UserRole::class)]
@@ -44,6 +44,8 @@ class RegisterData extends Data
         public UserRole $role,
 
         #[BooleanType]
-        public bool $remember = false,
-    ) {}
+        public bool     $remember = false,
+    )
+    {
+    }
 }

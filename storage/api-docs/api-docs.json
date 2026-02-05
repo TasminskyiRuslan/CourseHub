@@ -50,7 +50,7 @@
                     "Auth"
                 ],
                 "summary": "Login",
-                "description": "Authenticate user with email and password.",
+                "description": "Authenticate user.",
                 "operationId": "8e026335d25c3df3f6f6cf1f683ac7b8",
                 "requestBody": {
                     "required": true,
@@ -111,7 +111,7 @@
                     "Auth"
                 ],
                 "summary": "Logout current device",
-                "description": "Revoke  only the current authentication token for the authenticated user.",
+                "description": "Revoke only the current authentication token for the authenticated user.",
                 "operationId": "1b24911c0ac04bc4abfacef75080bbe8",
                 "responses": {
                     "204": {
@@ -164,7 +164,7 @@
                     "Auth"
                 ],
                 "summary": "Register",
-                "description": "Register a new user with name, email, password, and role.",
+                "description": "Register a new user.",
                 "operationId": "8e69ddc577b1650c4a010f798dd6c9d3",
                 "requestBody": {
                     "required": true,
@@ -222,7 +222,7 @@
                     "Auth"
                 ],
                 "summary": "Reset password",
-                "description": "Resets the user's password using a valid reset token.",
+                "description": "Resets the user's password.",
                 "operationId": "033879051100699c9ba3a190913d20c5",
                 "requestBody": {
                     "required": true,
@@ -309,7 +309,7 @@
                     "Courses"
                 ],
                 "summary": "List courses",
-                "description": "Retrieve a list of courses with optional filtering, sorting, and pagination.",
+                "description": "Retrieve a list of courses.",
                 "operationId": "0e56e7628c52236eef70b08dddecc424",
                 "parameters": [
                     {
@@ -355,18 +355,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/Course"
-                                            }
-                                        },
-                                        "meta": {
-                                            "$ref": "#/components/schemas/PaginationMeta"
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/CourseCollection"
                                 }
                             }
                         }
@@ -378,7 +367,7 @@
                     "Courses"
                 ],
                 "summary": "Create course",
-                "description": "Create a new course with the provided details.",
+                "description": "Create a new course.",
                 "operationId": "ef5a9f85705b2624559ac0e9e6d444e6",
                 "requestBody": {
                     "required": true,
@@ -424,7 +413,7 @@
                     "Courses"
                 ],
                 "summary": "Get course",
-                "description": "Get details of a specific course by its identifier.",
+                "description": "Retrieve a specific course.",
                 "operationId": "138c60f6701fad11d64200fa6df6a0dd",
                 "parameters": [
                     {
@@ -467,7 +456,7 @@
                     "Courses"
                 ],
                 "summary": "Update course",
-                "description": "Update the specified course by its identifier.",
+                "description": "Update a specific course.",
                 "operationId": "35911d475bcc8b91899ed036b9c84326",
                 "parameters": [
                     {
@@ -525,7 +514,7 @@
                     "Courses"
                 ],
                 "summary": "Delete course",
-                "description": "Delete the specified course by its identifier.",
+                "description": "Delete a specific course.",
                 "operationId": "65521517f1a7dc8a5a0478954ff53e0d",
                 "parameters": [
                     {
@@ -798,18 +787,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/Lesson"
-                                            }
-                                        },
-                                        "meta": {
-                                            "$ref": "#/components/schemas/PaginationMeta"
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/LessonCollection"
                                 }
                             }
                         }
@@ -1598,24 +1576,29 @@
                     "expires_at"
                 ],
                 "properties": {
-                    "user": {
-                        "$ref": "#/components/schemas/User"
-                    },
-                    "access_token": {
-                        "description": "Access token",
-                        "type": "string",
-                        "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
-                    },
-                    "token_type": {
-                        "description": "Type of the token for Authorization header",
-                        "type": "string",
-                        "example": "Bearer"
-                    },
-                    "expires_at": {
-                        "description": "Expiration date of the token",
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2026-01-28T12:00:00+02:00"
+                    "data": {
+                        "properties": {
+                            "user": {
+                                "$ref": "#/components/schemas/User"
+                            },
+                            "access_token": {
+                                "description": "Access token",
+                                "type": "string",
+                                "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                            },
+                            "token_type": {
+                                "description": "Type of the token for Authorization header",
+                                "type": "string",
+                                "example": "Bearer"
+                            },
+                            "expires_at": {
+                                "description": "Expiration date of the token",
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-01-28T12:00:00+02:00"
+                            }
+                        },
+                        "type": "object"
                     }
                 },
                 "type": "object"
@@ -1634,54 +1617,59 @@
                     "updated_at"
                 ],
                 "properties": {
-                    "id": {
-                        "description": "The user ID",
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "name": {
-                        "description": "The user name",
-                        "type": "string",
-                        "example": "John Doe"
-                    },
-                    "slug": {
-                        "description": "The user slug",
-                        "type": "string",
-                        "example": "john-doe"
-                    },
-                    "email": {
-                        "description": "The user email",
-                        "type": "string",
-                        "format": "email",
-                        "example": "john@example.com"
-                    },
-                    "role": {
-                        "description": "The user role",
-                        "type": "string",
-                        "enum": [
-                            "student",
-                            "teacher"
-                        ],
-                        "example": "student"
-                    },
-                    "email_verified_at": {
-                        "description": "The user email verified at",
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2026-01-01T12:00:00Z",
-                        "nullable": true
-                    },
-                    "created_at": {
-                        "description": "The user registered at",
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2026-01-01T12:00:00Z"
-                    },
-                    "updated_at": {
-                        "description": "The user last updated at",
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2026-01-10T12:00:00Z"
+                    "data": {
+                        "properties": {
+                            "id": {
+                                "description": "The user ID",
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "name": {
+                                "description": "The user name",
+                                "type": "string",
+                                "example": "John Doe"
+                            },
+                            "slug": {
+                                "description": "The user slug",
+                                "type": "string",
+                                "example": "john-doe"
+                            },
+                            "email": {
+                                "description": "The user email",
+                                "type": "string",
+                                "format": "email",
+                                "example": "john@example.com"
+                            },
+                            "role": {
+                                "description": "The user role",
+                                "type": "string",
+                                "enum": [
+                                    "student",
+                                    "teacher"
+                                ],
+                                "example": "student"
+                            },
+                            "email_verified_at": {
+                                "description": "The user email verified at",
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-01-01T12:00:00Z",
+                                "nullable": true
+                            },
+                            "created_at": {
+                                "description": "The user registered at",
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-01-01T12:00:00Z"
+                            },
+                            "updated_at": {
+                                "description": "The user last updated at",
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-01-10T12:00:00Z"
+                            }
+                        },
+                        "type": "object"
                     }
                 },
                 "type": "object"
@@ -1695,27 +1683,47 @@
                     "slug"
                 ],
                 "properties": {
-                    "id": {
-                        "description": "The user ID",
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "name": {
-                        "description": "The user name",
-                        "type": "string",
-                        "example": "John Doe"
-                    },
-                    "slug": {
-                        "description": "The user slug",
-                        "type": "string",
-                        "example": "john-doe"
+                    "data": {
+                        "properties": {
+                            "id": {
+                                "description": "The user ID",
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "name": {
+                                "description": "The user name",
+                                "type": "string",
+                                "example": "John Doe"
+                            },
+                            "slug": {
+                                "description": "The user slug",
+                                "type": "string",
+                                "example": "john-doe"
+                            }
+                        },
+                        "type": "object"
                     }
                 },
                 "type": "object"
             },
-            "Course": {
-                "title": "Course schema",
-                "description": "Details of a course returned by the API",
+            "CourseCollection": {
+                "title": "Course collection",
+                "description": "Collection of courses",
+                "required": [
+                    "data"
+                ],
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CourseData"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "CourseData": {
+                "title": "CourseDataSchema data schema",
                 "required": [
                     "id",
                     "author_id",
@@ -1803,9 +1811,37 @@
                 },
                 "type": "object"
             },
-            "Lesson": {
-                "title": "Lesson schema",
-                "description": "Details of a lesson returned by the API",
+            "Course": {
+                "title": "Course schema",
+                "description": "Details of a course returned by the API",
+                "required": [
+                    "data"
+                ],
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/CourseData"
+                    }
+                },
+                "type": "object"
+            },
+            "LessonCollection": {
+                "title": "Lesson collection",
+                "description": "Collection of lessons",
+                "required": [
+                    "data"
+                ],
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/LessonData"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "LessonData": {
+                "title": "Lesson data schema",
                 "required": [
                     "id",
                     "course_id",
@@ -1871,6 +1907,19 @@
                 },
                 "type": "object"
             },
+            "Lesson": {
+                "title": "Lesson schema",
+                "description": "Details of a lesson returned by the API",
+                "required": [
+                    "data"
+                ],
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/LessonData"
+                    }
+                },
+                "type": "object"
+            },
             "OfflineLesson": {
                 "title": "Offline lesson schema",
                 "description": "Offline content of a lesson returned by the API",
@@ -1881,27 +1930,32 @@
                     "room_number"
                 ],
                 "properties": {
-                    "start_time": {
-                        "description": "The start time of the lesson",
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2027-02-01T10:00:00Z"
-                    },
-                    "end_time": {
-                        "description": "The end time of the lesson",
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2027-02-01T12:00:00Z"
-                    },
-                    "address": {
-                        "description": "The address of the lesson",
-                        "type": "string",
-                        "example": "123 Main St, Springfield"
-                    },
-                    "room_number": {
-                        "description": "The room number of the lesson",
-                        "type": "string",
-                        "example": "Room 101"
+                    "data": {
+                        "properties": {
+                            "start_time": {
+                                "description": "The start time of the lesson",
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2027-02-01T10:00:00Z"
+                            },
+                            "end_time": {
+                                "description": "The end time of the lesson",
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2027-02-01T12:00:00Z"
+                            },
+                            "address": {
+                                "description": "The address of the lesson",
+                                "type": "string",
+                                "example": "123 Main St, Springfield"
+                            },
+                            "room_number": {
+                                "description": "The room number of the lesson",
+                                "type": "string",
+                                "example": "Room 101"
+                            }
+                        },
+                        "type": "object"
                     }
                 },
                 "type": "object"
@@ -1915,23 +1969,28 @@
                     "meeting_link"
                 ],
                 "properties": {
-                    "start_time": {
-                        "description": "The start time of the lesson",
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2027-02-01T10:00:00Z"
-                    },
-                    "end_time": {
-                        "description": "The end time of the lesson",
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2027-02-01T12:00:00Z"
-                    },
-                    "meeting_link": {
-                        "description": "The link of the lesson",
-                        "type": "string",
-                        "format": "uri",
-                        "example": "https://meet.example.com/lesson123"
+                    "data": {
+                        "properties": {
+                            "start_time": {
+                                "description": "The start time of the lesson",
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2027-02-01T10:00:00Z"
+                            },
+                            "end_time": {
+                                "description": "The end time of the lesson",
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2027-02-01T12:00:00Z"
+                            },
+                            "meeting_link": {
+                                "description": "The link of the lesson",
+                                "type": "string",
+                                "format": "uri",
+                                "example": "https://meet.example.com/lesson123"
+                            }
+                        },
+                        "type": "object"
                     }
                 },
                 "type": "object"
@@ -1944,16 +2003,21 @@
                     "provider"
                 ],
                 "properties": {
-                    "video_url": {
-                        "description": "The link of the video",
-                        "type": "string",
-                        "format": "uri",
-                        "example": "https://videos.example.com/lesson123.mp4"
-                    },
-                    "provider": {
-                        "description": "The provider of the video",
-                        "type": "string",
-                        "example": "youtube"
+                    "data": {
+                        "properties": {
+                            "video_url": {
+                                "description": "The link of the video",
+                                "type": "string",
+                                "format": "uri",
+                                "example": "https://videos.example.com/lesson123.mp4"
+                            },
+                            "provider": {
+                                "description": "The provider of the video",
+                                "type": "string",
+                                "example": "youtube"
+                            }
+                        },
+                        "type": "object"
                     }
                 },
                 "type": "object"

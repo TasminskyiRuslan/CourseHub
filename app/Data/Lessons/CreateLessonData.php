@@ -22,33 +22,35 @@ class CreateLessonData extends Data
         #[Required]
         #[StringType]
         #[Max(255)]
-        public string $title,
+        public string           $title,
 
         #[Nullable]
         #[StringType]
         #[Max(255)]
         #[WithCast(SlugCast::class)]
-        public ?string $slug,
+        public ?string          $slug,
 
         #[Nullable]
         #[IntegerType]
         #[Min(0)]
-        public ?int $position,
+        public ?int             $position,
 
         public ?CarbonImmutable $start_time,
 
         public ?CarbonImmutable $end_time,
 
-        public ?string $address,
+        public ?string          $address,
 
-        public ?string $room_number,
+        public ?string          $room_number,
 
-        public ?string $meeting_link,
+        public ?string          $meeting_link,
 
-        public ?string $video_url,
+        public ?string          $video_url,
 
-        public ?string $provider,
-    ) {}
+        public ?string          $provider,
+    )
+    {
+    }
 
     public static function rules(?ValidationContext $context = null): array
     {
@@ -63,19 +65,19 @@ class CreateLessonData extends Data
 
         $typeRules = match ($type) {
             CourseType::OFFLINE => [
-                'start_time'  => ['nullable', 'date', 'after_or_equal:today'],
-                'end_time'    => ['nullable', 'date', 'after:start_time'],
-                'address'     => ['nullable', 'string', 'max:255'],
+                'start_time' => ['nullable', 'date', 'after_or_equal:today'],
+                'end_time' => ['nullable', 'date', 'after:start_time'],
+                'address' => ['nullable', 'string', 'max:255'],
                 'room_number' => ['nullable', 'string', 'max:50'],
             ],
             CourseType::ONLINE => [
-                'start_time'   => ['nullable', 'date', 'after_or_equal:today'],
-                'end_time'     => ['nullable', 'date', 'after:start_time'],
+                'start_time' => ['nullable', 'date', 'after_or_equal:today'],
+                'end_time' => ['nullable', 'date', 'after:start_time'],
                 'meeting_link' => ['nullable', 'url', 'max:2048'],
             ],
             CourseType::VIDEO => [
                 'video_url' => ['nullable', 'url', 'max:2048'],
-                'provider'  => ['nullable', 'string', 'max:50'],
+                'provider' => ['nullable', 'string', 'max:50'],
             ],
         };
         return array_merge($rules, $typeRules);

@@ -15,7 +15,7 @@ class RegisterController extends Controller
 {
     #[OA\Post(
         path: '/auth/register',
-        description: 'Register a new user with name, email, password, and role.',
+        description: 'Register a new user.',
         summary: 'Register',
         requestBody: new OA\RequestBody(
             required: true,

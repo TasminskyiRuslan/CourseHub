@@ -17,5 +17,7 @@ class ForgotPasswordData extends Data
         #[Max(255)]
         #[WithCast(LowercaseCast::class)]
         public string $email,
-    ) {}
+    )
+    {
+    }
 }

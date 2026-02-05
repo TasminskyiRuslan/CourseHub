@@ -41,4 +41,6 @@ use OpenApi\Attributes as OA;
         )
     ]
 )]
-class StoreOfflineLessonRequestSchema {}
+class StoreOfflineLessonRequestSchema
+{
+}

@@ -59,4 +59,6 @@ use OpenApi\Attributes as OA;
     ],
     type: 'object'
 )]
-class RegisterRequestSchema {}
+class RegisterRequestSchema
+{
+}

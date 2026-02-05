@@ -29,7 +29,7 @@ describe('ForgotPasswordController', function () {
     */
     describe('success', function () {
         it('sends a reset link to an existing user', function () {
-            postJson(route('auth.password.forgot'), ($this->makePayload)())
+            postJson(route('password.forgot'), ($this->makePayload)())
                 ->assertNoContent();
 
             Notification::assertSentTo(
@@ -42,7 +42,7 @@ describe('ForgotPasswordController', function () {
         });
 
         it('silently succeeds when the email does not exist', function () {
-            postJson(route('auth.password.forgot'), ($this->makePayload)(['email' => 'nonexistent@example.com']))
+            postJson(route('password.forgot'), ($this->makePayload)(['email' => 'nonexistent@example.com']))
                 ->assertNoContent();
 
             Notification::assertNothingSent();
@@ -57,13 +57,13 @@ describe('ForgotPasswordController', function () {
     */
     describe('validation', function () {
         it('fails when email is missing', function () {
-            postJson(route('auth.password.forgot'), [])
+            postJson(route('password.forgot'), [])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
         });
 
         it('fails when email format is invalid', function () {
-            postJson(route('auth.password.forgot'), ($this->makePayload)(['email' => 'invalid-email']))
+            postJson(route('password.forgot'), ($this->makePayload)(['email' => 'invalid-email']))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
         });

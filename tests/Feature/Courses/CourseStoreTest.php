@@ -1,7 +1,6 @@
 <?php
 
 use App\Enums\CourseType;
-use App\Models\Course;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -18,11 +17,11 @@ describe('CourseController -> store', function () {
         $this->unverifiedTeacher = User::factory()->teacher()->unverified()->create();
 
         $this->makePayload = fn(array $overrides = []) => array_merge([
-            'title'       => 'New Laravel Course',
-            'slug'        => null,
+            'title' => 'New Laravel CourseDataSchema',
+            'slug' => null,
             'description' => 'Comprehensive course on Laravel',
-            'type'        => CourseType::ONLINE->value,
-            'price'       => '199.99',
+            'type' => CourseType::ONLINE->value,
+            'price' => '199.99',
         ], $overrides);
     });
 
@@ -46,12 +45,12 @@ describe('CourseController -> store', function () {
 
             $this->assertDatabaseHas('courses', [
                 'author_id' => $this->teacher->id,
-                'title'     => $data['title'],
+                'title' => $data['title'],
             ]);
 
             $this->assertDatabaseMissing('courses', [
                 'author_id' => $this->teacher->id,
-                'title'     => $data['title'],
+                'title' => $data['title'],
                 'slug' => null,
             ]);
         });
@@ -66,7 +65,7 @@ describe('CourseController -> store', function () {
 
             $this->assertDatabaseHas('courses', [
                 'author_id' => $this->teacher->id,
-                'slug'      => $data['slug'],
+                'slug' => $data['slug'],
             ]);
         });
     });

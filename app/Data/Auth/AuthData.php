@@ -9,8 +9,10 @@ use Spatie\LaravelData\Data;
 final class AuthData extends Data
 {
     public function __construct(
-        public User $user,
+        public User   $user,
         public string $token,
         public Carbon $expiresAt,
-    ) {}
+    )
+    {
+    }
 }

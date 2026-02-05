@@ -13,7 +13,7 @@ class LoginController extends Controller
 {
     #[OA\Post(
         path: '/auth/login',
-        description: 'Authenticate user with email and password.',
+        description: 'Authenticate user.',
         summary: 'Login',
         requestBody: new OA\RequestBody(
             required: true,

@@ -6,8 +6,8 @@ use App\Actions\Auth\RevokeAllTokensAction;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class LogoutAllController extends Controller
 {

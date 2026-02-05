@@ -13,33 +13,33 @@ uses(RefreshDatabase::class);
 
 describe('LessonsController -> update', function () {
     beforeEach(function () {
-        $this->author       = User::factory()->teacher()->create();
-        $this->otherTeacher  = User::factory()->teacher()->create();
-        $this->student       = User::factory()->student()->create();
-        $this->admin         = User::factory()->admin()->create();
+        $this->author = User::factory()->teacher()->create();
+        $this->otherTeacher = User::factory()->teacher()->create();
+        $this->student = User::factory()->student()->create();
+        $this->admin = User::factory()->admin()->create();
 
         $this->makePayload = function (Course $course, array $overrides = []) {
             $typeSpecific = match ($course->type) {
                 CourseType::OFFLINE => [
-                    'start_time'  => now()->addDay()->toIso8601String(),
-                    'end_time'    => now()->addDay()->addHours(2)->toIso8601String(),
-                    'address'     => 'Updated Street 456',
+                    'start_time' => now()->addDay()->toIso8601String(),
+                    'end_time' => now()->addDay()->addHours(2)->toIso8601String(),
+                    'address' => 'Updated Street 456',
                     'room_number' => '202B',
                 ],
                 CourseType::ONLINE => [
-                    'start_time'   => now()->addDay()->toIso8601String(),
-                    'end_time'     => now()->addDay()->addHours(2)->toIso8601String(),
+                    'start_time' => now()->addDay()->toIso8601String(),
+                    'end_time' => now()->addDay()->addHours(2)->toIso8601String(),
                     'meeting_link' => 'https://zoom.us/j/654321',
                 ],
                 CourseType::VIDEO => [
                     'video_url' => 'https://vimeo.com/654321',
-                    'provider'  => 'youtube',
+                    'provider' => 'youtube',
                 ],
             };
 
             return array_merge([
-                'title'    => 'Updated Lesson Title',
-                'slug'     => 'updated-lesson-slug',
+                'title' => 'Updated Lesson Title',
+                'slug' => 'updated-lesson-slug',
                 'position' => 1,
             ], $typeSpecific, $overrides);
         };
@@ -144,7 +144,7 @@ describe('LessonsController -> update', function () {
             $this->assertDatabaseHas('video_lessons', [
                 'id' => $lesson->lessonable->id,
                 'video_url' => $data['video_url'],
-                'provider'  => $data['provider'],
+                'provider' => $data['provider'],
             ]);
         });
     });

@@ -69,20 +69,7 @@ class LessonController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_OK,
                 description: 'Lessons list',
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(
-                            property: 'data',
-                            type: 'array',
-                            items: new OA\Items(ref: '#/components/schemas/Lesson')
-                        ),
-                        new OA\Property(
-                            property: 'meta',
-                            ref: '#/components/schemas/PaginationMeta'
-                        ),
-                    ],
-                    type: 'object'
-                )
+                content: new OA\JsonContent(ref: '#/components/schemas/LessonCollection')
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_FORBIDDEN,

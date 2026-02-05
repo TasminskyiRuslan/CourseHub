@@ -32,5 +32,7 @@ class ResetPasswordData extends Data
         #[Required]
         #[StringType]
         public string $token,
-    ) {}
+    )
+    {
+    }
 }

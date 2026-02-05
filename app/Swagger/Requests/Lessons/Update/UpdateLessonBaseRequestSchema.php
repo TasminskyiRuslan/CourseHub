@@ -31,4 +31,6 @@ use OpenApi\Attributes as OA;
     ],
     type: 'object'
 )]
-class UpdateLessonBaseRequestSchema {}
+class UpdateLessonBaseRequestSchema
+{
+}

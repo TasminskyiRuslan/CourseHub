@@ -14,9 +14,7 @@ describe('VerifyEmailController', function () {
     beforeEach(function () {
         Event::fake();
 
-        $this->user = User::factory()
-            ->unverified()
-            ->create();
+        $this->user = User::factory()->unverified()->create();
 
         $this->makeSignedUrl = fn(array $overrides = []) => URL::temporarySignedRoute(
             'auth.verification.verify',
@@ -34,19 +32,14 @@ describe('VerifyEmailController', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-
         it('verifies the email', function () {
-            $url = ($this->makeSignedUrl)();
-
-            getJson($url)->assertNoContent();
+            getJson(($this->makeSignedUrl)())->assertNoContent();
 
             expect($this->user->fresh()->hasVerifiedEmail())->toBeTrue();
         });
 
         it('dispatches the verified event', function () {
-            $url = ($this->makeSignedUrl)();
-
-            getJson($url)->assertNoContent();
+            getJson(($this->makeSignedUrl)())->assertNoContent();
 
             Event::assertDispatched(Verified::class, fn($event) => $event->user->id === $this->user->id);
         });
@@ -54,9 +47,7 @@ describe('VerifyEmailController', function () {
         it('does nothing if the email is already verified', function () {
             $this->user->markEmailAsVerified();
 
-            $url = ($this->makeSignedUrl)();
-
-            getJson($url)->assertNoContent();
+            getJson(($this->makeSignedUrl)())->assertNoContent();
 
             Event::assertNotDispatched(Verified::class);
         });
@@ -68,27 +59,19 @@ describe('VerifyEmailController', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-
         it('fails when the user ID does not exist', function () {
-            $url = ($this->makeSignedUrl)(['id' => 99999]);
-
-            getJson($url)->assertForbidden();
+               getJson(($this->makeSignedUrl)(['id' => 99999]))->assertForbidden();
         });
 
         it('fails when the hash is incorrect', function () {
-            $url = ($this->makeSignedUrl)(['hash' => 'wrong-hash']);
-
-            getJson($url)->assertForbidden();
+               getJson(($this->makeSignedUrl)(['hash' => 'wrong-hash']))->assertForbidden();
         });
 
         it('fails when the signature is missing', function () {
-            $url = route('auth.verification.verify', [
+            getJson(route('auth.verification.verify', [
                 'id' => $this->user->id,
                 'hash' => sha1($this->user->getEmailForVerification()),
-            ]);
-
-            getJson($url)->assertForbidden();
+            ]))->assertForbidden();
         });
     });
-
 })->group('auth');

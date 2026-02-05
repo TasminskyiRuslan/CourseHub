@@ -11,27 +11,15 @@ use function Pest\Laravel\deleteJson;
 uses(RefreshDatabase::class);
 
 describe('LessonsController -> destroy', function () {
-
     beforeEach(function () {
         $this->teacher       = User::factory()->teacher()->create();
         $this->otherTeacher  = User::factory()->teacher()->create();
         $this->student       = User::factory()->student()->create();
         $this->admin         = User::factory()->admin()->create();
 
-        $this->offlineCourse = Course::factory()
-            ->type(CourseType::OFFLINE)
-            ->for($this->teacher, 'author')
-            ->create();
-
-        $this->onlineCourse = Course::factory()
-            ->type(CourseType::ONLINE)
-            ->for($this->teacher, 'author')
-            ->create();
-
-        $this->videoCourse = Course::factory()
-            ->type(CourseType::VIDEO)
-            ->for($this->teacher, 'author')
-            ->create();
+        $this->offlineCourse = Course::factory()->type(CourseType::OFFLINE)->for($this->teacher, 'author')->create();
+        $this->onlineCourse = Course::factory()->type(CourseType::ONLINE)->for($this->teacher, 'author')->create();
+        $this->videoCourse = Course::factory()->type(CourseType::VIDEO)->for($this->teacher, 'author')->create();
 
         $this->offlineLesson = Lesson::factory()->for($this->offlineCourse)->create();
         $this->onlineLesson  = Lesson::factory()->for($this->onlineCourse)->create();
@@ -44,7 +32,6 @@ describe('LessonsController -> destroy', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-
         it('author deletes offline lesson', function () {
             Sanctum::actingAs($this->teacher);
 
@@ -112,11 +99,10 @@ describe('LessonsController -> destroy', function () {
 
     /*
     |--------------------------------------------------------------------------
-    | validation / not found
+    | validation
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-
         it('returns not found for non-existing lesson', function () {
             Sanctum::actingAs($this->teacher);
 
@@ -168,5 +154,4 @@ describe('LessonsController -> destroy', function () {
             ]))->assertUnauthorized();
         });
     });
-
 })->group('lessons');

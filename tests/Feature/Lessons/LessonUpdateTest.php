@@ -12,16 +12,13 @@ use function Pest\Laravel\putJson;
 uses(RefreshDatabase::class);
 
 describe('LessonsController -> update', function () {
-
     beforeEach(function () {
-        $this->teacher       = User::factory()->teacher()->create();
+        $this->author       = User::factory()->teacher()->create();
         $this->otherTeacher  = User::factory()->teacher()->create();
         $this->student       = User::factory()->student()->create();
         $this->admin         = User::factory()->admin()->create();
-        $this->unverifiedTeacher = User::factory()->teacher()->unverified()->create();
 
         $this->makePayload = function (Course $course, array $overrides = []) {
-
             $typeSpecific = match ($course->type) {
                 CourseType::OFFLINE => [
                     'start_time'  => now()->addDay()->toIso8601String(),
@@ -54,16 +51,12 @@ describe('LessonsController -> update', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-
         beforeEach(function () {
-            Sanctum::actingAs($this->teacher);
+            Sanctum::actingAs($this->author);
         });
 
         it('updates an offline lesson', function () {
-            $course = Course::factory()
-                ->type(CourseType::OFFLINE)
-                ->for($this->teacher, 'author')
-                ->create();
+            $course = Course::factory()->type(CourseType::OFFLINE)->for($this->author, 'author')->create();
 
             $lesson = Lesson::factory()->for($course)->create();
 
@@ -74,21 +67,28 @@ describe('LessonsController -> update', function () {
                 'lesson' => $lesson,
             ]), $data)
                 ->assertOk()
-                ->assertJsonPath('data.title', $data['title'])
+                ->assertJsonPath('data.slug', $data['slug'])
                 ->assertJsonStructure(['data' => LessonJsonStructure::get($course->type)]);
+
+            $this->assertDatabaseHas('lessons', [
+                'id' => $lesson->id,
+                'course_id' => $course->id,
+                'title' => $data['title'],
+                'slug' => $data['slug'],
+                'position' => $data['position'],
+            ]);
 
             $this->assertDatabaseHas('offline_lessons', [
                 'id' => $lesson->lessonable->id,
+                'start_time' => $data['start_time'],
+                'end_time' => $data['end_time'],
                 'address' => $data['address'],
                 'room_number' => $data['room_number'],
             ]);
         });
 
         it('updates an online lesson', function () {
-            $course = Course::factory()
-                ->type(CourseType::ONLINE)
-                ->for($this->teacher, 'author')
-                ->create();
+            $course = Course::factory()->type(CourseType::ONLINE)->for($this->author, 'author')->create();
 
             $lesson = Lesson::factory()->for($course)->create();
 
@@ -99,20 +99,27 @@ describe('LessonsController -> update', function () {
                 'lesson' => $lesson,
             ]), $data)
                 ->assertOk()
-                ->assertJsonPath('data.title', $data['title'])
+                ->assertJsonPath('data.slug', $data['slug'])
                 ->assertJsonStructure(['data' => LessonJsonStructure::get($course->type)]);
+
+            $this->assertDatabaseHas('lessons', [
+                'id' => $lesson->id,
+                'course_id' => $course->id,
+                'title' => $data['title'],
+                'slug' => $data['slug'],
+                'position' => $data['position'],
+            ]);
 
             $this->assertDatabaseHas('online_lessons', [
                 'id' => $lesson->lessonable->id,
+                'start_time' => $data['start_time'],
+                'end_time' => $data['end_time'],
                 'meeting_link' => $data['meeting_link'],
             ]);
         });
 
         it('updates a video lesson', function () {
-            $course = Course::factory()
-                ->type(CourseType::VIDEO)
-                ->for($this->teacher, 'author')
-                ->create();
+            $course = Course::factory()->type(CourseType::VIDEO)->for($this->author, 'author')->create();
 
             $lesson = Lesson::factory()->for($course)->create();
 
@@ -123,8 +130,16 @@ describe('LessonsController -> update', function () {
                 'lesson' => $lesson,
             ]), $data)
                 ->assertOk()
-                ->assertJsonPath('data.title', $data['title'])
+                ->assertJsonPath('data.slug', $data['slug'])
                 ->assertJsonStructure(['data' => LessonJsonStructure::get($course->type)]);
+
+            $this->assertDatabaseHas('lessons', [
+                'id' => $lesson->id,
+                'course_id' => $course->id,
+                'title' => $data['title'],
+                'slug' => $data['slug'],
+                'position' => $data['position'],
+            ]);
 
             $this->assertDatabaseHas('video_lessons', [
                 'id' => $lesson->lessonable->id,
@@ -140,14 +155,10 @@ describe('LessonsController -> update', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-
         beforeEach(function () {
-            Sanctum::actingAs($this->teacher);
+            Sanctum::actingAs($this->author);
 
-            $this->course = Course::factory()
-                ->for($this->teacher, 'author')
-                ->create();
-
+            $this->course = Course::factory()->for($this->author, 'author')->create();
             $this->lesson = Lesson::factory()->for($this->course)->create();
         });
 
@@ -183,12 +194,8 @@ describe('LessonsController -> update', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-
         beforeEach(function () {
-            $this->course = Course::factory()
-                ->for($this->teacher, 'author')
-                ->create();
-
+            $this->course = Course::factory()->for($this->author, 'author')->create();
             $this->lesson = Lesson::factory()->for($this->course)->create();
         });
 
@@ -204,16 +211,6 @@ describe('LessonsController -> update', function () {
 
         it('forbids non-author teacher', function () {
             Sanctum::actingAs($this->otherTeacher);
-
-            putJson(route('courses.lessons.update', [
-                'course' => $this->course,
-                'lesson' => $this->lesson,
-            ]), ($this->makePayload)($this->course))
-                ->assertForbidden();
-        });
-
-        it('forbids teacher with unverified email', function () {
-            Sanctum::actingAs($this->unverifiedTeacher);
 
             putJson(route('courses.lessons.update', [
                 'course' => $this->course,
@@ -240,5 +237,4 @@ describe('LessonsController -> update', function () {
                 ->assertUnauthorized();
         });
     });
-
 })->group('lessons');

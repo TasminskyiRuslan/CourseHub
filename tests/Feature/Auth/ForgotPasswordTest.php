@@ -10,18 +10,16 @@ use function Pest\Laravel\postJson;
 uses(RefreshDatabase::class);
 
 describe('ForgotPasswordController', function () {
-
     beforeEach(function () {
-        $this->user = User::factory()
-            ->verified()
-            ->create();
-
-        Notification::fake();
         $this->withoutMiddleware(ThrottleRequests::class);
+
+        $this->user = User::factory()->verified()->create();
 
         $this->makePayload = fn(array $overrides = []) => array_merge([
             'email' => $this->user->email,
         ], $overrides);
+
+        Notification::fake();
     });
 
     /*
@@ -30,11 +28,8 @@ describe('ForgotPasswordController', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-
         it('sends a reset link to an existing user', function () {
-            $data = ($this->makePayload)();
-
-            postJson(route('auth.password.forgot'), $data)
+            postJson(route('auth.password.forgot'), ($this->makePayload)())
                 ->assertNoContent();
 
             Notification::assertSentTo(
@@ -43,13 +38,11 @@ describe('ForgotPasswordController', function () {
                 fn($notification) => !empty($notification->token)
             );
 
-            $this->assertDatabaseHas('password_reset_tokens', ['email' => $this->user->email]);
+            $this->assertDatabaseHas('password_reset_tokens', ($this->makePayload)());
         });
 
         it('silently succeeds when the email does not exist', function () {
-            $data = ($this->makePayload)(['email' => 'nonexistent@example.com']);
-
-            postJson(route('auth.password.forgot'), $data)
+            postJson(route('auth.password.forgot'), ($this->makePayload)(['email' => 'nonexistent@example.com']))
                 ->assertNoContent();
 
             Notification::assertNothingSent();
@@ -63,7 +56,6 @@ describe('ForgotPasswordController', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-
         it('fails when email is missing', function () {
             postJson(route('auth.password.forgot'), [])
                 ->assertUnprocessable()
@@ -71,9 +63,7 @@ describe('ForgotPasswordController', function () {
         });
 
         it('fails when email format is invalid', function () {
-            $data = ($this->makePayload)(['email' => 'invalid-email']);
-
-            postJson(route('auth.password.forgot'), $data)
+            postJson(route('auth.password.forgot'), ($this->makePayload)(['email' => 'invalid-email']))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
         });

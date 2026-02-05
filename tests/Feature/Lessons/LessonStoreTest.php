@@ -11,7 +11,6 @@ use function Pest\Laravel\postJson;
 uses(RefreshDatabase::class);
 
 describe('LessonsController -> store', function () {
-
     beforeEach(function () {
         $this->teacher = User::factory()->teacher()->create();
         $this->otherTeacher = User::factory()->teacher()->create();
@@ -20,7 +19,6 @@ describe('LessonsController -> store', function () {
         $this->unverifiedTeacher = User::factory()->teacher()->unverified()->create();
 
         $this->makePayload = function (?Course $course = null, array $overrides = []) {
-
             $typeSpecific = $course ? match ($course->type) {
                 CourseType::OFFLINE => [
                     'start_time' => now()->addDay()->toIso8601String(),
@@ -53,16 +51,12 @@ describe('LessonsController -> store', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-
         beforeEach(function () {
             Sanctum::actingAs($this->teacher);
         });
 
         it('creates an offline lesson', function () {
-            $course = Course::factory()
-                ->type(CourseType::OFFLINE)
-                ->for($this->teacher, 'author')
-                ->create();
+            $course = Course::factory()->type(CourseType::OFFLINE)->for($this->teacher, 'author')->create();
 
             $data = ($this->makePayload)($course);
 
@@ -70,6 +64,18 @@ describe('LessonsController -> store', function () {
                 ->assertCreated()
                 ->assertJsonPath('data.title', $data['title'])
                 ->assertJsonStructure(['data' => LessonJsonStructure::get($course->type)]);
+
+            $this->assertDatabaseHas('lessons', [
+                'course_id' => $course->id,
+                'title' => $data['title'],
+            ]);
+
+            $this->assertDatabaseMissing('lessons', [
+                'course_id' => $course->id,
+                'title'     => $data['title'],
+                'slug' => null,
+                'position' => null
+            ]);
 
             $this->assertDatabaseHas('offline_lessons', [
                 'address' => $data['address'],
@@ -78,10 +84,7 @@ describe('LessonsController -> store', function () {
         });
 
         it('creates an online lesson', function () {
-            $course = Course::factory()
-                ->type(CourseType::ONLINE)
-                ->for($this->teacher, 'author')
-                ->create();
+            $course = Course::factory()->type(CourseType::ONLINE)->for($this->teacher, 'author')->create();
 
             $data = ($this->makePayload)($course);
 
@@ -89,6 +92,18 @@ describe('LessonsController -> store', function () {
                 ->assertCreated()
                 ->assertJsonPath('data.title', $data['title'])
                 ->assertJsonStructure(['data' => LessonJsonStructure::get($course->type)]);
+
+            $this->assertDatabaseHas('lessons', [
+                'course_id' => $course->id,
+                'title' => $data['title'],
+            ]);
+
+            $this->assertDatabaseMissing('lessons', [
+                'course_id' => $course->id,
+                'title'     => $data['title'],
+                'slug' => null,
+                'position' => null
+            ]);
 
             $this->assertDatabaseHas('online_lessons', [
                 'meeting_link' => $data['meeting_link'],
@@ -96,10 +111,7 @@ describe('LessonsController -> store', function () {
         });
 
         it('creates a video lesson', function () {
-            $course = Course::factory()
-                ->type(CourseType::VIDEO)
-                ->for($this->teacher, 'author')
-                ->create();
+            $course = Course::factory()->type(CourseType::VIDEO)->for($this->teacher, 'author')->create();
 
             $data = ($this->makePayload)($course);
 
@@ -108,15 +120,25 @@ describe('LessonsController -> store', function () {
                 ->assertJsonPath('data.title', $data['title'])
                 ->assertJsonStructure(['data' => LessonJsonStructure::get($course->type)]);
 
+            $this->assertDatabaseHas('lessons', [
+                'course_id' => $course->id,
+                'title' => $data['title'],
+            ]);
+
+            $this->assertDatabaseMissing('lessons', [
+                'course_id' => $course->id,
+                'title'     => $data['title'],
+                'slug' => null,
+                'position' => null
+            ]);
+
             $this->assertDatabaseHas('video_lessons', [
                 'video_url' => $data['video_url'],
             ]);
         });
 
         it('creates lesson with custom slug and position', function () {
-            $course = Course::factory()
-                ->for($this->teacher, 'author')
-                ->create();
+            $course = Course::factory()->for($this->teacher, 'author')->create();
 
             $data = ($this->makePayload)($course, [
                 'slug' => 'custom-slug-for-lesson',
@@ -142,7 +164,6 @@ describe('LessonsController -> store', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-
         beforeEach(function () {
             Sanctum::actingAs($this->teacher);
 
@@ -171,7 +192,6 @@ describe('LessonsController -> store', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-
         beforeEach(function () {
             $this->course = Course::factory()
                 ->for($this->teacher, 'author')

@@ -12,9 +12,8 @@ use function Pest\Laravel\deleteJson;
 uses(RefreshDatabase::class);
 
 describe('CourseController -> destroy', function () {
-
     beforeEach(function () {
-        $this->teacher      = User::factory()->teacher()->create();
+        $this->author      = User::factory()->teacher()->create();
         $this->otherTeacher = User::factory()->teacher()->create();
         $this->student      = User::factory()->student()->create();
         $this->admin        = User::factory()->admin()->create();
@@ -23,12 +22,7 @@ describe('CourseController -> destroy', function () {
 
         $this->imagePath = 'courses/test-image.jpg';
 
-        $this->course = Course::factory()
-            ->unpublished()
-            ->withImage($this->imagePath)
-            ->for($this->teacher, 'author')
-            ->create();
-
+        $this->course = Course::factory()->unpublished()->withImage($this->imagePath)->for($this->author, 'author')->create();
         $this->lessons = Lesson::factory()->for($this->course)->count(8)->create();
 
         Storage::disk('public')->put($this->course->image_path, 'fake');
@@ -40,10 +34,8 @@ describe('CourseController -> destroy', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-
-        it('author deletes course with image', function () {
-
-            Sanctum::actingAs($this->teacher);
+        it('author deletes course', function () {
+            Sanctum::actingAs($this->author);
 
             deleteJson(route('courses.destroy', $this->course))
                 ->assertNoContent();
@@ -69,8 +61,7 @@ describe('CourseController -> destroy', function () {
             Storage::disk('public')->assertMissing($this->imagePath);
         });
 
-        it('admin deletes course with image', function () {
-
+        it('admin deletes course', function () {
             Sanctum::actingAs($this->admin);
 
             deleteJson(route('courses.destroy', $this->course))
@@ -79,6 +70,20 @@ describe('CourseController -> destroy', function () {
             $this->assertDatabaseMissing('courses', [
                 'id' => $this->course->id,
             ]);
+
+            foreach ($this->lessons as $lesson) {
+                $this->assertDatabaseMissing('lessons', ['id' => $lesson->id]);
+
+                $lessonableTable = match ($this->course->type) {
+                    CourseType::OFFLINE => 'offline_lessons',
+                    CourseType::ONLINE => 'online_lessons',
+                    CourseType::VIDEO => 'video_lessons',
+                };
+
+                $this->assertDatabaseMissing($lessonableTable, [
+                    'id' => $lesson->lessonable->id,
+                ]);
+            }
 
             Storage::disk('public')->assertMissing($this->imagePath);
         });
@@ -90,10 +95,8 @@ describe('CourseController -> destroy', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-
         it('returns not found for non-existing course', function () {
-
-            Sanctum::actingAs($this->teacher);
+            Sanctum::actingAs($this->author);
 
             deleteJson(route('courses.destroy', 'non-existing-slug'))
                 ->assertNotFound();
@@ -106,9 +109,7 @@ describe('CourseController -> destroy', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-
         it('forbids non-author teacher', function () {
-
             Sanctum::actingAs($this->otherTeacher);
 
             deleteJson(route('courses.destroy', $this->course))
@@ -116,7 +117,6 @@ describe('CourseController -> destroy', function () {
         });
 
         it('forbids student', function () {
-
             Sanctum::actingAs($this->student);
 
             deleteJson(route('courses.destroy', $this->course))
@@ -124,10 +124,8 @@ describe('CourseController -> destroy', function () {
         });
 
         it('forbids unauthenticated user', function () {
-
             deleteJson(route('courses.destroy', $this->course))
                 ->assertUnauthorized();
         });
     });
-
 })->group('courses');

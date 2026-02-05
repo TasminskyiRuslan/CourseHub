@@ -10,22 +10,17 @@ use function Pest\Laravel\deleteJson;
 uses(RefreshDatabase::class);
 
 describe('CourseImageController -> destroy', function () {
-
     beforeEach(function () {
         Storage::fake('public');
 
-        $this->teacher      = User::factory()->teacher()->create();
+        $this->author      = User::factory()->teacher()->create();
         $this->otherTeacher = User::factory()->teacher()->create();
         $this->student      = User::factory()->student()->create();
         $this->admin        = User::factory()->admin()->create();
 
         $this->imagePath = 'courses/test-image.jpg';
 
-        $this->course = Course::factory()
-            ->unpublished()
-            ->withImage($this->imagePath)
-            ->for($this->teacher, 'author')
-            ->create();
+        $this->course = Course::factory()->unpublished()->withImage($this->imagePath)->for($this->author, 'author')->create();
 
         Storage::disk('public')->put($this->course->image_path, 'fake');
     });
@@ -36,13 +31,11 @@ describe('CourseImageController -> destroy', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-
         beforeEach(function () {
-            Sanctum::actingAs($this->teacher);
+            Sanctum::actingAs($this->author);
         });
 
         it('author deletes course image', function () {
-
             deleteJson(route('courses.image.destroy', $this->course))
                 ->assertNoContent();
 
@@ -55,7 +48,6 @@ describe('CourseImageController -> destroy', function () {
         });
 
         it('does nothing if image does not exist', function () {
-
             $this->course->update(['image_path' => null]);
 
             deleteJson(route('courses.image.destroy', $this->course))
@@ -69,10 +61,8 @@ describe('CourseImageController -> destroy', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-
         it('returns not found for non-existing course', function () {
-
-            Sanctum::actingAs($this->teacher);
+            Sanctum::actingAs($this->author);
 
             deleteJson(route('courses.image.destroy', 'non-existing-slug'))
                 ->assertNotFound();
@@ -85,9 +75,7 @@ describe('CourseImageController -> destroy', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-
         it('forbids admin', function () {
-
             Sanctum::actingAs($this->admin);
 
             deleteJson(route('courses.image.destroy', $this->course))
@@ -100,25 +88,37 @@ describe('CourseImageController -> destroy', function () {
         });
 
         it('forbids non-author teacher', function () {
-
             Sanctum::actingAs($this->otherTeacher);
 
             deleteJson(route('courses.image.destroy', $this->course))
                 ->assertForbidden();
+
+            $this->assertDatabaseHas('courses', [
+                'id' => $this->course->id,
+                'image_path' => $this->imagePath,
+            ]);
         });
 
         it('forbids student', function () {
-
             Sanctum::actingAs($this->student);
 
             deleteJson(route('courses.image.destroy', $this->course))
                 ->assertForbidden();
+
+            $this->assertDatabaseHas('courses', [
+                'id' => $this->course->id,
+                'image_path' => $this->imagePath,
+            ]);
         });
 
         it('forbids unauthenticated user', function () {
-
             deleteJson(route('courses.image.destroy', $this->course))
                 ->assertUnauthorized();
+
+            $this->assertDatabaseHas('courses', [
+                'id' => $this->course->id,
+                'image_path' => $this->imagePath,
+            ]);
         });
     });
 })->group('courses');

@@ -11,10 +11,8 @@ use function Pest\Laravel\postJson;
 uses(RefreshDatabase::class);
 
 describe('CourseController -> store', function () {
-
     beforeEach(function () {
         $this->teacher = User::factory()->teacher()->create();
-        $this->otherTeacher = User::factory()->teacher()->create();
         $this->student = User::factory()->student()->create();
         $this->admin = User::factory()->admin()->create();
         $this->unverifiedTeacher = User::factory()->teacher()->unverified()->create();
@@ -34,7 +32,6 @@ describe('CourseController -> store', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-
         beforeEach(function () {
             Sanctum::actingAs($this->teacher);
         });
@@ -50,6 +47,12 @@ describe('CourseController -> store', function () {
             $this->assertDatabaseHas('courses', [
                 'author_id' => $this->teacher->id,
                 'title'     => $data['title'],
+            ]);
+
+            $this->assertDatabaseMissing('courses', [
+                'author_id' => $this->teacher->id,
+                'title'     => $data['title'],
+                'slug' => null,
             ]);
         });
 
@@ -74,7 +77,6 @@ describe('CourseController -> store', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-
         beforeEach(function () {
             Sanctum::actingAs($this->teacher);
         });
@@ -92,7 +94,7 @@ describe('CourseController -> store', function () {
         });
 
         it('fails when type is invalid', function () {
-            postJson(route('courses.store'), ($this->makePayload)(['type' => 'INVALID']))
+            postJson(route('courses.store'), ($this->makePayload)(['type' => 'invalid-type']))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['type']);
         });

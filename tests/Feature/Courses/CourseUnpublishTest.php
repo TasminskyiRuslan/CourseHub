@@ -9,17 +9,13 @@ use function Pest\Laravel\patchJson;
 uses(RefreshDatabase::class);
 
 describe('UnpublishCourseController', function () {
-
     beforeEach(function () {
-        $this->teacher      = User::factory()->teacher()->create();
+        $this->author      = User::factory()->teacher()->create();
         $this->otherTeacher = User::factory()->teacher()->create();
         $this->student      = User::factory()->student()->create();
         $this->admin        = User::factory()->admin()->create();
 
-        $this->course = Course::factory()
-            ->published()
-            ->for($this->teacher, 'author')
-            ->create();
+        $this->course = Course::factory()->published()->for($this->author, 'author')->create();
     });
 
     /*
@@ -28,9 +24,8 @@ describe('UnpublishCourseController', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-
         it('author unpublishes course', function () {
-            Sanctum::actingAs($this->teacher);
+            Sanctum::actingAs($this->author);
 
             patchJson(route('courses.unpublish', $this->course))
                 ->assertNoContent();
@@ -54,9 +49,8 @@ describe('UnpublishCourseController', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-
         it('returns not found for non-existing course', function () {
-            Sanctum::actingAs($this->teacher);
+            Sanctum::actingAs($this->author);
 
             patchJson(route('courses.unpublish', 'non-existing-slug'))
                 ->assertNotFound();
@@ -69,7 +63,6 @@ describe('UnpublishCourseController', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-
         it('forbids non-author teacher', function () {
             Sanctum::actingAs($this->otherTeacher);
 
@@ -95,5 +88,4 @@ describe('UnpublishCourseController', function () {
             $this->assertTrue($this->course->fresh()->is_published);
         });
     });
-
 })->group('courses');

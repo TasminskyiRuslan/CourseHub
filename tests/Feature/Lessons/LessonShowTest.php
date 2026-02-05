@@ -11,30 +11,17 @@ use function Pest\Laravel\getJson;
 uses(RefreshDatabase::class);
 
 describe('LessonsController -> show', function () {
-
     beforeEach(function () {
-        $this->teacher       = User::factory()->teacher()->create();
+        $this->author       = User::factory()->teacher()->create();
         $this->otherTeacher = User::factory()->teacher()->create();
         $this->admin        = User::factory()->admin()->create();
         $this->student      = User::factory()->student()->create();
 
-        $this->unpublishedCourse = Course::factory()
-            ->unpublished()
-            ->for($this->teacher, 'author')
-            ->create();
+        $this->unpublishedCourse = Course::factory()->unpublished()->for($this->author, 'author')->create();
+        $this->publishedCourse = Course::factory()->published()->for($this->author, 'author')->create();
 
-        $this->publishedCourse = Course::factory()
-            ->published()
-            ->for($this->teacher, 'author')
-            ->create();
-
-        $this->unpublishedLesson = Lesson::factory()
-            ->for($this->unpublishedCourse)
-            ->create();
-
-        $this->publishedLesson = Lesson::factory()
-            ->for($this->publishedCourse)
-            ->create();
+        $this->unpublishedLesson = Lesson::factory()->for($this->unpublishedCourse)->create();
+        $this->publishedLesson = Lesson::factory()->for($this->publishedCourse)->create();
     });
 
     /*
@@ -43,12 +30,10 @@ describe('LessonsController -> show', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-
-        it('shows published lesson for unauthenticated user', function () {
-
+        it('shows published lesson for all user', function () {
             getJson(route('courses.lessons.show', [
-                'course' => $this->publishedCourse->slug,
-                'lesson' => $this->publishedLesson->slug,
+                'course' => $this->publishedCourse,
+                'lesson' => $this->publishedLesson,
             ]))
                 ->assertOk()
                 ->assertJsonStructure([
@@ -57,12 +42,11 @@ describe('LessonsController -> show', function () {
         });
 
         it('author sees unpublished lesson', function () {
-
-            Sanctum::actingAs($this->teacher);
+            Sanctum::actingAs($this->author);
 
             getJson(route('courses.lessons.show', [
-                'course' => $this->unpublishedCourse->slug,
-                'lesson' => $this->unpublishedLesson->slug,
+                'course' => $this->unpublishedCourse,
+                'lesson' => $this->unpublishedLesson,
             ]))
                 ->assertOk()
                 ->assertJsonStructure([
@@ -71,12 +55,11 @@ describe('LessonsController -> show', function () {
         });
 
         it('admin sees unpublished lesson', function () {
-
             Sanctum::actingAs($this->admin);
 
             getJson(route('courses.lessons.show', [
-                'course' => $this->unpublishedCourse->slug,
-                'lesson' => $this->unpublishedLesson->slug,
+                'course' => $this->unpublishedCourse,
+                'lesson' => $this->unpublishedLesson,
             ]))
                 ->assertOk()
                 ->assertJsonStructure([
@@ -91,21 +74,18 @@ describe('LessonsController -> show', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-
         it('returns not found for non-existing lesson', function () {
-
             getJson(route('courses.lessons.show', [
-                'course' => $this->publishedCourse->slug,
+                'course' => $this->publishedCourse,
                 'lesson' => 'non-existing-slug',
             ]))
                 ->assertNotFound();
         });
 
         it('returns not found for non-existing course', function () {
-
             getJson(route('courses.lessons.show', [
                 'course' => 'non-existing-course',
-                'lesson' => $this->publishedLesson->slug,
+                'lesson' => $this->publishedLesson,
             ]))
                 ->assertNotFound();
         });
@@ -117,34 +97,30 @@ describe('LessonsController -> show', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-
         it('forbids unpublished lesson for non-author teacher', function () {
-
             Sanctum::actingAs($this->otherTeacher);
 
             getJson(route('courses.lessons.show', [
-                'course' => $this->unpublishedCourse->slug,
-                'lesson' => $this->unpublishedLesson->slug,
+                'course' => $this->unpublishedCourse,
+                'lesson' => $this->unpublishedLesson,
             ]))
                 ->assertForbidden();
         });
 
         it('forbids unpublished lesson for student', function () {
-
             Sanctum::actingAs($this->student);
 
             getJson(route('courses.lessons.show', [
-                'course' => $this->unpublishedCourse->slug,
-                'lesson' => $this->unpublishedLesson->slug,
+                'course' => $this->unpublishedCourse,
+                'lesson' => $this->unpublishedLesson,
             ]))
                 ->assertForbidden();
         });
 
         it('forbids unpublished lesson for unauthenticated user', function () {
-
             getJson(route('courses.lessons.show', [
-                'course' => $this->unpublishedCourse->slug,
-                'lesson' => $this->unpublishedLesson->slug,
+                'course' => $this->unpublishedCourse,
+                'lesson' => $this->unpublishedLesson,
             ]))
                 ->assertForbidden();
         });

@@ -50,6 +50,10 @@ cd CourseHub
 
 ```bash
 cp .env.example .env
+
+# Sync your local user ID with Docker to avoid permission issues
+echo "UID=$(id -u)" >> .env
+echo "GID=$(id -g)" >> .env
 ```
 
 The default configuration works out-of-the-box with Docker.
@@ -78,28 +82,6 @@ docker compose exec app php artisan migrate --seed
 ```bash
 docker compose exec app php artisan l5-swagger:generate
 ```
-
----
-
-## 🌐 Accessing the API
-
-By default, the API is available at:
-
-```
-http://localhost
-```
-
-*(**Optional:** If you prefer using a custom domain like `coursehub.local`, update your hosts file and `APP_URL` in `.env` accordingly).*
-
----
-
-## 🔑 Default Credentials
-
-Running migrations with seeders creates a default **Admin** user:
-
-| Role  | Email                                             | Password |
-|-------| ------------------------------------------------- | -------- |
-| admin | [admin@coursehub.com](mailto:admin@coursehub.com) | secret   |
 
 ---
 
@@ -164,6 +146,44 @@ routes/api.php             # API Routes definitions
 docker/                    # Docker configuration files
 tests/                     # Feature and Unit tests (Pest)
 ```
+
+---
+
+## 🔑 Default Credentials
+
+Running migrations with seeders creates a default **Admin** user (not available via registration):
+
+| Role  | Email                                             | Password |
+| ----- | ------------------------------------------------- | -------- |
+| admin | [admin@coursehub.com](mailto:admin@coursehub.com) | secret   |
+
+> ⚠ Registration is available only for **STUDENT** and **TEACHER** roles.
+
+---
+
+## 📊 Database Design
+
+### Entities
+
+* **User:** Registered user with role (`STUDENT`, `TEACHER`, `ADMIN`) and mandatory email verification.
+* **Course:** Educational course created by a Teacher (author).
+* **Lesson:** Course lesson with ordering (`position`) and polymorphic content.
+* **OnlineLesson:** Scheduled online lesson with meeting link.
+* **OfflineLesson:** Scheduled physical lesson with address and room number.
+* **VideoLesson:** Pre-recorded video lesson with provider information.
+
+---
+
+### Relations
+
+* **User (TEACHER)** `hasMany` **Course** (as author)
+* **Course** `belongsTo` **User** (author)
+* **Course** `hasMany` **Lesson**
+* **Lesson** `belongsTo` **Course**
+* **Lesson** `morphTo` **Lessonable**
+* **OnlineLesson** `morphOne` **Lesson**
+* **OfflineLesson** `morphOne` **Lesson**
+* **VideoLesson** `morphOne` **Lesson**
 
 ---
 

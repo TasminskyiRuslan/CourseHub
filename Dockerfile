@@ -1,27 +1,21 @@
-FROM php:8.4-fpm
+FROM php:8.4-fpm-alpine
 
-RUN apt-get update && apt-get install -y \
-    git unzip libzip-dev libpng-dev libonig-dev libxml2-dev curl \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
-    libwebp-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install pdo_mysql mbstring zip pcntl gd
+ARG UID=1000
+ARG GID=1000
+
+RUN apk add --no-cache \
+    git unzip curl shadow libzip-dev libpng-dev libwebp-dev \
+    libjpeg-turbo-dev freetype-dev oniguruma-dev libxml2-dev icu-dev
+
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install -j$(nproc) pdo_mysql mbstring zip pcntl gd intl
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+RUN usermod -u ${UID} www-data && groupmod -g ${GID} www-data
+
 WORKDIR /var/www/html
 
-COPY composer.json composer.lock ./
-
-RUN composer install --no-interaction --optimize-autoloader --no-dev --no-scripts
-
-COPY . .
-
-RUN composer dump-autoload --optimize
-
-RUN chown -R www-data:www-data \
-    /var/www/html/storage \
-    /var/www/html/bootstrap/cache
+USER www-data
 
 CMD ["php-fpm"]

@@ -6,6 +6,7 @@ use App\Enums\CourseType;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Course>
@@ -19,10 +20,11 @@ class CourseFactory extends Factory
      */
     public function definition(): array
     {
+        $title = fake()->sentence(3);
         return [
             'author_id' => User::factory()->lazy(),
-            'title' => fake()->words(3, true),
-            'slug' => null,
+            'title' => $title,
+            'slug' => Str::slug($title),
             'description' => fake()->sentence(10),
             'price' => fake()->randomFloat(2, 0, 500),
             'type' => fake()->randomElement(CourseType::cases()),

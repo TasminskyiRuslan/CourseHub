@@ -24,6 +24,6 @@ use OpenApi\Attributes as OA;
     bearerFormat: "API Token",
     scheme: "bearer"
 )]
-class Documentation
+class OpenApi
 {
 }

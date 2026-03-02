@@ -9,12 +9,15 @@ use App\Models\OfflineLesson;
 use App\Models\OnlineLesson;
 use App\Models\VideoLesson;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Lesson>
  */
 class LessonFactory extends Factory
 {
+    protected static $order = 1;
+
     /**
      * Define the model's default state.
      *
@@ -22,11 +25,12 @@ class LessonFactory extends Factory
      */
     public function definition(): array
     {
+        $title = fake()->sentence(3);
         return [
             'course_id' => Course::factory()->lazy(),
-            'title' => fake()->sentence(3),
-            'slug' => null,
-            'position' => null,
+            'title' => $title,
+            'slug' => Str::slug($title),
+            'position' => self::$order++,
         ];
     }
 

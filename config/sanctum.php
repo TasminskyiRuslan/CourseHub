@@ -47,7 +47,10 @@ return [
     |
     */
 
-    'expiration' => null,
+    'token_ttl' => [
+        'default' => (int) env('SANCTUM_TOKEN_TTL_DEFAULT', 2880),
+        'remember' => (int) env('SANCTUM_TOKEN_TTL_REMEMBER', 20160),
+    ],
 
     /*
     |--------------------------------------------------------------------------

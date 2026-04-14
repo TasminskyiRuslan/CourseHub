@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\RegisterUserAction;
-use App\Data\Auth\RegisterData;
+use App\Data\Auth\Requests\RegisterUserData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Auth\AuthResource;
 use Illuminate\Http\JsonResponse;
@@ -15,32 +15,44 @@ class RegisterController extends Controller
 {
     #[OA\Post(
         path: '/auth/register',
-        description: 'Register a new user.',
-        summary: 'Register',
+        description: 'Register a new user and issue an access token.',
+        summary: 'Register user',
         requestBody: new OA\RequestBody(
             required: true,
-            content: new OA\JsonContent(ref: '#/components/schemas/RegisterRequest')
+            content: new OA\JsonContent(ref: '#/components/schemas/RegisterUserRequest')
         ),
         tags: ['Auth'],
         responses: [
             new OA\Response(
                 response: SymfonyResponse::HTTP_CREATED,
-                description: 'User registered',
-                content: new OA\JsonContent(ref: '#/components/schemas/Auth')
+                description: 'User registered successfully.',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/AuthResponse'
+                        )
+                    ]
+                )
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
-                description: 'Validation error'
+                description: 'Validation error.'
             ),
         ]
     )]
     /**
+     * Register a new user and issue an access token.
+     *
+     * @param RegisterUserData $userData
+     * @param RegisterUserAction $registerUserAction
+     * @return JsonResponse
      * @throws Throwable
      */
-    public function __invoke(RegisterData $data, RegisterUserAction $action): JsonResponse
+    public function __invoke(RegisterUserData $userData, RegisterUserAction $registerUserAction): JsonResponse
     {
-        $result = $action->handle($data);
-        return (new AuthResource($result))
+        $authData = $registerUserAction->handle($userData);
+        return AuthResource::make($authData)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_CREATED);
     }

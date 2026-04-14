@@ -9,7 +9,7 @@ use Illuminate\Database\Seeder;
 class LessonSeeder extends Seeder
 {
     /**
-     * LessonSeeder handles the initial population of the lesson tables.
+     * Seed the lessons table.
      */
     public function run(): void
     {

@@ -8,7 +8,7 @@ use Illuminate\Database\Seeder;
 class UserSeeder extends Seeder
 {
     /**
-     * UserSeeder handles the initial population of the users table.
+     * Seed the users table.
      */
     public function run(): void
     {
@@ -20,6 +20,11 @@ class UserSeeder extends Seeder
         User::factory()
             ->count(20)
             ->student()
+            ->create();
+
+        User::factory()
+            ->count(3)
+            ->admin()
             ->create();
 
         User::factory()

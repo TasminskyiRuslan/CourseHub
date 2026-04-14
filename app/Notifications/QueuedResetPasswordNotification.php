@@ -11,16 +11,34 @@ class QueuedResetPasswordNotification extends Notification implements ShouldQueu
 {
     use Queueable;
 
+    /**
+     * Create a new notification instance.
+     *
+     * @param string $token
+     * @return void
+     */
     public function __construct(public string $token)
     {
         $this->onQueue('high');
     }
 
+    /**
+     * Get the notification's delivery channels.
+     *
+     * @param mixed $notifiable
+     * @return array<int, string>
+     */
     public function via($notifiable): array
     {
         return ['mail'];
     }
 
+    /**
+     * Get the mail representation of the notification.
+     *
+     * @param mixed $notifiable
+     * @return MailMessage
+     */
     public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)

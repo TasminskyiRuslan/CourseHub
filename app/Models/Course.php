@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\CourseType;
+use Database\Factories\CourseFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -29,6 +30,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property-read User $author
  * @property-read Collection<int, Lesson> $lessons
  * @property-read int|null $lessons_count
+ * @method static CourseFactory factory($count = null, $state = [])
  * @method static Builder<static>|Course newModelQuery()
  * @method static Builder<static>|Course newQuery()
  * @method static Builder<static>|Course query()
@@ -47,8 +49,14 @@ use Spatie\Sluggable\SlugOptions;
  */
 class Course extends Model
 {
-    use HasSlug, HasFactory;
+    /** @use HasFactory<CourseFactory> */
+    use HasFactory, HasSlug;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'title',
         'slug',
@@ -59,10 +67,34 @@ class Course extends Model
         'is_published'
     ];
 
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array<string, mixed>
+     */
     protected $attributes = [
         'is_published' => false,
     ];
 
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'price' => 'decimal:2',
+            'type' => CourseType::class,
+            'is_published' => 'boolean',
+        ];
+    }
+
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
     protected static function booted(): void
     {
         static::deleting(function (Course $course) {
@@ -70,11 +102,21 @@ class Course extends Model
         });
     }
 
+    /**
+     * Get the route key name for the model.
+     *
+     * @return string
+     */
     public function getRouteKeyName(): string
     {
         return 'slug';
     }
 
+    /**
+     * Configure the slug generation options for the Author model.
+     *
+     * @return SlugOptions
+     */
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
@@ -83,37 +125,45 @@ class Course extends Model
             ->doNotGenerateSlugsOnUpdate();
     }
 
+    /**
+     * Get the lessons for the course.
+     *
+     * @return HasMany
+     */
     public function lessons(): HasMany
     {
         return $this->hasMany(Lesson::class);
     }
 
+    /**
+     * Get the author that owns the course.
+     *
+     * @return BelongsTo
+     */
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id');
     }
 
-    public function isVisibleFor(?User $user): bool
-    {
-        return $this->is_published || ($user && ($user->isAdmin() || $user->isAuthorOf($this)));
-    }
-
-    public function publish(): void
+    /**
+     * Mark the course as published.
+     *
+     * @return Course
+     */
+    public function publish(): static
     {
         $this->is_published = true;
+        return $this;
     }
 
-    public function unpublish(): void
+    /**
+     * Mark the course as unpublished.
+     *
+     * @return Course
+     */
+    public function unpublish(): static
     {
         $this->is_published = false;
-    }
-
-    protected function casts(): array
-    {
-        return [
-            'price' => 'decimal:2',
-            'type' => CourseType::class,
-            'is_published' => 'boolean',
-        ];
+        return $this;
     }
 }

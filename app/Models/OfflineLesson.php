@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Http\Resources\Api\Lessons\OfflineLessonResource;
+use Database\Factories\OfflineLessonFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,6 +21,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Lesson|null $lesson
+ * @method static OfflineLessonFactory factory($count = null, $state = [])
  * @method static Builder<static>|OfflineLesson newModelQuery()
  * @method static Builder<static>|OfflineLesson newQuery()
  * @method static Builder<static>|OfflineLesson query()
@@ -34,8 +36,14 @@ use Illuminate\Support\Carbon;
  */
 class OfflineLesson extends Model
 {
+    /** @use HasFactory<OfflineLessonFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'start_time',
         'end_time',
@@ -43,23 +51,39 @@ class OfflineLesson extends Model
         'room_number'
     ];
 
-    public function lesson(): MorphOne
-    {
-        return $this->morphOne(Lesson::class, 'lessonable');
-    }
-
-    public function toResource(?string $resourceClass = null): JsonResource
-    {
-        return $resourceClass
-            ? new $resourceClass($this)
-            : new OfflineLessonResource($this);
-    }
-
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
             'start_time' => 'datetime',
             'end_time' => 'datetime',
         ];
+    }
+
+    /**
+     * Get the lesson associated with the offline lesson.
+     *
+     * @return MorphOne
+     */
+    public function lesson(): MorphOne
+    {
+        return $this->morphOne(Lesson::class, 'lessonable');
+    }
+
+    /**
+     * Transform the model into a JSON resource.
+     *
+     * @param string|null $resourceClass
+     * @return JsonResource
+     */
+    public function toResource(?string $resourceClass = null): JsonResource
+    {
+        return $resourceClass
+            ? new $resourceClass($this)
+            : new OfflineLessonResource($this);
     }
 }

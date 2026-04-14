@@ -11,7 +11,7 @@
     },
     "servers": [
         {
-            "url": "http://coursehub.local/api",
+            "url": "http://localhost:8080/api",
             "description": "Local development server"
         }
     ],
@@ -22,7 +22,7 @@
                     "Auth"
                 ],
                 "summary": "Send password reset link",
-                "description": "Sends an email with a link to reset the password.",
+                "description": "Send an email with a link to reset the password.",
                 "operationId": "fec0b6c8f358bc4799c920204083ec12",
                 "requestBody": {
                     "required": true,
@@ -36,10 +36,10 @@
                 },
                 "responses": {
                     "204": {
-                        "description": "Reset link sent"
+                        "description": "Reset link sent successfully."
                     },
                     "422": {
-                        "description": "Validation error"
+                        "description": "Validation error."
                     }
                 }
             }
@@ -49,35 +49,37 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Login",
-                "description": "Authenticate user.",
+                "summary": "Authenticate user",
+                "description": "Authenticate the user using email and password and issue an access token.",
                 "operationId": "8e026335d25c3df3f6f6cf1f683ac7b8",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/LoginRequest"
+                                "$ref": "#/components/schemas/LoginUserRequest"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "User logged in",
+                        "description": "User authenticated successfully.",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Auth"
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/AuthResponse"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
-                    "401": {
-                        "description": "Invalid credentials"
-                    },
                     "422": {
-                        "description": "Validation error"
+                        "description": "Invalid credentials or validation error."
                     }
                 }
             }
@@ -88,14 +90,14 @@
                     "Auth"
                 ],
                 "summary": "Logout from all devices",
-                "description": "Revoke all authentication tokens for the authenticated user.",
+                "description": "Revoke all access tokens for an authenticated user.",
                 "operationId": "16deaba51e77f3ea7aa0577ff38a4439",
                 "responses": {
                     "204": {
-                        "description": "All tokens revoked"
+                        "description": "User logged out successfully."
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "User is unauthenticated."
                     }
                 },
                 "security": [
@@ -106,19 +108,19 @@
             }
         },
         "/auth/logout": {
-            "post": {
+            "delete": {
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Logout current device",
-                "description": "Revoke only the current authentication token for the authenticated user.",
-                "operationId": "1b24911c0ac04bc4abfacef75080bbe8",
+                "description": "Revoke the current access token for an authenticated user.",
+                "operationId": "23a3ec5e2e8d20c9fd2ea568ae96fcd3",
                 "responses": {
                     "204": {
-                        "description": "User logged out"
+                        "description": "User logged out successfully."
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "User is unauthenticated."
                     }
                 },
                 "security": [
@@ -133,22 +135,27 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Get authenticated user",
-                "description": "Get the authenticated user's data.",
+                "summary": "Retrieve current user",
+                "description": "Retrieve the currently authenticated user.",
                 "operationId": "a27984a716a6787c8b8537aee958673c",
                 "responses": {
                     "200": {
-                        "description": "Authenticated user data",
+                        "description": "User retrieved successfully.",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/User"
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserResponse"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "User is unauthenticated."
                     }
                 },
                 "security": [
@@ -163,32 +170,37 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Register",
-                "description": "Register a new user.",
+                "summary": "Register user",
+                "description": "Register a new user and issue an access token.",
                 "operationId": "8e69ddc577b1650c4a010f798dd6c9d3",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RegisterRequest"
+                                "$ref": "#/components/schemas/RegisterUserRequest"
                             }
                         }
                     }
                 },
                 "responses": {
                     "201": {
-                        "description": "User registered",
+                        "description": "User registered successfully.",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Auth"
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/AuthResponse"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
                     "422": {
-                        "description": "Validation error"
+                        "description": "Validation error."
                     }
                 }
             }
@@ -200,13 +212,13 @@
                 ],
                 "summary": "Resend verification email",
                 "description": "Resend the email verification notification to the authenticated user.",
-                "operationId": "552dbf24cead40062c7e1b48c8631629",
+                "operationId": "8b2718ed6f34f9ad7e84e68c3f20cb8d",
                 "responses": {
                     "204": {
-                        "description": "Verification email sent"
+                        "description": "Verification email sent successfully."
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "User is unauthenticated."
                     }
                 },
                 "security": [
@@ -222,7 +234,7 @@
                     "Auth"
                 ],
                 "summary": "Reset password",
-                "description": "Resets the user's password.",
+                "description": "Reset the user's password.",
                 "operationId": "033879051100699c9ba3a190913d20c5",
                 "requestBody": {
                     "required": true,
@@ -236,13 +248,10 @@
                 },
                 "responses": {
                     "204": {
-                        "description": "Password reset"
-                    },
-                    "403": {
-                        "description": "Access denied"
+                        "description": "Password reset successfully."
                     },
                     "422": {
-                        "description": "Validation error"
+                        "description": "Validation error."
                     }
                 }
             }
@@ -259,16 +268,16 @@
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "User ID",
+                        "description": "Unique identifier of the user.",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "integer"
                         }
                     },
                     {
                         "name": "hash",
                         "in": "path",
-                        "description": "Email verification hash",
+                        "description": "Hash of the email verification.",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -277,7 +286,7 @@
                     {
                         "name": "expires",
                         "in": "query",
-                        "description": "Expiration timestamp",
+                        "description": "Time of the link expiration.",
                         "required": false,
                         "schema": {
                             "type": "integer"
@@ -286,7 +295,7 @@
                     {
                         "name": "signature",
                         "in": "query",
-                        "description": "Signed URL signature",
+                        "description": "Signature of the email verification.",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -295,10 +304,10 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "Email verified successfully"
+                        "description": "Email verified successfully."
                     },
                     "403": {
-                        "description": "Invalid or expired verification link"
+                        "description": "Invalid or expired verification link."
                     }
                 }
             }
@@ -1037,14 +1046,14 @@
     "components": {
         "schemas": {
             "ForgotPasswordRequest": {
-                "title": "Forgot password request schema",
-                "description": "Schema for requesting a password reset link via API",
+                "title": "Forgot Password Request",
+                "description": "Request payload for sending password reset link.",
                 "required": [
                     "email"
                 ],
                 "properties": {
                     "email": {
-                        "description": "User email address",
+                        "description": "Email address of the user.",
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
@@ -1053,29 +1062,29 @@
                 },
                 "type": "object"
             },
-            "LoginRequest": {
-                "title": "Login request schema",
-                "description": "Schema for user login via API request",
+            "LoginUserRequest": {
+                "title": "Login User Request",
+                "description": "Request payload for authenticating a user.",
                 "required": [
                     "email",
                     "password"
                 ],
                 "properties": {
                     "email": {
-                        "description": "User registered email address",
+                        "description": "Email address of the user.",
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
                         "example": "john@example.com"
                     },
                     "password": {
-                        "description": "User password",
+                        "description": "Account password of the user.",
                         "type": "string",
                         "format": "password",
                         "example": "password123"
                     },
                     "remember": {
-                        "description": "Whether to stay logged in after the session expires",
+                        "description": "Remember me flag of the user.",
                         "type": "boolean",
                         "default": false,
                         "example": true
@@ -1083,9 +1092,9 @@
                 },
                 "type": "object"
             },
-            "RegisterRequest": {
-                "title": "Register request schema",
-                "description": "Schema for user registration via API request",
+            "RegisterUserRequest": {
+                "title": "Register User Request",
+                "description": "Request payload for registering a new user.",
                 "required": [
                     "name",
                     "email",
@@ -1095,53 +1104,48 @@
                 ],
                 "properties": {
                     "name": {
-                        "description": "Name of the user",
+                        "description": "Full name of the user.",
                         "type": "string",
-                        "maxLength": 255,
+                        "maxLength": 100,
+                        "minLength": 2,
                         "example": "John Doe"
                     },
                     "email": {
-                        "description": "Email of the user",
+                        "description": "Email address of the user.",
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
                         "example": "john@example.com"
                     },
                     "password": {
-                        "description": "Password of the user",
+                        "description": "Account password of the user.",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
                         "example": "password123"
                     },
                     "password_confirmation": {
-                        "description": "Password Confirmation of the user",
+                        "description": "Password confirmation of the user. (must match password)",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
                         "example": "password123"
                     },
                     "role": {
-                        "description": "Role of the user",
+                        "description": "Role of the user.",
                         "type": "string",
                         "enum": [
                             "student",
                             "teacher"
                         ],
                         "example": "student"
-                    },
-                    "remember": {
-                        "description": "Whether to stay logged in after the session expires",
-                        "type": "boolean",
-                        "default": false,
-                        "example": true
                     }
                 },
                 "type": "object"
             },
             "ResetPasswordRequest": {
-                "title": "Resend password request schema",
-                "description": "Request schema for resetting a user password using a token from email.",
+                "title": "Reset Password Request",
+                "description": "Request payload for resetting password.",
                 "required": [
                     "email",
                     "password",
@@ -1150,30 +1154,114 @@
                 ],
                 "properties": {
                     "email": {
-                        "description": "Email address",
+                        "description": "Email address of the user.",
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
                         "example": "john@example.com"
                     },
                     "password": {
-                        "description": "The new password",
+                        "description": "Account password of the user.",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
-                        "example": "NewPassword123"
+                        "example": "newPassword123"
                     },
                     "password_confirmation": {
-                        "description": "The new password confirmation",
+                        "description": "Password confirmation of the user. (must match password)",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
-                        "example": "NewPassword123"
+                        "example": "newPassword123"
                     },
                     "token": {
-                        "description": "The password reset token received via email.",
+                        "description": "Password reset token received via email.",
                         "type": "string",
-                        "example": "660064..."
+                        "example": "66006454322443..."
+                    }
+                },
+                "type": "object"
+            },
+            "AuthResponse": {
+                "title": "Auth Response",
+                "description": "Data returned after user login or registration.",
+                "required": [
+                    "user",
+                    "access_token",
+                    "token_type",
+                    "expires_at"
+                ],
+                "properties": {
+                    "user": {
+                        "$ref": "#/components/schemas/UserResponse"
+                    },
+                    "access_token": {
+                        "description": "Personal access token for API authentication.",
+                        "type": "string",
+                        "example": "1|eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                    },
+                    "token_type": {
+                        "description": "Token type to be used in the Authorization header.",
+                        "type": "string",
+                        "example": "Bearer"
+                    },
+                    "expires_at": {
+                        "description": "Time of the token expiration.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-28T12:00:00+02:00"
+                    }
+                },
+                "type": "object"
+            },
+            "UserResponse": {
+                "title": "User Response",
+                "description": "Data of a specific user.",
+                "required": [
+                    "id",
+                    "name",
+                    "slug",
+                    "email",
+                    "email_verified_at",
+                    "role"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier of the user.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Full name of the user.",
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "slug": {
+                        "description": "Slug of the user.",
+                        "type": "string",
+                        "example": "john-doe"
+                    },
+                    "email": {
+                        "description": "Email address of the user.",
+                        "type": "string",
+                        "format": "email",
+                        "example": "john@example.com"
+                    },
+                    "role": {
+                        "description": "Role of the user.",
+                        "type": "string",
+                        "enum": [
+                            "student",
+                            "teacher"
+                        ],
+                        "example": "student"
+                    },
+                    "email_verified_at": {
+                        "description": "Time of the email verified at.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-01T12:00:00Z",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -1566,114 +1654,6 @@
                     }
                 ]
             },
-            "Auth": {
-                "title": "Auth schema",
-                "description": "Authentication data returned by the API",
-                "required": [
-                    "user",
-                    "access_token",
-                    "token_type",
-                    "expires_at"
-                ],
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "user": {
-                                "$ref": "#/components/schemas/User"
-                            },
-                            "access_token": {
-                                "description": "Access token",
-                                "type": "string",
-                                "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
-                            },
-                            "token_type": {
-                                "description": "Type of the token for Authorization header",
-                                "type": "string",
-                                "example": "Bearer"
-                            },
-                            "expires_at": {
-                                "description": "Expiration date of the token",
-                                "type": "string",
-                                "format": "date-time",
-                                "example": "2026-01-28T12:00:00+02:00"
-                            }
-                        },
-                        "type": "object"
-                    }
-                },
-                "type": "object"
-            },
-            "User": {
-                "title": "User Schema",
-                "description": "Details of a user returned by the API",
-                "required": [
-                    "id",
-                    "name",
-                    "slug",
-                    "email",
-                    "role",
-                    "email_verified_at",
-                    "created_at",
-                    "updated_at"
-                ],
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "id": {
-                                "description": "The user ID",
-                                "type": "integer",
-                                "example": 1
-                            },
-                            "name": {
-                                "description": "The user name",
-                                "type": "string",
-                                "example": "John Doe"
-                            },
-                            "slug": {
-                                "description": "The user slug",
-                                "type": "string",
-                                "example": "john-doe"
-                            },
-                            "email": {
-                                "description": "The user email",
-                                "type": "string",
-                                "format": "email",
-                                "example": "john@example.com"
-                            },
-                            "role": {
-                                "description": "The user role",
-                                "type": "string",
-                                "enum": [
-                                    "student",
-                                    "teacher"
-                                ],
-                                "example": "student"
-                            },
-                            "email_verified_at": {
-                                "description": "The user email verified at",
-                                "type": "string",
-                                "format": "date-time",
-                                "example": "2026-01-01T12:00:00Z",
-                                "nullable": true
-                            },
-                            "created_at": {
-                                "description": "The user registered at",
-                                "type": "string",
-                                "format": "date-time",
-                                "example": "2026-01-01T12:00:00Z"
-                            },
-                            "updated_at": {
-                                "description": "The user last updated at",
-                                "type": "string",
-                                "format": "date-time",
-                                "example": "2026-01-10T12:00:00Z"
-                            }
-                        },
-                        "type": "object"
-                    }
-                },
-                "type": "object"
-            },
             "Author": {
                 "title": "Author Schema",
                 "description": "Details of a author returned by the API",
@@ -2059,8 +2039,10 @@
         "securitySchemes": {
             "sanctum": {
                 "type": "http",
-                "description": "Use your Sanctum token to authenticate requests",
-                "bearerFormat": "API Token",
+                "description": "Enter token in format: Bearer {token}",
+                "name": "Authorization",
+                "in": "header",
+                "bearerFormat": "JWT",
                 "scheme": "bearer"
             }
         }

@@ -6,9 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property mixed $user
- * @property mixed $token
- * @property mixed $expiresAt
+ * @property-read  mixed $user
+ * @property-read  mixed $accessToken
+ * @property-read string|null $tokenType
+ * @property-read  mixed $expiresAt
  */
 class AuthResource extends JsonResource
 {
@@ -18,9 +19,9 @@ class AuthResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'user' => new UserResource($this->user),
-            'access_token' => $this->token,
-            'token_type' => 'Bearer',
+            'user' => UserResource::make($this->user),
+            'access_token' => $this->accessToken,
+            'token_type' => $this->tokenType ?? 'Bearer',
             'expires_at' => $this->expiresAt->toIso8601String(),
         ];
     }

@@ -1,6 +1,8 @@
 <?php
 
+use App\Enums\UserRole;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -10,36 +12,7 @@ uses(RefreshDatabase::class);
 
 describe('ResetPasswordController', function () {
     beforeEach(function () {
-        $this->oldPassword = 'old-password';
-        $this->newPassword = 'new-password';
-
-        $this->user = User::factory()->verified()->create(['password' => $this->oldPassword]);
-        $this->admin = User::factory()->admin()->create(['password' => $this->oldPassword]);
-
-        $this->userToken = Password::createToken($this->user);
-        $this->adminToken = Password::createToken($this->admin);
-
-        $this->makePayload = fn(array $overrides = []) => array_merge([
-            'email' => $this->user->email,
-            'password' => $this->newPassword,
-            'password_confirmation' => $this->newPassword,
-            'token' => $this->userToken,
-        ], $overrides);
-    });
-
-    /*
-    |--------------------------------------------------------------------------
-    | success
-    |--------------------------------------------------------------------------
-    */
-    describe('success', function () {
-        it('resets the password', function () {
-            postJson(route('password.reset'), ($this->makePayload)())
-                ->assertNoContent();
-
-            $this->user->refresh();
-            expect(Hash::check($this->newPassword, $this->user->password))->toBeTrue();
-        });
+        $this->seed(RolesAndPermissionsSeeder::class);
     });
 
     /*
@@ -48,41 +21,76 @@ describe('ResetPasswordController', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-        it('fails when token is invalid', function () {
-            postJson(route('password.reset'), ($this->makePayload)(['token' => 'invalid-token']))
+        it('fails if the token is invalid', function () {
+            $newPassword = 'new-password';
+            $user = User::factory()->verified()->create();
+
+            postJson(route('password.reset'), [
+                'email' => $user->email,
+                'password' => $newPassword,
+                'password_confirmation' => $newPassword,
+                'token' => 'invalid-token',
+            ])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors('email');
         });
 
-        it('fails when required fields are missing', function () {
+        it('fails if the required fields are missing', function () {
             postJson(route('password.reset'), [])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email', 'password', 'token']);
         });
 
-        it('fails when password confirmation does not match', function () {
-            postJson(route('password.reset'), ($this->makePayload)(['password_confirmation' => 'different']))
+        it('fails if the password confirmation does not match', function () {
+            $user = User::factory()->verified()->create();
+
+            postJson(route('password.reset'), [
+                'email' => $user->email,
+                'password' => 'new-password',
+                'password_confirmation' => 'different',
+                'token' => Password::createToken($user),
+            ])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['password']);
         });
 
-        it('fails when email format is invalid', function () {
-            postJson(route('password.reset'), ($this->makePayload)(['email' => 'invalid-email']))
+        it('fails if the email format is invalid', function () {
+            $newPassword = 'new-password';
+            $user = User::factory()->verified()->create();
+
+            postJson(route('password.reset'), [
+                'email' => 'invalid-email',
+                'password' => $newPassword,
+                'password_confirmation' => $newPassword,
+                'token' => Password::createToken($user),
+            ])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
         });
 
-        it('fails when email does not exist', function () {
-            postJson(route('password.reset'), ($this->makePayload)(['email' => 'nonexistent@example.com']))
+        it('fails if the email does not exist', function () {
+            $newPassword = 'new-password';
+            $user = User::factory()->verified()->create();
+
+            postJson(route('password.reset'), [
+                'email' => 'nonexistent@example.com',
+                'password' => $newPassword,
+                'password_confirmation' => $newPassword,
+                'token' => Password::createToken($user),
+            ])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
         });
 
-        it('fails when the new password is too short', function () {
-            postJson(route('password.reset'), ($this->makePayload)([
+        it('fails if the new password is too short', function () {
+            $user = User::factory()->verified()->create();
+
+            postJson(route('password.reset'), [
+                'email' => $user->email,
                 'password' => '123',
                 'password_confirmation' => '123',
-            ]))
+                'token' => Password::createToken($user),
+            ])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['password']);
         });
@@ -94,12 +102,71 @@ describe('ResetPasswordController', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('forbids admin', function () {
-            postJson(route('password.reset'), ($this->makePayload)([
-                'email' => $this->admin->email,
-                'token' => $this->adminToken,
-            ]))
-                ->assertForbidden();
+        it('allows a student to reset password', function () {
+            $newPassword = 'new-password';
+            $student = User::factory()->student()->create();
+
+            postJson(route('password.reset'), [
+                'email' => $student->email,
+                'password' => $newPassword,
+                'password_confirmation' => $newPassword,
+                'token' => Password::createToken($student),
+            ])
+                ->assertNoContent();
+            $student->refresh();
+            expect(Hash::check($newPassword, $student->password))->toBeTrue();
+        });
+
+        it('allows a teacher to reset password', function () {
+            $newPassword = 'new-password';
+            $teacher = User::factory()->teacher()->create();
+
+            postJson(route('password.reset'), [
+                'email' => $teacher->email,
+                'password' => $newPassword,
+                'password_confirmation' => $newPassword,
+                'token' => Password::createToken($teacher),
+            ])
+                ->assertNoContent();
+            $teacher->refresh();
+            expect(Hash::check($newPassword, $teacher->password))->toBeTrue();
+        });
+
+        it('allows an admin to reset password', function () {
+            $newPassword = 'new-password';
+            $admin = User::factory()->admin()->create();
+
+            postJson(route('password.reset'), [
+                'email' => $admin->email,
+                'password' => $newPassword,
+                'password_confirmation' => $newPassword,
+                'token' => Password::createToken($admin),
+            ])
+                ->assertNoContent();
+            $admin->refresh();
+            expect(Hash::check($newPassword, $admin->password))->toBeTrue();
+        });
+
+        it('fails if a super-admin tries to reset password', function () {
+            $newPassword = 'new-password';
+            $superAdmin = User::factory()->create([
+                'name' => config('super-admin.name'),
+                'email' => config('super-admin.email'),
+                'password' => config('super-admin.password')
+            ]);
+            $superAdmin->assignRole(UserRole::SUPER_ADMIN->value);
+
+            postJson(route('password.reset'), [
+                'email' => $superAdmin->email,
+                'password' => $newPassword,
+                'password_confirmation' => $newPassword,
+                'token' => Password::createToken($superAdmin),
+            ])
+                ->assertNoContent();
+
+            $superAdmin->refresh();
+            expect(Hash::check(config('super-admin.password'), $superAdmin->password))->toBeTrue()
+                ->and(Hash::check($newPassword, $superAdmin->password))->toBeFalse();
         });
     });
 })->group('auth');

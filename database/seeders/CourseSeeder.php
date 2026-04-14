@@ -8,7 +8,7 @@ use Illuminate\Database\Seeder;
 class CourseSeeder extends Seeder
 {
     /**
-     * CourseSeeder handles the initial population of the course table.
+     * Seed the courses table.
      */
     public function run(): void
     {

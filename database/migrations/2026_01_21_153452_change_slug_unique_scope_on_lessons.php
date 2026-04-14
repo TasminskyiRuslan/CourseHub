@@ -22,9 +22,10 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('lessons', function (Blueprint $table) {
-
+            $table->dropForeign(['course_id']);
             $table->dropUnique('lessons_course_slug_unique');
             $table->unique('slug', 'lessons_slug_unique');
+            $table->foreign('course_id')->references('id')->on('courses')->cascadeOnDelete();
         });
     }
 };

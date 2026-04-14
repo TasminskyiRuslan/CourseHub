@@ -19,28 +19,28 @@ class VerifyEmailController extends Controller
         parameters: [
             new OA\Parameter(
                 name: 'id',
-                description: 'User ID',
+                description: 'Unique identifier of the user.',
                 in: 'path',
                 required: true,
-                schema: new OA\Schema(type: 'string')
+                schema: new OA\Schema(type: 'integer')
             ),
             new OA\Parameter(
                 name: 'hash',
-                description: 'Email verification hash',
+                description: 'Hash of the email verification.',
                 in: 'path',
                 required: true,
                 schema: new OA\Schema(type: 'string')
             ),
             new OA\Parameter(
                 name: 'expires',
-                description: 'Expiration timestamp',
+                description: 'Time of the link expiration.',
                 in: 'query',
                 required: false,
                 schema: new OA\Schema(type: 'integer')
             ),
             new OA\Parameter(
                 name: 'signature',
-                description: 'Signed URL signature',
+                description: 'Signature of the email verification.',
                 in: 'query',
                 required: true,
                 schema: new OA\Schema(type: 'string')
@@ -49,17 +49,26 @@ class VerifyEmailController extends Controller
         responses: [
             new OA\Response(
                 response: SymfonyResponse::HTTP_NO_CONTENT,
-                description: 'Email verified successfully',
+                description: 'Email verified successfully.',
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_FORBIDDEN,
-                description: 'Invalid or expired verification link'
+                description: 'Invalid or expired verification link.'
             ),
         ]
     )]
-    public function __invoke(Request $request, string $id, string $hash, VerifyEmailAction $action): Response
+    /**
+     * Verify the user's email address.
+     *
+     * @param Request $request
+     * @param string $id
+     * @param string $hash
+     * @param VerifyEmailAction $verifyEmailAction
+     * @return Response
+     */
+    public function __invoke(Request $request, string $id, string $hash, VerifyEmailAction $verifyEmailAction): Response
     {
-        $action->handle($id, $hash);
+        $verifyEmailAction->handle($id, $hash);
         return response()->noContent();
     }
 }

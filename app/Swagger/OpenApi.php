@@ -14,14 +14,16 @@ use OpenApi\Attributes as OA;
     )
 )]
 #[OA\Server(
-    url: "http://coursehub.local/api",
+    url: "http://localhost:8080/api",
     description: "Local development server"
 )]
 #[OA\SecurityScheme(
     securityScheme: "sanctum",
     type: "http",
-    description: "Use your Sanctum token to authenticate requests",
-    bearerFormat: "API Token",
+    description: "Enter token in format: Bearer {token}",
+    name: "Authorization",
+    in: "header",
+    bearerFormat: "JWT",
     scheme: "bearer"
 )]
 class OpenApi

@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\LoginUserAction;
-use App\Data\Auth\LoginData;
+use App\Data\Auth\Requests\LoginUserData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Auth\AuthResource;
+use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -13,32 +14,44 @@ class LoginController extends Controller
 {
     #[OA\Post(
         path: '/auth/login',
-        description: 'Authenticate user.',
-        summary: 'Login',
+        description: 'Authenticate the user using email and password and issue an access token.',
+        summary: 'Authenticate user',
         requestBody: new OA\RequestBody(
             required: true,
-            content: new OA\JsonContent(ref: '#/components/schemas/LoginRequest')
+            content: new OA\JsonContent(ref: '#/components/schemas/LoginUserRequest')
         ),
         tags: ['Auth'],
         responses: [
             new OA\Response(
                 response: SymfonyResponse::HTTP_OK,
-                description: 'User logged in',
-                content: new OA\JsonContent(ref: '#/components/schemas/Auth')
-            ),
-            new OA\Response(
-                response: SymfonyResponse::HTTP_UNAUTHORIZED,
-                description: 'Invalid credentials'
+                description: 'User authenticated successfully.',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/AuthResponse'
+                        )
+                    ]
+                )
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
-                description: 'Validation error'
+                description: 'Invalid credentials or validation error.'
             ),
         ]
     )]
-    public function __invoke(LoginData $data, LoginUserAction $action): AuthResource
+    /**
+     * Authenticate the user using email and password and issue an access token.
+     *
+     * @param LoginUserData $userData
+     * @param LoginUserAction $loginUserAction
+     * @return JsonResponse
+     */
+    public function __invoke(LoginUserData $userData, LoginUserAction $loginUserAction): JsonResponse
     {
-        $result = $action->handle($data);
-        return new AuthResource($result);
+        $authData = $loginUserAction->handle($userData);
+        return AuthResource::make($authData)
+            ->response()
+            ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 }

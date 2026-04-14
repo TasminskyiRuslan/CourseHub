@@ -11,26 +11,33 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class LogoutController extends Controller
 {
-    #[OA\Post(
+    #[OA\Delete(
         path: '/auth/logout',
-        description: 'Revoke only the current authentication token for the authenticated user.',
+        description: 'Revoke the current access token for an authenticated user.',
         summary: 'Logout current device',
         security: [['sanctum' => []]],
         tags: ['Auth'],
         responses: [
             new OA\Response(
                 response: SymfonyResponse::HTTP_NO_CONTENT,
-                description: 'User logged out'
+                description: 'User logged out successfully.'
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNAUTHORIZED,
-                description: 'Unauthorized'
+                description: 'User is unauthenticated.'
             )
         ]
     )]
-    public function __invoke(Request $request, RevokeCurrentTokenAction $action): Response
+    /**
+     * Revoke the current access token for an authenticated user.
+     *
+     * @param Request $request
+     * @param RevokeCurrentTokenAction $revokeCurrentTokenAction
+     * @return Response
+     */
+    public function __invoke(Request $request, RevokeCurrentTokenAction $revokeCurrentTokenAction): Response
     {
-        $action->handle($request->user());
+        $revokeCurrentTokenAction->handle($request->user());
         return response()->noContent();
     }
 }

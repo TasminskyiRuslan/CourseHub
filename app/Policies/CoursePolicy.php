@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\UserPermission;
 use App\Models\Course;
 use App\Models\User;
 
@@ -14,41 +15,31 @@ class CoursePolicy
 
     public function view(?User $user, Course $course): bool
     {
-        return $course->isVisibleFor($user);
+        return $course->is_published || $user && ($user->isAuthorOf($course) || $user->hasPermissionTo(UserPermission::COURSE_SHOW_UNPUBLISHED->value));
     }
 
     public function create(User $user): bool
     {
-        return $user->canPublishContent();
+        return $user->hasPermissionTo(UserPermission::COURSE_CREATE->value) && $user->hasVerifiedEmail();
     }
 
     public function update(User $user, Course $course): bool
     {
-        return $user->isAuthorOf($course);
+        return $user->hasPermissionTo(UserPermission::COURSE_UPDATE->value) && $user->isAuthorOf($course);
     }
 
     public function delete(User $user, Course $course): bool
     {
-        return $user->isAdmin() || $user->isAuthorOf($course);
-    }
-
-    public function restore(User $user, Course $course): bool
-    {
-        return false;
-    }
-
-    public function forceDelete(User $user, Course $course): bool
-    {
-        return false;
+        return $user->hasPermissionTo(UserPermission::COURSE_DELETE->value) && $user->isAuthorOf($course) || $user->hasPermissionTo(UserPermission::COURSE_DELETE_ANY->value);
     }
 
     public function publish(User $user, Course $course): bool
     {
-        return $user->isAuthorOf($course);
+        return $user->hasPermissionTo(UserPermission::COURSE_PUBLISH->value) && $user->isAuthorOf($course);
     }
 
     public function unpublish(User $user, Course $course): bool
     {
-        return $user->isAuthorOf($course) || $user->isAdmin();
+        return $user->hasPermissionTo(UserPermission::COURSE_UNPUBLISH->value) && $user->isAuthorOf($course) || $user->hasPermissionTo(UserPermission::COURSE_UNPUBLISH_ANY->value);
     }
 }

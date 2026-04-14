@@ -11,6 +11,8 @@
 |
 */
 
+use App\Enums\UserRole;
+
 pest()->extend(Tests\TestCase::class)
     // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Feature');
@@ -44,4 +46,51 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+/**
+ * Get the expected JSON structure for a user object.
+ *
+ * @return array
+ */
+function userJsonStructure(): array {
+    return [
+        'id',
+        'name',
+        'slug',
+        'email',
+        'email_verified_at',
+        'role',
+    ];
+}
+
+/**
+ * Get the expected JSON structure for an authentication response.
+ *
+ * @return array
+ */
+function authJsonStructure(): array {
+    return [
+        'user' => userJsonStructure(),
+        'access_token',
+        'token_type',
+        'expires_at',
+    ];
+}
+
+/**
+ * Generate a registration payload with optional overrides.
+ *
+ * @param array $overrides
+ * @return array
+ */
+function registrationPayload(array $overrides = []): array
+{
+    return array_merge([
+        'name'     => fake()->name(),
+        'email'    => fake()->unique()->safeEmail(),
+        'password' => 'password123',
+        'password_confirmation' => 'password123',
+        'role' => UserRole::STUDENT->value,
+    ], $overrides);
 }

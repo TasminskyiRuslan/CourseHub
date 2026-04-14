@@ -38,10 +38,11 @@
     34 => 'Termwind\\Laravel\\TermwindServiceProvider',
     35 => 'Pest\\Laravel\\PestServiceProvider',
     36 => 'Spatie\\LaravelData\\LaravelDataServiceProvider',
-    37 => 'Spatie\\QueryBuilder\\QueryBuilderServiceProvider',
-    38 => 'Spatie\\StructureDiscoverer\\StructureDiscovererServiceProvider',
-    39 => 'App\\Providers\\AppServiceProvider',
-    40 => 'App\\Providers\\EloquentServiceProvider',
+    37 => 'Spatie\\Permission\\PermissionServiceProvider',
+    38 => 'Spatie\\QueryBuilder\\QueryBuilderServiceProvider',
+    39 => 'Spatie\\StructureDiscoverer\\StructureDiscovererServiceProvider',
+    40 => 'App\\Providers\\AppServiceProvider',
+    41 => 'App\\Providers\\EloquentServiceProvider',
   ),
   'eager' => 
   array (
@@ -66,10 +67,11 @@
     18 => 'Termwind\\Laravel\\TermwindServiceProvider',
     19 => 'Pest\\Laravel\\PestServiceProvider',
     20 => 'Spatie\\LaravelData\\LaravelDataServiceProvider',
-    21 => 'Spatie\\QueryBuilder\\QueryBuilderServiceProvider',
-    22 => 'Spatie\\StructureDiscoverer\\StructureDiscovererServiceProvider',
-    23 => 'App\\Providers\\AppServiceProvider',
-    24 => 'App\\Providers\\EloquentServiceProvider',
+    21 => 'Spatie\\Permission\\PermissionServiceProvider',
+    22 => 'Spatie\\QueryBuilder\\QueryBuilderServiceProvider',
+    23 => 'Spatie\\StructureDiscoverer\\StructureDiscovererServiceProvider',
+    24 => 'App\\Providers\\AppServiceProvider',
+    25 => 'App\\Providers\\EloquentServiceProvider',
   ),
   'deferred' => 
   array (

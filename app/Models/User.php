@@ -19,6 +19,9 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Traits\HasRoles;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
@@ -27,22 +30,28 @@ use Spatie\Sluggable\SlugOptions;
  * @property string $name
  * @property string|null $slug
  * @property string $email
- * @property UserRole $role
  * @property Carbon|null $email_verified_at
  * @property string $password
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property UserRole $role
  * @property-read Collection<int, Course> $courses
  * @property-read int|null $courses_count
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
+ * @property-read Collection<int, Permission> $permissions
+ * @property-read int|null $permissions_count
+ * @property-read Collection<int, Role> $roles
+ * @property-read int|null $roles_count
  * @property-read Collection<int, PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
  * @method static UserFactory factory($count = null, $state = [])
  * @method static Builder<static>|User newModelQuery()
  * @method static Builder<static>|User newQuery()
+ * @method static Builder<static>|User permission($permissions, bool $without = false)
  * @method static Builder<static>|User query()
+ * @method static Builder<static>|User role($roles, ?string $guard = null, bool $without = false)
  * @method static Builder<static>|User whereCreatedAt($value)
  * @method static Builder<static>|User whereEmail($value)
  * @method static Builder<static>|User whereEmailVerifiedAt($value)
@@ -50,26 +59,64 @@ use Spatie\Sluggable\SlugOptions;
  * @method static Builder<static>|User whereName($value)
  * @method static Builder<static>|User wherePassword($value)
  * @method static Builder<static>|User whereRememberToken($value)
- * @method static Builder<static>|User whereRole($value)
  * @method static Builder<static>|User whereSlug($value)
  * @method static Builder<static>|User whereUpdatedAt($value)
+ * @method static Builder<static>|User withoutPermission($permissions)
+ * @method static Builder<static>|User withoutRole($roles, ?string $guard = null)
  * @mixin Eloquent
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, HasSlug;
+    /** @use HasFactory<UserFactory> */
+    use HasFactory, HasApiTokens, Notifiable, HasSlug, HasRoles;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'name',
         'email',
         'password',
-        'role',
     ];
 
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
     protected $hidden = [
         'password',
+        'remember_token',
     ];
 
+    /**
+     * The guard name used for Spatie permissions.
+     *
+     * @var string
+     */
+    protected string $guard_name = 'api';
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+            'role' => UserRole::class,
+            'email_verified_at' => 'datetime',
+        ];
+    }
+
+    /**
+     * Get the options for generating the slug.
+     *
+     * @return SlugOptions
+     */
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
@@ -78,47 +125,45 @@ class User extends Authenticatable implements MustVerifyEmail
             ->doNotGenerateSlugsOnUpdate();
     }
 
+    /**
+     * Send the email verification notification.
+     *
+     * @return void
+     */
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new QueuedVerifyEmailNotification());
     }
 
+    /**
+     * Send the password reset notification.
+     *
+     * @param string $token
+     * @return void
+     */
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new QueuedResetPasswordNotification($token));
     }
 
+    /**
+     * Get the courses authored by the user.
+     *
+     * @return HasMany
+     */
     public function courses(): HasMany
     {
         return $this->hasMany(Course::class, 'author_id');
     }
 
-    public function isAdmin(): bool
-    {
-        return $this->role === UserRole::ADMIN;
-    }
-
-    public function canPublishContent(): bool
-    {
-        return $this->isTeacher() && $this->hasVerifiedEmail();
-    }
-
-    public function isTeacher(): bool
-    {
-        return $this->role === UserRole::TEACHER;
-    }
-
+    /**
+     * Determine if the user is the author of the given course.
+     *
+     * @param Course $course
+     * @return bool
+     */
     public function isAuthorOf(Course $course): bool
     {
         return $this->is($course->author);
-    }
-
-    protected function casts(): array
-    {
-        return [
-            'password' => 'hashed',
-            'role' => UserRole::class,
-            'email_verified_at' => 'datetime',
-        ];
     }
 }

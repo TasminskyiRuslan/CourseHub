@@ -33,26 +33,54 @@ class CourseFactory extends Factory
         ];
     }
 
+    /**
+     * Indicate that the course is published.
+     *
+     * @return $this
+     */
     public function published(): static
     {
         return $this->state(fn() => ['is_published' => true]);
     }
 
+    /**
+     * Indicate that the course is unpublished.
+     *
+     * @return $this
+     */
     public function unpublished(): static
     {
         return $this->state(fn() => ['is_published' => false]);
     }
 
+    /**
+     * Indicate that the course is free.
+     *
+     * @return $this
+     */
     public function free(): static
     {
         return $this->state(fn() => ['price' => 0]);
     }
 
-    public function withImage(string $path): static
+    /**
+     * Add an image to the book.
+     *
+     * @param string|null $path
+     * @return static
+     */
+    public function withImage(?string $path = null): static
     {
-        return $this->state(fn() => ['image_path' => $path]);
+        return $this->state(function (array $attributes) use ($path) {
+            return ['image_path' => $path ?? 'courses/' . fake()->uuid() . '.jpg'];
+        });
     }
 
+    /**
+     * Indicate that the user has some type.
+     *
+     * @return $this
+     */
     public function type(CourseType $courseType): static
     {
         return $this->state(fn() => ['type' => $courseType]);

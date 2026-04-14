@@ -16,7 +16,10 @@ use Illuminate\Support\Str;
  */
 class LessonFactory extends Factory
 {
-    protected static $order = 1;
+    /**
+     * The current order being used by the factory.
+     */
+    protected static int $order = 1;
 
     /**
      * Define the model's default state.
@@ -34,6 +37,11 @@ class LessonFactory extends Factory
         ];
     }
 
+    /**
+     * Configure the model factory.
+     *
+     * @return $this
+     */
     public function configure(): static
     {
         return $this->afterMaking(function (Lesson $lesson) {
@@ -49,7 +57,11 @@ class LessonFactory extends Factory
         });
     }
 
-
+    /**
+     * Indicate that the user has the offline type.
+     *
+     * @return $this
+     */
     public function offline(): static
     {
         return $this->afterCreating(function (Lesson $lesson) {
@@ -57,6 +69,11 @@ class LessonFactory extends Factory
         });
     }
 
+    /**
+     * Indicate that the user has the online type.
+     *
+     * @return $this
+     */
     public function online(): static
     {
         return $this->afterCreating(function (Lesson $lesson) {
@@ -64,6 +81,11 @@ class LessonFactory extends Factory
         });
     }
 
+    /**
+     * Indicate that the user has the video type.
+     *
+     * @return $this
+     */
     public function video(): static
     {
         return $this->afterCreating(function (Lesson $lesson) {

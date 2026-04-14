@@ -2,7 +2,9 @@
 
 namespace App\Actions\Auth;
 
-use App\Data\Auth\ResetPasswordData;
+use App\Data\Auth\Requests\ResetPasswordData;
+use App\Enums\UserRole;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
@@ -10,22 +12,32 @@ use Str;
 
 class ResetPasswordAction
 {
-    public function handle(ResetPasswordData $data): void
+    /**
+     * Reset the user's password.
+     *
+     * @param ResetPasswordData $resetPasswordData
+     * @return void
+     */
+    public function handle(ResetPasswordData $resetPasswordData): void
     {
+        $user = User::whereEmail($resetPasswordData->email)->first();
+        if ($user?->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return;
+        }
+
         $status = Password::reset([
-            'email' => $data->email,
-            'password' => $data->password,
-            'password_confirmation' => $data->password,
-            'token' => $data->token,
+            'email' => $resetPasswordData->email,
+            'password' => $resetPasswordData->password,
+            'password_confirmation' => $resetPasswordData->password,
+            'token' => $resetPasswordData->token,
         ], function ($user, $password) {
             $user->forceFill([
                 'password' => Hash::make($password),
-            ])->setRememberToken(Str::random(60));
-            $user->save();
+            ])->save();
         });
 
         if ($status !== Password::PASSWORD_RESET) {
-            throw ValidationException::withMessages(['email' => [trans($status)]]);
+            throw ValidationException::withMessages(['email' => [__($status)]]);
         }
     }
 }

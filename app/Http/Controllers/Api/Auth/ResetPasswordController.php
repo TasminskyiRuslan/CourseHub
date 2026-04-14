@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\ResetPasswordAction;
-use App\Data\Auth\ResetPasswordData;
+use App\Data\Auth\Requests\ResetPasswordData;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -17,7 +17,7 @@ class ResetPasswordController extends Controller
 
     #[OA\Post(
         path: '/auth/password/reset',
-        description: 'Resets the user\'s password.',
+        description: 'Reset the user\'s password.',
         summary: 'Reset password',
         requestBody: new OA\RequestBody(
             required: true,
@@ -27,25 +27,24 @@ class ResetPasswordController extends Controller
         responses: [
             new OA\Response(
                 response: SymfonyResponse::HTTP_NO_CONTENT,
-                description: 'Password reset',
-            ),
-            new OA\Response(
-                response: SymfonyResponse::HTTP_FORBIDDEN,
-                description: 'Access denied'
+                description: 'Password reset successfully.',
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
-                description: 'Validation error'
+                description: 'Validation error.'
             ),
         ]
     )]
-    public function __invoke(ResetPasswordData $data, ResetPasswordAction $action): Response
+    /**
+     * Reset the user's password.
+     *
+     * @param ResetPasswordData $resetPasswordData
+     * @param ResetPasswordAction $resetPasswordAction
+     * @return Response
+     */
+    public function __invoke(ResetPasswordData $resetPasswordData, ResetPasswordAction $resetPasswordAction): Response
     {
-        $user = User::where('email', $data->email)->first();
-        if ($user) {
-            $this->authorize('resetPassword', $user);
-        }
-        $action->handle($data);
+        $resetPasswordAction->handle($resetPasswordData);
         return response()->noContent();
     }
 }

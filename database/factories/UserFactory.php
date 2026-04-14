@@ -4,8 +4,10 @@ namespace Database\Factories;
 
 use App\Enums\UserRole;
 use App\Models\User;
+use Hash;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use Spatie\Permission\PermissionRegistrar;
 
 /**
  * @extends Factory<User>
@@ -31,11 +33,31 @@ class UserFactory extends Factory
             'slug' => Str::slug($name),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => 'password',
-            'role' => fake()->randomElement([UserRole::STUDENT, UserRole::TEACHER]),
+            'password' => static::$password ??= Hash::make('password'),
         ];
     }
 
+    /**
+     * Configure the model factory.
+     *
+     * @return $this
+     */
+    public function configure(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            app()[PermissionRegistrar::class]->forgetCachedPermissions();
+
+            if ($user->roles->isEmpty()) {
+                $user->assignRole(UserRole::STUDENT->value);
+            }
+        });
+    }
+
+    /**
+     * Indicate that the user is unverified.
+     *
+     * @return $this
+     */
     public function unverified(): static
     {
         return $this->state(fn() => [
@@ -43,6 +65,11 @@ class UserFactory extends Factory
         ]);
     }
 
+    /**
+     * Indicate that the user is verified.
+     *
+     * @return $this
+     */
     public function verified(): static
     {
         return $this->state(fn() => [
@@ -50,24 +77,39 @@ class UserFactory extends Factory
         ]);
     }
 
+    /**
+     * Indicate that the user has the student role.
+     *
+     * @return $this
+     */
     public function student(): static
     {
-        return $this->state(fn() => [
-            'role' => UserRole::STUDENT,
-        ]);
+        return $this->afterCreating(function (User $user) {
+            $user->syncRoles(UserRole::STUDENT->value);
+        });
     }
 
+    /**
+     * Indicate that the user has the teacher role.
+     *
+     * @return $this
+     */
     public function teacher(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'role' => UserRole::TEACHER,
-        ]);
+        return $this->afterCreating(function (User $user) {
+            $user->syncRoles(UserRole::TEACHER->value);
+        });
     }
 
+    /**
+     * Indicate that the user has the admin role.
+     *
+     * @return $this
+     */
     public function admin(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'role' => UserRole::ADMIN,
-        ]);
+        return $this->afterCreating(function (User $user) {
+            $user->syncRoles(UserRole::ADMIN->value);
+        });
     }
 }

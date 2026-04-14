@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Http\Resources\Api\Lessons\VideoLessonResource;
+use Database\Factories\VideoLessonFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,6 +19,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Lesson|null $lesson
+ * @method static VideoLessonFactory factory($count = null, $state = [])
  * @method static Builder<static>|VideoLesson newModelQuery()
  * @method static Builder<static>|VideoLesson newQuery()
  * @method static Builder<static>|VideoLesson query()
@@ -30,18 +32,35 @@ use Illuminate\Support\Carbon;
  */
 class VideoLesson extends Model
 {
+    /** @use HasFactory<VideoLessonFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'video_url',
         'provider'
     ];
 
+    /**
+     * Get the lesson associated with the video lesson.
+     *
+     * @return MorphOne
+     */
     public function lesson(): MorphOne
     {
         return $this->morphOne(Lesson::class, 'lessonable');
     }
 
+    /**
+     * Transform the model into a JSON resource.
+     *
+     * @param string|null $resourceClass
+     * @return JsonResource
+     */
     public function toResource(?string $resourceClass = null): JsonResource
     {
         return $resourceClass

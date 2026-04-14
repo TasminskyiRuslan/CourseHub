@@ -2,30 +2,46 @@
 
 namespace App\Actions\Auth;
 
-use App\Data\Auth\AuthData;
-use App\Data\Auth\LoginData;
+use App\Data\Auth\Requests\LoginUserData;
+use App\Data\Auth\Results\AuthData;
 use App\Models\User;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class LoginUserAction
 {
+    /**
+     * @param IssueAccessTokenAction $issueAccessTokenAction
+     */
     public function __construct(
-        protected IssueTokenAction $issueTokenAction,
+        protected IssueAccessTokenAction $issueAccessTokenAction,
     )
     {
     }
 
-    public function handle(LoginData $data): AuthData
+    /**
+     * Authenticate the user and issue an access token.
+     *
+     * @param LoginUserData $userData
+     * @return AuthData
+     * @throws ValidationException
+     */
+    public function handle(LoginUserData $userData): AuthData
     {
-        $user = User::where('email', $data->email)->first();
-
-        if (!$user || !Hash::check($data->password, $user->password)) {
+        $user = User::whereEmail($userData->email)->first();
+        if (!$user || !Hash::check($userData->password, $user->password)) {
             throw ValidationException::withMessages([
-                'email' => [trans('auth.failed')],
+                'email' => [__('auth.failed')],
             ]);
         }
 
-        return $this->issueTokenAction->handle($user, $data->remember);
+        $accessTokenData = $this->issueAccessTokenAction->handle($user, $userData->remember);
+        event(new Login(config('auth.defaults.guard'), $user, $userData->remember));
+        return new AuthData(
+            user: $user,
+            accessToken: $accessTokenData->plainTextToken,
+            expiresAt: $accessTokenData->accessToken->expires_at,
+        );
     }
 }

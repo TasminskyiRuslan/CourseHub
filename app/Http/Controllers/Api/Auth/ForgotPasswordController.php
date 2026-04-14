@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
-use App\Actions\Auth\SendResetLinkAction;
-use App\Data\Auth\ForgotPasswordData;
+use App\Actions\Auth\SendResetPasswordEmailAction;
+use App\Data\Auth\Requests\ForgotPasswordData;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Response;
@@ -16,7 +16,7 @@ class ForgotPasswordController extends Controller
 
     #[OA\Post(
         path: '/auth/password/forgot',
-        description: 'Sends an email with a link to reset the password.',
+        description: 'Send an email with a link to reset the password.',
         summary: 'Send password reset link',
         requestBody: new OA\RequestBody(
             required: true,
@@ -26,17 +26,24 @@ class ForgotPasswordController extends Controller
         responses: [
             new OA\Response(
                 response: SymfonyResponse::HTTP_NO_CONTENT,
-                description: 'Reset link sent',
+                description: 'Reset link sent successfully.',
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
-                description: 'Validation error'
+                description: 'Validation error.'
             ),
         ]
     )]
-    public function __invoke(ForgotPasswordData $data, SendResetLinkAction $action): Response
+    /**
+     * Send an email with a link to reset the password.
+     *
+     * @param ForgotPasswordData $forgotPasswordData
+     * @param SendResetPasswordEmailAction $sendResetPasswordEmailAction
+     * @return Response
+     */
+    public function __invoke(ForgotPasswordData $forgotPasswordData, SendResetPasswordEmailAction $sendResetPasswordEmailAction): Response
     {
-        $action->handle($data->email);
+        $sendResetPasswordEmailAction->handle($forgotPasswordData);
         return response()->noContent();
     }
 }

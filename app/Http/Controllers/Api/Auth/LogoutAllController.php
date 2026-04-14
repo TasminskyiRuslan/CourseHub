@@ -13,24 +13,31 @@ class LogoutAllController extends Controller
 {
     #[OA\Delete(
         path: '/auth/tokens',
-        description: 'Revoke all authentication tokens for the authenticated user.',
+        description: 'Revoke all access tokens for an authenticated user.',
         summary: 'Logout from all devices',
         security: [['sanctum' => []]],
         tags: ['Auth'],
         responses: [
             new OA\Response(
                 response: SymfonyResponse::HTTP_NO_CONTENT,
-                description: 'All tokens revoked'
+                description: 'User logged out successfully.'
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNAUTHORIZED,
-                description: 'Unauthorized'
+                description: 'User is unauthenticated.'
             ),
         ]
     )]
-    public function __invoke(Request $request, RevokeAllTokensAction $action): Response
+    /**
+     * Revoke all access tokens for an authenticated user.
+     *
+     * @param Request $request
+     * @param RevokeAllTokensAction $revokeAllTokensAction
+     * @return Response
+     */
+    public function __invoke(Request $request, RevokeAllTokensAction $revokeAllTokensAction): Response
     {
-        $action->handle($request->user());
+        $revokeAllTokensAction->handle($request->user());
         return response()->noContent();
     }
 }

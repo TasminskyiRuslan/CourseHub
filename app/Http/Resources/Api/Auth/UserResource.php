@@ -6,14 +6,12 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property mixed $id
- * @property mixed $name
- * @property mixed $slug
- * @property mixed $email
- * @property mixed $role
- * @property mixed $email_verified_at
- * @property mixed $created_at
- * @property mixed $updated_at
+ * @property-read mixed $id
+ * @property-read mixed $name
+ * @property-read mixed $slug
+ * @property-read mixed $email
+ * @property-read mixed $roles
+ * @property-read mixed $email_verified_at
  */
 class UserResource extends JsonResource
 {
@@ -27,10 +25,8 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'email' => $this->email,
-            'role' => $this->role,
             'email_verified_at' => $this->email_verified_at,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'role' => $this->roles->first()?->name,
         ];
     }
 }

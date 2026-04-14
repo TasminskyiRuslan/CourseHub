@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\Auth\LogoutAllController;
 use App\Http\Controllers\Api\Auth\LogoutController;
 use App\Http\Controllers\Api\Auth\MeController;
 use App\Http\Controllers\Api\Auth\RegisterController;
-use App\Http\Controllers\Api\Auth\ResendVerificationController;
+use App\Http\Controllers\Api\Auth\ResendVerificationEmailController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\Courses\CourseController;
@@ -23,10 +23,12 @@ use Illuminate\Support\Facades\Route;
 */
 Route::prefix('auth')->group(function () {
     // Register action
-    Route::post('/register', RegisterController::class)->name('auth.register');
+    Route::post('/register', RegisterController::class)
+        ->name('auth.register');
 
     // Login action
-    Route::post('/login', LoginController::class)->name('auth.login');
+    Route::post('/login', LoginController::class)
+        ->name('auth.login');
 
     // Me action
     Route::get('/me', MeController::class)
@@ -34,7 +36,7 @@ Route::prefix('auth')->group(function () {
         ->name('auth.me');
 
     // Logout actions
-    Route::post('/logout', LogoutController::class)
+    Route::delete('/logout', LogoutController::class)
         ->middleware('auth:sanctum')
         ->name('auth.logout');
     Route::delete('/tokens', LogoutAllController::class)
@@ -53,7 +55,7 @@ Route::prefix('auth')->group(function () {
     Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)
         ->middleware(['signed', 'throttle:6,1'])
         ->name('verification.verify');
-    Route::post('/email/verification-notification', ResendVerificationController::class)
+    Route::post('/email/verification-notification', ResendVerificationEmailController::class)
         ->middleware(['auth:sanctum', 'throttle:6,1'])
         ->name('verification.resend');
 });

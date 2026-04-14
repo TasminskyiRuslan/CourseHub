@@ -8,6 +8,13 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class VerifyEmailAction
 {
+    /**
+     * Verify the user's email address.
+     *
+     * @param string $id
+     * @param string $hash
+     * @return void
+     */
     public function handle(string $id, string $hash): void
     {
         $user = User::find($id);

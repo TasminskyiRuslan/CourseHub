@@ -9,11 +9,11 @@ use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\ResendVerificationEmailController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\Auth\VerifyEmailController;
-use App\Http\Controllers\Api\Courses\CourseController;
-use App\Http\Controllers\Api\Courses\CourseImageController;
-use App\Http\Controllers\Api\Courses\PublishCourseController;
-use App\Http\Controllers\Api\Courses\UnpublishCourseController;
-use App\Http\Controllers\Api\Lessons\LessonController;
+use App\Http\Controllers\Api\Course\CourseController;
+use App\Http\Controllers\Api\Course\CourseImageController;
+use App\Http\Controllers\Api\Course\PublishCourseController;
+use App\Http\Controllers\Api\Course\UnpublishCourseController;
+use App\Http\Controllers\Api\Lesson\LessonController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -62,55 +62,59 @@ Route::prefix('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Courses & Lessons actions
+| Course & Lessons actions
 |--------------------------------------------------------------------------
 */
-Route::prefix('courses')->name('courses.')->group(function () {
-    // CourseDataSchema actions
-    Route::get('/', [CourseController::class, 'index'])->name('index');
+Route::prefix('courses')->group(function () {
+    // CourseResponseSchema actions
+    Route::get('/', [CourseController::class, 'index'])
+        ->name('course.index');
     Route::post('/', [CourseController::class, 'store'])
         ->middleware(['auth:sanctum', 'verified'])
-        ->name('store');
-    Route::get('/{course}', [CourseController::class, 'show'])->name('show');
+        ->name('course.store');
+    Route::get('/{course}', [CourseController::class, 'show'])
+        ->name('course.show');
     Route::put('/{course}', [CourseController::class, 'update'])
         ->middleware(['auth:sanctum', 'verified'])
-        ->name('update');
+        ->name('course.update');
     Route::delete('/{course}', [CourseController::class, 'destroy'])
         ->middleware(['auth:sanctum', 'verified'])
-        ->name('destroy');
+        ->name('course.destroy');
 
     Route::prefix('{course}')->scopeBindings()->group(function () {
-        // CourseDataSchema image actions
-        Route::prefix('image')->name('image.')->group(function () {
+        // CourseResponseSchema image actions
+        Route::prefix('image')->group(function () {
             Route::patch('/', [CourseImageController::class, 'update'])
                 ->middleware(['auth:sanctum', 'verified'])
-                ->name('update');
+                ->name('course.image.update');
             Route::delete('/', [CourseImageController::class, 'destroy'])
                 ->middleware(['auth:sanctum', 'verified'])
-                ->name('destroy');
+                ->name('course.image.destroy');
         });
 
         // Publish/Unpublish actions
         Route::patch('/publish', PublishCourseController::class)
             ->middleware(['auth:sanctum', 'verified'])
-            ->name('publish');
+            ->name('course.publish');
         Route::patch('/unpublish', UnpublishCourseController::class)
             ->middleware(['auth:sanctum', 'verified'])
-            ->name('unpublish');
+            ->name('course.unpublish');
 
         // Lesson actions
-        Route::prefix('lessons')->name('lessons.')->group(function () {
-            Route::get('/', [LessonController::class, 'index'])->name('index');
+        Route::prefix('lessons')->group(function () {
+            Route::get('/', [LessonController::class, 'index'])
+                ->name('lesson.index');
             Route::post('/', [LessonController::class, 'store'])
                 ->middleware(['auth:sanctum', 'verified'])
-                ->name('store');
-            Route::get('/{lesson}', [LessonController::class, 'show'])->name('show');
+                ->name('lesson.store');
+            Route::get('/{lesson}', [LessonController::class, 'show'])
+                ->name('lesson.show');
             Route::put('/{lesson}', [LessonController::class, 'update'])
                 ->middleware(['auth:sanctum', 'verified'])
-                ->name('update');
+                ->name('lesson.update');
             Route::delete('/{lesson}', [LessonController::class, 'destroy'])
                 ->middleware(['auth:sanctum', 'verified'])
-                ->name('destroy');
+                ->name('lesson.destroy');
         });
     });
 });

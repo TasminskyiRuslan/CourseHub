@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Courses;
+namespace App\Http\Controllers\Api\Course;
 
 use App\Http\Controllers\Controller;
 use App\Models\Course;
@@ -20,7 +20,7 @@ class PublishCourseController extends Controller
         description: 'Publish a specific course.',
         summary: 'Publish course',
         security: [['sanctum' => []]],
-        tags: ['Courses'],
+        tags: ['Course'],
         parameters: [
             new OA\Parameter(
                 name: 'course',

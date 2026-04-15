@@ -15,7 +15,7 @@ class CoursePolicy
 
     public function view(?User $user, Course $course): bool
     {
-        return $course->is_published || $user && ($user->isAuthorOf($course) || $user->hasPermissionTo(UserPermission::COURSE_SHOW_UNPUBLISHED->value));
+        return $course->is_published || $user && ($user->isAuthorOf($course) || $user->hasPermissionTo(UserPermission::COURSE_VIEW_UNPUBLISHED->value));
     }
 
     public function create(User $user): bool

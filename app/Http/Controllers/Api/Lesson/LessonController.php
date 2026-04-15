@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Api\Lessons;
+namespace App\Http\Controllers\Api\Lesson;
 
-use App\Data\Lessons\CreateLessonData;
-use App\Data\Lessons\UpdateLessonData;
+use App\Data\Lesson\CreateLessonData;
+use App\Data\Lesson\UpdateLessonData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Lessons\LessonResource;
 use App\Models\Course;

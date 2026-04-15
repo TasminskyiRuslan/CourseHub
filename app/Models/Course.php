@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\CourseType;
+use App\Enums\UserPermission;
+use App\Enums\UserRole;
 use Database\Factories\CourseFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
@@ -165,5 +167,25 @@ class Course extends Model
     {
         $this->is_published = false;
         return $this;
+    }
+
+    /**
+     * Scope a query to only include courses visible to the given user.
+     *
+     * @param Builder $query
+     * @param  User|null  $user
+     * @return Builder
+     */
+    public function scopeVisibleFor(Builder $query, ?User $user): Builder
+    {
+        if ($user?->hasPermissionTo(UserPermission::COURSE_VIEW_UNPUBLISHED->value) || $user?->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return $query;
+        }
+        return $query->where(function ($q) use ($user) {
+            $q->where('is_published', true);
+            if ($user) {
+                $q->orWhere('author_id', $user->id);
+            }
+        });
     }
 }

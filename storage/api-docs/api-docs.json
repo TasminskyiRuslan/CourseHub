@@ -315,11 +315,11 @@
         "/courses": {
             "get": {
                 "tags": [
-                    "Courses"
+                    "Course"
                 ],
-                "summary": "List courses",
-                "description": "Retrieve a list of courses.",
-                "operationId": "0e56e7628c52236eef70b08dddecc424",
+                "summary": "Retrieve a list of courses",
+                "description": "Retrieve a cached and paginated list of courses with filters and sorting.",
+                "operationId": "fb9d5ed8eebcf64545eccbec4e07e665",
                 "parameters": [
                     {
                         "name": "filter[search]",
@@ -356,101 +356,36 @@
                             "type": "integer",
                             "minimum": 1
                         }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Courses list",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/CourseCollection"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "tags": [
-                    "Courses"
-                ],
-                "summary": "Create course",
-                "description": "Create a new course.",
-                "operationId": "ef5a9f85705b2624559ac0e9e6d444e6",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/StoreCourseRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Course created",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Course"
-                                }
-                            }
-                        }
                     },
-                    "422": {
-                        "description": "Validation error"
-                    },
-                    "401": {
-                        "description": "Authentication required"
-                    },
-                    "403": {
-                        "description": "Access denied"
-                    }
-                },
-                "security": [
                     {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/courses/{course}": {
-            "get": {
-                "tags": [
-                    "Courses"
-                ],
-                "summary": "Get course",
-                "description": "Retrieve a specific course.",
-                "operationId": "138c60f6701fad11d64200fa6df6a0dd",
-                "parameters": [
-                    {
-                        "name": "course",
-                        "in": "path",
-                        "description": "Course identifier (slug)",
-                        "required": true,
+                        "name": "include",
+                        "in": "query",
+                        "description": "Relations to include.",
+                        "required": false,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "author,lessons,lessons_count"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Course details",
+                        "description": "Course list retrieved successfully.",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Course"
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CourseResponse"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
-                    },
-                    "403": {
-                        "description": "Access denied"
-                    },
-                    "404": {
-                        "description": "Course not found"
                     }
                 },
                 "security": [
@@ -459,210 +394,16 @@
                     },
                     {}
                 ]
-            },
-            "put": {
-                "tags": [
-                    "Courses"
-                ],
-                "summary": "Update course",
-                "description": "Update a specific course.",
-                "operationId": "35911d475bcc8b91899ed036b9c84326",
-                "parameters": [
-                    {
-                        "name": "course",
-                        "in": "path",
-                        "description": "Course identifier (slug)",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateCourseRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Course updated",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Course"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation error"
-                    },
-                    "401": {
-                        "description": "Authentication required"
-                    },
-                    "403": {
-                        "description": "Access denied"
-                    },
-                    "404": {
-                        "description": "Course not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Courses"
-                ],
-                "summary": "Delete course",
-                "description": "Delete a specific course.",
-                "operationId": "65521517f1a7dc8a5a0478954ff53e0d",
-                "parameters": [
-                    {
-                        "name": "course",
-                        "in": "path",
-                        "description": "Course identifier (slug)",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Course deleted"
-                    },
-                    "401": {
-                        "description": "Authentication required"
-                    },
-                    "403": {
-                        "description": "Access denied"
-                    },
-                    "404": {
-                        "description": "Course not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/courses/{course}/image": {
-            "delete": {
-                "tags": [
-                    "Courses"
-                ],
-                "summary": "Delete course image",
-                "description": "Delete the image of a specific course.",
-                "operationId": "30857db84e5ef2638e43305d4628a7ce",
-                "parameters": [
-                    {
-                        "name": "course",
-                        "in": "path",
-                        "description": "Course identifier (slug)",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Image deleted"
-                    },
-                    "401": {
-                        "description": "Authentication required"
-                    },
-                    "403": {
-                        "description": "Access denied"
-                    },
-                    "404": {
-                        "description": "Course not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
-            "patch": {
-                "tags": [
-                    "Courses"
-                ],
-                "summary": "Update course image",
-                "description": "Update the image of a specific course.",
-                "operationId": "6f0d46fd14ff2175e50c729d772a4bdb",
-                "parameters": [
-                    {
-                        "name": "course",
-                        "in": "path",
-                        "description": "Course identifier (slug)",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateCourseImageRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Image updated",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Course"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Authentication required"
-                    },
-                    "403": {
-                        "description": "Access denied"
-                    },
-                    "422": {
-                        "description": "Validation error"
-                    },
-                    "404": {
-                        "description": "Course not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
             }
         },
         "/courses/{course}/publish": {
             "patch": {
                 "tags": [
-                    "Courses"
+                    "Course"
                 ],
                 "summary": "Publish course",
                 "description": "Publish a specific course.",
-                "operationId": "40be793dabf577a4dd809dca40bf2fac",
+                "operationId": "c8056c77345bb2662b17653c2b9417b1",
                 "parameters": [
                     {
                         "name": "course",
@@ -698,11 +439,11 @@
         "/courses/{course}/unpublish": {
             "patch": {
                 "tags": [
-                    "Courses"
+                    "Course"
                 ],
                 "summary": "Unpublish course",
                 "description": "Unpublish a specific course.",
-                "operationId": "1aaf3a7d2d65257cc12f738dfd4b51fe",
+                "operationId": "8a0226a3ec517403257dcc9e5b2864e5",
                 "parameters": [
                     {
                         "name": "course",
@@ -742,7 +483,7 @@
                 ],
                 "summary": "List course lessons",
                 "description": "Retrieve a list of lessons for a specific course.",
-                "operationId": "327902ee615ff858b3b1be3fbe82013e",
+                "operationId": "235f3dcd29c974b5dfacc6f125487fc1",
                 "parameters": [
                     {
                         "name": "course",
@@ -821,7 +562,7 @@
                 ],
                 "summary": "Create lessons",
                 "description": "Create a new lesson for a specific course.",
-                "operationId": "ca99305077d9510bae5c228a0f95f93c",
+                "operationId": "3688868ff5b41c7b976a7a0c10e012d3",
                 "parameters": [
                     {
                         "name": "course",
@@ -881,7 +622,7 @@
                 ],
                 "summary": "Get lesson",
                 "description": "Retrieve a specific lesson for a specific course.",
-                "operationId": "774b85c4b881d33bc897ea973a887c55",
+                "operationId": "44edac41fc34e68e26d87d0e6a01ba10",
                 "parameters": [
                     {
                         "name": "course",
@@ -933,7 +674,7 @@
                 ],
                 "summary": "Update lesson",
                 "description": "Update a specific lesson for a specific course.",
-                "operationId": "970409cf6c019b47687cd43911e94f17",
+                "operationId": "19eef4647ae27f9c616744c34e7b7ccb",
                 "parameters": [
                     {
                         "name": "course",
@@ -1000,7 +741,7 @@
                 ],
                 "summary": "Delete lesson",
                 "description": "Delete a specific lesson from a specific course.",
-                "operationId": "467c323cd4e4a4e62f352e25b695d1d5",
+                "operationId": "f0874920178e45bebf1598a0907b5698",
                 "parameters": [
                     {
                         "name": "course",
@@ -1267,8 +1008,8 @@
                 "type": "object"
             },
             "StoreCourseRequest": {
-                "title": "Store course request schema",
-                "description": "Schema for creating a new course via API request",
+                "title": "Store Course Request",
+                "description": "Request payload for creating a new course.",
                 "required": [
                     "title",
                     "type",
@@ -1285,12 +1026,14 @@
                         "description": "The slug of the new course",
                         "type": "string",
                         "maxLength": 255,
+                        "pattern": "^[a-z0-9-]+$",
                         "example": "math-101",
                         "nullable": true
                     },
                     "description": {
                         "description": "The description of the new course",
                         "type": "string",
+                        "maxLength": 5000,
                         "example": "A basic mathematics course",
                         "nullable": true
                     },
@@ -1302,7 +1045,8 @@
                             "online",
                             "video"
                         ],
-                        "example": "online"
+                        "example": "online",
+                        "nullable": false
                     },
                     "price": {
                         "description": "The price of the new course",
@@ -1316,8 +1060,8 @@
                 "type": "object"
             },
             "UpdateCourseImageRequest": {
-                "title": "Update course image request schema",
-                "description": "Schema for updating a course image. Supports common image formats up to 2MB",
+                "title": "Update Course Image Request",
+                "description": "Request payload for updating a course image.",
                 "required": [
                     "image"
                 ],
@@ -1365,6 +1109,123 @@
                         "maximum": 99999999.99,
                         "minimum": 0,
                         "example": 199.99
+                    }
+                },
+                "type": "object"
+            },
+            "Author": {
+                "title": "Author Schema",
+                "description": "Details of a author returned by the API",
+                "required": [
+                    "id",
+                    "name",
+                    "slug"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "The user ID",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "The user name",
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "slug": {
+                        "description": "The user slug",
+                        "type": "string",
+                        "example": "john-doe"
+                    }
+                },
+                "type": "object"
+            },
+            "CourseResponse": {
+                "title": "Course Response",
+                "description": "Data of a specific course.",
+                "required": [
+                    "id",
+                    "author_id",
+                    "author",
+                    "title",
+                    "slug",
+                    "description",
+                    "type",
+                    "price",
+                    "image_url",
+                    "is_published",
+                    "created_at",
+                    "updated_at"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier of the course",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "author_id": {
+                        "description": "Author unique identifier of the course",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "author": {
+                        "$ref": "#/components/schemas/Author"
+                    },
+                    "title": {
+                        "description": "Title of the course",
+                        "type": "string",
+                        "example": "Math 101"
+                    },
+                    "slug": {
+                        "description": "Slug of the course",
+                        "type": "string",
+                        "example": "math-101"
+                    },
+                    "description": {
+                        "description": "Description of the course",
+                        "type": "string",
+                        "example": "A basic mathematics course",
+                        "nullable": true
+                    },
+                    "type": {
+                        "description": "Type of the course",
+                        "type": "string",
+                        "enum": [
+                            "online",
+                            "offline",
+                            "video"
+                        ],
+                        "example": "online"
+                    },
+                    "price": {
+                        "description": "Price of the course",
+                        "type": "string",
+                        "format": "float",
+                        "example": 99.99
+                    },
+                    "image_url": {
+                        "description": "Image url of the course",
+                        "type": "string",
+                        "format": "url",
+                        "example": "http://loclhost:8080/storage/courses/course1.png",
+                        "nullable": true
+                    },
+                    "is_published": {
+                        "description": "Status of the course",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "created_at": {
+                        "description": "Creation date of the course",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-20T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "description": "Modification date of the course",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-25T12:00:00Z"
                     }
                 },
                 "type": "object"
@@ -1654,156 +1515,6 @@
                     }
                 ]
             },
-            "Author": {
-                "title": "Author Schema",
-                "description": "Details of a author returned by the API",
-                "required": [
-                    "id",
-                    "name",
-                    "slug"
-                ],
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "id": {
-                                "description": "The user ID",
-                                "type": "integer",
-                                "example": 1
-                            },
-                            "name": {
-                                "description": "The user name",
-                                "type": "string",
-                                "example": "John Doe"
-                            },
-                            "slug": {
-                                "description": "The user slug",
-                                "type": "string",
-                                "example": "john-doe"
-                            }
-                        },
-                        "type": "object"
-                    }
-                },
-                "type": "object"
-            },
-            "CourseCollection": {
-                "title": "Course collection",
-                "description": "Collection of courses",
-                "required": [
-                    "data"
-                ],
-                "properties": {
-                    "data": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/CourseData"
-                        }
-                    }
-                },
-                "type": "object"
-            },
-            "CourseData": {
-                "title": "CourseDataSchema data schema",
-                "required": [
-                    "id",
-                    "author_id",
-                    "author",
-                    "title",
-                    "slug",
-                    "description",
-                    "type",
-                    "price",
-                    "image_url",
-                    "is_published",
-                    "created_at",
-                    "updated_at"
-                ],
-                "properties": {
-                    "id": {
-                        "description": "The ID of the course",
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "author_id": {
-                        "description": "The author of the lesson",
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "author": {
-                        "$ref": "#/components/schemas/Author"
-                    },
-                    "title": {
-                        "description": "The title of the lesson",
-                        "type": "string",
-                        "example": "Math 101"
-                    },
-                    "slug": {
-                        "description": "The slug of the lesson",
-                        "type": "string",
-                        "example": "math-101"
-                    },
-                    "description": {
-                        "description": "The description of the lesson",
-                        "type": "string",
-                        "example": "A basic mathematics course",
-                        "nullable": true
-                    },
-                    "type": {
-                        "description": "The type of the lesson",
-                        "type": "string",
-                        "enum": [
-                            "online",
-                            "offline",
-                            "video"
-                        ],
-                        "example": "online"
-                    },
-                    "price": {
-                        "description": "The price of the lesson",
-                        "type": "string",
-                        "format": "float",
-                        "example": 99.99
-                    },
-                    "image_url": {
-                        "description": "The image of the lesson",
-                        "type": "string",
-                        "format": "uri",
-                        "example": "https://example.com/images/course1.png",
-                        "nullable": true
-                    },
-                    "is_published": {
-                        "description": "The status of the lesson",
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "created_at": {
-                        "description": "The creation date of the lesson",
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2026-01-20T12:00:00Z"
-                    },
-                    "updated_at": {
-                        "description": "The modification date of the course",
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2026-01-25T12:00:00Z"
-                    }
-                },
-                "type": "object"
-            },
-            "Course": {
-                "title": "Course schema",
-                "description": "Details of a course returned by the API",
-                "required": [
-                    "data"
-                ],
-                "properties": {
-                    "data": {
-                        "$ref": "#/components/schemas/CourseData"
-                    }
-                },
-                "type": "object"
-            },
             "LessonCollection": {
                 "title": "Lesson collection",
                 "description": "Collection of lessons",
@@ -2053,8 +1764,8 @@
             "description": "Auth"
         },
         {
-            "name": "Courses",
-            "description": "Courses"
+            "name": "Course",
+            "description": "Course"
         },
         {
             "name": "Lessons",

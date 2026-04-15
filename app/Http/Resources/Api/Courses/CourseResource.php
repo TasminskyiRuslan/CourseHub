@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\Courses;
 
+use App\Http\Resources\Api\Lessons\LessonResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
@@ -22,8 +23,9 @@ use Illuminate\Support\Facades\Storage;
  */
 class CourseResource extends JsonResource
 {
-
     /**
+     * Transform the resource into an array.
+     *
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
@@ -31,7 +33,7 @@ class CourseResource extends JsonResource
         return [
             'id' => $this->id,
             'author_id' => $this->author_id,
-            'author' => new AuthorResource($this->whenLoaded('author')),
+            'author' => AuthorResource::make($this->whenLoaded('author')),
             'title' => $this->title,
             'slug' => $this->slug,
             'description' => $this->description,
@@ -39,6 +41,8 @@ class CourseResource extends JsonResource
             'price' => $this->price,
             'image_url' => $this->image_path ? Storage::disk('public')->url($this->image_path) : null,
             'is_published' => $this->is_published,
+            'lessons_count' => $this->whenCounted('lessons_count'),
+            'lessons' => LessonResource::collection($this->whenLoaded('lessons')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -1,22 +1,28 @@
 <?php
 
-namespace App\Data\Courses;
+namespace App\Data\Course\Requests;
 
-use App\Data\Casts\SlugCast;
 use App\Enums\CourseType;
 use Spatie\LaravelData\Attributes\Validation\Enum;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\Numeric;
+use Spatie\LaravelData\Attributes\Validation\Regex;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\Unique;
-use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Data;
 
 class CreateCourseData extends Data
 {
+    /**
+     * @param string $title
+     * @param string|null $slug
+     * @param string|null $description
+     * @param CourseType $type
+     * @param string $price
+     */
     public function __construct(
         #[Required]
         #[StringType]
@@ -26,15 +32,17 @@ class CreateCourseData extends Data
         #[Nullable]
         #[StringType]
         #[Max(255)]
-        #[WithCast(SlugCast::class)]
-        #[Unique('courses', 'slug')]
+        #[Unique(table: 'courses', column: 'slug')]
+        #[Regex('/^[a-z0-9-]+$/')]
         public ?string    $slug,
 
         #[Nullable]
         #[StringType]
+        #[Max(5000)]
         public ?string    $description,
 
         #[Required]
+        #[StringType]
         #[Enum(CourseType::class)]
         public CourseType $type,
 

@@ -17,7 +17,7 @@ describe('CourseController -> store', function () {
         $this->unverifiedTeacher = User::factory()->teacher()->unverified()->create();
 
         $this->makePayload = fn(array $overrides = []) => array_merge([
-            'title' => 'New Laravel CourseDataSchema',
+            'title' => 'New Laravel CourseResponseSchema',
             'slug' => null,
             'description' => 'Comprehensive course on Laravel',
             'type' => CourseType::ONLINE->value,

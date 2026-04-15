@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Swagger\Requests\Courses;
+namespace App\Swagger\Course\Requests;
 
 use App\Enums\CourseType;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
     schema: 'StoreCourseRequest',
-    title: 'Store course request schema',
-    description: 'Schema for creating a new course via API request',
+    title: 'Store Course Request',
+    description: 'Request payload for creating a new course.',
     required: ['title', 'type', 'price'],
     properties: [
         new OA\Property(
@@ -23,6 +23,7 @@ use OpenApi\Attributes as OA;
             description: 'The slug of the new course',
             type: 'string',
             maxLength: 255,
+            pattern: '^[a-z0-9-]+$',
             example: 'math-101',
             nullable: true
         ),
@@ -30,6 +31,7 @@ use OpenApi\Attributes as OA;
             property: 'description',
             description: 'The description of the new course',
             type: 'string',
+            maxLength: 5000,
             example: 'A basic mathematics course',
             nullable: true
         ),
@@ -42,7 +44,8 @@ use OpenApi\Attributes as OA;
                 CourseType::ONLINE->value,
                 CourseType::VIDEO->value,
             ],
-            example: CourseType::ONLINE->value
+            example: CourseType::ONLINE->value,
+            nullable: false
         ),
         new OA\Property(
             property: 'price',

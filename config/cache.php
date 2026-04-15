@@ -114,4 +114,8 @@ return [
 
     'prefix' => env('CACHE_PREFIX', Str::slug((string)env('APP_NAME', 'laravel')) . '-cache-'),
 
+    'ttl' => [
+        'course' => env('COURSE_CACHE_TTL', 86400),
+        'lesson'   => env('LESSON_CACHE_TTL', 86400),
+    ],
 ];

@@ -2,8 +2,8 @@
 
 namespace App\Services\Courses;
 
-use App\Data\Courses\CreateCourseData;
-use App\Data\Courses\UpdateCourseData;
+use App\Data\Courses\Requests\CreateCourseData;
+use App\Data\Courses\Requests\UpdateCourseData;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;

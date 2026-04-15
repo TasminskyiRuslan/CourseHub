@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Courses;
+namespace App\Http\Controllers\Api\Course;
 
 use App\Http\Controllers\Controller;
 use App\Models\Course;
@@ -20,7 +20,7 @@ class UnpublishCourseController extends Controller
         description: 'Unpublish a specific course.',
         summary: 'Unpublish course',
         security: [['sanctum' => []]],
-        tags: ['Courses'],
+        tags: ['Course'],
         parameters: [
             new OA\Parameter(
                 name: 'course',

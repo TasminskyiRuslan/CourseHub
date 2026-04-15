@@ -11,6 +11,7 @@
 |
 */
 
+use App\Enums\CourseType;
 use App\Enums\UserRole;
 
 pest()->extend(Tests\TestCase::class)
@@ -75,6 +76,105 @@ function authJsonStructure(): array {
         'access_token',
         'token_type',
         'expires_at',
+    ];
+}
+
+/**
+ * Get the expected JSON structure for an author object.
+ *
+ * @return array
+ */
+function authorJsonStructure(): array {
+    return [
+        'id',
+        'name',
+        'slug',
+    ];
+}
+
+/**
+ * Get the expected JSON structure for a lesson object.
+ *
+ * @param CourseType|null $courseType
+ * @return array
+ */
+function lessonJsonStructure(?CourseType $courseType = null): array {
+    return [
+        'id',
+        'course_id',
+        'title',
+        'slug',
+        'position',
+        'content' => match ($courseType) {
+            CourseType::OFFLINE => [
+                'start_time',
+                'end_time',
+                'address',
+                'room_number'
+            ],
+            CourseType::ONLINE => [
+                'start_time',
+                'end_time',
+                'meeting_link',
+            ],
+            CourseType::VIDEO => [
+                'video_url',
+                'provider',
+            ],
+            null => [],
+        },
+        'created_at',
+        'updated_at',
+    ];
+}
+
+/**
+ * Get the expected JSON structure for a course object.
+ *
+ * @param bool $withAuthor
+ * @param bool $withLessonsCount
+ * @param bool $withLessons
+ * @param CourseType|null $courseType
+ * @return array
+ */
+function courseJsonStructure(bool $withAuthor = false, bool $withLessonsCount = false, bool $withLessons = false, ?CourseType $courseType = null): array {
+    $base = [
+        'id',
+        'author_id',
+        'title',
+        'slug',
+        'description',
+        'type',
+        'price',
+        'image_url',
+        'is_published',
+        'created_at',
+        'updated_at',
+    ];
+    if ($withAuthor) {
+        $base['author'] = authorJsonStructure();
+    }
+    if ($withLessonsCount) {
+        $base[] = 'lessons_count';
+    }
+    if ($withLessons) {
+        $base['lessons'] = [
+            '*' => lessonJsonStructure($courseType),
+        ];;
+    }
+    return $base;
+}
+
+/**
+ * Get the expected JSON structure for a pagination data.
+ *
+ * @return array
+ */
+function paginationJsonStructure(): array {
+    return [
+        'data',
+        'links',
+        'meta'
     ];
 }
 

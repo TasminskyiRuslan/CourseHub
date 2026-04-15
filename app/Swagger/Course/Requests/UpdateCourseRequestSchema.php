@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Swagger\Requests\Courses;
+namespace App\Swagger\Course\Requests;
 
 use OpenApi\Attributes as OA;
 

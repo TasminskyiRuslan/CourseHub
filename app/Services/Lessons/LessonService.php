@@ -2,8 +2,8 @@
 
 namespace App\Services\Lessons;
 
-use App\Data\Lessons\CreateLessonData;
-use App\Data\Lessons\UpdateLessonData;
+use App\Data\Lesson\CreateLessonData;
+use App\Data\Lesson\UpdateLessonData;
 use App\Models\Course;
 use App\Models\Lesson;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;

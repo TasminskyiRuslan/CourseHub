@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Swagger\Requests\Courses;
+namespace App\Swagger\Course\Requests;
 
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
     schema: 'UpdateCourseImageRequest',
-    title: 'Update course image request schema',
-    description: 'Schema for updating a course image. Supports common image formats up to 2MB',
+    title: 'Update Course Image Request',
+    description: 'Request payload for updating a course image.',
     required: ['image'],
     properties: [
         new OA\Property(

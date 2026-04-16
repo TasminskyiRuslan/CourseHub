@@ -20,7 +20,7 @@ describe('CourseController -> store', function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Permissions
+    | permissions
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
@@ -43,7 +43,7 @@ describe('CourseController -> store', function () {
 
         it('allows users with course:create to create a course', function ($user) {
             if ($user) {
-                Sanctum::actingAs($user, ['*'], 'sanctum');
+                Sanctum::actingAs($user);
             }
             $data = coursePayload();
 
@@ -67,10 +67,6 @@ describe('CourseController -> store', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-        beforeEach(function () {
-            Sanctum::actingAs(User::factory()->teacher()->create());
-        });
-
         it('fails if required fields are missing', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
@@ -121,6 +117,8 @@ describe('CourseController -> store', function () {
         });
 
         it('fails if slug is not unique', function () {
+            $teacher = User::factory()->teacher()->create();
+            Sanctum::actingAs($teacher);
             Course::factory()->create(['slug' => 'existing-slug']);
 
             postJson(route('course.store'), coursePayload(['slug' => 'existing-slug']))
@@ -129,9 +127,22 @@ describe('CourseController -> store', function () {
         });
 
         it('fails if slug format is invalid', function () {
+            $teacher = User::factory()->teacher()->create();
+            Sanctum::actingAs($teacher);
+
             postJson(route('course.store'), coursePayload(['slug' => 'Invalid Slug!']))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['slug']);
+        });
+
+        it('succeeds if a slug is provided manually', function () {
+            $teacher = User::factory()->teacher()->create();
+            Sanctum::actingAs($teacher);
+            $slug = 'test-slug';
+
+            postJson(route('course.store'), coursePayload(['slug' => $slug]))
+                ->assertCreated()
+                ->assertJsonFragment(['slug' => $slug]);
         });
     });
 

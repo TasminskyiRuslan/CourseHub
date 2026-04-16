@@ -440,6 +440,56 @@
                 ]
             }
         },
+        "/courses/{course}": {
+            "get": {
+                "tags": [
+                    "Course"
+                ],
+                "summary": "Retrieve course details",
+                "description": "Retrieve detailed information about a specific course.",
+                "operationId": "ac9df8579adf9db70c70ca96b5800656",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Course details retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CourseResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course not found."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    },
+                    {}
+                ]
+            }
+        },
         "/courses/{course}/publish": {
             "patch": {
                 "tags": [

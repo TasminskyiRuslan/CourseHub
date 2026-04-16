@@ -143,44 +143,59 @@ class CourseController extends Controller
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_CREATED);
     }
-//
-//    #[OA\Get(
-//        path: '/courses/{course}',
-//        description: 'Retrieve a specific course.',
-//        summary: 'Get course',
-//        security: [['sanctum' => []], []],
-//        tags: ['Course'],
-//        parameters: [
-//            new OA\Parameter(
-//                name: 'course',
-//                description: 'Course identifier (slug)',
-//                in: 'path',
-//                required: true,
-//                schema: new OA\Schema(type: 'string')
-//            )
-//        ],
-//        responses: [
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_OK,
-//                description: 'Course details',
-//                content: new OA\JsonContent(ref: '#/components/schemas/Course')
-//            ),
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_FORBIDDEN,
-//                description: 'Access denied'
-//            ),
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_NOT_FOUND,
-//                description: 'Course not found'
-//            ),
-//        ]
-//    )]
-//    public function show(Course $course): CourseResource
-//    {
-//        $this->authorize('view', $course);
-//        return new CourseResource($course->loadMissing('author'));
-//    }
-//
+
+    #[OA\Get(
+        path: '/courses/{course}',
+        description: 'Retrieve detailed information about a specific course.',
+        summary: 'Retrieve course details',
+        security: [['sanctum' => []], []],
+        tags: ['Course'],
+        parameters: [
+            new OA\Parameter(
+                name: 'course',
+                description: 'Course identifier (slug)',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: SymfonyResponse::HTTP_OK,
+                description: 'Course details retrieved successfully.',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/CourseResponse'
+                        )
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+                description: 'User does not have permissions.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_NOT_FOUND,
+                description: 'Course not found.'
+            ),
+        ]
+    )]
+    /**
+     * Retrieve detailed information about a specific course.
+     *
+     * @param Course $course
+     * @return JsonResponse
+     */
+    public function show(Course $course): JsonResponse
+    {
+        $this->authorize('view', $course);
+        return CourseResource::make($course->loadCount('lessons')->loadMissing(['author', 'lessons']))
+            ->response()
+            ->setStatusCode(SymfonyResponse::HTTP_OK);
+    }
+
 //    #[OA\Put(
 //        path: '/courses/{course}',
 //        description: 'Update a specific course.',

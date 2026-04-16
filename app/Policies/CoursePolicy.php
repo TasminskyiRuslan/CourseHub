@@ -8,18 +8,31 @@ use App\Models\User;
 
 class CoursePolicy
 {
+    /**
+     * Determine whether the user can view the list of courses.
+     *
+     * @param User|null $user
+     * @return bool
+     */
     public function viewAny(?User $user): bool
     {
         return true;
     }
 
+    /**
+     * Determine whether the user can view the specific course's details.
+     *
+     * @param User|null $user
+     * @param Course $course
+     * @return bool
+     */
     public function view(?User $user, Course $course): bool
     {
         if ($course->is_published) {
             return true;
         }
 
-        if (! $user) {
+        if (!$user) {
             return false;
         }
 
@@ -30,6 +43,12 @@ class CoursePolicy
         return $user->can(UserPermission::COURSE_VIEW_UNPUBLISHED->value);
     }
 
+    /**
+     * Determine whether the user can create courses.
+     *
+     * @param User $user
+     * @return bool
+     */
     public function create(User $user): bool
     {
         return $user->can(UserPermission::COURSE_CREATE->value);

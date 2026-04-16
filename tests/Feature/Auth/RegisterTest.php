@@ -92,14 +92,14 @@ describe('RegisterController', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-        it('registers a user and return an access token if the role is a student', function () {
+        it('registers users and return an access token', function ($role) {
             Event::fake();
-            $data = registrationPayload(['role' => UserRole::STUDENT->value]);
+            $data = registrationPayload(['role' => $role->value]);
 
             postJson(route('auth.register'), $data)
                 ->assertCreated()
                 ->assertJsonFragment(['email' => $data['email']])
-                ->assertJsonFragment(['role' => UserRole::STUDENT->value])
+                ->assertJsonFragment(['role' => $role->value])
                 ->assertJsonStructure([
                     'data' => authJsonStructure(),
                 ]);
@@ -107,24 +107,11 @@ describe('RegisterController', function () {
             expect($user)->not->toBeNull()
                 ->and(Hash::check($data['password'], $user->password))->toBeTrue();
             Event::assertDispatched(Registered::class, fn($event) => $event->user->email === $data['email']);
-        });
-
-        it('registers a user and return an access token if the role is a teacher', function () {
-            Event::fake();
-            $data = registrationPayload(['role' => UserRole::TEACHER->value]);
-
-            postJson(route('auth.register'), $data)
-                ->assertCreated()
-                ->assertJsonFragment(['email' => $data['email']])
-                ->assertJsonFragment(['role' => UserRole::TEACHER->value])
-                ->assertJsonStructure([
-                    'data' => authJsonStructure(),
-                ]);
-            $user = User::whereEmail($data['email'])->first();
-            expect($user)->not->toBeNull()
-                ->and(Hash::check($data['password'], $user->password))->toBeTrue();
-            Event::assertDispatched(Registered::class, fn($event) => $event->user->email === $data['email']);
-        });
+        })
+        ->with([
+            'student role' => UserRole::STUDENT,
+            'teacher role' => UserRole::TEACHER,
+        ]);
 
         it('sets a short token expiration by default', function () {
             $response = postJson(route('auth.register'), registrationPayload())

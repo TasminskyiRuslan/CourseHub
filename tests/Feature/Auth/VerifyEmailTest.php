@@ -4,6 +4,7 @@ use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 use function Pest\Laravel\getJson;
@@ -14,6 +15,7 @@ describe('VerifyEmailController', function () {
 
     beforeEach(function () {
         $this->seed(RolesAndPermissionsSeeder::class);
+        $this->withoutMiddleware(ThrottleRequests::class);
     });
 
     /*
@@ -67,39 +69,26 @@ describe('VerifyEmailController', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-        it('verifies the email for a student', function () {
+        it('verifies the email for user', function ($user) {
             Event::fake();
-            $student = User::factory()->unverified()->student()->create();
             getJson(URL::temporarySignedRoute(
                 'verification.verify',
                 now()->addMinutes(60),
                 [
-                    'id' => $student->id,
-                    'hash' => sha1($student->getEmailForVerification()),
+                    'id' => $user->id,
+                    'hash' => sha1($user->getEmailForVerification()),
                 ]
             ))
                 ->assertNoContent();
 
-            expect($student->fresh()->hasVerifiedEmail())->toBeTrue();
-            Event::assertDispatched(Verified::class, fn($event) => $event->user->id === $student->id);
-        });
-
-        it('verifies the email for a teacher', function () {
-            Event::fake();
-            $teacher = User::factory()->unverified()->teacher()->create();
-            getJson(URL::temporarySignedRoute(
-                'verification.verify',
-                now()->addMinutes(60),
-                [
-                    'id' => $teacher->id,
-                    'hash' => sha1($teacher->getEmailForVerification()),
-                ]
-            ))
-                ->assertNoContent();
-
-            expect($teacher->fresh()->hasVerifiedEmail())->toBeTrue();
-            Event::assertDispatched(Verified::class, fn($event) => $event->user->id === $teacher->id);
-        });
+            expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
+            Event::assertDispatched(Verified::class, fn($event) => $event->user->id === $user->id);
+        })
+            ->with([
+                'student' => fn() => User::factory()->unverified()->student()->create(),
+                'teacher' => fn() => User::factory()->unverified()->teacher()->create(),
+                'admin' => fn() => User::factory()->unverified()->admin()->create(),
+            ]);
 
         it('does nothing if the email is already verified', function () {
             Event::fake();

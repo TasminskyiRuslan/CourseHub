@@ -16,21 +16,24 @@ use OpenApi\Attributes as OA;
             type: 'string',
             format: 'email',
             maxLength: 255,
-            example: 'john@example.com'
+            example: 'john@example.com',
+            nullable: false
         ),
         new OA\Property(
             property: 'password',
             description: 'Account password of the user.',
             type: 'string',
             format: 'password',
-            example: 'password123'
+            example: 'password123',
+            nullable: false
         ),
         new OA\Property(
             property: 'remember',
             description: 'Remember me flag of the user.',
             type: 'boolean',
             default: false,
-            example: true
+            example: true,
+            nullable: false
         ),
     ],
     type: 'object'

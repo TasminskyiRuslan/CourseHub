@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers\Api\Course;
 
-use App\Data\Courses\Requests\CreateCourseData;
-use App\Data\Courses\Requests\UpdateCourseData;
-use App\Enums\UserPermission;
+use App\Actions\Course\CreateCourseAction;
+use App\Data\Course\Requests\CreateCourseData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Courses\CourseResource;
 use App\Models\Course;
@@ -12,10 +11,6 @@ use App\Queries\Course\CourseListQuery;
 use App\Services\Courses\CourseService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Cache;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Throwable;
@@ -101,46 +96,53 @@ class CourseController extends Controller
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
-//
-//    #[OA\Post(
-//        path: '/courses',
-//        description: 'Create a new course.',
-//        summary: 'Create course',
-//        security: [['sanctum' => []]],
-//        requestBody: new OA\RequestBody(
-//            required: true,
-//            content: new OA\JsonContent(ref: '#/components/schemas/StoreCourseRequest')
-//        ),
-//        tags: ['Course'],
-//        responses: [
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_CREATED,
-//                description: 'Course created',
-//                content: new OA\JsonContent(ref: '#/components/schemas/Course')
-//            ),
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
-//                description: 'Validation error'
-//            ),
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_UNAUTHORIZED,
-//                description: 'Authentication required'
-//            ),
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_FORBIDDEN,
-//                description: 'Access denied'
-//            ),
-//        ]
-//    )]
-//    /**
-//     * @throws Throwable
-//     */
-//    public function store(Request $request, CreateCourseData $data): CourseResource
-//    {
-//        $this->authorize('create', Course::class);
-//        $newCourse = $this->courseService->create($data, $request->user());
-//        return new CourseResource($newCourse);
-//    }
+
+    #[OA\Post(
+        path: '/courses',
+        description: 'Create a new course.',
+        summary: 'Create a course',
+        security: [['sanctum' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: '#/components/schemas/CreateCourseRequest')
+        ),
+        tags: ['Course'],
+        responses: [
+            new OA\Response(
+                response: SymfonyResponse::HTTP_CREATED,
+                description: 'Course created successfully.',
+                content: new OA\JsonContent(ref: '#/components/schemas/CourseResponse')
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+                description: 'User is unauthenticated.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_FORBIDDEN,
+                description: 'User does not have permissions.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
+                description: 'Validation error.'
+            ),
+        ]
+    )]
+    /**
+     * Create a new course.
+     *
+     * @param CreateCourseData $courseData
+     * @param CreateCourseAction $createCourseAction
+     * @return JsonResponse
+     * @throws Throwable
+     */
+    public function store(CreateCourseData $courseData, CreateCourseAction $createCourseAction): JsonResponse
+    {
+        $this->authorize('create', Course::class);
+        $course = $createCourseAction->handle($courseData, auth()->user());
+        return CourseResource::make($course->loadCount('lessons')->loadMissing(['author', 'lessons']))
+            ->response()
+            ->setStatusCode(SymfonyResponse::HTTP_CREATED);
+    }
 //
 //    #[OA\Get(
 //        path: '/courses/{course}',

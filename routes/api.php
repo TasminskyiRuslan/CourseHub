@@ -66,7 +66,7 @@ Route::prefix('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::prefix('courses')->group(function () {
-    // CourseResponseSchema actions
+    // Course actions
     Route::get('/', [CourseController::class, 'index'])
         ->name('course.index');
     Route::post('/', [CourseController::class, 'store'])
@@ -82,7 +82,7 @@ Route::prefix('courses')->group(function () {
         ->name('course.destroy');
 
     Route::prefix('{course}')->scopeBindings()->group(function () {
-        // CourseResponseSchema image actions
+        // Course image actions
         Route::prefix('image')->group(function () {
             Route::patch('/', [CourseImageController::class, 'update'])
                 ->middleware(['auth:sanctum', 'verified'])

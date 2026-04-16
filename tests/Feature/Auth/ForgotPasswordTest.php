@@ -4,6 +4,7 @@ use App\Enums\UserRole;
 use App\Models\User;
 use App\Notifications\QueuedResetPasswordNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Notification;
@@ -15,6 +16,7 @@ describe('ForgotPasswordController', function () {
     beforeEach(function () {
         $this->withoutMiddleware(ThrottleRequests::class);
         $this->seed(RolesAndPermissionsSeeder::class);
+        $this->seed(SuperAdminUserSeeder::class);
     });
 
     /*
@@ -52,9 +54,8 @@ describe('ForgotPasswordController', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-        it('sends a reset link to a verified user', function () {
+        it('sends a reset link to verify user', function ($user) {
             Notification::fake();
-            $user = User::factory()->verified()->create();
 
             postJson(route('password.forgot'), [
                 'email' => $user->email,
@@ -69,35 +70,15 @@ describe('ForgotPasswordController', function () {
             $this->assertDatabaseHas('password_reset_tokens', [
                 'email' => $user->email,
             ]);
-        });
-
-        it('sends a reset link to an unverified user', function () {
-            Notification::fake();
-            $user = User::factory()->unverified()->create();
-
-            postJson(route('password.forgot'), [
-                'email' => $user->email,
-            ])->assertNoContent();
-
-            Notification::assertSentTo(
-                $user,
-                QueuedResetPasswordNotification::class,
-                fn($notification) => !empty($notification->token)
-            );
-
-            $this->assertDatabaseHas('password_reset_tokens', [
-                'email' => $user->email,
-            ]);
-        });
+        })
+        ->with([
+            'verified user' => fn() => User::factory()->verified()->create(),
+            'unverified user' => fn() => User::factory()->unverified()->create(),
+        ]);
 
         it('silently succeeds if the role is super-admin', function () {
             Notification::fake();
-            $superAdmin = User::factory()->create([
-                'name' => config('super-admin.name'),
-                'email' => config('super-admin.email'),
-                'password' => config('super-admin.password')
-            ]);
-            $superAdmin->assignRole(UserRole::SUPER_ADMIN->value);
+            $superAdmin = User::whereEmail(config('super-admin.email'))->first();
 
             postJson(route('password.forgot'), [
                 'email' => $superAdmin->email,

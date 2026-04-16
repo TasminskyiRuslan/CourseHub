@@ -43,8 +43,8 @@ describe('CourseController -> index', function () {
                 ->assertJsonCount($publishedCourses->count(), 'data');
         })->with([
             'guest' => null,
-            'unverified user' => fn() => User::factory()->unverified()->create(),
-            'verified student' => fn() => User::factory()->verified()->create(),
+            'unverified student' => fn() => User::factory()->student()->unverified()->create(),
+            'verified student' => fn() => User::factory()->student()->verified()->create(),
         ]);
 
         it('allows the author to retrieve their own unpublished courses', function () {
@@ -64,8 +64,6 @@ describe('CourseController -> index', function () {
             if ($user) {
                 Sanctum::actingAs($user);
             }
-            $admin = User::factory()->admin()->create();
-            Sanctum::actingAs($admin);
 
             $publishedCourses = Course::factory()->count(2)->published()->create();
             $unpublishedCourses = Course::factory()->count(3)->unpublished()->create();
@@ -168,13 +166,13 @@ describe('CourseController -> index', function () {
         });
 
         it('includes author, lessons_count, lessons by using the include query parameter', function () {
-            Course::factory()->published()->type(CourseType::OFFLINE)->count(3)->create();
+            $courses = Course::factory()->published()->type(CourseType::OFFLINE)->count(3)->create();
 
             getJson(route('course.index', ['include' => 'author,lessons_count,lessons']))
                 ->assertOk()
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: CourseType::OFFLINE)
+                        '*' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $courses->first()->type)
                     ]
                 ]);
         });
@@ -199,7 +197,7 @@ describe('CourseController -> index', function () {
 
             getJson(route('course.index'))->assertOk();
             Cache::shouldHaveReceived('tags')
-                ->with(['course'])
+                ->with([config('cache.tags.course')])
                 ->once();
         });
 

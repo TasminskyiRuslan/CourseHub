@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\CourseType;
 use App\Enums\UserPermission;
 use App\Enums\UserRole;
+use App\Observers\Course\CourseObserver;
 use Database\Factories\CourseFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
@@ -99,9 +100,7 @@ class Course extends Model
      */
     protected static function booted(): void
     {
-        static::deleting(function (Course $course) {
-            $course->lessons->each->delete();
-        });
+        static::observe(CourseObserver::class);
     }
 
     /**

@@ -394,6 +394,50 @@
                     },
                     {}
                 ]
+            },
+            "post": {
+                "tags": [
+                    "Course"
+                ],
+                "summary": "Create a course",
+                "description": "Create a new course.",
+                "operationId": "b923cafaec6b13f5d12afd86e8a55be9",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCourseRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Course created successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CourseResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
         "/courses/{course}/publish": {
@@ -798,7 +842,8 @@
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
-                        "example": "john@example.com"
+                        "example": "john@example.com",
+                        "nullable": false
                     }
                 },
                 "type": "object"
@@ -816,19 +861,22 @@
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
-                        "example": "john@example.com"
+                        "example": "john@example.com",
+                        "nullable": false
                     },
                     "password": {
                         "description": "Account password of the user.",
                         "type": "string",
                         "format": "password",
-                        "example": "password123"
+                        "example": "password123",
+                        "nullable": false
                     },
                     "remember": {
                         "description": "Remember me flag of the user.",
                         "type": "boolean",
                         "default": false,
-                        "example": true
+                        "example": true,
+                        "nullable": false
                     }
                 },
                 "type": "object"
@@ -849,28 +897,32 @@
                         "type": "string",
                         "maxLength": 100,
                         "minLength": 2,
-                        "example": "John Doe"
+                        "example": "John Doe",
+                        "nullable": false
                     },
                     "email": {
                         "description": "Email address of the user.",
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
-                        "example": "john@example.com"
+                        "example": "john@example.com",
+                        "nullable": false
                     },
                     "password": {
                         "description": "Account password of the user.",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
-                        "example": "password123"
+                        "example": "password123",
+                        "nullable": false
                     },
                     "password_confirmation": {
                         "description": "Password confirmation of the user. (must match password)",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
-                        "example": "password123"
+                        "example": "password123",
+                        "nullable": false
                     },
                     "role": {
                         "description": "Role of the user.",
@@ -879,7 +931,8 @@
                             "student",
                             "teacher"
                         ],
-                        "example": "student"
+                        "example": "student",
+                        "nullable": false
                     }
                 },
                 "type": "object"
@@ -899,26 +952,30 @@
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
-                        "example": "john@example.com"
+                        "example": "john@example.com",
+                        "nullable": false
                     },
                     "password": {
                         "description": "Account password of the user.",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
-                        "example": "newPassword123"
+                        "example": "newPassword123",
+                        "nullable": false
                     },
                     "password_confirmation": {
                         "description": "Password confirmation of the user. (must match password)",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
-                        "example": "newPassword123"
+                        "example": "newPassword123",
+                        "nullable": false
                     },
                     "token": {
                         "description": "Password reset token received via email.",
                         "type": "string",
-                        "example": "66006454322443..."
+                        "example": "66006454322443...",
+                        "nullable": false
                     }
                 },
                 "type": "object"
@@ -1007,8 +1064,8 @@
                 },
                 "type": "object"
             },
-            "StoreCourseRequest": {
-                "title": "Store Course Request",
+            "CreateCourseRequest": {
+                "title": "Create Course Request",
                 "description": "Request payload for creating a new course.",
                 "required": [
                     "title",
@@ -1017,13 +1074,14 @@
                 ],
                 "properties": {
                     "title": {
-                        "description": "The title of the new course",
+                        "description": "Title of the course",
                         "type": "string",
                         "maxLength": 255,
-                        "example": "Math 101"
+                        "example": "Math 101",
+                        "nullable": false
                     },
                     "slug": {
-                        "description": "The slug of the new course",
+                        "description": "Slug of the course",
                         "type": "string",
                         "maxLength": 255,
                         "pattern": "^[a-z0-9-]+$",
@@ -1031,14 +1089,14 @@
                         "nullable": true
                     },
                     "description": {
-                        "description": "The description of the new course",
+                        "description": "Description of the course",
                         "type": "string",
                         "maxLength": 5000,
                         "example": "A basic mathematics course",
                         "nullable": true
                     },
                     "type": {
-                        "description": "The type of the new course",
+                        "description": "Type of the course",
                         "type": "string",
                         "enum": [
                             "offline",
@@ -1049,12 +1107,13 @@
                         "nullable": false
                     },
                     "price": {
-                        "description": "The price of the new course",
+                        "description": "Price of the course",
                         "type": "string",
                         "format": "float",
                         "maximum": 99999999.99,
                         "minimum": 0,
-                        "example": 199.99
+                        "example": 199.99,
+                        "nullable": false
                     }
                 },
                 "type": "object"

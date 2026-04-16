@@ -13,6 +13,7 @@ uses(RefreshDatabase::class);
 
 describe('ResendVerificationEmailController', function () {
     beforeEach(function () {
+        $this->withoutMiddleware(ThrottleRequests::class);
         $this->seed(RolesAndPermissionsSeeder::class);
     });
 

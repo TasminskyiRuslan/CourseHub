@@ -3,6 +3,7 @@
 use App\Enums\UserRole;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -13,6 +14,7 @@ uses(RefreshDatabase::class);
 describe('ResetPasswordController', function () {
     beforeEach(function () {
         $this->seed(RolesAndPermissionsSeeder::class);
+        $this->seed(SuperAdminUserSeeder::class);
     });
 
     /*
@@ -102,59 +104,28 @@ describe('ResetPasswordController', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('allows a student to reset password', function () {
+        it('allows users to reset password', function ($user) {
             $newPassword = 'new-password';
-            $student = User::factory()->student()->create();
 
             postJson(route('password.reset'), [
-                'email' => $student->email,
+                'email' => $user->email,
                 'password' => $newPassword,
                 'password_confirmation' => $newPassword,
-                'token' => Password::createToken($student),
+                'token' => Password::createToken($user),
             ])
                 ->assertNoContent();
-            $student->refresh();
-            expect(Hash::check($newPassword, $student->password))->toBeTrue();
-        });
-
-        it('allows a teacher to reset password', function () {
-            $newPassword = 'new-password';
-            $teacher = User::factory()->teacher()->create();
-
-            postJson(route('password.reset'), [
-                'email' => $teacher->email,
-                'password' => $newPassword,
-                'password_confirmation' => $newPassword,
-                'token' => Password::createToken($teacher),
-            ])
-                ->assertNoContent();
-            $teacher->refresh();
-            expect(Hash::check($newPassword, $teacher->password))->toBeTrue();
-        });
-
-        it('allows an admin to reset password', function () {
-            $newPassword = 'new-password';
-            $admin = User::factory()->admin()->create();
-
-            postJson(route('password.reset'), [
-                'email' => $admin->email,
-                'password' => $newPassword,
-                'password_confirmation' => $newPassword,
-                'token' => Password::createToken($admin),
-            ])
-                ->assertNoContent();
-            $admin->refresh();
-            expect(Hash::check($newPassword, $admin->password))->toBeTrue();
-        });
+            $user->refresh();
+            expect(Hash::check($newPassword, $user->password))->toBeTrue();
+        })
+            ->with([
+                'student' => fn() => User::factory()->student()->create(),
+                'teacher' => fn() => User::factory()->teacher()->create(),
+                'admin' => fn() => User::factory()->admin()->create(),
+            ]);
 
         it('fails if a super-admin tries to reset password', function () {
             $newPassword = 'new-password';
-            $superAdmin = User::factory()->create([
-                'name' => config('super-admin.name'),
-                'email' => config('super-admin.email'),
-                'password' => config('super-admin.password')
-            ]);
-            $superAdmin->assignRole(UserRole::SUPER_ADMIN->value);
+            $superAdmin = User::whereEmail(config('super-admin.email'))->first();
 
             postJson(route('password.reset'), [
                 'email' => $superAdmin->email,

@@ -15,12 +15,24 @@ class CoursePolicy
 
     public function view(?User $user, Course $course): bool
     {
-        return $course->is_published || $user && ($user->isAuthorOf($course) || $user->hasPermissionTo(UserPermission::COURSE_VIEW_UNPUBLISHED->value));
+        if ($course->is_published) {
+            return true;
+        }
+
+        if (! $user) {
+            return false;
+        }
+
+        if ($user->isAuthorOf($course)) {
+            return true;
+        }
+
+        return $user->can(UserPermission::COURSE_VIEW_UNPUBLISHED->value);
     }
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo(UserPermission::COURSE_CREATE->value) && $user->hasVerifiedEmail();
+        return $user->can(UserPermission::COURSE_CREATE->value);
     }
 
     public function update(User $user, Course $course): bool

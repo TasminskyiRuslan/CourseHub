@@ -20,7 +20,6 @@ class CourseListQuery
      * Handle the request and return results with or without caching based on user permissions.
      *
      * @return LengthAwarePaginator
-     * @throws AuthenticationException
      */
     public function handle(): LengthAwarePaginator
     {
@@ -29,7 +28,7 @@ class CourseListQuery
             return $this->get($user);
         }
 
-        return Cache::tags(['course'])->remember(md5(http_build_query(request()->only('page', 'filter', 'sort', 'include'))), config('cache.ttl.course'), function () use ($user) {
+        return Cache::tags([config('cache.tags.course')])->remember(md5(http_build_query(request()->only('page', 'filter', 'sort', 'include'))), config('cache.ttl.course'), function () use ($user) {
             return $this->get($user);
         });
     }

@@ -6,21 +6,22 @@ use App\Enums\CourseType;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
-    schema: 'StoreCourseRequest',
-    title: 'Store Course Request',
+    schema: 'CreateCourseRequest',
+    title: 'Create Course Request',
     description: 'Request payload for creating a new course.',
     required: ['title', 'type', 'price'],
     properties: [
         new OA\Property(
             property: 'title',
-            description: 'The title of the new course',
+            description: 'Title of the course',
             type: 'string',
             maxLength: 255,
-            example: 'Math 101'
+            example: 'Math 101',
+            nullable: false,
         ),
         new OA\Property(
             property: 'slug',
-            description: 'The slug of the new course',
+            description: 'Slug of the course',
             type: 'string',
             maxLength: 255,
             pattern: '^[a-z0-9-]+$',
@@ -29,7 +30,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'description',
-            description: 'The description of the new course',
+            description: 'Description of the course',
             type: 'string',
             maxLength: 5000,
             example: 'A basic mathematics course',
@@ -37,7 +38,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'type',
-            description: 'The type of the new course',
+            description: 'Type of the course',
             type: 'string',
             enum: [
                 CourseType::OFFLINE->value,
@@ -49,16 +50,17 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'price',
-            description: 'The price of the new course',
+            description: 'Price of the course',
             type: 'string',
             format: 'float',
             maximum: 99999999.99,
             minimum: 0,
-            example: 199.99
+            example: 199.99,
+            nullable: false
         ),
     ],
     type: 'object'
 )]
-class StoreCourseRequestSchema
+class CreateCourseRequestSchema
 {
 }

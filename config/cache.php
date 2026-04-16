@@ -118,4 +118,9 @@ return [
         'course' => env('COURSE_CACHE_TTL', 86400),
         'lesson'   => env('LESSON_CACHE_TTL', 86400),
     ],
+
+    'tags' => [
+        'course' => env('COURSE_CACHE_TAG', 'course'),
+        'lesson' => env('LESSON_CACHE_TAG', 'lesson'),
+    ]
 ];

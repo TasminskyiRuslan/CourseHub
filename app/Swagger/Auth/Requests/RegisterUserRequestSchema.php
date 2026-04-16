@@ -17,7 +17,8 @@ use OpenApi\Attributes as OA;
             type: 'string',
             maxLength: 100,
             minLength: 2,
-            example: 'John Doe'
+            example: 'John Doe',
+            nullable: false
         ),
         new OA\Property(
             property: 'email',
@@ -25,7 +26,8 @@ use OpenApi\Attributes as OA;
             type: 'string',
             format: 'email',
             maxLength: 255,
-            example: 'john@example.com'
+            example: 'john@example.com',
+            nullable: false
         ),
         new OA\Property(
             property: 'password',
@@ -33,7 +35,8 @@ use OpenApi\Attributes as OA;
             type: 'string',
             format: 'password',
             minLength: 8,
-            example: 'password123'
+            example: 'password123',
+            nullable: false
         ),
         new OA\Property(
             property: 'password_confirmation',
@@ -41,14 +44,16 @@ use OpenApi\Attributes as OA;
             type: 'string',
             format: 'password',
             minLength: 8,
-            example: 'password123'
+            example: 'password123',
+            nullable: false
         ),
         new OA\Property(
             property: 'role',
             description: 'Role of the user.',
             type: 'string',
             enum: [UserRole::STUDENT->value, UserRole::TEACHER->value],
-            example: UserRole::STUDENT->value
+            example: UserRole::STUDENT->value,
+            nullable: false
         )
     ],
     type: 'object'

@@ -66,9 +66,20 @@ class CoursePolicy
         return $user->can(UserPermission::COURSE_EDIT_OWN->value) && $user->isAuthorOf($course);
     }
 
+    /**
+     * Determine whether the user can delete the course.
+     *
+     * @param User $user
+     * @param Course $course
+     * @return bool
+     */
     public function delete(User $user, Course $course): bool
     {
-        return $user->hasPermissionTo(UserPermission::COURSE_DELETE->value) && $user->isAuthorOf($course) || $user->hasPermissionTo(UserPermission::COURSE_DELETE_ANY->value);
+        if ($user->can(UserPermission::COURSE_DELETE_ANY->value)) {
+            return true;
+        }
+
+        return $user->can(UserPermission::COURSE_DELETE_OWN->value) && $user->isAuthorOf($course);
     }
 
     public function publish(User $user, Course $course): bool

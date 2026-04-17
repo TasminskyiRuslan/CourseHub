@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Course;
 
 use App\Actions\Course\CreateCourseAction;
+use App\Actions\Course\DeleteCourseAction;
 use App\Actions\Course\UpdateCourseAction;
 use App\Data\Course\Requests\CreateCourseData;
 use App\Data\Course\Requests\UpdateCourseData;
@@ -13,6 +14,7 @@ use App\Queries\Course\CourseListQuery;
 use App\Services\Courses\CourseService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Throwable;
@@ -272,47 +274,55 @@ class CourseController extends Controller
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 
-//    #[OA\Delete(
-//        path: '/courses/{course}',
-//        description: 'Delete a specific course.',
-//        summary: 'Delete course',
-//        security: [['sanctum' => []]],
-//        tags: ['Course'],
-//        parameters: [
-//            new OA\Parameter(
-//                name: 'course',
-//                description: 'Course identifier (slug)',
-//                in: 'path',
-//                required: true,
-//                schema: new OA\Schema(type: 'string')
-//            )
-//        ],
-//        responses: [
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_NO_CONTENT,
-//                description: 'Course deleted'
-//            ),
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_UNAUTHORIZED,
-//                description: 'Authentication required'
-//            ),
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_FORBIDDEN,
-//                description: 'Access denied'
-//            ),
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_NOT_FOUND,
-//                description: 'Course not found'
-//            ),
-//        ]
-//    )]
-//    /**
-//     * @throws Throwable
-//     */
-//    public function destroy(Course $course): Response
-//    {
-//        $this->authorize('delete', $course);
-//        $this->courseService->delete($course);
-//        return response()->noContent();
-//    }
+    #[OA\Delete(
+        path: '/courses/{course}',
+        description: 'Remove the specified course.',
+        summary: 'Remove a course',
+        security: [['sanctum' => []]],
+        tags: ['Course'],
+        parameters: [
+            new OA\Parameter(
+                name: 'course',
+                description: 'Course identifier (slug).',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(
+                    type: 'string',
+                    example: 'math-101'
+                )
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: SymfonyResponse::HTTP_NO_CONTENT,
+                description: 'Course deleted successfully.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+                description: 'User is unauthenticated.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_FORBIDDEN,
+                description: 'User does not have permissions.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_NOT_FOUND,
+                description: 'Course not found.'
+            ),
+        ]
+    )]
+    /**
+     * Remove the specified course.
+     *
+     * @param Course $course
+     * @param DeleteCourseAction $deleteCourseAction
+     * @return Response
+     * @throws Throwable
+     */
+    public function destroy(Course $course, DeleteCourseAction $deleteCourseAction): Response
+    {
+        $this->authorize('delete', $course);
+        $deleteCourseAction->handle($course);
+        return response()->noContent();
+    }
 }

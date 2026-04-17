@@ -503,6 +503,45 @@
                     {}
                 ]
             },
+            "delete": {
+                "tags": [
+                    "Course"
+                ],
+                "summary": "Remove a course",
+                "description": "Remove the specified course.",
+                "operationId": "b2ad98bf222fcb881591892f6ea118cc",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Course deleted successfully."
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course not found."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
             "patch": {
                 "tags": [
                     "Course"

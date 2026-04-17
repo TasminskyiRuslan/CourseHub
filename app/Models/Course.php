@@ -187,4 +187,15 @@ class Course extends Model
             }
         });
     }
+
+    /**
+     * Remove the image path.
+     *
+     * @return $this
+     */
+    public function removeImage(): static
+    {
+        $this->image_path = null;
+        return $this;
+    }
 }

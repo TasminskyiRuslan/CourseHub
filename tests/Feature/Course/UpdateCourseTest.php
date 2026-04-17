@@ -50,7 +50,6 @@ describe('CourseController -> update', function () {
         it('allows author to update their own course', function () {
             $author = User::factory()->teacher()->verified()->create();
             $course = Course::factory()->for($author, 'author')->create();
-
             Sanctum::actingAs($author);
 
             $data = updatingCoursePayload();
@@ -68,7 +67,6 @@ describe('CourseController -> update', function () {
         it('allows super-admin to update any course', function () {
             $superAdmin = User::whereEmail(config('super-admin.email'))->first();
             $course = Course::factory()->create(['title' => 'Original Title']);
-
             Sanctum::actingAs($superAdmin);
 
             $data = updatingCoursePayload();
@@ -195,7 +193,7 @@ describe('CourseController -> update', function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Caching & Logic
+    | caching
     |--------------------------------------------------------------------------
     */
     it('flushes the course cache when a course is updated', function () {

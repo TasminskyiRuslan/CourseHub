@@ -31,7 +31,7 @@ class UpdateCourseData extends Data
         #[Sometimes]
         #[StringType]
         #[Max(255)]
-        #[Unique(table: 'books', column: 'slug', ignore: new RouteParameterReference('course.id'))]
+        #[Unique(table: 'courses', column: 'slug', ignore: new RouteParameterReference('course.id'))]
         #[Regex('/^[a-z0-9-]+$/')]
         public string|Optional  $slug,
 

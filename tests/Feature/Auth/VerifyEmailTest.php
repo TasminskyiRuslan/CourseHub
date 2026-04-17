@@ -28,7 +28,7 @@ describe('VerifyEmailController', function () {
             $user = User::factory()->unverified()->create();
 
             getJson(URL::temporarySignedRoute(
-                'verification.verify',
+                'auth.verification.verify',
                 now()->addMinutes(60),
                 [
                     'id' => 999999,
@@ -42,7 +42,7 @@ describe('VerifyEmailController', function () {
             $user = User::factory()->unverified()->create();
 
             getJson(URL::temporarySignedRoute(
-                'verification.verify',
+                'auth.verification.verify',
                 now()->addMinutes(60),
                 [
                     'id' => $user->id,
@@ -55,7 +55,7 @@ describe('VerifyEmailController', function () {
         it('fails when the signature is missing', function () {
             $user = User::factory()->unverified()->create();
 
-            getJson(route('verification.verify', [
+            getJson(route('auth.verification.verify', [
                 'id' => $user->id,
                 'hash' => sha1($user->getEmailForVerification()),
             ]))
@@ -72,7 +72,7 @@ describe('VerifyEmailController', function () {
         it('verifies the email for user', function ($user) {
             Event::fake();
             getJson(URL::temporarySignedRoute(
-                'verification.verify',
+                'auth.verification.verify',
                 now()->addMinutes(60),
                 [
                     'id' => $user->id,
@@ -95,7 +95,7 @@ describe('VerifyEmailController', function () {
             $user = User::factory()->verified()->create();
 
             getJson(URL::temporarySignedRoute(
-                'verification.verify',
+                'auth.verification.verify',
                 now()->addMinutes(60),
                 [
                     'id' => $user->id,

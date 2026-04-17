@@ -16,7 +16,7 @@ class RegisterController extends Controller
     #[OA\Post(
         path: '/auth/register',
         description: 'Register a new user and issue an access token.',
-        summary: 'Register user',
+        summary: 'Register a new user',
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(ref: '#/components/schemas/RegisterUserRequest')

@@ -6,6 +6,9 @@ use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\URL;
 
 class QueuedVerifyEmailNotification extends VerifyEmail implements ShouldQueue
 {
@@ -45,5 +48,27 @@ class QueuedVerifyEmailNotification extends VerifyEmail implements ShouldQueue
             ->subject('Verify Your Email Address')
             ->line('Please, confirm your email address.')
             ->action('Confirm email', $url);
+    }
+
+    /**
+     * Get the verification URL for the given notifiable.
+     *
+     * @param  mixed  $notifiable
+     * @return string
+     */
+    protected function verificationUrl($notifiable): string
+    {
+        if (static::$createUrlCallback) {
+            return call_user_func(static::$createUrlCallback, $notifiable);
+        }
+
+        return URL::temporarySignedRoute(
+            'auth.verification.verify',
+            Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
+            [
+                'id' => $notifiable->getKey(),
+                'hash' => sha1($notifiable->getEmailForVerification()),
+            ]
+        );
     }
 }

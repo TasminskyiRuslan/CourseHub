@@ -24,7 +24,7 @@ describe('ResendVerificationEmailController', function () {
     */
     describe('permissions', function () {
         it('fails for unauthenticated user', function () {
-            postJson(route('verification.resend'))
+            postJson(route('auth.verification.resend'))
                 ->assertUnauthorized();
         });
     });
@@ -40,7 +40,7 @@ describe('ResendVerificationEmailController', function () {
             $user = User::factory()->unverified()->create();
             Sanctum::actingAs($user);
 
-            postJson(route('verification.resend'))
+            postJson(route('auth.verification.resend'))
                 ->assertNoContent();
             Notification::assertSentTo($user, QueuedVerifyEmailNotification::class);
         });
@@ -50,7 +50,7 @@ describe('ResendVerificationEmailController', function () {
             $user = User::factory()->verified()->create();
             Sanctum::actingAs($user);
 
-            postJson(route('verification.resend'))
+            postJson(route('auth.verification.resend'))
                 ->assertNoContent();
             Notification::assertNothingSent();
         });

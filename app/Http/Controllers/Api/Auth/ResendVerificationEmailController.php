@@ -26,6 +26,10 @@ class ResendVerificationEmailController extends Controller
                 response: SymfonyResponse::HTTP_UNAUTHORIZED,
                 description: 'User is unauthenticated.'
             ),
+             new OA\Response(
+                response: SymfonyResponse::HTTP_TOO_MANY_REQUESTS,
+                description: 'Too many requests.'
+            )
         ]
     )]
     /**

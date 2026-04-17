@@ -40,6 +40,9 @@
                     },
                     "422": {
                         "description": "Validation error."
+                    },
+                    "429": {
+                        "description": "Too many requests."
                     }
                 }
             }
@@ -170,7 +173,7 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Register user",
+                "summary": "Register a new user",
                 "description": "Register a new user and issue an access token.",
                 "operationId": "8e69ddc577b1650c4a010f798dd6c9d3",
                 "requestBody": {
@@ -219,6 +222,9 @@
                     },
                     "401": {
                         "description": "User is unauthenticated."
+                    },
+                    "429": {
+                        "description": "Too many requests."
                     }
                 },
                 "security": [
@@ -271,7 +277,8 @@
                         "description": "Unique identifier of the user.",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
                         }
                     },
                     {
@@ -280,7 +287,8 @@
                         "description": "Hash of the email verification.",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "5224cb6fdd5bbe463af1db8ee499e858fcb79f81"
                         }
                     },
                     {
@@ -289,7 +297,8 @@
                         "description": "Time of the link expiration.",
                         "required": false,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1776361972
                         }
                     },
                     {
@@ -298,7 +307,8 @@
                         "description": "Signature of the email verification.",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "e697b7c8f76cae59e0121fbde183a47f7556ae973b5890d7ac7ee85a0a3e52bc"
                         }
                     }
                 ],
@@ -308,6 +318,9 @@
                     },
                     "403": {
                         "description": "Invalid or expired verification link."
+                    },
+                    "429": {
+                        "description": "Too many requests."
                     }
                 }
             }
@@ -324,7 +337,7 @@
                     {
                         "name": "filter[search]",
                         "in": "query",
-                        "description": "Search courses by title or description",
+                        "description": "Search courses by title or description.",
                         "required": false,
                         "schema": {
                             "type": "string"
@@ -333,7 +346,7 @@
                     {
                         "name": "sort",
                         "in": "query",
-                        "description": "Sort courses by field. Use \"-\" prefix for descending order",
+                        "description": "Sort courses by field. Use \"-\" prefix for descending order.",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -350,7 +363,7 @@
                     {
                         "name": "page",
                         "in": "query",
-                        "description": "Page number for pagination",
+                        "description": "Page number for pagination.",
                         "required": false,
                         "schema": {
                             "type": "integer",
@@ -452,10 +465,11 @@
                     {
                         "name": "course",
                         "in": "path",
-                        "description": "Course identifier (slug)",
+                        "description": "Course identifier (slug).",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "math-101"
                         }
                     }
                 ],
@@ -475,7 +489,7 @@
                             }
                         }
                     },
-                    "401": {
+                    "403": {
                         "description": "User does not have permissions."
                     },
                     "404": {
@@ -487,6 +501,70 @@
                         "sanctum": []
                     },
                     {}
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Course"
+                ],
+                "summary": "Update a course",
+                "description": "Update the specified course.",
+                "operationId": "f4c07044a4f22f76356c7c367d19f56d",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCourseRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Course updated successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CourseResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course not found."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
                 ]
             }
         },
@@ -892,8 +970,7 @@
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
-                        "example": "john@example.com",
-                        "nullable": false
+                        "example": "john@example.com"
                     }
                 },
                 "type": "object"
@@ -911,22 +988,19 @@
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
-                        "example": "john@example.com",
-                        "nullable": false
+                        "example": "john@example.com"
                     },
                     "password": {
                         "description": "Account password of the user.",
                         "type": "string",
                         "format": "password",
-                        "example": "password123",
-                        "nullable": false
+                        "example": "password123"
                     },
                     "remember": {
                         "description": "Remember me flag of the user.",
                         "type": "boolean",
                         "default": false,
-                        "example": true,
-                        "nullable": false
+                        "example": true
                     }
                 },
                 "type": "object"
@@ -947,32 +1021,28 @@
                         "type": "string",
                         "maxLength": 100,
                         "minLength": 2,
-                        "example": "John Doe",
-                        "nullable": false
+                        "example": "John Doe"
                     },
                     "email": {
                         "description": "Email address of the user.",
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
-                        "example": "john@example.com",
-                        "nullable": false
+                        "example": "john@example.com"
                     },
                     "password": {
                         "description": "Account password of the user.",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
-                        "example": "password123",
-                        "nullable": false
+                        "example": "password123"
                     },
                     "password_confirmation": {
                         "description": "Password confirmation of the user. (must match password)",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
-                        "example": "password123",
-                        "nullable": false
+                        "example": "password123"
                     },
                     "role": {
                         "description": "Role of the user.",
@@ -981,8 +1051,7 @@
                             "student",
                             "teacher"
                         ],
-                        "example": "student",
-                        "nullable": false
+                        "example": "student"
                     }
                 },
                 "type": "object"
@@ -1002,30 +1071,26 @@
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
-                        "example": "john@example.com",
-                        "nullable": false
+                        "example": "john@example.com"
                     },
                     "password": {
                         "description": "Account password of the user.",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
-                        "example": "newPassword123",
-                        "nullable": false
+                        "example": "newPassword123"
                     },
                     "password_confirmation": {
                         "description": "Password confirmation of the user. (must match password)",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
-                        "example": "newPassword123",
-                        "nullable": false
+                        "example": "newPassword123"
                     },
                     "token": {
                         "description": "Password reset token received via email.",
                         "type": "string",
-                        "example": "66006454322443...",
-                        "nullable": false
+                        "example": "66006454322443..."
                     }
                 },
                 "type": "object"
@@ -1124,14 +1189,13 @@
                 ],
                 "properties": {
                     "title": {
-                        "description": "Title of the course",
+                        "description": "Title of the course.",
                         "type": "string",
                         "maxLength": 255,
-                        "example": "Math 101",
-                        "nullable": false
+                        "example": "Math 101"
                     },
                     "slug": {
-                        "description": "Slug of the course",
+                        "description": "Slug of the course. (optional, must be unique if provided)",
                         "type": "string",
                         "maxLength": 255,
                         "pattern": "^[a-z0-9-]+$",
@@ -1139,31 +1203,29 @@
                         "nullable": true
                     },
                     "description": {
-                        "description": "Description of the course",
+                        "description": "Description of the course.",
                         "type": "string",
                         "maxLength": 5000,
                         "example": "A basic mathematics course",
                         "nullable": true
                     },
                     "type": {
-                        "description": "Type of the course",
+                        "description": "Type of the course.",
                         "type": "string",
                         "enum": [
                             "offline",
                             "online",
                             "video"
                         ],
-                        "example": "online",
-                        "nullable": false
+                        "example": "online"
                     },
                     "price": {
-                        "description": "Price of the course",
+                        "description": "Price of the course.",
                         "type": "string",
                         "format": "float",
                         "maximum": 99999999.99,
                         "minimum": 0,
-                        "example": 199.99,
-                        "nullable": false
+                        "example": 199.99
                     }
                 },
                 "type": "object"
@@ -1184,35 +1246,31 @@
                 "type": "object"
             },
             "UpdateCourseRequest": {
-                "title": "Update course request schema",
-                "description": "Schema for updating an existing course via API request",
-                "required": [
-                    "title",
-                    "slug",
-                    "description",
-                    "price"
-                ],
+                "title": "Update Course Request",
+                "description": "Request payload for updating the course.",
+                "required": [],
                 "properties": {
                     "title": {
-                        "description": "The title of the course",
+                        "description": "Title of the course.",
                         "type": "string",
                         "maxLength": 255,
                         "example": "Math 101"
                     },
                     "slug": {
-                        "description": "The slug of the course",
+                        "description": "Slug of the course. (must be unique)",
                         "type": "string",
                         "maxLength": 255,
+                        "pattern": "^[a-z0-9-]+$",
                         "example": "math-101"
                     },
                     "description": {
-                        "description": "The description of the course",
+                        "description": "Description of the course.",
                         "type": "string",
                         "example": "A basic mathematics course",
                         "nullable": true
                     },
                     "price": {
-                        "description": "The price of the course",
+                        "description": "Price of the course.",
                         "type": "string",
                         "format": "float",
                         "maximum": 99999999.99,

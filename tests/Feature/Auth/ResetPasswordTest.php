@@ -27,7 +27,7 @@ describe('ResetPasswordController', function () {
             $newPassword = 'new-password';
             $user = User::factory()->verified()->create();
 
-            postJson(route('password.reset'), [
+            postJson(route('auth.password.reset'), [
                 'email' => $user->email,
                 'password' => $newPassword,
                 'password_confirmation' => $newPassword,
@@ -38,7 +38,7 @@ describe('ResetPasswordController', function () {
         });
 
         it('fails if the required fields are missing', function () {
-            postJson(route('password.reset'), [])
+            postJson(route('auth.password.reset'), [])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email', 'password', 'token']);
         });
@@ -46,7 +46,7 @@ describe('ResetPasswordController', function () {
         it('fails if the password confirmation does not match', function () {
             $user = User::factory()->verified()->create();
 
-            postJson(route('password.reset'), [
+            postJson(route('auth.password.reset'), [
                 'email' => $user->email,
                 'password' => 'new-password',
                 'password_confirmation' => 'different',
@@ -60,7 +60,7 @@ describe('ResetPasswordController', function () {
             $newPassword = 'new-password';
             $user = User::factory()->verified()->create();
 
-            postJson(route('password.reset'), [
+            postJson(route('auth.password.reset'), [
                 'email' => 'invalid-email',
                 'password' => $newPassword,
                 'password_confirmation' => $newPassword,
@@ -74,7 +74,7 @@ describe('ResetPasswordController', function () {
             $newPassword = 'new-password';
             $user = User::factory()->verified()->create();
 
-            postJson(route('password.reset'), [
+            postJson(route('auth.password.reset'), [
                 'email' => 'nonexistent@example.com',
                 'password' => $newPassword,
                 'password_confirmation' => $newPassword,
@@ -87,7 +87,7 @@ describe('ResetPasswordController', function () {
         it('fails if the new password is too short', function () {
             $user = User::factory()->verified()->create();
 
-            postJson(route('password.reset'), [
+            postJson(route('auth.password.reset'), [
                 'email' => $user->email,
                 'password' => '123',
                 'password_confirmation' => '123',
@@ -107,7 +107,7 @@ describe('ResetPasswordController', function () {
         it('allows users to reset password', function ($user) {
             $newPassword = 'new-password';
 
-            postJson(route('password.reset'), [
+            postJson(route('auth.password.reset'), [
                 'email' => $user->email,
                 'password' => $newPassword,
                 'password_confirmation' => $newPassword,
@@ -127,7 +127,7 @@ describe('ResetPasswordController', function () {
             $newPassword = 'new-password';
             $superAdmin = User::whereEmail(config('super-admin.email'))->first();
 
-            postJson(route('password.reset'), [
+            postJson(route('auth.password.reset'), [
                 'email' => $superAdmin->email,
                 'password' => $newPassword,
                 'password_confirmation' => $newPassword,

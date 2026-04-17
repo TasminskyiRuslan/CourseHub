@@ -39,25 +39,24 @@ Route::prefix('auth')->group(function () {
     Route::delete('/logout', LogoutController::class)
         ->middleware('auth:sanctum')
         ->name('auth.logout');
-    Route::delete('/tokens', LogoutAllController::class)
+    Route::delete('/logout/all', LogoutAllController::class)
         ->middleware('auth:sanctum')
-        ->name('auth.tokens.destroy');
-
+        ->name('auth.logout.all');
 
     // Password actions
     Route::post('/password/forgot', ForgotPasswordController::class)
         ->middleware('throttle:5,1')
-        ->name('password.forgot');
+        ->name('auth.password.forgot');
     Route::post('/password/reset', ResetPasswordController::class)
-        ->name('password.reset');
+        ->name('auth.password.reset');
 
     // Email verification actions
     Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)
         ->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
+        ->name('auth.verification.verify');
     Route::post('/email/verification-notification', ResendVerificationEmailController::class)
         ->middleware(['auth:sanctum', 'throttle:6,1'])
-        ->name('verification.resend');
+        ->name('auth.verification.resend');
 });
 
 /*
@@ -74,7 +73,7 @@ Route::prefix('courses')->group(function () {
         ->name('course.store');
     Route::get('/{course}', [CourseController::class, 'show'])
         ->name('course.show');
-    Route::put('/{course}', [CourseController::class, 'update'])
+    Route::patch('/{course}', [CourseController::class, 'update'])
         ->middleware(['auth:sanctum', 'verified'])
         ->name('course.update');
     Route::delete('/{course}', [CourseController::class, 'destroy'])

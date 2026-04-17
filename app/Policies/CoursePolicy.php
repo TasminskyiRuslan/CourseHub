@@ -54,9 +54,16 @@ class CoursePolicy
         return $user->can(UserPermission::COURSE_CREATE->value);
     }
 
+    /**
+     * Determine whether the user can update the course.
+     *
+     * @param User $user
+     * @param Course $course
+     * @return bool
+     */
     public function update(User $user, Course $course): bool
     {
-        return $user->hasPermissionTo(UserPermission::COURSE_UPDATE->value) && $user->isAuthorOf($course);
+        return $user->can(UserPermission::COURSE_EDIT_OWN->value) && $user->isAuthorOf($course);
     }
 
     public function delete(User $user, Course $course): bool

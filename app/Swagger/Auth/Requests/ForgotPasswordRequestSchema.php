@@ -17,7 +17,6 @@ use OpenApi\Attributes as OA;
             format: 'email',
             maxLength: 255,
             example: 'john@example.com',
-            nullable: false,
         ),
     ],
     type: 'object'

@@ -20,7 +20,7 @@ describe('LogoutAllController', function () {
     */
     describe('permissions', function () {
         it('fails for an unauthenticated user', function () {
-            deleteJson(route('auth.tokens.destroy'))
+            deleteJson(route('auth.logout.all'))
                 ->assertUnauthorized();
         });
     });
@@ -37,7 +37,7 @@ describe('LogoutAllController', function () {
                 ->each(fn() => $user->createToken('access_token'));
             Sanctum::actingAs($user);
 
-            deleteJson(route('auth.tokens.destroy'))
+            deleteJson(route('auth.logout.all'))
                 ->assertNoContent();
             expect($user->tokens()->count())->toBe(0);
         });

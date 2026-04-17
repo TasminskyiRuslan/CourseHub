@@ -26,13 +26,13 @@ describe('ForgotPasswordController', function () {
     */
     describe('validation', function () {
         it('fails if the required fields are missing', function () {
-            postJson(route('password.forgot'), [])
+            postJson(route('auth.password.forgot'), [])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
         });
 
         it('fails if the email format is invalid', function () {
-            postJson(route('password.forgot'), [
+            postJson(route('auth.password.forgot'), [
                 'email' => 'invalid-email',
             ])
                 ->assertUnprocessable()
@@ -40,7 +40,7 @@ describe('ForgotPasswordController', function () {
         });
 
         it('fails if the email is too long', function () {
-            postJson(route('password.forgot'), [
+            postJson(route('auth.password.forgot'), [
                 'email' => str_repeat('a', 256) . '@example.com',
             ])
                 ->assertUnprocessable()
@@ -57,7 +57,7 @@ describe('ForgotPasswordController', function () {
         it('sends a reset link to verify user', function ($user) {
             Notification::fake();
 
-            postJson(route('password.forgot'), [
+            postJson(route('auth.password.forgot'), [
                 'email' => $user->email,
             ])->assertNoContent();
 
@@ -80,7 +80,7 @@ describe('ForgotPasswordController', function () {
             Notification::fake();
             $superAdmin = User::whereEmail(config('super-admin.email'))->first();
 
-            postJson(route('password.forgot'), [
+            postJson(route('auth.password.forgot'), [
                 'email' => $superAdmin->email,
             ])->assertNoContent();
 
@@ -90,7 +90,7 @@ describe('ForgotPasswordController', function () {
 
         it('silently succeeds if the email does not exist', function () {
             Notification::fake();
-            postJson(route('password.forgot'), [
+            postJson(route('auth.password.forgot'), [
                 'email' => 'nonexistent@example.com',
             ])->assertNoContent();
 

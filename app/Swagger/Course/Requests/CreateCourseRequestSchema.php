@@ -13,15 +13,14 @@ use OpenApi\Attributes as OA;
     properties: [
         new OA\Property(
             property: 'title',
-            description: 'Title of the course',
+            description: 'Title of the course.',
             type: 'string',
             maxLength: 255,
-            example: 'Math 101',
-            nullable: false,
+            example: 'Math 101'
         ),
         new OA\Property(
             property: 'slug',
-            description: 'Slug of the course',
+            description: 'Slug of the course. (optional, must be unique if provided)',
             type: 'string',
             maxLength: 255,
             pattern: '^[a-z0-9-]+$',
@@ -30,7 +29,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'description',
-            description: 'Description of the course',
+            description: 'Description of the course.',
             type: 'string',
             maxLength: 5000,
             example: 'A basic mathematics course',
@@ -38,26 +37,24 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'type',
-            description: 'Type of the course',
+            description: 'Type of the course.',
             type: 'string',
             enum: [
                 CourseType::OFFLINE->value,
                 CourseType::ONLINE->value,
                 CourseType::VIDEO->value,
             ],
-            example: CourseType::ONLINE->value,
-            nullable: false
+            example: CourseType::ONLINE->value
         ),
         new OA\Property(
             property: 'price',
-            description: 'Price of the course',
+            description: 'Price of the course.',
             type: 'string',
             format: 'float',
             maximum: 99999999.99,
             minimum: 0,
-            example: 199.99,
-            nullable: false
-        ),
+            example: 199.99
+        )
     ],
     type: 'object'
 )]

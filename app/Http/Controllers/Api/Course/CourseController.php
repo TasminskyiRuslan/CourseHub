@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api\Course;
 
 use App\Actions\Course\CreateCourseAction;
+use App\Actions\Course\UpdateCourseAction;
 use App\Data\Course\Requests\CreateCourseData;
+use App\Data\Course\Requests\UpdateCourseData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Courses\CourseResource;
 use App\Models\Course;
@@ -34,14 +36,14 @@ class CourseController extends Controller
         parameters: [
             new OA\Parameter(
                 name: 'filter[search]',
-                description: 'Search courses by title or description',
+                description: 'Search courses by title or description.',
                 in: 'query',
                 required: false,
                 schema: new OA\Schema(type: 'string'),
             ),
             new OA\Parameter(
                 name: 'sort',
-                description: 'Sort courses by field. Use "-" prefix for descending order',
+                description: 'Sort courses by field. Use "-" prefix for descending order.',
                 in: 'query',
                 required: false,
                 schema: new OA\Schema(
@@ -51,7 +53,7 @@ class CourseController extends Controller
             ),
             new OA\Parameter(
                 name: 'page',
-                description: 'Page number for pagination',
+                description: 'Page number for pagination.',
                 in: 'query',
                 required: false,
                 schema: new OA\Schema(type: 'integer', minimum: 1),
@@ -64,7 +66,7 @@ class CourseController extends Controller
                 schema: new OA\Schema(
                     type: 'string',
                     example: 'author,lessons,lessons_count',
-                ),
+                )
             )
         ],
         responses: [
@@ -80,7 +82,7 @@ class CourseController extends Controller
                         )
                     ]
                 )
-            ),
+            )
         ]
     )]
     /**
@@ -124,7 +126,7 @@ class CourseController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
                 description: 'Validation error.'
-            ),
+            )
         ]
     )]
     /**
@@ -153,10 +155,13 @@ class CourseController extends Controller
         parameters: [
             new OA\Parameter(
                 name: 'course',
-                description: 'Course identifier (slug)',
+                description: 'Course identifier (slug).',
                 in: 'path',
                 required: true,
-                schema: new OA\Schema(type: 'string')
+                schema: new OA\Schema(
+                    type: 'string',
+                    example: 'math-101'
+                )
             )
         ],
         responses: [
@@ -173,7 +178,7 @@ class CourseController extends Controller
                 )
             ),
             new OA\Response(
-                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+                response: SymfonyResponse::HTTP_FORBIDDEN,
                 description: 'User does not have permissions.'
             ),
             new OA\Response(
@@ -196,59 +201,77 @@ class CourseController extends Controller
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 
-//    #[OA\Put(
-//        path: '/courses/{course}',
-//        description: 'Update a specific course.',
-//        summary: 'Update course',
-//        security: [['sanctum' => []]],
-//        requestBody: new OA\RequestBody(
-//            required: true,
-//            content: new OA\JsonContent(ref: '#/components/schemas/UpdateCourseRequest')
-//        ),
-//        tags: ['Course'],
-//        parameters: [
-//            new OA\Parameter(
-//                name: 'course',
-//                description: 'Course identifier (slug)',
-//                in: 'path',
-//                required: true,
-//                schema: new OA\Schema(type: 'string')
-//            )
-//        ],
-//        responses: [
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_OK,
-//                description: 'Course updated',
-//                content: new OA\JsonContent(ref: '#/components/schemas/Course')
-//            ),
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
-//                description: 'Validation error'
-//            ),
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_UNAUTHORIZED,
-//                description: 'Authentication required'
-//            ),
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_FORBIDDEN,
-//                description: 'Access denied'
-//            ),
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_NOT_FOUND,
-//                description: 'Course not found'
-//            ),
-//        ]
-//    )]
-//    /**
-//     * @throws Throwable
-//     */
-//    public function update(UpdateCourseData $data, Course $course): CourseResource
-//    {
-//        $this->authorize('update', $course);
-//        $updatedCourse = $this->courseService->update($data, $course);
-//        return new CourseResource($updatedCourse);
-//    }
-//
+    #[OA\Patch(
+        path: '/courses/{course}',
+        description: 'Update the specified course.',
+        summary: 'Update a course',
+        security: [['sanctum' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: '#/components/schemas/UpdateCourseRequest')
+        ),
+        tags: ['Course'],
+        parameters: [
+            new OA\Parameter(
+                name: 'course',
+                description: 'Course identifier (slug).',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(
+                    type: 'string',
+                    example: 'math-101'
+                )
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: SymfonyResponse::HTTP_OK,
+                description: 'Course updated successfully.',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/CourseResponse'
+                        )
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+                description: 'User is unauthenticated.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_FORBIDDEN,
+                description: 'User does not have permissions.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_NOT_FOUND,
+                description: 'Course not found.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
+                description: 'Validation error.'
+            ),
+        ]
+    )]
+    /**
+     * Update the specified course.
+     *
+     * @param UpdateCourseData $courseData
+     * @param Course $course
+     * @param UpdateCourseAction $updateCourseAction
+     * @return JsonResponse
+     * @throws Throwable
+     */
+    public function update(UpdateCourseData $courseData, Course $course, UpdateCourseAction $updateCourseAction): JsonResponse
+    {
+        $this->authorize('update', $course);
+        $course = $updateCourseAction->handle($courseData, $course);
+        return CourseResource::make($course->loadCount('lessons')->loadMissing(['author', 'lessons']))
+            ->response()
+            ->setStatusCode(SymfonyResponse::HTTP_OK);
+    }
+
 //    #[OA\Delete(
 //        path: '/courses/{course}',
 //        description: 'Delete a specific course.',

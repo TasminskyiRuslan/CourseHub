@@ -22,28 +22,40 @@ class VerifyEmailController extends Controller
                 description: 'Unique identifier of the user.',
                 in: 'path',
                 required: true,
-                schema: new OA\Schema(type: 'integer')
+                schema: new OA\Schema(
+                    type: 'integer',
+                    example: 1,
+                )
             ),
             new OA\Parameter(
                 name: 'hash',
                 description: 'Hash of the email verification.',
                 in: 'path',
                 required: true,
-                schema: new OA\Schema(type: 'string')
+                schema: new OA\Schema(
+                    type: 'string',
+                    example: '5224cb6fdd5bbe463af1db8ee499e858fcb79f81',
+                )
             ),
             new OA\Parameter(
                 name: 'expires',
                 description: 'Time of the link expiration.',
                 in: 'query',
                 required: false,
-                schema: new OA\Schema(type: 'integer')
+                schema: new OA\Schema(
+                    type: 'integer',
+                    example: 1776361972,
+                )
             ),
             new OA\Parameter(
                 name: 'signature',
                 description: 'Signature of the email verification.',
                 in: 'query',
                 required: true,
-                schema: new OA\Schema(type: 'string')
+                schema: new OA\Schema(
+                    type: 'string',
+                    example: 'e697b7c8f76cae59e0121fbde183a47f7556ae973b5890d7ac7ee85a0a3e52bc',
+                )
             )
         ],
         responses: [
@@ -54,6 +66,10 @@ class VerifyEmailController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_FORBIDDEN,
                 description: 'Invalid or expired verification link.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_TOO_MANY_REQUESTS,
+                description: 'Too many requests.'
             ),
         ]
     )]

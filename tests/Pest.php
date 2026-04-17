@@ -201,12 +201,27 @@ function registrationPayload(array $overrides = []): array
  * @param array $overrides
  * @return array
  */
-function coursePayload(array $overrides = []): array
+function creatingCoursePayload(array $overrides = []): array
 {
     return array_merge([
         'title' => fake()->sentence(3),
         'description' => fake()->optional()->paragraph(),
         'type' => CourseType::OFFLINE,
+        'price' => (string) fake()->randomFloat(2, 0, 99999999.99),
+    ], $overrides);
+}
+
+/**
+ * Generate an updating course payload with optional overrides.
+ *
+ * @param array $overrides
+ * @return array
+ */
+function updatingCoursePayload(array $overrides = []): array
+{
+    return array_merge([
+        'title' => fake()->sentence(3),
+        'description' => fake()->optional()->paragraph(),
         'price' => (string) fake()->randomFloat(2, 0, 99999999.99),
     ], $overrides);
 }

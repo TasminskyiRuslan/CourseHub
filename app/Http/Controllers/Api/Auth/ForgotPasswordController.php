@@ -32,6 +32,10 @@ class ForgotPasswordController extends Controller
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
                 description: 'Validation error.'
             ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_TOO_MANY_REQUESTS,
+                description: 'Too many requests.'
+            )
         ]
     )]
     /**

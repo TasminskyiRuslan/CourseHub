@@ -49,9 +49,9 @@ describe('CourseController -> show', function () {
         })->with([
             'guest' => null,
             'unverified' => fn() => User::factory()->unverified()->create(),
-            'student' => fn() => User::factory()->student()->verified()->create(),
-            'teacher' => fn() => User::factory()->teacher()->verified()->create(),
-            'admin' => fn() => User::factory()->admin()->verified()->create(),
+            'student' => fn() => User::factory()->student()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
         ]);
 

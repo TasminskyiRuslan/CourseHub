@@ -41,14 +41,14 @@ describe('CourseController -> update', function () {
             patchJson(route('course.update', $course), updatingCoursePayload())
                 ->assertForbidden();
         })->with([
-            'student' => fn() => User::factory()->student()->verified()->create(),
+            'student' => fn() => User::factory()->student()->create(),
             'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'another teacher' => fn() => User::factory()->teacher()->verified()->create(),
+            'another teacher' => fn() => User::factory()->teacher()->create(),
             'admin' => fn() => User::factory()->admin()->create(),
         ]);
 
         it('allows author to update their own course', function () {
-            $author = User::factory()->teacher()->verified()->create();
+            $author = User::factory()->teacher()->create();
             $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
 
@@ -89,7 +89,7 @@ describe('CourseController -> update', function () {
     */
     describe('validation', function () {
         it('fails if the present fields are empty', function () {
-            $author = User::factory()->teacher()->verified()->create();
+            $author = User::factory()->teacher()->create();
             $course = Course::factory()->for($author, 'author')->create();
 
             Sanctum::actingAs($author);
@@ -104,7 +104,7 @@ describe('CourseController -> update', function () {
         });
 
         it('fails if the present fields are null', function () {
-            $author = User::factory()->teacher()->verified()->create();
+            $author = User::factory()->teacher()->create();
             $course = Course::factory()->for($author, 'author')->create();
 
             Sanctum::actingAs($author);
@@ -119,7 +119,7 @@ describe('CourseController -> update', function () {
         });
 
         it('fails if the fields are too long', function () {
-            $author = User::factory()->teacher()->verified()->create();
+            $author = User::factory()->teacher()->create();
             $course = Course::factory()->for($author, 'author')->create();
 
             Sanctum::actingAs($author);
@@ -135,7 +135,7 @@ describe('CourseController -> update', function () {
         });
 
         it('fails if the slug is taken by another course', function () {
-            $author = User::factory()->teacher()->verified()->create();
+            $author = User::factory()->teacher()->create();
             $course = Course::factory()->for($author, 'author')->create(['slug' => 'my-slug']);
             $anotherCourse = Course::factory()->for($author, 'author')->create(['slug' => 'taken-slug']);
             Sanctum::actingAs($author);
@@ -148,7 +148,7 @@ describe('CourseController -> update', function () {
         });
 
         it('fails if the slug format is invalid', function () {
-            $author = User::factory()->teacher()->verified()->create();
+            $author = User::factory()->teacher()->create();
             $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
 
@@ -160,7 +160,7 @@ describe('CourseController -> update', function () {
         });
 
         it('succeeds if the slug remains the same (ignore current)', function () {
-            $author = User::factory()->teacher()->verified()->create();
+            $author = User::factory()->teacher()->create();
             $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
 
@@ -172,7 +172,7 @@ describe('CourseController -> update', function () {
         });
 
         it('fails if the book does not exist', function () {
-            $author = User::factory()->teacher()->verified()->create();
+            $author = User::factory()->teacher()->create();
             Sanctum::actingAs($author);
 
             patchJson(route('course.update', 999))
@@ -180,7 +180,7 @@ describe('CourseController -> update', function () {
         });
 
         it('fails if price is invalid', function () {
-            $author = User::factory()->teacher()->verified()->create();
+            $author = User::factory()->teacher()->create();
             $course = Course::factory()->for($author, 'author')->create();
 
             Sanctum::actingAs($author);
@@ -197,7 +197,7 @@ describe('CourseController -> update', function () {
     |--------------------------------------------------------------------------
     */
     it('flushes the course cache when a course is updated', function () {
-        $author = User::factory()->teacher()->verified()->create();
+        $author = User::factory()->teacher()->create();
         $course = Course::factory()->for($author, 'author')->create();
         Sanctum::actingAs($author);
 

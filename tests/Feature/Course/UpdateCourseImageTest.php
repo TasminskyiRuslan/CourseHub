@@ -52,14 +52,14 @@ describe('CourseImageController -> update', function () {
             expect($course->image_path)->toBeNull();
             Storage::disk('courses')->assertMissing($course->image_path);
         })->with([
-            'student' => fn() => User::factory()->student()->verified()->create(),
+            'student' => fn() => User::factory()->student()->create(),
             'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'another teacher' => fn() => User::factory()->teacher()->verified()->create(),
+            'another teacher' => fn() => User::factory()->teacher()->create(),
             'admin' => fn() => User::factory()->admin()->create(),
         ]);
 
         it('allows author to update their own course image', function () {
-            $author = User::factory()->teacher()->verified()->create();
+            $author = User::factory()->teacher()->create();
             $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
 
@@ -96,7 +96,7 @@ describe('CourseImageController -> update', function () {
     */
     describe('validation', function () {
         it('fails if the required fields are missing', function () {
-            $author = User::factory()->teacher()->verified()->create();
+            $author = User::factory()->teacher()->create();
             $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
 
@@ -106,7 +106,7 @@ describe('CourseImageController -> update', function () {
         });
 
         it('fails if the image is not a file', function () {
-            $author = User::factory()->teacher()->verified()->create();
+            $author = User::factory()->teacher()->create();
             $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
 
@@ -118,7 +118,7 @@ describe('CourseImageController -> update', function () {
         });
 
         it('fails if the file is not an image', function () {
-            $author = User::factory()->teacher()->verified()->create();
+            $author = User::factory()->teacher()->create();
             $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
 
@@ -130,7 +130,7 @@ describe('CourseImageController -> update', function () {
         });
 
         it('fails if the image exceeds the 2048KB size limit', function () {
-            $author = User::factory()->teacher()->verified()->create();
+            $author = User::factory()->teacher()->create();
             $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
 
@@ -142,7 +142,7 @@ describe('CourseImageController -> update', function () {
         });
 
         it('succeeds if image uploads with all allowed extensions', function (string $ext) {
-            $author = User::factory()->teacher()->verified()->create();
+            $author = User::factory()->teacher()->create();
             $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
 
@@ -157,7 +157,7 @@ describe('CourseImageController -> update', function () {
         })->with(['jpg', 'jpeg', 'png']);
 
         it('fails if the course does not exist', function () {
-            $author = User::factory()->teacher()->verified()->create();
+            $author = User::factory()->teacher()->create();
             Sanctum::actingAs($author);
 
             postJson(route('course.image.update', 999), imagePayload())
@@ -172,7 +172,7 @@ describe('CourseImageController -> update', function () {
     */
     describe('caching', function () {
         it('flushes the cache when an course image is updated', function () {
-            $author = User::factory()->teacher()->verified()->create();
+            $author = User::factory()->teacher()->create();
             $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
 

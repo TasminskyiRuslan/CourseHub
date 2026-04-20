@@ -671,6 +671,48 @@
                         "sanctum": []
                     }
                 ]
+            },
+            "delete": {
+                "tags": [
+                    "Course"
+                ],
+                "summary": "Remove a course image",
+                "description": "Remove the specified course image.",
+                "operationId": "e4bb9915f6ce96e6ce307381f97daf9c",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Course image deleted successfully."
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course not found."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
         "/courses/{course}/publish": {

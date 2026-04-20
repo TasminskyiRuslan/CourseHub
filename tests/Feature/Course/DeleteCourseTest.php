@@ -47,9 +47,9 @@ describe('CourseController -> destroy', function () {
                 'id' => $course->id,
             ]);
         })->with([
-            'student' => fn() => User::factory()->student()->verified()->create(),
+            'student' => fn() => User::factory()->student()->create(),
             'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'another teacher' => fn() => User::factory()->teacher()->verified()->create(),
+            'another teacher' => fn() => User::factory()->teacher()->create(),
         ]);
 
         it('allows author to delete their own course', function () {
@@ -116,7 +116,7 @@ describe('CourseController -> destroy', function () {
     |--------------------------------------------------------------------------
     */
     it('flushes the course cache when a course is updated', function () {
-        $author = User::factory()->teacher()->verified()->create();
+        $author = User::factory()->teacher()->create();
         $course = Course::factory()->for($author, 'author')->create();
         Sanctum::actingAs($author);
 

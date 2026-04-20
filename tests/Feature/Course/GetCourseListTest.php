@@ -43,8 +43,9 @@ describe('CourseController -> index', function () {
                 ->assertJsonCount($publishedCourses->count(), 'data');
         })->with([
             'guest' => null,
-            'unverified student' => fn() => User::factory()->student()->unverified()->create(),
-            'verified student' => fn() => User::factory()->student()->verified()->create(),
+            'unverified' => fn() => User::factory()->unverified()->create(),
+            'student' => fn() => User::factory()->student()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
         ]);
 
         it('allows the author to retrieve their own unpublished courses', function () {

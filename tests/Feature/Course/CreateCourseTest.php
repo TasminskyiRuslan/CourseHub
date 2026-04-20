@@ -36,8 +36,8 @@ describe('CourseController -> store', function () {
             postJson(route('course.store'), creatingCoursePayload())
                 ->assertForbidden();
         })->with([
-            'unverified student' => fn() => User::factory()->student()->unverified()->create(),
-            'verified student' => fn() => User::factory()->student()->verified()->create(),
+            'student' => fn() => User::factory()->student()->create(),
+            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
             'admin' => fn() => User::factory()->admin()->create(),
         ]);
 
@@ -56,7 +56,7 @@ describe('CourseController -> store', function () {
                 'author_id' => $user->id,
             ]);
         })->with([
-            'teacher' => fn() => User::factory()->teacher()->verified()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
             'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
         ]);
     });

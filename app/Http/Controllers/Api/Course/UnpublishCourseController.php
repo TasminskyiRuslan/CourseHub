@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Api\Course;
 
+use App\Actions\Course\UnpublishCourseAction;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\Courses\CourseResource;
 use App\Models\Course;
-use App\Services\Courses\CourseService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -17,8 +18,8 @@ class UnpublishCourseController extends Controller
 
     #[OA\Patch(
         path: '/courses/{course}/unpublish',
-        description: 'Unpublish a specific course.',
-        summary: 'Unpublish course',
+        description: 'Unpublish the specified course.',
+        summary: 'Unpublish a course',
         security: [['sanctum' => []]],
         tags: ['Course'],
         parameters: [
@@ -27,32 +28,45 @@ class UnpublishCourseController extends Controller
                 description: 'Course identifier (slug)',
                 in: 'path',
                 required: true,
-                schema: new OA\Schema(type: 'string')
+                schema: new OA\Schema(
+                    type: 'string',
+                    example: 'math-101'
+                )
             )
         ],
         responses: [
             new OA\Response(
-                response: SymfonyResponse::HTTP_NO_CONTENT,
-                description: 'Course unpublished'
+                response: SymfonyResponse::HTTP_OK,
+                description: 'Course unpublished successfully.'
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNAUTHORIZED,
-                description: 'Authentication required'
+                description: 'User is unauthenticated.'
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_FORBIDDEN,
-                description: 'Access denied'
+                description: 'User does not have permissions.'
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
-                description: 'Course not found'
+                description: 'Course not found.'
             )
         ]
     )]
-    public function __invoke(Request $request, Course $course, CourseService $service): Response
+    /**
+     * Unpublish the specified course.
+     *
+     * @param Request $request
+     * @param Course $course
+     * @param UnpublishCourseAction $unpublishCourseAction
+     * @return JsonResponse
+     */
+    public function __invoke(Request $request, Course $course, UnpublishCourseAction $unpublishCourseAction): JsonResponse
     {
         $this->authorize('unpublish', $course);
-        $service->unpublish($course);
-        return response()->noContent();
+        $course = $unpublishCourseAction->handle($course);
+        return CourseResource::make($course->loadCount('lessons')->loadMissing(['author', 'lessons']))
+            ->response()
+            ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 }

@@ -49,8 +49,7 @@ describe('PublishCourseController', function () {
         });
 
         it('fails if users tries to publish someone else\'s course', function ($user) {
-            $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->unpublished()->create();
+            $course = Course::factory()->unpublished()->create();
 
             if ($user) {
                 Sanctum::actingAs($user);

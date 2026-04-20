@@ -29,9 +29,8 @@ describe('CourseController -> index', function () {
                 Sanctum::actingAs($user);
             }
 
-            $author = User::factory()->teacher()->create();
             $publishedCourses = Course::factory()->count(3)->create();
-            $unpublishedCourses = Course::factory()->count(2)->unpublished()->for($author, 'author')->create();
+            $unpublishedCourses = Course::factory()->count(2)->unpublished()->create();
 
             getJson(route('course.index'))
                 ->assertOk()

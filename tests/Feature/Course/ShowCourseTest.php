@@ -36,8 +36,7 @@ describe('CourseController -> show', function () {
     */
     describe('permissions', function () {
         it('allows users to retrieve the course', function ($user) {
-            $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
+            $course = Course::factory()->create();
             if ($user) {
                 Sanctum::actingAs($user);
             }
@@ -68,8 +67,7 @@ describe('CourseController -> show', function () {
         });
 
         it('allows admins to retrieve any unpublished course', function ($user) {
-            $author = User::factory()->teacher()->create();
-            $unpublishedCourse = Course::factory()->unpublished()->for($author, 'author')->create();
+            $unpublishedCourse = Course::factory()->unpublished()->create();
             if ($user) {
                 Sanctum::actingAs($user);
             }

@@ -114,8 +114,7 @@ describe('CourseImageController -> update', function () {
         });
 
         it('fails if users tries to update someone else\'s course image', function ($user) {
-            $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
+            $course = Course::factory()->create();
 
             if ($user) {
                 Sanctum::actingAs($user);

@@ -49,8 +49,7 @@ describe('CourseController -> destroy', function () {
         });
 
         it('fails if users tries to delete someone else\'s course', function ($user) {
-            $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
+            $course = Course::factory()->create();
 
             if ($user) {
                 Sanctum::actingAs($user);
@@ -89,8 +88,7 @@ describe('CourseController -> destroy', function () {
             Storage::fake('courses');
             $filename = 'test-image';
 
-            $author = User::factory()->teacher()->create();
-            $course = Course::factory()->withImage($filename)->for($author, 'author')->create();
+            $course = Course::factory()->withImage($filename)->create();
 
             if ($user) {
                 Sanctum::actingAs($user);

@@ -761,8 +761,8 @@
                 "tags": [
                     "Course"
                 ],
-                "summary": "Unpublish course",
-                "description": "Unpublish a specific course.",
+                "summary": "Unpublish a course",
+                "description": "Unpublish the specified course.",
                 "operationId": "8a0226a3ec517403257dcc9e5b2864e5",
                 "parameters": [
                     {
@@ -771,22 +771,23 @@
                         "description": "Course identifier (slug)",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "math-101"
                         }
                     }
                 ],
                 "responses": {
-                    "204": {
-                        "description": "Course unpublished"
+                    "200": {
+                        "description": "Course unpublished successfully."
                     },
                     "401": {
-                        "description": "Authentication required"
+                        "description": "User is unauthenticated."
                     },
                     "403": {
-                        "description": "Access denied"
+                        "description": "User does not have permissions."
                     },
                     "404": {
-                        "description": "Course not found"
+                        "description": "Course not found."
                     }
                 },
                 "security": [

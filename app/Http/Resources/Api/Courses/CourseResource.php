@@ -39,7 +39,7 @@ class CourseResource extends JsonResource
             'description' => $this->description,
             'type' => $this->type,
             'price' => $this->price,
-            'image_url' => $this->image_path ? Storage::disk('public')->url($this->image_path) : null,
+            'image_url' => $this->image_path ? Storage::disk('courses')->url($this->image_path) : null,
             'is_published' => $this->is_published,
             'lessons_count' => $this->whenCounted('lessons_count'),
             'lessons' => LessonResource::collection($this->whenLoaded('lessons')),

@@ -189,6 +189,17 @@ class Course extends Model
     }
 
     /**
+     * Set the image path.
+     *
+     * @return $this
+     */
+    public function setImage(string $path): static
+    {
+        $this->image_path = $path;
+        return $this;
+    }
+
+    /**
      * Remove the image path.
      *
      * @return $this

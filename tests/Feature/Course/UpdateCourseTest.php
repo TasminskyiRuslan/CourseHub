@@ -201,11 +201,10 @@ describe('CourseController -> update', function () {
         $course = Course::factory()->for($author, 'author')->create();
         Sanctum::actingAs($author);
 
-        Cache::tags([config('cache.tags.course')])->put('courses', 'test_value', config('cache.ttl.books'));
+        Cache::tags([config('cache.tags.course')])->put('courses', 'test_value', config('cache.ttl.course'));
 
         patchJson(route('course.update', $course), updatingCoursePayload())
             ->assertOk();
-
         expect(Cache::tags([config('cache.tags.course')])->get('courses'))->toBeNull();
     });
 })->group('course');

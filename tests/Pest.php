@@ -13,6 +13,7 @@
 
 use App\Enums\CourseType;
 use App\Enums\UserRole;
+use Illuminate\Http\UploadedFile;
 
 pest()->extend(Tests\TestCase::class)
     // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
@@ -223,5 +224,19 @@ function updatingCoursePayload(array $overrides = []): array
         'title' => fake()->sentence(3),
         'description' => fake()->optional()->paragraph(),
         'price' => (string) fake()->randomFloat(2, 0, 99999999.99),
+    ], $overrides);
+}
+
+/**
+ * Generate an image payload with optional overrides.
+ *
+ * @param array $overrides
+ * @return array
+ */
+function imagePayload(array $overrides = []): array
+{
+    return array_merge([
+        'image'     => UploadedFile::fake()->image('image.jpg'),
+        '_method' => 'PUT',
     ], $overrides);
 }

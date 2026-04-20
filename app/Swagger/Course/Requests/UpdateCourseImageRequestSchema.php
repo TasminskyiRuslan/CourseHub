@@ -8,13 +8,21 @@ use OpenApi\Attributes as OA;
     schema: 'UpdateCourseImageRequest',
     title: 'Update Course Image Request',
     description: 'Request payload for updating a course image.',
-    required: ['image'],
+    required: ['image', '_method'],
     properties: [
         new OA\Property(
             property: 'image',
-            description: 'The image file. Allowed formats: jpg, jpeg, png, webp. Max size: 2048 KB.',
+            description: 'Image of the course.',
             type: 'string',
             format: 'binary'
+        ),
+        new OA\Property(
+            property: '_method',
+            description: 'Method spoofing to treat POST as PUT.',
+            type: 'string',
+            default: 'PUT',
+            enum: ['PUT'],
+            example: 'PUT'
         )
     ],
     type: 'object'

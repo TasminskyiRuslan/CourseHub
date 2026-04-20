@@ -607,6 +607,72 @@
                 ]
             }
         },
+        "/courses/{course}/image": {
+            "post": {
+                "tags": [
+                    "Course"
+                ],
+                "summary": "Update a course image",
+                "description": "Update the specified course image.",
+                "operationId": "a7d7fd4dc45f82ed33e8aa84b68f6690",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCourseImageRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Course image updated successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CourseResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course not found."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/courses/{course}/publish": {
             "patch": {
                 "tags": [
@@ -1273,13 +1339,23 @@
                 "title": "Update Course Image Request",
                 "description": "Request payload for updating a course image.",
                 "required": [
-                    "image"
+                    "image",
+                    "_method"
                 ],
                 "properties": {
                     "image": {
-                        "description": "The image file. Allowed formats: jpg, jpeg, png, webp. Max size: 2048 KB.",
+                        "description": "Image of the course.",
                         "type": "string",
                         "format": "binary"
+                    },
+                    "_method": {
+                        "description": "Method spoofing to treat POST as PUT.",
+                        "type": "string",
+                        "default": "PUT",
+                        "enum": [
+                            "PUT"
+                        ],
+                        "example": "PUT"
                     }
                 },
                 "type": "object"

@@ -98,11 +98,12 @@ Route::prefix('courses')->group(function () {
         ->middleware(['auth:sanctum', 'verified'])
         ->name('course.image.destroy');
 
-    // Publish/Unpublish actions
-    Route::patch('/publish', PublishCourseController::class)
+    // Publish course actions
+    Route::patch('{course}/publish', PublishCourseController::class)
         ->middleware(['auth:sanctum', 'verified'])
         ->name('course.publish');
-    Route::patch('/unpublish', UnpublishCourseController::class)
+    // Unpublish course action
+    Route::patch('{course}/unpublish', UnpublishCourseController::class)
         ->middleware(['auth:sanctum', 'verified'])
         ->name('course.unpublish');
 

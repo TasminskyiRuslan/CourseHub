@@ -720,8 +720,8 @@
                 "tags": [
                     "Course"
                 ],
-                "summary": "Publish course",
-                "description": "Publish a specific course.",
+                "summary": "Publish a course",
+                "description": "Publish the specified course.",
                 "operationId": "c8056c77345bb2662b17653c2b9417b1",
                 "parameters": [
                     {
@@ -730,22 +730,23 @@
                         "description": "Course identifier (slug)",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "math-101"
                         }
                     }
                 ],
                 "responses": {
-                    "204": {
-                        "description": "Course published"
+                    "200": {
+                        "description": "Course published successfully."
                     },
                     "401": {
-                        "description": "Authentication required"
+                        "description": "User is unauthenticated."
                     },
                     "403": {
-                        "description": "Access denied"
+                        "description": "User does not have permissions."
                     },
                     "404": {
-                        "description": "Course not found"
+                        "description": "Course not found."
                     }
                 },
                 "security": [

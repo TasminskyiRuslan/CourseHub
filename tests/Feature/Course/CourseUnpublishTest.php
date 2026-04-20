@@ -15,7 +15,7 @@ describe('UnpublishCourseController', function () {
         $this->student = User::factory()->student()->create();
         $this->admin = User::factory()->admin()->create();
 
-        $this->course = Course::factory()->published()->for($this->author, 'author')->create();
+        $this->course = Course::factory()->for($this->author, 'author')->create();
     });
 
     /*

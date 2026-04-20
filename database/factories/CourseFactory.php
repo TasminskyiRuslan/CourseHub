@@ -29,18 +29,8 @@ class CourseFactory extends Factory
             'price' => fake()->randomFloat(2, 0, 500),
             'type' => fake()->randomElement(CourseType::cases()),
             'image_path' => null,
-            'is_published' => false,
+            'is_published' => true,
         ];
-    }
-
-    /**
-     * Indicate that the course is published.
-     *
-     * @return $this
-     */
-    public function published(): static
-    {
-        return $this->state(fn() => ['is_published' => true]);
     }
 
     /**

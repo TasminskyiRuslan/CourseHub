@@ -47,7 +47,7 @@ describe('ResendVerificationEmailController', function () {
 
         it('does nothing if email is already verified', function () {
             Notification::fake();
-            $user = User::factory()->verified()->create();
+            $user = User::factory()->create();
             Sanctum::actingAs($user);
 
             postJson(route('auth.verification.resend'))

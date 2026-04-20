@@ -18,6 +18,21 @@ describe('CourseController -> destroy', function () {
 
     /*
     |--------------------------------------------------------------------------
+    | validation
+    |--------------------------------------------------------------------------
+    */
+    describe('validation', function () {
+        it('fails if the course does not exist', function () {
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
+
+            deleteJson(route('course.destroy', 'non-existing-slug'))
+                ->assertNotFound();
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
     | permissions
     |--------------------------------------------------------------------------
     */
@@ -93,21 +108,6 @@ describe('CourseController -> destroy', function () {
             'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
         ]);
-    });
-
-    /*
-    |--------------------------------------------------------------------------
-    | validation
-    |--------------------------------------------------------------------------
-    */
-    describe('validation', function () {
-        it('fails if the course does not exist', function () {
-            $author = User::factory()->teacher()->create();
-            Sanctum::actingAs($author);
-
-            deleteJson(route('course.destroy', 999))
-                ->assertNotFound();
-        });
     });
 
     /*

@@ -31,7 +31,7 @@ describe('RegisterController', function () {
         it('fails if the email is already taken', function () {
             $data = registrationPayload();
 
-            User::factory()->verified()->create(['email' => $data['email']]);
+            User::factory()->create(['email' => $data['email']]);
 
             postJson(route('auth.register'), $data)
                 ->assertUnprocessable()

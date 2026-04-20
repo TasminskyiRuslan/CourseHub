@@ -19,71 +19,6 @@ describe('CourseController -> update', function () {
 
     /*
     |--------------------------------------------------------------------------
-    | permissions
-    |--------------------------------------------------------------------------
-    */
-    describe('permissions', function () {
-        it('fails if unauthenticated user tries to update a course', function () {
-            $course = Course::factory()->create();
-
-            patchJson(route('course.update', $course), updatingCoursePayload())
-                ->assertUnauthorized();
-        });
-
-        it('fails if users tries to update someone else\'s course', function ($user) {
-            $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
-
-            if ($user) {
-                Sanctum::actingAs($user);
-            }
-
-            patchJson(route('course.update', $course), updatingCoursePayload())
-                ->assertForbidden();
-        })->with([
-            'student' => fn() => User::factory()->student()->create(),
-            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'another teacher' => fn() => User::factory()->teacher()->create(),
-            'admin' => fn() => User::factory()->admin()->create(),
-        ]);
-
-        it('allows author to update their own course', function () {
-            $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
-            Sanctum::actingAs($author);
-
-            $data = updatingCoursePayload();
-
-            patchJson(route('course.update', $course), $data)
-                ->assertOk()
-                ->assertJsonPath('data.title', $data['title']);
-            $this->assertDatabaseHas('courses', [
-                'id' => $course->id,
-                'title' => $data['title'],
-                'description' => $data['description'],
-            ]);
-        });
-
-        it('allows super-admin to update any course', function () {
-            $superAdmin = User::whereEmail(config('super-admin.email'))->first();
-            $course = Course::factory()->create(['title' => 'Original Title']);
-            Sanctum::actingAs($superAdmin);
-
-            $data = updatingCoursePayload();
-
-            patchJson(route('course.update', $course), $data)
-                ->assertOk()
-                ->assertJsonPath('data.title', $data['title']);
-            $this->assertDatabaseHas('courses', [
-                'id' => $course->id,
-                'title' => $data['title'],
-                'description' => $data['description'],
-            ]);
-        });
-    });
-
-    /*
-    |--------------------------------------------------------------------------
     | validation
     |--------------------------------------------------------------------------
     */
@@ -171,14 +106,6 @@ describe('CourseController -> update', function () {
                 ->assertJsonFragment(['slug' => $course->slug]);
         });
 
-        it('fails if the book does not exist', function () {
-            $author = User::factory()->teacher()->create();
-            Sanctum::actingAs($author);
-
-            patchJson(route('course.update', 999))
-                ->assertNotFound();
-        });
-
         it('fails if price is invalid', function () {
             $author = User::factory()->teacher()->create();
             $course = Course::factory()->for($author, 'author')->create();
@@ -188,6 +115,79 @@ describe('CourseController -> update', function () {
             patchJson(route('course.update', $course), ['price' => 'not-a-number'])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['price']);
+        });
+
+        it('fails if the book does not exist', function () {
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
+
+            patchJson(route('course.update', 'non-existing-slug'))
+                ->assertNotFound();
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | permissions
+    |--------------------------------------------------------------------------
+    */
+    describe('permissions', function () {
+        it('fails if unauthenticated user tries to update a course', function () {
+            $course = Course::factory()->create();
+
+            patchJson(route('course.update', $course), updatingCoursePayload())
+                ->assertUnauthorized();
+        });
+
+        it('fails if users tries to update someone else\'s course', function ($user) {
+            $author = User::factory()->teacher()->create();
+            $course = Course::factory()->for($author, 'author')->create();
+
+            if ($user) {
+                Sanctum::actingAs($user);
+            }
+
+            patchJson(route('course.update', $course), updatingCoursePayload())
+                ->assertForbidden();
+        })->with([
+            'student' => fn() => User::factory()->student()->create(),
+            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
+            'another teacher' => fn() => User::factory()->teacher()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
+        ]);
+
+        it('allows author to update their own course', function () {
+            $author = User::factory()->teacher()->create();
+            $course = Course::factory()->for($author, 'author')->create();
+            Sanctum::actingAs($author);
+
+            $data = updatingCoursePayload();
+
+            patchJson(route('course.update', $course), $data)
+                ->assertOk()
+                ->assertJsonPath('data.title', $data['title']);
+            $this->assertDatabaseHas('courses', [
+                'id' => $course->id,
+                'title' => $data['title'],
+                'description' => $data['description'],
+            ]);
+        });
+
+        it('allows super-admin to update any course', function () {
+            $superAdmin = User::whereEmail(config('super-admin.email'))->first();
+            $course = Course::factory()->create(['title' => 'Original Title']);
+            Sanctum::actingAs($superAdmin);
+
+            $data = updatingCoursePayload();
+
+            patchJson(route('course.update', $course), $data)
+                ->assertOk()
+                ->assertJsonPath('data.title', $data['title']);
+            $this->assertDatabaseHas('courses', [
+                'id' => $course->id,
+                'title' => $data['title'],
+                'description' => $data['description'],
+            ]);
         });
     });
 

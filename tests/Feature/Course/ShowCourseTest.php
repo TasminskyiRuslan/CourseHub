@@ -37,7 +37,7 @@ describe('CourseController -> show', function () {
     describe('permissions', function () {
         it('allows users to retrieve the course', function ($user) {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->published()->for($author, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
             if ($user) {
                 Sanctum::actingAs($user);
             }

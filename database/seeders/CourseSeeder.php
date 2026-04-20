@@ -14,13 +14,11 @@ class CourseSeeder extends Seeder
     {
         Course::factory()
             ->count(10)
-            ->published()
             ->withImage()
             ->create();
 
         Course::factory()
             ->count(5)
-            ->published()
             ->free()
             ->withImage()
             ->create();

@@ -32,7 +32,7 @@ describe('LogoutAllController', function () {
     */
     describe('success', function () {
         it('revokes all authentication tokens', function () {
-            $user = User::factory()->verified()->create();
+            $user = User::factory()->create();
             collect(range(1, 5))
                 ->each(fn() => $user->createToken('access_token'));
             Sanctum::actingAs($user);

@@ -72,7 +72,7 @@ describe('ForgotPasswordController', function () {
             ]);
         })
         ->with([
-            'verified user' => fn() => User::factory()->verified()->create(),
+            'verified user' => fn() => User::factory()->create(),
             'unverified user' => fn() => User::factory()->unverified()->create(),
         ]);
 

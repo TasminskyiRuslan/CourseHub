@@ -25,7 +25,7 @@ describe('ResetPasswordController', function () {
     describe('validation', function () {
         it('fails if the token is invalid', function () {
             $newPassword = 'new-password';
-            $user = User::factory()->verified()->create();
+            $user = User::factory()->create();
 
             postJson(route('auth.password.reset'), [
                 'email' => $user->email,
@@ -44,7 +44,7 @@ describe('ResetPasswordController', function () {
         });
 
         it('fails if the password confirmation does not match', function () {
-            $user = User::factory()->verified()->create();
+            $user = User::factory()->create();
 
             postJson(route('auth.password.reset'), [
                 'email' => $user->email,
@@ -58,7 +58,7 @@ describe('ResetPasswordController', function () {
 
         it('fails if the email format is invalid', function () {
             $newPassword = 'new-password';
-            $user = User::factory()->verified()->create();
+            $user = User::factory()->create();
 
             postJson(route('auth.password.reset'), [
                 'email' => 'invalid-email',
@@ -72,7 +72,7 @@ describe('ResetPasswordController', function () {
 
         it('fails if the email does not exist', function () {
             $newPassword = 'new-password';
-            $user = User::factory()->verified()->create();
+            $user = User::factory()->create();
 
             postJson(route('auth.password.reset'), [
                 'email' => 'nonexistent@example.com',
@@ -85,7 +85,7 @@ describe('ResetPasswordController', function () {
         });
 
         it('fails if the new password is too short', function () {
-            $user = User::factory()->verified()->create();
+            $user = User::factory()->create();
 
             postJson(route('auth.password.reset'), [
                 'email' => $user->email,

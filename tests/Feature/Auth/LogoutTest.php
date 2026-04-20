@@ -32,7 +32,7 @@ describe('LogoutController', function () {
     */
     describe('success', function () {
         it('revokes the current access token only', function () {
-            $user = User::factory()->verified()->create();
+            $user = User::factory()->create();
 
             Sanctum::actingAs($user);
 

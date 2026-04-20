@@ -33,7 +33,7 @@ describe('MeController', function () {
     */
     describe('success', function () {
         it('returns authenticated user data', function () {
-            $user = User::factory()->verified()->create();
+            $user = User::factory()->create();
             Sanctum::actingAs($user);
 
             getJson(route('auth.me'))

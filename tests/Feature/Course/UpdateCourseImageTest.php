@@ -22,75 +22,6 @@ describe('CourseImageController -> update', function () {
 
     /*
     |--------------------------------------------------------------------------
-    | permissions
-    |--------------------------------------------------------------------------
-    */
-    describe('permissions', function () {
-        it('fails if an unauthenticated user tries to update the course image', function () {
-            $course = Course::factory()->create();
-
-            postJson(route('course.image.update', $course), imagePayload())
-                ->assertUnauthorized();
-
-            $course->refresh();
-            expect($course->image_path)->toBeNull();
-            Storage::disk('courses')->assertMissing($course->image_path);
-        });
-
-        it('fails if users tries to update someone else\'s course image', function ($user) {
-            $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
-
-            if ($user) {
-                Sanctum::actingAs($user);
-            }
-
-            postJson(route('course.image.update', $course), imagePayload())
-                ->assertForbidden();
-
-            $course->refresh();
-            expect($course->image_path)->toBeNull();
-            Storage::disk('courses')->assertMissing($course->image_path);
-        })->with([
-            'student' => fn() => User::factory()->student()->create(),
-            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'another teacher' => fn() => User::factory()->teacher()->create(),
-            'admin' => fn() => User::factory()->admin()->create(),
-        ]);
-
-        it('allows author to update their own course image', function () {
-            $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
-            Sanctum::actingAs($author);
-
-            $data = imagePayload();
-
-            postJson(route('course.image.update', $course), $data)
-                ->assertOk()
-                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $course->type)]);
-            $course->refresh();
-            expect($course->image_path)->not()->toBeNull();
-            Storage::disk('courses')->assertExists($course->image_path);
-        });
-
-        it('allows super-admin to update any course image', function () {
-            $superAdmin = User::whereEmail(config('super-admin.email'))->first();
-            $course = Course::factory()->create(['title' => 'Original Title']);
-            Sanctum::actingAs($superAdmin);
-
-            $data = imagePayload();
-
-            postJson(route('course.image.update', $course), $data)
-                ->assertOk()
-                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $course->type)]);
-            $course->refresh();
-            expect($course->image_path)->not()->toBeNull();
-            Storage::disk('courses')->assertExists($course->image_path);
-        });
-    });
-
-    /*
-    |--------------------------------------------------------------------------
     | validation
     |--------------------------------------------------------------------------
     */
@@ -160,8 +91,77 @@ describe('CourseImageController -> update', function () {
             $author = User::factory()->teacher()->create();
             Sanctum::actingAs($author);
 
-            postJson(route('course.image.update', 999), imagePayload())
+            postJson(route('course.image.update', 'non-existing-slug'), imagePayload())
                 ->assertNotFound();
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | permissions
+    |--------------------------------------------------------------------------
+    */
+    describe('permissions', function () {
+        it('fails if an unauthenticated user tries to update the course image', function () {
+            $course = Course::factory()->create();
+
+            postJson(route('course.image.update', $course), imagePayload())
+                ->assertUnauthorized();
+
+            $course->refresh();
+            expect($course->image_path)->toBeNull();
+            Storage::disk('courses')->assertMissing($course->image_path);
+        });
+
+        it('fails if users tries to update someone else\'s course image', function ($user) {
+            $author = User::factory()->teacher()->create();
+            $course = Course::factory()->for($author, 'author')->create();
+
+            if ($user) {
+                Sanctum::actingAs($user);
+            }
+
+            postJson(route('course.image.update', $course), imagePayload())
+                ->assertForbidden();
+
+            $course->refresh();
+            expect($course->image_path)->toBeNull();
+            Storage::disk('courses')->assertMissing($course->image_path);
+        })->with([
+            'student' => fn() => User::factory()->student()->create(),
+            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
+            'another teacher' => fn() => User::factory()->teacher()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
+        ]);
+
+        it('allows author to update their own course image', function () {
+            $author = User::factory()->teacher()->create();
+            $course = Course::factory()->for($author, 'author')->create();
+            Sanctum::actingAs($author);
+
+            $data = imagePayload();
+
+            postJson(route('course.image.update', $course), $data)
+                ->assertOk()
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $course->type)]);
+            $course->refresh();
+            expect($course->image_path)->not()->toBeNull();
+            Storage::disk('courses')->assertExists($course->image_path);
+        });
+
+        it('allows super-admin to update any course image', function () {
+            $superAdmin = User::whereEmail(config('super-admin.email'))->first();
+            $course = Course::factory()->create();
+            Sanctum::actingAs($superAdmin);
+
+            $data = imagePayload();
+
+            postJson(route('course.image.update', $course), $data)
+                ->assertOk()
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $course->type)]);
+            $course->refresh();
+            expect($course->image_path)->not()->toBeNull();
+            Storage::disk('courses')->assertExists($course->image_path);
         });
     });
 

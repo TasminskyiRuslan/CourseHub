@@ -79,7 +79,7 @@ describe('LoginController', function () {
         })
         ->with([
             'unverified user' => fn() => User::factory()->unverified()->create(['password' => 'secret']),
-            'verified user' => fn() => User::factory()->verified()->create(['password' => 'secret']),
+            'verified user' => fn() => User::factory()->create(['password' => 'secret']),
             'student' => fn() => User::factory()->student()->create(['password' => 'secret']),
             'teacher' => fn() => User::factory()->teacher()->create(['password' => 'secret']),
             'admin' => fn() => User::factory()->admin()->create(['password' => 'secret']),
@@ -95,7 +95,7 @@ describe('LoginController', function () {
     describe('success', function () {
         it('sets a long token expiration when remember is true', function () {
             $password = 'password';
-            $user = User::factory()->verified()->create(['password' => $password]);
+            $user = User::factory()->create(['password' => $password]);
 
             $response = postJson(route('auth.login'), [
                 'email' => $user->email,
@@ -109,7 +109,7 @@ describe('LoginController', function () {
 
         it('sets a short token expiration when remember is false', function () {
             $password = 'password';
-            $user = User::factory()->verified()->create(['password' => $password]);
+            $user = User::factory()->create(['password' => $password]);
 
             $response = postJson(route('auth.login'), [
                 'email' => $user->email,
@@ -123,7 +123,7 @@ describe('LoginController', function () {
 
         it('sets a short token expiration by default', function () {
             $password = 'password';
-            $user = User::factory()->verified()->create(['password' => $password]);
+            $user = User::factory()->create(['password' => $password]);
 
             $response = postJson(route('auth.login'), [
                 'email' => $user->email,

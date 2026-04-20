@@ -66,18 +66,6 @@ class UserFactory extends Factory
     }
 
     /**
-     * Indicate that the user is verified.
-     *
-     * @return $this
-     */
-    public function verified(): static
-    {
-        return $this->state(fn() => [
-            'email_verified_at' => now(),
-        ]);
-    }
-
-    /**
      * Indicate that the user has the student role.
      *
      * @return $this

@@ -36,7 +36,7 @@ class CoursePolicy
             return false;
         }
 
-        if ($user->isAuthorOf($course)) {
+        if ($user->is($course->author)) {
             return true;
         }
 
@@ -63,7 +63,7 @@ class CoursePolicy
      */
     public function update(User $user, Course $course): bool
     {
-        return $user->can(UserPermission::COURSE_EDIT_OWN->value) && $user->isAuthorOf($course);
+        return $user->can(UserPermission::COURSE_EDIT_OWN->value) && $user->is($course->author);
     }
 
     /**
@@ -79,16 +79,20 @@ class CoursePolicy
             return true;
         }
 
-        return $user->can(UserPermission::COURSE_DELETE_OWN->value) && $user->isAuthorOf($course);
+        return $user->can(UserPermission::COURSE_DELETE_OWN->value) && $user->is($course->author);
     }
 
     public function publish(User $user, Course $course): bool
     {
-        return $user->hasPermissionTo(UserPermission::COURSE_PUBLISH->value) && $user->isAuthorOf($course);
+        return $user->can(UserPermission::COURSE_PUBLISH_OWN->value) && $user->is($course->author);
     }
 
     public function unpublish(User $user, Course $course): bool
     {
-        return $user->hasPermissionTo(UserPermission::COURSE_UNPUBLISH->value) && $user->isAuthorOf($course) || $user->hasPermissionTo(UserPermission::COURSE_UNPUBLISH_ANY->value);
+        if ($user->can(UserPermission::COURSE_UNPUBLISH_ANY->value)) {
+            return true;
+        }
+
+        return $user->can(UserPermission::COURSE_PUBLISH_OWN->value) && $user->is($course->author);
     }
 }

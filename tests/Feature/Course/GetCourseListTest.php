@@ -30,7 +30,7 @@ describe('CourseController -> index', function () {
             }
 
             $author = User::factory()->teacher()->create();
-            $publishedCourses = Course::factory()->count(3)->published()->create();
+            $publishedCourses = Course::factory()->count(3)->create();
             $unpublishedCourses = Course::factory()->count(2)->unpublished()->for($author, 'author')->create();
 
             getJson(route('course.index'))
@@ -52,7 +52,7 @@ describe('CourseController -> index', function () {
             $author = User::factory()->teacher()->create();
             Sanctum::actingAs($author);
 
-            $publishedCourses = Course::factory()->count(2)->published()->create();
+            $publishedCourses = Course::factory()->count(2)->create();
             $ownUnpublishedCourses = Course::factory()->count(2)->unpublished()->for($author, 'author')->create();
             $unpublishedCourses = Course::factory()->unpublished()->create();
 
@@ -66,7 +66,7 @@ describe('CourseController -> index', function () {
                 Sanctum::actingAs($user);
             }
 
-            $publishedCourses = Course::factory()->count(2)->published()->create();
+            $publishedCourses = Course::factory()->count(2)->create();
             $unpublishedCourses = Course::factory()->count(3)->unpublished()->create();
 
             getJson(route('course.index'))
@@ -85,8 +85,8 @@ describe('CourseController -> index', function () {
     */
     describe('filters & sorting', function () {
         it('filters courses by a search string', function () {
-            $course1 = Course::factory()->published()->create(['title' => 'Laravel Deep Dive']);
-            $course2 = Course::factory()->published()->create(['title' => 'React Basics']);
+            $course1 = Course::factory()->create(['title' => 'Laravel Deep Dive']);
+            $course2 = Course::factory()->create(['title' => 'React Basics']);
             $searchString = substr($course1->title, 7);
 
             getJson(route('course.index', ['filter[search]' => $searchString]))
@@ -97,8 +97,8 @@ describe('CourseController -> index', function () {
 
         it('filters courses by author slug', function () {
             $author = User::factory()->create();
-            $course1 = Course::factory()->for($author, 'author')->published()->create();
-            $course2 = Course::factory()->published()->create();
+            $course1 = Course::factory()->for($author, 'author')->create();
+            $course2 = Course::factory()->create();
 
             getJson(route('course.index', ['filter[author]' => $author]))
                 ->assertOk()
@@ -107,9 +107,9 @@ describe('CourseController -> index', function () {
         });
 
         it('sorts courses by created_at (desc) by default', function () {
-            $oldCourse = Course::factory()->published()->create();
+            $oldCourse = Course::factory()->create();
             $oldCourse->setCreatedAt(now()->subDays(2))->save();
-            $newCourse = Course::factory()->published()->create();
+            $newCourse = Course::factory()->create();
             $newCourse->setCreatedAt(now()->subDay())->save();
 
             getJson(route('course.index'))
@@ -119,9 +119,9 @@ describe('CourseController -> index', function () {
         });
 
         it('sorts courses by created_at (asc and desc)', function () {
-            $oldCourse = Course::factory()->published()->create();
+            $oldCourse = Course::factory()->create();
             $oldCourse->setCreatedAt(now()->subDays(2))->save();
-            $newCourse = Course::factory()->published()->create();
+            $newCourse = Course::factory()->create();
             $newCourse->setCreatedAt(now()->subDay())->save();
 
             getJson(route('course.index', ['sort' => 'created_at']))
@@ -135,9 +135,9 @@ describe('CourseController -> index', function () {
         });
 
         it('sorts courses by title (asc and desc)', function () {
-            $courseA = Course::factory()->published()->create(['title' => 'CourseA']);
-            $courseB = Course::factory()->published()->create(['title' => 'CourseB']);
-            $courseC = Course::factory()->published()->create(['title' => 'CourseC']);
+            $courseA = Course::factory()->create(['title' => 'CourseA']);
+            $courseB = Course::factory()->create(['title' => 'CourseB']);
+            $courseC = Course::factory()->create(['title' => 'CourseC']);
 
             getJson(route('course.index', ['sort' => 'title']))
                 ->assertOk()
@@ -153,8 +153,8 @@ describe('CourseController -> index', function () {
         });
 
         it('sorts courses by price (asc and desc)', function () {
-            $cheap = Course::factory()->published()->create(['price' => 100]);
-            $expensive = Course::factory()->published()->create(['price' => 500]);
+            $cheap = Course::factory()->create(['price' => 100]);
+            $expensive = Course::factory()->create(['price' => 500]);
 
             getJson(route('course.index', ['sort' => 'price']))
                 ->assertOk()
@@ -167,7 +167,7 @@ describe('CourseController -> index', function () {
         });
 
         it('includes author, lessons_count, lessons by using the include query parameter', function () {
-            $courses = Course::factory()->published()->type(CourseType::OFFLINE)->count(3)->create();
+            $courses = Course::factory()->type(CourseType::OFFLINE)->count(3)->create();
 
             getJson(route('course.index', ['include' => 'author,lessons_count,lessons']))
                 ->assertOk()
@@ -179,7 +179,7 @@ describe('CourseController -> index', function () {
         });
 
         it('returns empty data when no courses match the search', function () {
-            Course::factory()->published()->create();
+            Course::factory()->create();
 
             getJson(route('course.index', ['filter[search]' => 'non-existent']))
                 ->assertOk()
@@ -204,7 +204,7 @@ describe('CourseController -> index', function () {
 
         it('returns data from the cache instead of the database on subsequent requests', function () {
             $oldTitle = 'CourseA';
-            Course::factory()->published()->create(['title' => $oldTitle]);
+            Course::factory()->create(['title' => $oldTitle]);
 
             getJson(route('course.index'))->assertOk();
 

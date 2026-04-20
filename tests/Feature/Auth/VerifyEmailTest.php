@@ -92,7 +92,7 @@ describe('VerifyEmailController', function () {
 
         it('does nothing if the email is already verified', function () {
             Event::fake();
-            $user = User::factory()->verified()->create();
+            $user = User::factory()->create();
 
             getJson(URL::temporarySignedRoute(
                 'auth.verification.verify',

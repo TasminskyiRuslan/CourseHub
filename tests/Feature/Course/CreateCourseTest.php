@@ -20,49 +20,6 @@ describe('CourseController -> store', function () {
 
     /*
     |--------------------------------------------------------------------------
-    | permissions
-    |--------------------------------------------------------------------------
-    */
-    describe('permissions', function () {
-        it('fails if unauthenticated user tries to create a course', function () {
-            postJson(route('course.store'), creatingCoursePayload())
-                ->assertUnauthorized();
-        });
-
-        it('fails if users without course:create tries to create a course', function ($user) {
-            if ($user) {
-                Sanctum::actingAs($user);
-            }
-            postJson(route('course.store'), creatingCoursePayload())
-                ->assertForbidden();
-        })->with([
-            'student' => fn() => User::factory()->student()->create(),
-            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'admin' => fn() => User::factory()->admin()->create(),
-        ]);
-
-        it('allows users with course:create to create a course', function ($user) {
-            if ($user) {
-                Sanctum::actingAs($user);
-            }
-            $data = creatingCoursePayload();
-
-            postJson(route('course.store'), $data)
-                ->assertCreated()
-                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $data['type'])]);
-
-            $this->assertDatabaseHas('courses', [
-                'title' => $data['title'],
-                'author_id' => $user->id,
-            ]);
-        })->with([
-            'teacher' => fn() => User::factory()->teacher()->create(),
-            'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
-        ]);
-    });
-
-    /*
-    |--------------------------------------------------------------------------
     | validation
     |--------------------------------------------------------------------------
     */
@@ -144,6 +101,49 @@ describe('CourseController -> store', function () {
                 ->assertCreated()
                 ->assertJsonFragment(['slug' => $slug]);
         });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | permissions
+    |--------------------------------------------------------------------------
+    */
+    describe('permissions', function () {
+        it('fails if unauthenticated user tries to create a course', function () {
+            postJson(route('course.store'), creatingCoursePayload())
+                ->assertUnauthorized();
+        });
+
+        it('fails if users without course:create tries to create a course', function ($user) {
+            if ($user) {
+                Sanctum::actingAs($user);
+            }
+            postJson(route('course.store'), creatingCoursePayload())
+                ->assertForbidden();
+        })->with([
+            'student' => fn() => User::factory()->student()->create(),
+            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
+        ]);
+
+        it('allows users with course:create to create a course', function ($user) {
+            if ($user) {
+                Sanctum::actingAs($user);
+            }
+            $data = creatingCoursePayload();
+
+            postJson(route('course.store'), $data)
+                ->assertCreated()
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $data['type'])]);
+
+            $this->assertDatabaseHas('courses', [
+                'title' => $data['title'],
+                'author_id' => $user->id,
+            ]);
+        })->with([
+            'teacher' => fn() => User::factory()->teacher()->create(),
+            'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
+        ]);
     });
 
     /*

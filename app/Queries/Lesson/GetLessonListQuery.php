@@ -16,7 +16,7 @@ class GetLessonListQuery
     use HasCacheBypass;
 
     /**
-     * Get paginated lessons with conditional caching.
+     * Retrieve paginated lessons with conditional caching.
      *
      * @param Course $course
      * @param User|null $user

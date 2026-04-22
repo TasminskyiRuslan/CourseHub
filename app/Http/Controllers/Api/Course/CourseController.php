@@ -8,7 +8,7 @@ use App\Actions\Course\UpdateCourseAction;
 use App\Data\Course\Requests\CreateCourseData;
 use App\Data\Course\Requests\UpdateCourseData;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\Courses\CourseResource;
+use App\Http\Resources\Api\Course\CourseResource;
 use App\Models\Course;
 use App\Queries\Course\GetCourseListQuery;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -24,7 +24,7 @@ class CourseController extends Controller
 
     #[OA\Get(
         path: '/courses',
-        description: 'Retrieve a cached and paginated list of courses with filters and sorting.',
+        description: 'Retrieve a paginated list of courses.',
         summary: 'Retrieve a list of courses',
         security: [['sanctum' => []], []],
         tags: ['Course'],
@@ -81,7 +81,7 @@ class CourseController extends Controller
         ]
     )]
     /**
-     * Retrieve a cached and paginated list of courses with filters and sorting.
+     * Retrieve a paginated list of courses.
      *
      * @param GetCourseListQuery $getCourseListQuery
      * @return JsonResponse

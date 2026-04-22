@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Http\Resources\Api\Lessons\OnlineLessonResource;
+use App\Http\Resources\Api\Lesson\OnlineLessonResource;
 use Database\Factories\OnlineLessonFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,8 +19,8 @@ use Illuminate\Support\Carbon;
  * @property string|null $meeting_link
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read Lesson|null $lesson
- * @method static OnlineLessonFactory factory($count = null, $state = [])
+ * @property-read \App\Models\Lesson|null $lesson
+ * @method static \Database\Factories\OnlineLessonFactory factory($count = null, $state = [])
  * @method static Builder<static>|OnlineLesson newModelQuery()
  * @method static Builder<static>|OnlineLesson newQuery()
  * @method static Builder<static>|OnlineLesson query()

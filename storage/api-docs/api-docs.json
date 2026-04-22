@@ -331,7 +331,7 @@
                     "Course"
                 ],
                 "summary": "Retrieve a list of courses",
-                "description": "Retrieve a cached and paginated list of courses with filters and sorting.",
+                "description": "Retrieve a paginated list of courses.",
                 "operationId": "fb9d5ed8eebcf64545eccbec4e07e665",
                 "parameters": [
                     {
@@ -802,23 +802,24 @@
                 "tags": [
                     "Lessons"
                 ],
-                "summary": "List course lessons",
-                "description": "Retrieve a list of lessons for a specific course.",
+                "summary": "Retrieve a list of course lessons",
+                "description": "Retrieve a paginated list of course lessons.",
                 "operationId": "235f3dcd29c974b5dfacc6f125487fc1",
                 "parameters": [
                     {
                         "name": "course",
                         "in": "path",
-                        "description": "Course identifier (slug)",
+                        "description": "Course identifier (slug).",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "math-101"
                         }
                     },
                     {
                         "name": "filter[search]",
                         "in": "query",
-                        "description": "Search lessons by title",
+                        "description": "Search lessons by title.",
                         "required": false,
                         "schema": {
                             "type": "string"
@@ -827,7 +828,7 @@
                     {
                         "name": "sort",
                         "in": "query",
-                        "description": "Sort lessons by field. Use \"-\" prefix for descending order",
+                        "description": "Sort lessons by field. Use \"-\" prefix for descending order.",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -844,7 +845,7 @@
                     {
                         "name": "page",
                         "in": "query",
-                        "description": "Page number for pagination",
+                        "description": "Page number for pagination.",
                         "required": false,
                         "schema": {
                             "type": "integer",
@@ -854,20 +855,28 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Lessons list",
+                        "description": "Lesson list retrieved successfully.",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/LessonCollection"
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/LessonResponse"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
                     "403": {
-                        "description": "Access denied"
+                        "description": "User does not have permissions."
                     },
                     "404": {
-                        "description": "Course not found"
+                        "description": "Course not found."
                     }
                 },
                 "security": [
@@ -1546,6 +1555,12 @@
                         "type": "boolean",
                         "example": true
                     },
+                    "lessons_count": {
+                        "description": "Total number of course lessons",
+                        "type": "integer",
+                        "example": 10,
+                        "nullable": true
+                    },
                     "created_at": {
                         "description": "Creation date of the course",
                         "type": "string",
@@ -1557,11 +1572,168 @@
                         "type": "string",
                         "format": "date-time",
                         "example": "2026-01-25T12:00:00Z"
-                    },
-                    "lessons_count": {
-                        "description": "Total number of course lessons",
+                    }
+                },
+                "type": "object"
+            },
+            "LessonResponse": {
+                "title": "Data of a specific lesson.",
+                "required": [
+                    "id",
+                    "course_id",
+                    "title",
+                    "slug",
+                    "position",
+                    "content",
+                    "created_at",
+                    "updated_at"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier of the lesson.",
                         "type": "integer",
-                        "example": 10,
+                        "example": 1
+                    },
+                    "course_id": {
+                        "description": "Course unique identifier of the lesson.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "description": "Title of the lesson.",
+                        "type": "string",
+                        "example": "Introduction to Algebra"
+                    },
+                    "slug": {
+                        "description": "Slug of the lesson.",
+                        "type": "string",
+                        "example": "introduction-to-algebra"
+                    },
+                    "position": {
+                        "description": "Position of the lesson.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "content": {
+                        "description": "Content of the lesson.",
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/OfflineLessonResponse"
+                            },
+                            {
+                                "$ref": "#/components/schemas/OnlineLessonResponse"
+                            },
+                            {
+                                "$ref": "#/components/schemas/VideoLessonResponse"
+                            }
+                        ]
+                    },
+                    "created_at": {
+                        "description": "Creation date of the lesson.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-01T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "description": "Modification date of the lesson.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-10T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "OfflineLessonResponse": {
+                "title": "Offline Lesson Response",
+                "description": "Content of a specific offline lesson.",
+                "required": [
+                    "start_time",
+                    "end_time",
+                    "address",
+                    "room_number"
+                ],
+                "properties": {
+                    "start_time": {
+                        "description": "Start time of the offline lesson.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2027-02-01T10:00:00Z",
+                        "nullable": true
+                    },
+                    "end_time": {
+                        "description": "End time of the offline lesson.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2027-02-01T12:00:00Z",
+                        "nullable": true
+                    },
+                    "address": {
+                        "description": "Address of the offline lesson.",
+                        "type": "string",
+                        "example": "123 Main St, Springfield",
+                        "nullable": true
+                    },
+                    "room_number": {
+                        "description": "Room number of the offline lesson.",
+                        "type": "string",
+                        "example": "Room 101",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "OnlineLessonResponse": {
+                "title": "Online Lesson Response",
+                "description": "Content of a specific online lesson.",
+                "required": [
+                    "start_time",
+                    "end_time",
+                    "meeting_link"
+                ],
+                "properties": {
+                    "start_time": {
+                        "description": "Start time of the online lesson.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2027-02-01T10:00:00Z",
+                        "nullable": true
+                    },
+                    "end_time": {
+                        "description": "End time of the online lesson.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2027-02-01T12:00:00Z",
+                        "nullable": true
+                    },
+                    "meeting_link": {
+                        "description": "Link of the online lesson.",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "https://meet.example.com/lesson123",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "VideoLessonResponse": {
+                "title": "Video Lesson Response",
+                "description": "Content of a specific video lesson.",
+                "required": [
+                    "video_url",
+                    "provider"
+                ],
+                "properties": {
+                    "video_url": {
+                        "description": "Link of the video lesson.",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "https://videos.example.com/lesson123.mp4",
+                        "nullable": true
+                    },
+                    "provider": {
+                        "description": "Provider of the video lesson.",
+                        "type": "string",
+                        "example": "youtube",
                         "nullable": true
                     }
                 },

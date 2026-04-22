@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Http\Resources\Api\Lessons\VideoLessonResource;
+use App\Http\Resources\Api\Lesson\VideoLessonResource;
 use Database\Factories\VideoLessonFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,8 +18,8 @@ use Illuminate\Support\Carbon;
  * @property string|null $provider
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read Lesson|null $lesson
- * @method static VideoLessonFactory factory($count = null, $state = [])
+ * @property-read \App\Models\Lesson|null $lesson
+ * @method static \Database\Factories\VideoLessonFactory factory($count = null, $state = [])
  * @method static Builder<static>|VideoLesson newModelQuery()
  * @method static Builder<static>|VideoLesson newQuery()
  * @method static Builder<static>|VideoLesson query()

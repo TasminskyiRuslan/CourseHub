@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Course;
 
 use App\Actions\Course\PublishCourseAction;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\Courses\CourseResource;
+use App\Http\Resources\Api\Course\CourseResource;
 use App\Models\Course;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Lesson;
 use App\Data\Lesson\CreateLessonData;
 use App\Data\Lesson\UpdateLessonData;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\Lessons\LessonResource;
+use App\Http\Resources\Api\Lesson\LessonResource;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Queries\Lesson\GetLessonListQuery;
@@ -29,28 +29,31 @@ class LessonController extends Controller
 
     #[OA\Get(
         path: '/courses/{course}/lessons',
-        description: 'Retrieve a list of lessons for a specific course.',
-        summary: 'List course lessons',
+        description: 'Retrieve a paginated list of course lessons.',
+        summary: 'Retrieve a list of course lessons',
         security: [['sanctum' => []], []],
         tags: ['Lessons'],
         parameters: [
             new OA\Parameter(
                 name: 'course',
-                description: 'Course identifier (slug)',
+                description: 'Course identifier (slug).',
                 in: 'path',
                 required: true,
-                schema: new OA\Schema(type: 'string')
+                schema: new OA\Schema(
+                    type: 'string',
+                    example: 'math-101'
+                )
             ),
             new OA\Parameter(
                 name: 'filter[search]',
-                description: 'Search lessons by title',
+                description: 'Search lessons by title.',
                 in: 'query',
                 required: false,
                 schema: new OA\Schema(type: 'string')
             ),
             new OA\Parameter(
                 name: 'sort',
-                description: 'Sort lessons by field. Use "-" prefix for descending order',
+                description: 'Sort lessons by field. Use "-" prefix for descending order.',
                 in: 'query',
                 required: false,
                 schema: new OA\Schema(
@@ -60,7 +63,7 @@ class LessonController extends Controller
             ),
             new OA\Parameter(
                 name: 'page',
-                description: 'Page number for pagination',
+                description: 'Page number for pagination.',
                 in: 'query',
                 required: false,
                 schema: new OA\Schema(type: 'integer', minimum: 1)
@@ -69,21 +72,29 @@ class LessonController extends Controller
         responses: [
             new OA\Response(
                 response: SymfonyResponse::HTTP_OK,
-                description: 'Lessons list',
-                content: new OA\JsonContent(ref: '#/components/schemas/LessonCollection')
+                description: 'Lesson list retrieved successfully.',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            type: 'array',
+                            items: new OA\Items(ref: '#/components/schemas/LessonResponse')
+                        )
+                    ]
+                )
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_FORBIDDEN,
-                description: 'Access denied'
+                description: 'User does not have permissions.'
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
-                description: 'Course not found'
+                description: 'Course not found.'
             ),
         ]
     )]
     /**
-     * Retrieve a cached and paginated list of course lessons with filters and sorting.
+     * Retrieve a paginated list of course lessons.
      *
      * @param Course $course
      * @param GetLessonListQuery $getLessonListQuery

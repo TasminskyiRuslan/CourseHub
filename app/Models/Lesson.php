@@ -24,12 +24,13 @@ use Spatie\Sluggable\SlugOptions;
  * @property int $lessonable_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read Course $course
- * @property-read Model|Eloquent $lessonable
- * @method static LessonFactory factory($count = null, $state = [])
+ * @property-read \App\Models\Course $course
+ * @property-read Model|\Eloquent $lessonable
+ * @method static \Database\Factories\LessonFactory factory($count = null, $state = [])
  * @method static Builder<static>|Lesson newModelQuery()
  * @method static Builder<static>|Lesson newQuery()
  * @method static Builder<static>|Lesson query()
+ * @method static Builder<static>|Lesson visibleFor(?\App\Models\User $user)
  * @method static Builder<static>|Lesson whereCourseId($value)
  * @method static Builder<static>|Lesson whereCreatedAt($value)
  * @method static Builder<static>|Lesson whereId($value)

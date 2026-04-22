@@ -6,9 +6,8 @@ use App\Actions\Course\DeleteCourseImageAction;
 use App\Actions\Course\UpdateCourseImageAction;
 use App\Data\Course\Requests\UpdateCourseImageData;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\Courses\CourseResource;
+use App\Http\Resources\Api\Course\CourseResource;
 use App\Models\Course;
-use App\Services\Courses\CourseService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -19,12 +18,6 @@ use Throwable;
 class CourseImageController extends Controller
 {
     use AuthorizesRequests;
-
-    public function __construct(
-        protected CourseService $courseService
-    )
-    {
-    }
 
     #[OA\Post(
         path: '/courses/{course}/image',

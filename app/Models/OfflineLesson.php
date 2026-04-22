@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Http\Resources\Api\Lessons\OfflineLessonResource;
+use App\Http\Resources\Api\Lesson\OfflineLessonResource;
 use Database\Factories\OfflineLessonFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
@@ -20,8 +20,8 @@ use Illuminate\Support\Carbon;
  * @property string|null $room_number
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read Lesson|null $lesson
- * @method static OfflineLessonFactory factory($count = null, $state = [])
+ * @property-read \App\Models\Lesson|null $lesson
+ * @method static \Database\Factories\OfflineLessonFactory factory($count = null, $state = [])
  * @method static Builder<static>|OfflineLesson newModelQuery()
  * @method static Builder<static>|OfflineLesson newQuery()
  * @method static Builder<static>|OfflineLesson query()

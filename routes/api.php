@@ -114,27 +114,27 @@ Route::prefix('courses')->group(function () {
         ->middleware(['auth:sanctum', 'verified'])
         ->name('course.unpublish');
 
-    Route::prefix('lessons')->group(function () {
+    Route::prefix('/{course}/lessons')->group(function () {
         // Get course lessons list action
-        Route::get('/{course}', [LessonController::class, 'index'])
+        Route::get('/', [LessonController::class, 'index'])
             ->name('course.lesson.index');
 
         // Create lesson action
-        Route::post('/{course}', [LessonController::class, 'store'])
+        Route::post('/', [LessonController::class, 'store'])
             ->middleware(['auth:sanctum', 'verified'])
             ->name('course.lesson.store');
 
         // Show lesson action
-        Route::get('/{course}/{lesson}', [LessonController::class, 'show'])
+        Route::get('/{lesson}', [LessonController::class, 'show'])
             ->name('course.lesson.show');
 
         // Update lesson action
-        Route::put('/{course}/{lesson}', [LessonController::class, 'update'])
+        Route::put('/{lesson}', [LessonController::class, 'update'])
             ->middleware(['auth:sanctum', 'verified'])
             ->name('course.lesson.update');
 
         // Delete lesson action
-        Route::delete('/{course}/{lesson}', [LessonController::class, 'destroy'])
+        Route::delete('/{lesson}', [LessonController::class, 'destroy'])
             ->middleware(['auth:sanctum', 'verified'])
             ->name('course.lesson.destroy');
     });

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Resources\Api\Courses;
+namespace App\Http\Resources\Api\Course;
 
-use App\Http\Resources\Api\Lessons\LessonResource;
+use App\Http\Resources\Api\Lesson\LessonResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;

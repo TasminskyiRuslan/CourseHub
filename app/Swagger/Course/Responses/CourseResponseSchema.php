@@ -77,6 +77,13 @@ use OpenApi\Attributes as OA;
             example: true
         ),
         new OA\Property(
+            property: 'lessons_count',
+            description: 'Total number of course lessons',
+            type: 'integer',
+            example: 10,
+            nullable: true
+        ),
+        new OA\Property(
             property: 'created_at',
             description: 'Creation date of the course',
             type: 'string',
@@ -89,13 +96,6 @@ use OpenApi\Attributes as OA;
             type: 'string',
             format: 'date-time',
             example: '2026-01-25T12:00:00Z'
-        ),
-        new OA\Property(
-            property: 'lessons_count',
-            description: 'Total number of course lessons',
-            type: 'integer',
-            example: 10,
-            nullable: true
         )
     ],
     type: 'object'

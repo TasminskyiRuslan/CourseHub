@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\SendResetPasswordEmailAction;
-use App\Data\Auth\Requests\ForgotPasswordData;
+use App\Data\Auth\Requests\SendPasswordResetEmailData;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
-class ForgotPasswordController extends Controller
+class SendPasswordResetEmailController extends Controller
 {
     use AuthorizesRequests;
 
@@ -41,13 +41,13 @@ class ForgotPasswordController extends Controller
     /**
      * Send an email with a link to reset the password.
      *
-     * @param ForgotPasswordData $forgotPasswordData
+     * @param SendPasswordResetEmailData $passwordResetEmailData
      * @param SendResetPasswordEmailAction $sendResetPasswordEmailAction
      * @return Response
      */
-    public function __invoke(ForgotPasswordData $forgotPasswordData, SendResetPasswordEmailAction $sendResetPasswordEmailAction): Response
+    public function __invoke(SendPasswordResetEmailData $passwordResetEmailData, SendResetPasswordEmailAction $sendResetPasswordEmailAction): Response
     {
-        $sendResetPasswordEmailAction->handle($forgotPasswordData);
+        $sendResetPasswordEmailAction->handle($passwordResetEmailData);
         return response()->noContent();
     }
 }

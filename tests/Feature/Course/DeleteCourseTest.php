@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\CourseType;
+use App\Models\Lesson;
 use App\Models\User;
 use App\Models\Course;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -12,6 +14,7 @@ uses(RefreshDatabase::class);
 
 describe('CourseController -> destroy', function () {
     beforeEach(function () {
+        Cache::flush();
         $this->seed(RolesAndPermissionsSeeder::class);
         $this->seed(SuperAdminUserSeeder::class);
     });
@@ -49,11 +52,11 @@ describe('CourseController -> destroy', function () {
         });
 
         it('fails if users tries to delete someone else\'s course', function ($user) {
-            $course = Course::factory()->create();
-
             if ($user) {
                 Sanctum::actingAs($user);
             }
+
+            $course = Course::factory()->create();
 
             deleteJson(route('course.destroy', $course))
                 ->assertForbidden();
@@ -67,13 +70,13 @@ describe('CourseController -> destroy', function () {
         ]);
 
         it('allows author to delete their own course', function () {
-            Storage::fake('courses');
-            $filename = 'test-image';
-
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->withImage($filename)->for($author, 'author')->create();
             Sanctum::actingAs($author);
 
+            Storage::fake('courses');
+            $filename = 'test-image';
+            $course = Course::factory()->withImage($filename)->for($author, 'author')->create();
+            $lessons = Lesson::factory()->for($course)->count(8)->create();
             Storage::disk('courses')->put($filename, 'fake');
 
             deleteJson(route('course.destroy', $course))
@@ -81,19 +84,31 @@ describe('CourseController -> destroy', function () {
             $this->assertDatabaseMissing('courses', [
                 'id' => $course->id,
             ]);
+            foreach ($lessons as $lesson) {
+                $this->assertDatabaseMissing('lessons', ['id' => $lesson->id]);
+
+                $lessonableTable = match ($course->type) {
+                    CourseType::OFFLINE => 'offline_lessons',
+                    CourseType::ONLINE => 'online_lessons',
+                    CourseType::VIDEO => 'video_lessons',
+                };
+
+                $this->assertDatabaseMissing($lessonableTable, [
+                    'id' => $lesson->lessonable->id,
+                ]);
+            }
             Storage::disk('courses')->assertMissing($filename);
         });
 
         it('allows admins to delete the course and its image', function ($user) {
-            Storage::fake('courses');
-            $filename = 'test-image';
-
-            $course = Course::factory()->withImage($filename)->create();
-
             if ($user) {
                 Sanctum::actingAs($user);
             }
 
+            Storage::fake('courses');
+            $filename = 'test-image';
+            $course = Course::factory()->withImage($filename)->create();
+            $lessons = Lesson::factory()->for($course)->count(8)->create();
             Storage::disk('courses')->put($filename, 'fake');
 
             deleteJson(route('course.destroy', $course))
@@ -101,6 +116,19 @@ describe('CourseController -> destroy', function () {
             $this->assertDatabaseMissing('courses', [
                 'id' => $course->id,
             ]);
+            foreach ($lessons as $lesson) {
+                $this->assertDatabaseMissing('lessons', ['id' => $lesson->id]);
+
+                $lessonableTable = match ($course->type) {
+                    CourseType::OFFLINE => 'offline_lessons',
+                    CourseType::ONLINE => 'online_lessons',
+                    CourseType::VIDEO => 'video_lessons',
+                };
+
+                $this->assertDatabaseMissing($lessonableTable, [
+                    'id' => $lesson->lessonable->id,
+                ]);
+            }
             Storage::disk('courses')->assertMissing($filename);
         })->with([
             'admin' => fn() => User::factory()->admin()->create(),
@@ -115,14 +143,14 @@ describe('CourseController -> destroy', function () {
     */
     it('flushes the course cache when a course is updated', function () {
         $author = User::factory()->teacher()->create();
-        $course = Course::factory()->for($author, 'author')->create();
         Sanctum::actingAs($author);
 
-        Cache::tags([config('cache.tags.course')])->put('courses', 'test_value', config('cache.ttl.books'));
+        $course = Course::factory()->for($author, 'author')->create();
+        Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.books'));
 
         deleteJson(route('course.destroy', $course))
             ->assertNoContent();
 
-        expect(Cache::tags([config('cache.tags.course')])->get('courses'))->toBeNull();
+        expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->toBeNull();
     });
 })->group('course');

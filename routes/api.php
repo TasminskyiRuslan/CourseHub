@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\Auth\ForgotPasswordController;
+use App\Http\Controllers\Api\Auth\SendPasswordResetEmailController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\LogoutAllController;
 use App\Http\Controllers\Api\Auth\LogoutController;
@@ -35,25 +35,31 @@ Route::prefix('auth')->group(function () {
         ->middleware('auth:sanctum')
         ->name('auth.me');
 
-    // Logout actions
+    // Logout action
     Route::delete('/logout', LogoutController::class)
         ->middleware('auth:sanctum')
         ->name('auth.logout');
+
+    // Logout all action
     Route::delete('/logout/all', LogoutAllController::class)
         ->middleware('auth:sanctum')
         ->name('auth.logout.all');
 
-    // Password actions
-    Route::post('/password/forgot', ForgotPasswordController::class)
+    // Send password reset email action
+    Route::post('/password/forgot', SendPasswordResetEmailController::class)
         ->middleware('throttle:5,1')
         ->name('auth.password.forgot');
+
+    // Reset password action
     Route::post('/password/reset', ResetPasswordController::class)
         ->name('auth.password.reset');
 
-    // Email verification actions
+    // Verify email actions
     Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)
         ->middleware(['signed', 'throttle:6,1'])
         ->name('auth.verification.verify');
+
+    // Resend verification email action
     Route::post('/email/verification-notification', ResendVerificationEmailController::class)
         ->middleware(['auth:sanctum', 'throttle:6,1'])
         ->name('auth.verification.resend');
@@ -94,33 +100,42 @@ Route::prefix('courses')->group(function () {
         ->name('course.image.update');
 
     // Delete course image action
-    Route::delete('{course}/image', [CourseImageController::class, 'destroy'])
+    Route::delete('/{course}/image', [CourseImageController::class, 'destroy'])
         ->middleware(['auth:sanctum', 'verified'])
         ->name('course.image.destroy');
 
     // Publish course actions
-    Route::patch('{course}/publish', PublishCourseController::class)
+    Route::patch('/{course}/publish', PublishCourseController::class)
         ->middleware(['auth:sanctum', 'verified'])
         ->name('course.publish');
+
     // Unpublish course action
-    Route::patch('{course}/unpublish', UnpublishCourseController::class)
+    Route::patch('/{course}/unpublish', UnpublishCourseController::class)
         ->middleware(['auth:sanctum', 'verified'])
         ->name('course.unpublish');
 
-    // Lesson actions
     Route::prefix('lessons')->group(function () {
-        Route::get('/', [LessonController::class, 'index'])
-            ->name('lesson.index');
-        Route::post('/', [LessonController::class, 'store'])
+        // Get course lessons list action
+        Route::get('/{course}', [LessonController::class, 'index'])
+            ->name('course.lesson.index');
+
+        // Create lesson action
+        Route::post('/{course}', [LessonController::class, 'store'])
             ->middleware(['auth:sanctum', 'verified'])
-            ->name('lesson.store');
-        Route::get('/{lesson}', [LessonController::class, 'show'])
-            ->name('lesson.show');
-        Route::put('/{lesson}', [LessonController::class, 'update'])
+            ->name('course.lesson.store');
+
+        // Show lesson action
+        Route::get('/{course}/{lesson}', [LessonController::class, 'show'])
+            ->name('course.lesson.show');
+
+        // Update lesson action
+        Route::put('/{course}/{lesson}', [LessonController::class, 'update'])
             ->middleware(['auth:sanctum', 'verified'])
-            ->name('lesson.update');
-        Route::delete('/{lesson}', [LessonController::class, 'destroy'])
+            ->name('course.lesson.update');
+
+        // Delete lesson action
+        Route::delete('/{course}/{lesson}', [LessonController::class, 'destroy'])
             ->middleware(['auth:sanctum', 'verified'])
-            ->name('lesson.destroy');
+            ->name('course.lesson.destroy');
     });
 });

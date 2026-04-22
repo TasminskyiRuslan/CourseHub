@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\CourseType;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
@@ -15,9 +14,10 @@ uses(RefreshDatabase::class);
 describe('CourseImageController -> update', function () {
 
     beforeEach(function () {
+        Cache::flush();
+        Storage::fake('courses');
         $this->seed(RolesAndPermissionsSeeder::class);
         $this->seed(SuperAdminUserSeeder::class);
-        Storage::fake('courses');
     });
 
     /*
@@ -28,8 +28,9 @@ describe('CourseImageController -> update', function () {
     describe('validation', function () {
         it('fails if the required fields are missing', function () {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
+
+            $course = Course::factory()->for($author, 'author')->create();
 
             postJson(route('course.image.update', $course), ['_method' => 'PUT'])
                 ->assertUnprocessable()
@@ -38,8 +39,9 @@ describe('CourseImageController -> update', function () {
 
         it('fails if the image is not a file', function () {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
+
+            $course = Course::factory()->for($author, 'author')->create();
 
             postJson(route('course.image.update', $course), imagePayload([
                 'image' => 'not-a-file',
@@ -50,8 +52,9 @@ describe('CourseImageController -> update', function () {
 
         it('fails if the file is not an image', function () {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
+
+            $course = Course::factory()->for($author, 'author')->create();
 
             postJson(route('course.image.update', $course), imagePayload([
                 'image' => UploadedFile::fake()->create('document.pdf'),
@@ -62,8 +65,9 @@ describe('CourseImageController -> update', function () {
 
         it('fails if the image exceeds the 2048KB size limit', function () {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
+
+            $course = Course::factory()->for($author, 'author')->create();
 
             postJson(route('course.image.update', $course), imagePayload([
                 'image' => UploadedFile::fake()->create('author.jpg')->size(2049),
@@ -74,14 +78,15 @@ describe('CourseImageController -> update', function () {
 
         it('succeeds if image uploads with all allowed extensions', function (string $ext) {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
+
+            $course = Course::factory()->for($author, 'author')->create();
 
             postJson(route('course.image.update', $course), imagePayload([
                 'image' => UploadedFile::fake()->image("author.$ext"),
             ]))
                 ->assertOk()
-                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $course->type)]);
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
             $course->refresh();
             expect($course->image_path)->not->toBeNull();
             Storage::disk('courses')->assertExists($course->image_path);
@@ -107,22 +112,20 @@ describe('CourseImageController -> update', function () {
 
             postJson(route('course.image.update', $course), imagePayload())
                 ->assertUnauthorized();
-
             $course->refresh();
             expect($course->image_path)->toBeNull();
             Storage::disk('courses')->assertMissing($course->image_path);
         });
 
         it('fails if users tries to update someone else\'s course image', function ($user) {
-            $course = Course::factory()->create();
-
             if ($user) {
                 Sanctum::actingAs($user);
             }
 
+            $course = Course::factory()->create();
+
             postJson(route('course.image.update', $course), imagePayload())
                 ->assertForbidden();
-
             $course->refresh();
             expect($course->image_path)->toBeNull();
             Storage::disk('courses')->assertMissing($course->image_path);
@@ -135,14 +138,14 @@ describe('CourseImageController -> update', function () {
 
         it('allows author to update their own course image', function () {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
 
+            $course = Course::factory()->for($author, 'author')->create();
             $data = imagePayload();
 
             postJson(route('course.image.update', $course), $data)
                 ->assertOk()
-                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $course->type)]);
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
             $course->refresh();
             expect($course->image_path)->not()->toBeNull();
             Storage::disk('courses')->assertExists($course->image_path);
@@ -150,14 +153,14 @@ describe('CourseImageController -> update', function () {
 
         it('allows super-admin to update any course image', function () {
             $superAdmin = User::whereEmail(config('super-admin.email'))->first();
-            $course = Course::factory()->create();
             Sanctum::actingAs($superAdmin);
 
+            $course = Course::factory()->create();
             $data = imagePayload();
 
             postJson(route('course.image.update', $course), $data)
                 ->assertOk()
-                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $course->type)]);
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
             $course->refresh();
             expect($course->image_path)->not()->toBeNull();
             Storage::disk('courses')->assertExists($course->image_path);
@@ -172,14 +175,15 @@ describe('CourseImageController -> update', function () {
     describe('caching', function () {
         it('flushes the cache when an course image is updated', function () {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
 
-            Cache::tags([config('cache.tags.course')])->put('courses', 'test_value', config('cache.ttl.books'));
+            $course = Course::factory()->for($author, 'author')->create();
+            Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.books'));
 
             postJson(route('course.image.update', $course), imagePayload())
-                ->assertOk();
-            expect(Cache::tags([config('cache.tags.course')])->get('courses'))->toBeNull();
+                ->assertOk()
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
+            expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->toBeNull();
         });
     });
 })->group('course');

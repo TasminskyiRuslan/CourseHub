@@ -9,7 +9,7 @@ use OpenApi\Attributes as OA;
     schema: 'CourseResponse',
     title: 'Course Response',
     description: 'Data of a specific course.',
-    required: ['id', 'author_id', 'author', 'title', 'slug', 'description', 'type', 'price', 'image_url', 'is_published', 'created_at', 'updated_at'],
+    required: ['id', 'author_id', 'title', 'slug', 'description', 'type', 'price', 'image_url', 'is_published', 'created_at', 'updated_at'],
     properties: [
         new OA\Property(
             property: 'id',
@@ -27,6 +27,7 @@ use OpenApi\Attributes as OA;
             property: 'author',
             ref: '#/components/schemas/Author',
             description: 'Author of the course',
+            nullable: true
         ),
         new OA\Property(
             property: 'title',
@@ -89,6 +90,13 @@ use OpenApi\Attributes as OA;
             format: 'date-time',
             example: '2026-01-25T12:00:00Z'
         ),
+        new OA\Property(
+            property: 'lessons_count',
+            description: 'Total number of course lessons',
+            type: 'integer',
+            example: 10,
+            nullable: true
+        )
     ],
     type: 'object'
 )]

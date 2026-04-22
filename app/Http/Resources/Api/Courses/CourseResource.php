@@ -42,7 +42,6 @@ class CourseResource extends JsonResource
             'image_url' => $this->image_path ? Storage::disk('courses')->url($this->image_path) : null,
             'is_published' => $this->is_published,
             'lessons_count' => $this->whenCounted('lessons_count'),
-            'lessons' => LessonResource::collection($this->whenLoaded('lessons')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -8,9 +8,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Lessons\LessonResource;
 use App\Models\Course;
 use App\Models\Lesson;
+use App\Queries\Lesson\GetLessonListQuery;
 use App\Services\Lessons\LessonService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -81,11 +82,20 @@ class LessonController extends Controller
             ),
         ]
     )]
-    public function index(Course $course): AnonymousResourceCollection
+    /**
+     * Retrieve a cached and paginated list of course lessons with filters and sorting.
+     *
+     * @param Course $course
+     * @param GetLessonListQuery $getLessonListQuery
+     * @return JsonResponse
+     */
+    public function index(Course $course, GetLessonListQuery $getLessonListQuery): JsonResponse
     {
-        $this->authorize('viewAny', [Lesson::class, $course]);
-        $lessonsList = $this->lessonService->search($course);
-        return LessonResource::collection($lessonsList);
+        $this->authorize('view-any', [Lesson::class, $course]);
+        $lessons = $getLessonListQuery->get($course, auth()->user());
+        return LessonResource::collection($lessons)
+            ->response()
+            ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 
     #[OA\Post(

@@ -44,7 +44,7 @@ class CoursePolicy
     }
 
     /**
-     * Determine whether the user can create courses.
+     * Determine whether the user can create a course.
      *
      * @param User $user
      * @return bool
@@ -82,11 +82,25 @@ class CoursePolicy
         return $user->can(UserPermission::COURSE_DELETE_OWN->value) && $user->is($course->author);
     }
 
+    /**
+     * Determine whether the user can publish the course.
+     *
+     * @param User $user
+     * @param Course $course
+     * @return bool
+     */
     public function publish(User $user, Course $course): bool
     {
         return $user->can(UserPermission::COURSE_PUBLISH_OWN->value) && $user->is($course->author);
     }
 
+    /**
+     * Determine whether the user can unpublish the course.
+     *
+     * @param User $user
+     * @param Course $course
+     * @return bool
+     */
     public function unpublish(User $user, Course $course): bool
     {
         if ($user->can(UserPermission::COURSE_UNPUBLISH_ANY->value)) {

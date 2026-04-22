@@ -25,9 +25,9 @@ describe('CourseController -> update', function () {
     describe('validation', function () {
         it('fails if the present fields are empty', function () {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
-
             Sanctum::actingAs($author);
+
+            $course = Course::factory()->for($author, 'author')->create();
 
             patchJson(route('course.update', $course), updatingCoursePayload([
                 'title' => '',
@@ -40,9 +40,9 @@ describe('CourseController -> update', function () {
 
         it('fails if the present fields are null', function () {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
-
             Sanctum::actingAs($author);
+
+            $course = Course::factory()->for($author, 'author')->create();
 
             patchJson(route('course.update', $course), updatingCoursePayload([
                 'title' => null,
@@ -55,9 +55,9 @@ describe('CourseController -> update', function () {
 
         it('fails if the fields are too long', function () {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
-
             Sanctum::actingAs($author);
+
+            $course = Course::factory()->for($author, 'author')->create();
 
             patchJson(route('course.update', $course), updatingCoursePayload([
                 'title' => str_repeat('A', 256),
@@ -71,9 +71,10 @@ describe('CourseController -> update', function () {
 
         it('fails if the slug is taken by another course', function () {
             $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
+
             $course = Course::factory()->for($author, 'author')->create(['slug' => 'my-slug']);
             $anotherCourse = Course::factory()->for($author, 'author')->create(['slug' => 'taken-slug']);
-            Sanctum::actingAs($author);
 
             patchJson(route('course.update', $course), updatingCoursePayload([
                 'slug' => $anotherCourse->slug,
@@ -84,8 +85,9 @@ describe('CourseController -> update', function () {
 
         it('fails if the slug format is invalid', function () {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
+
+            $course = Course::factory()->for($author, 'author')->create();
 
             patchJson(route('course.update', $course), updatingCoursePayload([
                 'slug' => 'Invalid Slug!'
@@ -96,21 +98,23 @@ describe('CourseController -> update', function () {
 
         it('succeeds if the slug remains the same (ignore current)', function () {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
+
+            $course = Course::factory()->for($author, 'author')->create();
 
             patchJson(route('course.update', $course), [
                 'slug' => $course->slug,
             ])
                 ->assertOk()
-                ->assertJsonFragment(['slug' => $course->slug]);
+                ->assertJsonFragment(['slug' => $course->slug])
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
         });
 
         it('fails if price is invalid', function () {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
-
             Sanctum::actingAs($author);
+
+            $course = Course::factory()->for($author, 'author')->create();
 
             patchJson(route('course.update', $course), ['price' => 'not-a-number'])
                 ->assertUnprocessable()
@@ -140,11 +144,11 @@ describe('CourseController -> update', function () {
         });
 
         it('fails if users tries to update someone else\'s course', function ($user) {
-            $course = Course::factory()->create();
-
             if ($user) {
                 Sanctum::actingAs($user);
             }
+
+            $course = Course::factory()->create();
 
             patchJson(route('course.update', $course), updatingCoursePayload())
                 ->assertForbidden();
@@ -157,14 +161,15 @@ describe('CourseController -> update', function () {
 
         it('allows author to update their own course', function () {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
 
+            $course = Course::factory()->for($author, 'author')->create();
             $data = updatingCoursePayload();
 
             patchJson(route('course.update', $course), $data)
                 ->assertOk()
-                ->assertJsonPath('data.title', $data['title']);
+                ->assertJsonPath('data.title', $data['title'])
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
             $this->assertDatabaseHas('courses', [
                 'id' => $course->id,
                 'title' => $data['title'],
@@ -174,14 +179,15 @@ describe('CourseController -> update', function () {
 
         it('allows super-admin to update any course', function () {
             $superAdmin = User::whereEmail(config('super-admin.email'))->first();
-            $course = Course::factory()->create(['title' => 'Original Title']);
             Sanctum::actingAs($superAdmin);
 
+            $course = Course::factory()->create(['title' => 'Original Title']);
             $data = updatingCoursePayload();
 
             patchJson(route('course.update', $course), $data)
                 ->assertOk()
-                ->assertJsonPath('data.title', $data['title']);
+                ->assertJsonPath('data.title', $data['title'])
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
             $this->assertDatabaseHas('courses', [
                 'id' => $course->id,
                 'title' => $data['title'],
@@ -197,13 +203,14 @@ describe('CourseController -> update', function () {
     */
     it('flushes the course cache when a course is updated', function () {
         $author = User::factory()->teacher()->create();
-        $course = Course::factory()->for($author, 'author')->create();
         Sanctum::actingAs($author);
 
-        Cache::tags([config('cache.tags.course')])->put('courses', 'test_value', config('cache.ttl.course'));
+        $course = Course::factory()->for($author, 'author')->create();
+        Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.course'));
 
         patchJson(route('course.update', $course), updatingCoursePayload())
-            ->assertOk();
-        expect(Cache::tags([config('cache.tags.course')])->get('courses'))->toBeNull();
+            ->assertOk()
+            ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
+        expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->toBeNull();
     });
 })->group('course');

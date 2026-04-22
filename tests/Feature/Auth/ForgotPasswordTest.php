@@ -12,7 +12,7 @@ use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class);
 
-describe('ForgotPasswordController', function () {
+describe('SendPasswordResetEmailController', function () {
     beforeEach(function () {
         $this->withoutMiddleware(ThrottleRequests::class);
         $this->seed(RolesAndPermissionsSeeder::class);

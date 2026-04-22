@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Observers\Lesson\LessonObserver;
 use Database\Factories\LessonFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
@@ -75,16 +76,7 @@ class Lesson extends Model
      */
     protected static function booted(): void
     {
-        static::creating(function (Lesson $lesson) {
-            if (!is_null($lesson->position)) {
-                return;
-            }
-            $maxPosition = Lesson::where('course_id', $lesson->course_id)->max('position');
-            $lesson->position = $maxPosition + 1;
-        });
-        static::deleting(function (Lesson $lesson) {
-            $lesson->lessonable?->delete();
-        });
+        static::observe(LessonObserver::class);
     }
 
     /**
@@ -129,5 +121,19 @@ class Lesson extends Model
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
+    }
+
+    /**
+     * Scope a query to only include lessons of courses visible to the given user.
+     *
+     * @param Builder $query
+     * @param User|null $user
+     * @return Builder
+     */
+    public function scopeVisibleFor(Builder $query, ?User $user): Builder
+    {
+        return $query->whereHas('course', function (Builder $q) use ($user) {
+            $q->visibleFor($user);
+        });
     }
 }

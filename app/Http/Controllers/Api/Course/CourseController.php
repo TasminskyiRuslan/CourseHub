@@ -10,8 +10,7 @@ use App\Data\Course\Requests\UpdateCourseData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Courses\CourseResource;
 use App\Models\Course;
-use App\Queries\Course\CourseListQuery;
-use App\Services\Courses\CourseService;
+use App\Queries\Course\GetCourseListQuery;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -22,12 +21,6 @@ use Throwable;
 class CourseController extends Controller
 {
     use AuthorizesRequests;
-
-    public function __construct(
-        protected CourseService $courseService,
-    )
-    {
-    }
 
     #[OA\Get(
         path: '/courses',
@@ -67,7 +60,7 @@ class CourseController extends Controller
                 required: false,
                 schema: new OA\Schema(
                     type: 'string',
-                    example: 'author,lessons,lessons_count',
+                    example: 'author,lessons_count',
                 )
             )
         ],
@@ -90,13 +83,14 @@ class CourseController extends Controller
     /**
      * Retrieve a cached and paginated list of courses with filters and sorting.
      *
-     * @param CourseListQuery $courseListQuery
+     * @param GetCourseListQuery $getCourseListQuery
      * @return JsonResponse
      */
-    public function index(CourseListQuery $courseListQuery): JsonResponse
+    public function index(GetCourseListQuery $getCourseListQuery): JsonResponse
     {
         $this->authorize('view-any', Course::class);
-        return CourseResource::collection($courseListQuery->handle())
+        $courses = $getCourseListQuery->get(auth()->user());
+        return CourseResource::collection($courses)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
@@ -143,7 +137,7 @@ class CourseController extends Controller
     {
         $this->authorize('create', Course::class);
         $course = $createCourseAction->handle($courseData, auth()->user());
-        return CourseResource::make($course->loadCount('lessons')->loadMissing(['author', 'lessons']))
+        return CourseResource::make($course->loadCount('lessons')->loadMissing(['author']))
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_CREATED);
     }
@@ -198,7 +192,7 @@ class CourseController extends Controller
     public function show(Course $course): JsonResponse
     {
         $this->authorize('view', $course);
-        return CourseResource::make($course->loadCount('lessons')->loadMissing(['author', 'lessons']))
+        return CourseResource::make($course->loadCount('lessons')->loadMissing(['author']))
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
@@ -269,7 +263,7 @@ class CourseController extends Controller
     {
         $this->authorize('update', $course);
         $course = $updateCourseAction->handle($courseData, $course);
-        return CourseResource::make($course->loadCount('lessons')->loadMissing(['author', 'lessons']))
+        return CourseResource::make($course->loadCount('lessons')->loadMissing(['author']))
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }

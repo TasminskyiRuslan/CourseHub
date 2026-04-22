@@ -7,15 +7,15 @@ use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use function Pest\Laravel\patchJson;
-use function PHPUnit\Framework\assertFalse;
 
 uses(RefreshDatabase::class);
 
 describe('PublishCourseController', function () {
     beforeEach(function () {
+        Cache::flush();
+        Storage::fake('courses');
         $this->seed(RolesAndPermissionsSeeder::class);
         $this->seed(SuperAdminUserSeeder::class);
-        Storage::fake('courses');
     });
 
     /*
@@ -49,11 +49,11 @@ describe('PublishCourseController', function () {
         });
 
         it('fails if users tries to publish someone else\'s course', function ($user) {
-            $course = Course::factory()->unpublished()->create();
-
             if ($user) {
                 Sanctum::actingAs($user);
             }
+
+            $course = Course::factory()->unpublished()->create();
 
             patchJson(route('course.publish', $course))
                 ->assertForbidden();
@@ -68,24 +68,26 @@ describe('PublishCourseController', function () {
 
         it('allows author to publish their own course', function () {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->unpublished()->create();
             Sanctum::actingAs($author);
+
+            $course = Course::factory()->for($author, 'author')->unpublished()->create();
 
             patchJson(route('course.publish', $course))
                 ->assertOk()
-                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $course->type)]);
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
             $course->refresh();
             expect($course->is_published)->toBeTrue();
         });
 
         it('allows super-admin to publish any course', function () {
             $superAdmin = User::whereEmail(config('super-admin.email'))->first();
-            $course = Course::factory()->unpublished()->create();
             Sanctum::actingAs($superAdmin);
+
+            $course = Course::factory()->unpublished()->create();
 
             patchJson(route('course.publish', $course))
                 ->assertOk()
-                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $course->type)]);
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
             $course->refresh();
             expect($course->is_published)->toBeTrue();
         });
@@ -99,14 +101,15 @@ describe('PublishCourseController', function () {
     describe('caching', function () {
         it('flushes the cache when the course is published', function () {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->unpublished()->create();
             Sanctum::actingAs($author);
 
-            Cache::tags([config('cache.tags.course')])->put('courses', 'test_value', config('cache.ttl.books'));
+            $course = Course::factory()->for($author, 'author')->unpublished()->create();
+            Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.books'));
 
             patchJson(route('course.publish', $course))
-                ->assertOK();
-            expect(Cache::tags([config('cache.tags.course')])->get('courses'))->toBeNull();
+                ->assertOK()
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
+            expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->toBeNull();
         });
     });
 })->group('course');

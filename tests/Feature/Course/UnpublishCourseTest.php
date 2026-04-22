@@ -12,9 +12,10 @@ uses(RefreshDatabase::class);
 
 describe('UnpublishCourseController', function () {
     beforeEach(function () {
+        Cache::flush();
+        Storage::fake('courses');
         $this->seed(RolesAndPermissionsSeeder::class);
         $this->seed(SuperAdminUserSeeder::class);
-        Storage::fake('courses');
     });
 
     /*
@@ -48,11 +49,11 @@ describe('UnpublishCourseController', function () {
         });
 
         it('fails if users tries to unpublish someone else\'s course', function ($user) {
-            $course = Course::factory()->create();
-
             if ($user) {
                 Sanctum::actingAs($user);
             }
+
+            $course = Course::factory()->create();
 
             patchJson(route('course.unpublish', $course))
                 ->assertForbidden();
@@ -66,26 +67,27 @@ describe('UnpublishCourseController', function () {
 
         it('allows author to unpublish their own course', function () {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
+
+            $course = Course::factory()->for($author, 'author')->create();
 
             patchJson(route('course.unpublish', $course))
                 ->assertOk()
-                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $course->type)]);
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
             $course->refresh();
             expect($course->is_published)->toBeFalse();
         });
 
         it('allows admins to unpublish any course', function ($user) {
-            $course = Course::factory()->create();
-
             if ($user) {
                 Sanctum::actingAs($user);
             }
 
+            $course = Course::factory()->create();
+
             patchJson(route('course.unpublish', $course))
                 ->assertOk()
-                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $course->type)]);
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
             $course->refresh();
             expect($course->is_published)->toBeFalse();
         })->with([
@@ -102,14 +104,15 @@ describe('UnpublishCourseController', function () {
     describe('caching', function () {
         it('flushes the cache when the course is unpublished', function () {
             $author = User::factory()->teacher()->create();
-            $course = Course::factory()->for($author, 'author')->create();
             Sanctum::actingAs($author);
 
-            Cache::tags([config('cache.tags.course')])->put('courses', 'test_value', config('cache.ttl.books'));
+            $course = Course::factory()->for($author, 'author')->create();
+            Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.books'));
 
             patchJson(route('course.unpublish', $course))
-                ->assertOK();
-            expect(Cache::tags([config('cache.tags.course')])->get('courses'))->toBeNull();
+                ->assertOK()
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
+            expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->toBeNull();
         });
     });
 })->group('course');

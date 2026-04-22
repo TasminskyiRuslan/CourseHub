@@ -16,37 +16,6 @@
         }
     ],
     "paths": {
-        "/auth/password/forgot": {
-            "post": {
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Send password reset link",
-                "description": "Send an email with a link to reset the password.",
-                "operationId": "fec0b6c8f358bc4799c920204083ec12",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ForgotPasswordRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "204": {
-                        "description": "Reset link sent successfully."
-                    },
-                    "422": {
-                        "description": "Validation error."
-                    },
-                    "429": {
-                        "description": "Too many requests."
-                    }
-                }
-            }
-        },
         "/auth/login": {
             "post": {
                 "tags": [
@@ -262,6 +231,37 @@
                 }
             }
         },
+        "/auth/password/forgot": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Send password reset link",
+                "description": "Send an email with a link to reset the password.",
+                "operationId": "a6257242c1f3b4c342c2b1ed1cd79b71",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ForgotPasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Reset link sent successfully."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    },
+                    "429": {
+                        "description": "Too many requests."
+                    }
+                }
+            }
+        },
         "/auth/email/verify/{id}/{hash}": {
             "get": {
                 "tags": [
@@ -377,7 +377,7 @@
                         "required": false,
                         "schema": {
                             "type": "string",
-                            "example": "author,lessons,lessons_count"
+                            "example": "author,lessons_count"
                         }
                     }
                 ],
@@ -1472,7 +1472,6 @@
                 "required": [
                     "id",
                     "author_id",
-                    "author",
                     "title",
                     "slug",
                     "description",
@@ -1495,7 +1494,13 @@
                         "example": 1
                     },
                     "author": {
-                        "$ref": "#/components/schemas/Author"
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Author"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Author of the course"
                     },
                     "title": {
                         "description": "Title of the course",
@@ -1552,6 +1557,12 @@
                         "type": "string",
                         "format": "date-time",
                         "example": "2026-01-25T12:00:00Z"
+                    },
+                    "lessons_count": {
+                        "description": "Total number of course lessons",
+                        "type": "integer",
+                        "example": 10,
+                        "nullable": true
                     }
                 },
                 "type": "object"

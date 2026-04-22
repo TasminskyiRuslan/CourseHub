@@ -6,13 +6,13 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
-use Tests\Support\CourseJsonStructure;
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class);
 
 describe('CourseController -> show', function () {
     beforeEach(function () {
+        Cache::flush();
         $this->seed(RolesAndPermissionsSeeder::class);
         $this->seed(SuperAdminUserSeeder::class);
     });
@@ -36,15 +36,15 @@ describe('CourseController -> show', function () {
     */
     describe('permissions', function () {
         it('allows users to retrieve the course', function ($user) {
-            $course = Course::factory()->create();
             if ($user) {
                 Sanctum::actingAs($user);
             }
+
+            $course = Course::factory()->create();
+
             getJson(route('course.show', $course))
                 ->assertOk()
-                ->assertJsonStructure([
-                    'data' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $course->type),
-                ]);
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
         })->with([
             'guest' => null,
             'unverified' => fn() => User::factory()->unverified()->create(),
@@ -56,40 +56,43 @@ describe('CourseController -> show', function () {
 
         it('allows an author to retrieve own unpublished course', function () {
             $author = User::factory()->teacher()->create();
-            $unpublishedCourse = Course::factory()->unpublished()->for($author, 'author')->create();
             Sanctum::actingAs($author);
+
+            $unpublishedCourse = Course::factory()->unpublished()->for($author, 'author')->create();
 
             getJson(route('course.show', $unpublishedCourse))
                 ->assertOk()
-                ->assertJsonStructure([
-                    'data' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $unpublishedCourse->type),
-                ]);
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
         });
 
         it('allows admins to retrieve any unpublished course', function ($user) {
-            $unpublishedCourse = Course::factory()->unpublished()->create();
             if ($user) {
                 Sanctum::actingAs($user);
             }
 
+            $unpublishedCourse = Course::factory()->unpublished()->create();
+
             getJson(route('course.show', $unpublishedCourse))
                 ->assertOk()
-                ->assertJsonStructure([
-                    'data' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $unpublishedCourse->type),
-                ]);
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
         })->with([
             'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
         ]);
 
-        it('fails if user without permissions tries to retrieve unpublished course', function () {
-            $user = User::factory()->teacher()->create();
-            $unpublishedCourse = Course::factory()->unpublished()->for($user, 'author')->create();
-            $user = User::factory()->teacher()->create();
-            Sanctum::actingAs($user);
+        it('fails if users without permissions tries to retrieve unpublished course', function ($user) {
+            if ($user) {
+                Sanctum::actingAs($user);
+            }
+
+            $unpublishedCourse = Course::factory()->unpublished()->create();
 
             getJson(route('course.show', $unpublishedCourse))
                 ->assertForbidden();
-        });
+        })->with([
+            'guest' => null,
+            'student' => fn() => User::factory()->student()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
+        ]);
     });
 })->group('course');

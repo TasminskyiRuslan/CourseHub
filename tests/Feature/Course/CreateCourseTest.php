@@ -14,6 +14,7 @@ uses(RefreshDatabase::class);
 
 describe('CourseController -> store', function () {
     beforeEach(function () {
+        Cache::flush();
         $this->seed(RolesAndPermissionsSeeder::class);
         $this->seed(SuperAdminUserSeeder::class);
     });
@@ -76,7 +77,7 @@ describe('CourseController -> store', function () {
         it('fails if slug is not unique', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
-            Course::factory()->create(['slug' => 'existing-slug']);
+            $course = Course::factory()->create(['slug' => 'existing-slug']);
 
             postJson(route('course.store'), creatingCoursePayload(['slug' => 'existing-slug']))
                 ->assertUnprocessable()
@@ -99,7 +100,8 @@ describe('CourseController -> store', function () {
 
             postJson(route('course.store'), creatingCoursePayload(['slug' => $slug]))
                 ->assertCreated()
-                ->assertJsonFragment(['slug' => $slug]);
+                ->assertJsonFragment(['slug' => $slug])
+                ->assertJsonStructure(['data' =>  courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
         });
     });
 
@@ -134,7 +136,7 @@ describe('CourseController -> store', function () {
 
             postJson(route('course.store'), $data)
                 ->assertCreated()
-                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $data['type'])]);
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
 
             $this->assertDatabaseHas('courses', [
                 'title' => $data['title'],
@@ -156,13 +158,13 @@ describe('CourseController -> store', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
 
-            Cache::tags([config('cache.tags.course')])->put('courses', 'test_value', config('cache.ttl.books'));
-            expect(Cache::tags([config('cache.tags.course')])->get('courses'))->not->toBeNull();
+            Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.books'));
+            expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->not->toBeNull();
 
             postJson(route('course.store'), creatingCoursePayload())
                 ->assertCreated();
 
-            expect(Cache::tags([config('cache.tags.course')])->get('courses'))->toBeNull();
+            expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->toBeNull();
         });
     });
 })->group('course');

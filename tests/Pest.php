@@ -138,7 +138,7 @@ function lessonJsonStructure(?CourseType $courseType = null): array {
  * @param CourseType|null $courseType
  * @return array
  */
-function courseJsonStructure(bool $withAuthor = false, bool $withLessonsCount = false, bool $withLessons = false, ?CourseType $courseType = null): array {
+function courseJsonStructure(bool $withAuthor = false, bool $withLessonsCount = false): array {
     $base = [
         'id',
         'author_id',
@@ -157,11 +157,6 @@ function courseJsonStructure(bool $withAuthor = false, bool $withLessonsCount = 
     }
     if ($withLessonsCount) {
         $base[] = 'lessons_count';
-    }
-    if ($withLessons) {
-        $base['lessons'] = [
-            '*' => lessonJsonStructure($courseType),
-        ];;
     }
     return $base;
 }

@@ -15,7 +15,7 @@ class CourseObserver
      */
     public function created(Course $course): void
     {
-        Cache::tags([config('cache.tags.course')])->flush();
+        Cache::tags([config('cache.tags.course_list')])->flush();
     }
 
     /**
@@ -26,18 +26,10 @@ class CourseObserver
      */
     public function updated(Course $course): void
     {
-        Cache::tags([config('cache.tags.course')])->flush();
-    }
-
-    /**
-     * Flush the cache when a course is deleted.
-     *
-     * @param Course $course
-     * @return void
-     */
-    public function deleted(Course $course): void
-    {
-        Cache::tags([config('cache.tags.course')])->flush();
+        Cache::tags([
+            config('cache.tags.course_list'),
+            config('cache.tags.course') . $course->id,
+        ])->flush();
     }
 
     /**
@@ -49,5 +41,19 @@ class CourseObserver
     public function deleting(Course $course): void
     {
         $course->lessons->each->delete();
+    }
+
+    /**
+     * Flush the cache when a course is deleted.
+     *
+     * @param Course $course
+     * @return void
+     */
+    public function deleted(Course $course): void
+    {
+        Cache::tags([
+            config('cache.tags.course_list'),
+            config('cache.tags.course') . $course->id,
+        ])->flush();
     }
 }

@@ -34,12 +34,12 @@ describe('CourseController -> index', function () {
 
             getJson(route('course.index'))
                 ->assertOk()
+                ->assertJsonCount($publishedCourses->count(), 'data')
                 ->assertJsonStructure([
                     'data' => [
                         '*' => courseJsonStructure()
                     ]
-                ])
-                ->assertJsonCount($publishedCourses->count(), 'data');
+                ]);
         })->with([
             'guest' => null,
             'unverified' => fn() => User::factory()->unverified()->create(),
@@ -57,6 +57,11 @@ describe('CourseController -> index', function () {
 
             getJson(route('course.index'))
                 ->assertOk()
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => courseJsonStructure()
+                    ]
+                ])
                 ->assertJsonCount($publishedCourses->count() + $ownUnpublishedCourses->count(), 'data');
         });
 
@@ -70,6 +75,11 @@ describe('CourseController -> index', function () {
 
             getJson(route('course.index'))
                 ->assertOk()
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => courseJsonStructure()
+                    ]
+                ])
                 ->assertJsonCount($publishedCourses->count() + $unpublishedCourses->count(), 'data');
         })->with([
             'admin' => fn() => User::factory()->admin()->create(),
@@ -91,7 +101,12 @@ describe('CourseController -> index', function () {
             getJson(route('course.index', ['filter[search]' => $searchString]))
                 ->assertOk()
                 ->assertJsonCount(1, 'data')
-                ->assertJsonFragment(['id' => $course1->id]);
+                ->assertJsonFragment(['id' => $course1->id])
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => courseJsonStructure()
+                    ]
+                ]);
         });
 
         it('filters courses by author slug', function () {
@@ -102,7 +117,12 @@ describe('CourseController -> index', function () {
             getJson(route('course.index', ['filter[author]' => $author]))
                 ->assertOk()
                 ->assertJsonCount(1, 'data')
-                ->assertJsonFragment(['id' => $course1->id]);
+                ->assertJsonFragment(['id' => $course1->id])
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => courseJsonStructure()
+                    ]
+                ]);
         });
 
         it('sorts courses by created_at (desc) by default', function () {
@@ -114,7 +134,12 @@ describe('CourseController -> index', function () {
             getJson(route('course.index'))
                 ->assertOk()
                 ->assertJsonPath('data.0.id', $newCourse->id)
-                ->assertJsonPath('data.1.id', $oldCourse->id);
+                ->assertJsonPath('data.1.id', $oldCourse->id)
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => courseJsonStructure()
+                    ]
+                ]);
         });
 
         it('sorts courses by created_at (asc and desc)', function () {
@@ -126,11 +151,21 @@ describe('CourseController -> index', function () {
             getJson(route('course.index', ['sort' => 'created_at']))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $oldCourse->id])
-                ->assertJsonFragment(['id' => $newCourse->id]);
+                ->assertJsonFragment(['id' => $newCourse->id])
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => courseJsonStructure()
+                    ]
+                ]);
             getJson(route('course.index', ['sort' => '-created_at']))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $newCourse->id])
-                ->assertJsonFragment(['id' => $oldCourse->id]);
+                ->assertJsonFragment(['id' => $oldCourse->id])
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => courseJsonStructure()
+                    ]
+                ]);
         });
 
         it('sorts courses by title (asc and desc)', function () {
@@ -142,13 +177,22 @@ describe('CourseController -> index', function () {
                 ->assertOk()
                 ->assertJsonPath('data.0.id', $courseA->id)
                 ->assertJsonPath('data.1.id', $courseB->id)
-                ->assertJsonPath('data.2.id', $courseC->id);
-
+                ->assertJsonPath('data.2.id', $courseC->id)
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => courseJsonStructure()
+                    ]
+                ]);
             getJson(route('course.index', ['sort' => '-title']))
                 ->assertOk()
                 ->assertJsonPath('data.0.id', $courseC->id)
                 ->assertJsonPath('data.1.id', $courseB->id)
-                ->assertJsonPath('data.2.id', $courseA->id);
+                ->assertJsonPath('data.2.id', $courseA->id)
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => courseJsonStructure()
+                    ]
+                ]);
         });
 
         it('sorts courses by price (asc and desc)', function () {
@@ -158,27 +202,37 @@ describe('CourseController -> index', function () {
             getJson(route('course.index', ['sort' => 'price']))
                 ->assertOk()
                 ->assertJsonPath('data.0.id', $cheap->id)
-                ->assertJsonPath('data.1.id', $expensive->id);
+                ->assertJsonPath('data.1.id', $expensive->id)
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => courseJsonStructure()
+                    ]
+                ]);
             getJson(route('course.index', ['sort' => '-price']))
                 ->assertOk()
                 ->assertJsonPath('data.0.id', $expensive->id)
-                ->assertJsonPath('data.1.id', $cheap->id);
+                ->assertJsonPath('data.1.id', $cheap->id)
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => courseJsonStructure()
+                    ]
+                ]);
         });
 
-        it('includes author, lessons_count, lessons by using the include query parameter', function () {
+        it('includes author, lessons_count by using the include query parameter', function () {
             $courses = Course::factory()->type(CourseType::OFFLINE)->count(3)->create();
 
-            getJson(route('course.index', ['include' => 'author,lessons_count,lessons']))
+            getJson(route('course.index', ['include' => 'author,lessons_count']))
                 ->assertOk()
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => courseJsonStructure(withAuthor: true, withLessonsCount: true, withLessons: true, courseType: $courses->first()->type)
+                        '*' => courseJsonStructure(withAuthor: true, withLessonsCount: true)
                     ]
                 ]);
         });
 
         it('returns empty data when no courses match the search', function () {
-            Course::factory()->create();
+            $course = Course::factory()->create();
 
             getJson(route('course.index', ['filter[search]' => 'non-existent']))
                 ->assertOk()
@@ -197,7 +251,7 @@ describe('CourseController -> index', function () {
 
             getJson(route('course.index'))->assertOk();
             Cache::shouldHaveReceived('tags')
-                ->with([config('cache.tags.course')])
+                ->with([config('cache.tags.course_list')])
                 ->once();
         });
 
@@ -217,10 +271,12 @@ describe('CourseController -> index', function () {
         });
 
         it('does not store the course list in the cache users with course:view-unpublished and course:create permission', function ($user) {
-            Cache::spy();
             if ($user) {
                 Sanctum::actingAs($user);
             }
+
+            Cache::spy();
+
             getJson(route('course.index'))->assertOk();
             Cache::shouldNotHaveReceived('tags');
         })->with([
@@ -237,7 +293,7 @@ describe('CourseController -> index', function () {
     */
     describe('pagination', function () {
         it('returns a paginated list of courses', function () {
-            Course::factory()->count(7)->create();
+            $courses = Course::factory()->count(7)->create();
 
             getJson(route('course.index'))
                 ->assertOk()

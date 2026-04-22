@@ -2,50 +2,46 @@
 
 namespace App\Queries\Course;
 
-use App\Enums\UserPermission;
-use App\Enums\UserRole;
 use App\Models\Course;
 use App\Models\User;
-use Illuminate\Auth\AuthenticationException;
+use App\Queries\Concerns\HasCacheBypass;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedInclude;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class CourseListQuery
+class GetCourseListQuery
 {
+    use HasCacheBypass;
+
     /**
-     * Handle the request and return results with or without caching based on user permissions.
+     * Get paginated courses with conditional caching.
      *
+     * @param User|null $author
      * @return LengthAwarePaginator
      */
-    public function handle(): LengthAwarePaginator
+    public function get(?User $author): LengthAwarePaginator
     {
-        $user = auth()->user();
-        if ($user?->hasAnyPermission(UserPermission::COURSE_VIEW_UNPUBLISHED->value, UserPermission::COURSE_CREATE->value) || $user?->hasRole(UserRole::SUPER_ADMIN->value)) {
-            return $this->get($user);
+        if ($this->shouldBypassCache($author) || request()->hasAny(['filter', 'sort', 'include'])) {
+            return $this->fetchFromDatabase($author);
         }
 
-        return Cache::tags([config('cache.tags.course')])->remember(md5(http_build_query(request()->only('page', 'filter', 'sort', 'include'))), config('cache.ttl.course'), function () use ($user) {
-            return $this->get($user);
-        });
+        return $this->fetchFromCache();
     }
 
     /**
-     * Build the course list query with filters, sorting, and visibility scopes.
+     * Fetch filtered and sorted courses directly from the database.
      *
-     * @param User|null $user
+     * @param User|null $author
      * @return LengthAwarePaginator
      */
-    protected function get(?User $user): LengthAwarePaginator
+    protected function fetchFromDatabase(?User $author): LengthAwarePaginator
     {
         return QueryBuilder::for(Course::class)
-            ->visibleFor($user)
+            ->visibleFor($author)
             ->allowedIncludes([
                 AllowedInclude::count('lessons_count', 'lessons'),
-                'lessons',
                 'author',
             ])
             ->allowedFilters([
@@ -66,5 +62,30 @@ class CourseListQuery
             ->defaultSort('-created_at')
             ->paginate(config('pagination.courses_per_page'))
             ->withQueryString();
+    }
+
+    /**
+     * Fetch courses from the cache.
+     *
+     * @return LengthAwarePaginator
+     */
+    protected function fetchFromCache(): LengthAwarePaginator
+    {
+        $page = request()->query('page', 1);
+        $cacheKey = "courses:page:{$page}";
+        $tags = [
+            config('cache.tags.course_list'),
+        ];
+        return Cache::tags($tags)->remember(
+            $cacheKey,
+            config('cache.ttl.lesson'),
+            function () {
+                return Course::query()
+                    ->where('is_published', true)
+                    ->orderByDesc('created_at')
+                    ->paginate(config('pagination.courses_per_page'))
+                    ->withQueryString();
+            }
+        );
     }
 }

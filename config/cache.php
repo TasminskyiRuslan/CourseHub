@@ -115,12 +115,13 @@ return [
     'prefix' => env('CACHE_PREFIX', Str::slug((string)env('APP_NAME', 'laravel')) . '-cache-'),
 
     'ttl' => [
-        'course' => env('COURSE_CACHE_TTL', 86400),
-        'lesson'   => env('LESSON_CACHE_TTL', 86400),
+        'course' => env('CACHE_TTL_COURSE', 86400),
+        'lesson'   => env('CACHE_TTL_LESSON', 86400),
     ],
 
     'tags' => [
-        'course' => env('COURSE_CACHE_TAG', 'course'),
-        'lesson' => env('LESSON_CACHE_TAG', 'lesson'),
+        'course_list' => env('CACHE_TAGS_COURSE_LIST', 'course_list'),
+        'lesson_list' => env('CACHE_TAGS_LESSON_LIST', 'lesson_list'),
+        'course' => env('CACHE_TAGS_COURSE', 'course'),
     ]
 ];

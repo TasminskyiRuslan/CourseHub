@@ -955,6 +955,67 @@
                     }
                 ]
             }
+        },
+        "/courses/{course}/lessons/{lesson}": {
+            "get": {
+                "tags": [
+                    "Lesson"
+                ],
+                "summary": "Retrieve lesson details",
+                "description": "Retrieve detailed information about a specific lesson.",
+                "operationId": "44edac41fc34e68e26d87d0e6a01ba10",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    },
+                    {
+                        "name": "lesson",
+                        "in": "path",
+                        "description": "Lesson identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "introduction-to-algebra"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lesson details retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/LessonResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course or lesson not found."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    },
+                    {}
+                ]
+            }
         }
     },
     "components": {

@@ -180,51 +180,73 @@ class LessonController extends Controller
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_CREATED);
     }
-//
-//    #[OA\Get(
-//        path: '/courses/{course}/lessons/{lesson}',
-//        description: 'Retrieve a specific lesson for a specific course.',
-//        summary: 'Get lesson',
-//        security: [['sanctum' => []], []],
-//        tags: ['Lessons'],
-//        parameters: [
-//            new OA\Parameter(
-//                name: 'course',
-//                description: 'Course identifier (slug)',
-//                in: 'path',
-//                required: true,
-//                schema: new OA\Schema(type: 'string')
-//            ),
-//            new OA\Parameter(
-//                name: 'lesson',
-//                description: 'Lesson identifier (slug)',
-//                in: 'path',
-//                required: true,
-//                schema: new OA\Schema(type: 'string')
-//            )
-//        ],
-//        responses: [
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_OK,
-//                description: 'Lesson details',
-//                content: new OA\JsonContent(ref: '#/components/schemas/Lesson')
-//            ),
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_FORBIDDEN,
-//                description: 'Access denied'
-//            ),
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_NOT_FOUND,
-//                description: 'Course or Lesson not found'
-//            ),
-//        ]
-//    )]
-//    public function show(Course $course, Lesson $lesson): LessonResource
-//    {
-//        $this->authorize('view', $lesson);
-//        return new LessonResource($lesson->loadMissing('lessonable'));
-//    }
-//
+
+    #[OA\Get(
+        path: '/courses/{course}/lessons/{lesson}',
+        description: 'Retrieve detailed information about a specific lesson.',
+        summary: 'Retrieve lesson details',
+        security: [['sanctum' => []], []],
+        tags: ['Lesson'],
+        parameters: [
+            new OA\Parameter(
+                name: 'course',
+                description: 'Course identifier (slug).',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(
+                    type: 'string',
+                    example: 'math-101'
+                )
+            ),
+            new OA\Parameter(
+                name: 'lesson',
+                description: 'Lesson identifier (slug).',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(
+                    type: 'string',
+                    example: 'introduction-to-algebra'
+                )
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: SymfonyResponse::HTTP_OK,
+                description: 'Lesson details retrieved successfully.',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/LessonResponse'
+                        )
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_FORBIDDEN,
+                description: 'User does not have permissions.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_NOT_FOUND,
+                description: 'Course or lesson not found.'
+            ),
+        ]
+    )]
+    /**
+     * Retrieve detailed information about a specific lesson.
+     *
+     * @param Course $course
+     * @param Lesson $lesson
+     * @return JsonResponse
+     */
+    public function show(Course $course, Lesson $lesson): JsonResponse
+    {
+        $this->authorize('view', $lesson);
+        return LessonResource::make($lesson->load(['lessonable']))
+            ->response()
+            ->setStatusCode(SymfonyResponse::HTTP_OK);
+    }
+
 //    #[OA\Put(
 //        path: '/courses/{course}/lessons/{lesson}',
 //        description: 'Update a specific lesson for a specific course.',

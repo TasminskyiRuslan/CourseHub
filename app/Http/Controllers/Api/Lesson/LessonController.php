@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Lesson;
 
 use App\Actions\Lesson\CreateLessonAction;
+use App\Actions\Lesson\DeleteLessonAction;
 use App\Actions\Lesson\UpdateLessonAction;
 use App\Data\Lesson\CreateLessonData;
 use App\Data\Lesson\UpdateLessonData;
@@ -11,7 +12,6 @@ use App\Http\Resources\Api\Lesson\LessonResource;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Queries\Lesson\GetLessonListQuery;
-use App\Services\Lessons\LessonService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -22,12 +22,6 @@ use Throwable;
 class LessonController extends Controller
 {
     use AuthorizesRequests;
-
-    public function __construct(
-        protected LessonService $lessonService,
-    )
-    {
-    }
 
     #[OA\Get(
         path: '/courses/{course}/lessons',
@@ -330,54 +324,66 @@ class LessonController extends Controller
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 
-//    #[OA\Delete(
-//        path: '/courses/{course}/lessons/{lesson}',
-//        description: 'Delete a specific lesson from a specific course.',
-//        summary: 'Delete lesson',
-//        security: [['sanctum' => []]],
-//        tags: ['Lessons'],
-//        parameters: [
-//            new OA\Parameter(
-//                name: 'course',
-//                description: 'Course identifier (slug)',
-//                in: 'path',
-//                required: true,
-//                schema: new OA\Schema(type: 'string')
-//            ),
-//            new OA\Parameter(
-//                name: 'lesson',
-//                description: 'Lesson identifier (slug)',
-//                in: 'path',
-//                required: true,
-//                schema: new OA\Schema(type: 'string')
-//            )
-//        ],
-//        responses: [
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_NO_CONTENT,
-//                description: 'Lesson deleted'
-//            ),
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_UNAUTHORIZED,
-//                description: 'Authentication required'
-//            ),
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_FORBIDDEN,
-//                description: 'Access denied'
-//            ),
-//            new OA\Response(
-//                response: SymfonyResponse::HTTP_NOT_FOUND,
-//                description: 'Course or Lesson not found'
-//            ),
-//        ]
-//    )]
-//    /**
-//     * @throws Throwable
-//     */
-//    public function destroy(Course $course, Lesson $lesson): Response
-//    {
-//        $this->authorize('delete', $lesson);
-//        $this->lessonService->delete($lesson);
-//        return response()->noContent();
-//    }
+    #[OA\Delete(
+        path: '/courses/{course}/lessons/{lesson}',
+        description: 'Remove the specified lesson.',
+        summary: 'Remove a lesson',
+        security: [['sanctum' => []]],
+        tags: ['Lesson'],
+        parameters: [
+            new OA\Parameter(
+                name: 'course',
+                description: 'Course identifier (slug).',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(
+                    type: 'string',
+                    example: 'math-101'
+                )
+            ),
+            new OA\Parameter(
+                name: 'lesson',
+                description: 'Lesson identifier (slug).',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(
+                    type: 'string',
+                    example: 'introduction-to-algebra'
+                )
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: SymfonyResponse::HTTP_NO_CONTENT,
+                description: 'Lesson deleted successfully.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+                description: 'User is unauthenticated.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_FORBIDDEN,
+                description: 'User does not have permissions.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_NOT_FOUND,
+                description: 'Course or lesson not found.'
+            ),
+        ]
+    )]
+    /**
+     * Remove the specified lesson.
+     *
+     * @param Course $course
+     * @param Lesson $lesson
+     * @param DeleteLessonAction $deleteLessonAction
+     * @return Response
+     * @throws Throwable
+     */
+    public function destroy(Course $course, Lesson $lesson, DeleteLessonAction $deleteLessonAction): Response
+    {
+        $this->authorize('delete', $lesson);
+        $deleteLessonAction->handle($lesson);
+        return response()->noContent();
+    }
 }

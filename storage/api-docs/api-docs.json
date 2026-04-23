@@ -1016,6 +1016,55 @@
                     {}
                 ]
             },
+            "delete": {
+                "tags": [
+                    "Lesson"
+                ],
+                "summary": "Remove a lesson",
+                "description": "Remove the specified lesson.",
+                "operationId": "f0874920178e45bebf1598a0907b5698",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    },
+                    {
+                        "name": "lesson",
+                        "in": "path",
+                        "description": "Lesson identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "introduction-to-algebra"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Lesson deleted successfully."
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course or lesson not found."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
             "patch": {
                 "tags": [
                     "Lesson"

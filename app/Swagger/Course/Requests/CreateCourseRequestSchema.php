@@ -44,7 +44,7 @@ use OpenApi\Attributes as OA;
                 CourseType::ONLINE->value,
                 CourseType::VIDEO->value,
             ],
-            example: CourseType::ONLINE->value
+            example: CourseType::OFFLINE->value
         ),
         new OA\Property(
             property: 'price',

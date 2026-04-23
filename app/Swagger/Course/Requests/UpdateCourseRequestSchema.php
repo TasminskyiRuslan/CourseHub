@@ -14,7 +14,7 @@ use OpenApi\Attributes as OA;
             description: 'Title of the course.',
             type: 'string',
             maxLength: 255,
-            example: 'Math 101'
+            example: 'Math 102'
         ),
         new OA\Property(
             property: 'slug',
@@ -22,14 +22,14 @@ use OpenApi\Attributes as OA;
             type: 'string',
             maxLength: 255,
             pattern: '^[a-z0-9-]+$',
-            example: 'math-101'
+            example: 'math-102'
         ),
         new OA\Property(
             property: 'description',
             description: 'Description of the course.',
             type: 'string',
             maxLength: 5000,
-            example: 'A basic mathematics course',
+            example: 'An advanced mathematics course',
             nullable: true
         ),
         new OA\Property(
@@ -39,7 +39,7 @@ use OpenApi\Attributes as OA;
             format: 'float',
             maximum: 99999999.99,
             minimum: 0,
-            example: 199.99
+            example: 299.99
         )
     ],
     type: 'object'

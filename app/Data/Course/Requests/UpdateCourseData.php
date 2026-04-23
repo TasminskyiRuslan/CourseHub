@@ -26,14 +26,14 @@ class UpdateCourseData extends Data
         #[Sometimes]
         #[StringType]
         #[Max(255)]
-        public string|Optional  $title,
+        public string|Optional      $title,
 
         #[Sometimes]
         #[StringType]
         #[Max(255)]
         #[Unique(table: 'courses', column: 'slug', ignore: new RouteParameterReference('course.id'))]
         #[Regex('/^[a-z0-9-]+$/')]
-        public string|Optional  $slug,
+        public string|Optional      $slug,
 
         #[Sometimes]
         #[Nullable]
@@ -45,7 +45,7 @@ class UpdateCourseData extends Data
         #[Numeric]
         #[Min(0)]
         #[Max(99999999.99)]
-        public string|Optional  $price,
+        public string|Optional      $price,
     )
     {
     }

@@ -5,9 +5,9 @@ namespace App\Swagger\Lesson\Requests;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
-    schema: 'CreateVideoLessonRequest',
-    title: 'Create Video Lesson Request',
-    description: 'Video part of request payload for creating a new lesson.',
+    schema: 'UpdateVideoLessonRequest',
+    title: 'Update Video Lesson Request',
+    description: 'Video part of request payload for updating the lesson.',
     properties: [
         new OA\Property(
             property: 'video_url',
@@ -15,20 +15,20 @@ use OpenApi\Attributes as OA;
             type: 'string',
             format: 'uri',
             maxLength: 2048,
-            example: 'https://youtube.com/lesson123',
-            nullable: true,
+            example: 'https://vimeo.com/lesson123',
+            nullable: true
         ),
         new OA\Property(
             property: 'provider',
             description: 'Provider of the video lesson.',
             type: 'string',
             maxLength: 50,
-            example: 'youtube',
+            example: 'vimeo',
             nullable: true
         ),
     ],
     type: 'object'
 )]
-class CreateVideoLessonRequestSchema
+class UpdateVideoLessonRequestSchema
 {
 }

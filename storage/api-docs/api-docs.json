@@ -1015,6 +1015,80 @@
                     },
                     {}
                 ]
+            },
+            "patch": {
+                "tags": [
+                    "Lesson"
+                ],
+                "summary": "Update a lesson",
+                "description": "Update the specified lesson.",
+                "operationId": "e0d04c6dc9bbc03b6e8467050226a24a",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    },
+                    {
+                        "name": "lesson",
+                        "in": "path",
+                        "description": "Lesson identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "introduction-to-algebra"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateLessonRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Lesson updated successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/LessonResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course or Lesson not found."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         }
     },
@@ -1279,7 +1353,7 @@
                             "online",
                             "video"
                         ],
-                        "example": "online"
+                        "example": "offline"
                     },
                     "price": {
                         "description": "Price of the course.",
@@ -1324,20 +1398,20 @@
                         "description": "Title of the course.",
                         "type": "string",
                         "maxLength": 255,
-                        "example": "Math 101"
+                        "example": "Math 102"
                     },
                     "slug": {
                         "description": "Slug of the course. (must be unique)",
                         "type": "string",
                         "maxLength": 255,
                         "pattern": "^[a-z0-9-]+$",
-                        "example": "math-101"
+                        "example": "math-102"
                     },
                     "description": {
                         "description": "Description of the course.",
                         "type": "string",
                         "maxLength": 5000,
-                        "example": "A basic mathematics course",
+                        "example": "An advanced mathematics course",
                         "nullable": true
                     },
                     "price": {
@@ -1346,7 +1420,7 @@
                         "format": "float",
                         "maximum": 99999999.99,
                         "minimum": 0,
-                        "example": 199.99
+                        "example": 299.99
                     }
                 },
                 "type": "object"
@@ -1591,7 +1665,7 @@
                         "type": "string",
                         "format": "uri",
                         "maxLength": 2048,
-                        "example": "https://videos.example.com/lesson123.mp4",
+                        "example": "https://youtube.com/lesson123",
                         "nullable": true
                     },
                     "provider": {
@@ -1599,6 +1673,127 @@
                         "type": "string",
                         "maxLength": 50,
                         "example": "youtube",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateLessonRequest": {
+                "title": "Update Lesson Request",
+                "properties": {
+                    "title": {
+                        "description": "Title of the lesson.",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Introduction to Geometry"
+                    },
+                    "slug": {
+                        "description": "Slug of the lesson. (must be unique)",
+                        "type": "string",
+                        "maxLength": 255,
+                        "pattern": "^[a-z0-9-]+$",
+                        "example": "introduction-to-geometry"
+                    },
+                    "position": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "example": 1
+                    }
+                },
+                "type": "object",
+                "oneOf": [
+                    {
+                        "$ref": "#/components/schemas/UpdateOfflineLessonRequest"
+                    },
+                    {
+                        "$ref": "#/components/schemas/UpdateOnlineLessonRequest"
+                    },
+                    {
+                        "$ref": "#/components/schemas/UpdateVideoLessonRequest"
+                    }
+                ]
+            },
+            "UpdateOfflineLessonRequest": {
+                "title": "Update Offline Lesson Request",
+                "description": "Offline part of request payload for updating the lesson.",
+                "properties": {
+                    "start_time": {
+                        "description": "Start time of the offline lesson.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2027-02-02T10:00:00Z",
+                        "nullable": true
+                    },
+                    "end_time": {
+                        "description": "End time of the offline lesson.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2027-02-02T12:00:00Z",
+                        "nullable": true
+                    },
+                    "address": {
+                        "description": "Address of the offline lesson.",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "125 Main St, Springfield",
+                        "nullable": true
+                    },
+                    "room_number": {
+                        "description": "Room number of the offline lesson.",
+                        "type": "string",
+                        "maxLength": 50,
+                        "example": "Room 105",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateOnlineLessonRequest": {
+                "title": "Update Online Lesson Request",
+                "description": "Online part of request payload for updating the lesson.",
+                "properties": {
+                    "start_time": {
+                        "description": "Start time of the online lesson.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2027-02-02T10:00:00Z",
+                        "nullable": true
+                    },
+                    "end_time": {
+                        "description": "End time of the online lesson.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2027-02-02T12:00:00Z",
+                        "nullable": true
+                    },
+                    "meeting_link": {
+                        "description": "Meeting link of the lesson.",
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 2048,
+                        "example": "https://meet.example.com/lesson123",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateVideoLessonRequest": {
+                "title": "Update Video Lesson Request",
+                "description": "Video part of request payload for updating the lesson.",
+                "properties": {
+                    "video_url": {
+                        "description": "Link of the video lesson.",
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 2048,
+                        "example": "https://vimeo.com/lesson123",
+                        "nullable": true
+                    },
+                    "provider": {
+                        "description": "Provider of the video lesson.",
+                        "type": "string",
+                        "maxLength": 50,
+                        "example": "vimeo",
                         "nullable": true
                     }
                 },
@@ -1751,149 +1946,6 @@
                     }
                 },
                 "type": "object"
-            },
-            "UpdateLessonBaseRequest": {
-                "title": "Update Lesson Base Request",
-                "required": [
-                    "title",
-                    "slug",
-                    "position"
-                ],
-                "properties": {
-                    "title": {
-                        "type": "string",
-                        "maxLength": 255,
-                        "example": "Introduction to Algebra"
-                    },
-                    "slug": {
-                        "type": "string",
-                        "maxLength": 255,
-                        "example": "introduction-to-algebra"
-                    },
-                    "position": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "example": 1,
-                        "nullable": true
-                    }
-                },
-                "type": "object"
-            },
-            "UpdateLessonRequest": {
-                "title": "Update Lesson Request",
-                "description": "Schema for updating a lesson depending on course type",
-                "oneOf": [
-                    {
-                        "$ref": "#/components/schemas/UpdateOfflineLessonRequest"
-                    },
-                    {
-                        "$ref": "#/components/schemas/UpdateOnlineLessonRequest"
-                    },
-                    {
-                        "$ref": "#/components/schemas/UpdateVideoLessonRequest"
-                    }
-                ]
-            },
-            "UpdateOfflineLessonRequest": {
-                "title": "Update Offline Lesson Request",
-                "allOf": [
-                    {
-                        "$ref": "#/components/schemas/UpdateLessonBaseRequest"
-                    },
-                    {
-                        "required": [
-                            "start_time",
-                            "end_time",
-                            "address",
-                            "room_number"
-                        ],
-                        "properties": {
-                            "start_time": {
-                                "type": "string",
-                                "format": "date-time",
-                                "example": "2027-02-01T10:00:00Z"
-                            },
-                            "end_time": {
-                                "type": "string",
-                                "format": "date-time",
-                                "example": "2027-02-01T12:00:00Z"
-                            },
-                            "address": {
-                                "type": "string",
-                                "maxLength": 255,
-                                "example": "123 Main St, Springfield"
-                            },
-                            "room_number": {
-                                "type": "string",
-                                "maxLength": 50,
-                                "example": "Room 101"
-                            }
-                        },
-                        "type": "object"
-                    }
-                ]
-            },
-            "UpdateOnlineLessonRequest": {
-                "title": "Update Online Lesson Request",
-                "allOf": [
-                    {
-                        "$ref": "#/components/schemas/UpdateLessonBaseRequest"
-                    },
-                    {
-                        "required": [
-                            "start_time",
-                            "end_time",
-                            "meeting_link"
-                        ],
-                        "properties": {
-                            "start_time": {
-                                "type": "string",
-                                "format": "date-time",
-                                "example": "2027-02-01T10:00:00Z"
-                            },
-                            "end_time": {
-                                "type": "string",
-                                "format": "date-time",
-                                "example": "2027-02-01T12:00:00Z"
-                            },
-                            "meeting_link": {
-                                "type": "string",
-                                "format": "uri",
-                                "maxLength": 2048,
-                                "example": "https://meet.example.com/lesson123"
-                            }
-                        },
-                        "type": "object"
-                    }
-                ]
-            },
-            "UpdateVideoLessonRequest": {
-                "title": "Update Video Lesson Request",
-                "allOf": [
-                    {
-                        "$ref": "#/components/schemas/UpdateLessonBaseRequest"
-                    },
-                    {
-                        "required": [
-                            "video_url",
-                            "provider"
-                        ],
-                        "properties": {
-                            "video_url": {
-                                "type": "string",
-                                "format": "uri",
-                                "maxLength": 2048,
-                                "example": "https://videos.example.com/lesson123.mp4"
-                            },
-                            "provider": {
-                                "type": "string",
-                                "maxLength": 50,
-                                "example": "youtube"
-                            }
-                        },
-                        "type": "object"
-                    }
-                ]
             }
         },
         "securitySchemes": {

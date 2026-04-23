@@ -48,7 +48,7 @@ class RegisterUserData extends Data
         public string   $password,
 
         #[Required]
-        #[Enum(enum: UserRole::class, only: [UserRole::STUDENT->value, UserRole::TEACHER->value])]
+        #[Enum(enum: UserRole::class, only: [UserRole::STUDENT, UserRole::TEACHER])]
         public UserRole $role,
     )
     {

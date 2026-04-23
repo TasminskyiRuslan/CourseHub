@@ -46,6 +46,12 @@ class CreateLessonData extends Data
     {
     }
 
+    /**
+     * Return validation rules.
+     *
+     * @param ValidationContext|null $context
+     * @return array
+     */
     public static function rules(?ValidationContext $context = null): array
     {
         $course = request()->route('course');

@@ -200,7 +200,7 @@ function creatingCoursePayload(array $overrides = []): array
 {
     return array_merge([
         'title' => fake()->sentence(3),
-        'description' => fake()->optional()->paragraph(),
+        'description' => fake()->paragraph(),
         'type' => CourseType::OFFLINE,
         'price' => (string) fake()->randomFloat(2, 0, 99999999.99),
     ], $overrides);
@@ -216,7 +216,7 @@ function updatingCoursePayload(array $overrides = []): array
 {
     return array_merge([
         'title' => fake()->sentence(3),
-        'description' => fake()->optional()->paragraph(),
+        'description' => fake()->paragraph(),
         'price' => (string) fake()->randomFloat(2, 0, 99999999.99),
     ], $overrides);
 }
@@ -265,5 +265,40 @@ function creatingLessonPayload(CourseType $courseType, array $overrides = []): a
 
     return array_merge([
         'title' => fake()->sentence(3)
+    ], $typeSpecific, $overrides);
+}
+
+/**
+ * Generate an updating lesson payload with optional overrides.
+ *
+ * @param CourseType $courseType
+ * @param array $overrides
+ * @return array
+ */
+function updatingLessonPayload(CourseType $courseType, array $overrides = []): array
+{
+    $startTime = now()->addDay();
+    $typeSpecific = match ($courseType) {
+        CourseType::OFFLINE => [
+            'start_time' => $startTime->toIso8601String(),
+            'end_time' => $startTime->copy()->addHour()->toIso8601String(),
+            'address' => fake()->address(),
+            'room_number' => fake()->randomLetter(),
+        ],
+        CourseType::ONLINE => [
+            'start_time' => $startTime->toIso8601String(),
+            'end_time' => $startTime->copy()->addHour()->toIso8601String(),
+            'meeting_link' => fake()->url(),
+        ],
+        CourseType::VIDEO => [
+            'video_url' => fake()->url(),
+            'provider' => fake()->word(),
+        ],
+    };
+
+    return array_merge([
+        'title' => fake()->sentence(3),
+        'slug' => fake()->slug(),
+        'position' => fake()->randomNumber(),
     ], $typeSpecific, $overrides);
 }

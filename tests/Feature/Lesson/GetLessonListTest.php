@@ -20,6 +20,18 @@ describe('LessonController -> index', function () {
 
     /*
     |--------------------------------------------------------------------------
+    | validation
+    |--------------------------------------------------------------------------
+    */
+    describe('validation', function () {
+        it('fails if the course does not exist', function () {
+            getJson(route('course.lesson.index', 'non-existing-slug'))
+                ->assertNotFound();
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
     | permissions
     |--------------------------------------------------------------------------
     */

@@ -98,7 +98,7 @@ describe('CourseController -> destroy', function () {
             Storage::disk('courses')->assertMissing($filename);
         });
 
-        it('allows users with permissions to delete the course and its image', function ($user) {
+        it('allows users with permissions to delete the course', function ($user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }

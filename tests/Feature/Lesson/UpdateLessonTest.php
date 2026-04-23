@@ -9,11 +9,11 @@ use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\Sanctum;
-use function Pest\Laravel\postJson;
+use function Pest\Laravel\patchJson;
 
 uses(RefreshDatabase::class);
 
-describe('LessonController -> store', function () {
+describe('LessonController -> update', function () {
     beforeEach(function () {
         Cache::flush();
         $this->seed(RolesAndPermissionsSeeder::class);
@@ -26,15 +26,36 @@ describe('LessonController -> store', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-        it('fails if required fields are missing', function () {
+        it('fails if the present fields are empty', function () {
             $author = User::factory()->teacher()->create();
             Sanctum::actingAs($author);
 
             $course = Course::factory()->for($author, 'author')->create();
+            $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            postJson(route('course.lesson.store', $course), [])
+            patchJson(route('course.lesson.update', [$course, $lesson]), updatingLessonPayload($course->type, [
+                'title' => '',
+                'slug' => '',
+                'position' => ''
+            ]))
                 ->assertUnprocessable()
-                ->assertJsonValidationErrors(['title']);
+                ->assertJsonValidationErrors(['title', 'slug', 'position']);
+        });
+
+        it('fails if the present fields are null', function () {
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
+
+            $course = Course::factory()->for($author, 'author')->create();
+            $lesson = Lesson::factory()->for($course, 'course')->create();
+
+            patchJson(route('course.lesson.update', [$course, $lesson]), updatingLessonPayload($course->type, [
+                'title' => null,
+                'slug' => null,
+                'position' => null
+            ]))
+                ->assertUnprocessable()
+                ->assertJsonValidationErrors(['title', 'slug', 'position']);
         });
 
         it('fails if fields are invalid', function () {
@@ -42,8 +63,9 @@ describe('LessonController -> store', function () {
             Sanctum::actingAs($author);
 
             $course = Course::factory()->for($author, 'author')->create();
+            $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            postJson(route('course.lesson.store', $course), creatingLessonPayload($course->type, [
+            patchJson(route('course.lesson.update', [$course, $lesson]), updatingLessonPayload($course->type, [
                 'title' => str_repeat('A', 256),
                 'slug' => str_repeat('b', 256),
                 'position' => -1
@@ -52,18 +74,33 @@ describe('LessonController -> store', function () {
                 ->assertJsonValidationErrors(['title', 'slug', 'position']);
         });
 
-        it('fails if slug is not unique within the same course', function () {
+        it('fails if slug is taken by another lesson within the same course', function () {
             $author = User::factory()->teacher()->create();
             Sanctum::actingAs($author);
 
             $course = Course::factory()->for($author, 'author')->create();
-            $lesson = Lesson::factory()->for($course, 'course')->create(['slug' => 'existing-slug']);
+            $lesson = Lesson::factory()->for($course, 'course')->create();
+            $anotherLesson = Lesson::factory()->for($course, 'course')->create(['slug' => 'taken-slug']);
 
-            postJson(route('course.lesson.store', $course), creatingLessonPayload($course->type, [
-                'slug' => $lesson->slug,
+            patchJson(route('course.lesson.update', [$course, $lesson]), updatingLessonPayload($course->type, [
+                'slug' => $anotherLesson->slug,
             ]))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['slug']);
+        });
+
+        it('succeeds if the slug remains the same (ignore current)', function () {
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
+
+            $course = Course::factory()->for($author, 'author')->create();
+            $lesson = Lesson::factory()->for($course, 'course')->create();
+
+            patchJson(route('course.lesson.update', [$course, $lesson]), updatingLessonPayload($course->type, [
+                'slug' => $lesson->slug,
+            ]))
+                ->assertOk()
+                ->assertJsonFragment(['slug' => $lesson->slug]);
         });
 
         it('fails if slug format is invalid', function () {
@@ -71,8 +108,9 @@ describe('LessonController -> store', function () {
             Sanctum::actingAs($author);
 
             $course = Course::factory()->for($author, 'author')->create();
+            $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            postJson(route('course.lesson.store', $course), creatingLessonPayload($course->type, [
+            patchJson(route('course.lesson.update', [$course, $lesson]), updatingLessonPayload($course->type, [
                 'slug' => 'Invalid Slug!',
             ]))
                 ->assertUnprocessable()
@@ -84,15 +122,16 @@ describe('LessonController -> store', function () {
             Sanctum::actingAs($author);
 
             $course = Course::factory()->type(CourseType::OFFLINE)->for($author, 'author')->create();
+            $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            postJson(route('course.lesson.store', $course), creatingLessonPayload($course->type, [
-                'start_time' => now()->subDay(),
+            patchJson(route('course.lesson.update', [$course, $lesson]), updatingLessonPayload($course->type, [
+                'start_time' => now(),
                 'end_time' => now()->subDays(2),
                 'address' => str_repeat('A', 256),
                 'room_number' => str_repeat('1', 51),
             ]))
                 ->assertUnprocessable()
-                ->assertJsonValidationErrors(['start_time', 'end_time', 'address', 'room_number']);
+                ->assertJsonValidationErrors(['end_time', 'address', 'room_number']);
         });
 
         it('fails if ONLINE fields are invalid', function () {
@@ -100,14 +139,15 @@ describe('LessonController -> store', function () {
             Sanctum::actingAs($author);
 
             $course = Course::factory()->type(CourseType::ONLINE)->for($author, 'author')->create();
+            $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            postJson(route('course.lesson.store', $course), creatingLessonPayload($course->type, [
-                'start_time' => now()->subDay(),
+            patchJson(route('course.lesson.update', [$course, $lesson]), updatingLessonPayload($course->type, [
+                'start_time' => now(),
                 'end_time' => now()->subDays(2),
-                'meeting_link' => 'invalid-link',
+                'meeting_link' => 'not-a-url',
             ]))
                 ->assertUnprocessable()
-                ->assertJsonValidationErrors(['start_time', 'end_time', 'meeting_link']);
+                ->assertJsonValidationErrors(['end_time', 'meeting_link']);
         });
 
         it('fails if VIDEO fields are invalid', function () {
@@ -115,8 +155,9 @@ describe('LessonController -> store', function () {
             Sanctum::actingAs($author);
 
             $course = Course::factory()->type(CourseType::VIDEO)->for($author, 'author')->create();
+            $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            postJson(route('course.lesson.store', $course), creatingLessonPayload($course->type, [
+            patchJson(route('course.lesson.update', [$course, $lesson]), updatingLessonPayload($course->type, [
                 'video_url' => 'invalid-url',
                 'provider' => str_repeat('A', 51),
             ]))
@@ -124,70 +165,24 @@ describe('LessonController -> store', function () {
                 ->assertJsonValidationErrors(['video_url', 'provider']);
         });
 
-        it('succeeds if a slug is provided manually', function () {
-            $author = User::factory()->teacher()->create();
-            Sanctum::actingAs($author);
-
-            $course = Course::factory()->for($author, 'author')->create();
-            $slug = 'test-slug';
-
-            postJson(route('course.lesson.store', $course), creatingLessonPayload($course->type, [
-                'slug' => $slug,
-            ]))
-                ->assertCreated()
-                ->assertJsonFragment(['slug' => $slug])
-                ->assertJsonStructure([
-                    'data' => lessonJsonStructure($course->type),
-                ]);
-        });
-
-        it('automatically assigns the next position to a new lesson', function () {
-            $author = User::factory()->teacher()->create();
-            Sanctum::actingAs($author);
-
-            $course = Course::factory()->for($author, 'author')->create();
-            $lesson = Lesson::factory()->for($course, 'course')->create(['position' => 1]);
-
-            postJson(route('course.lesson.store', $course), creatingLessonPayload($course->type))
-                ->assertCreated()
-                ->assertJsonFragment(['position' => $lesson->position + 1])
-                ->assertJsonStructure([
-                    'data' => lessonJsonStructure($course->type),
-                ]);
-            $this->assertDatabaseHas('lessons', [
-                'course_id' => $course->id,
-                'position' => $lesson->position + 1,
-            ]);
-        });
-
-        it('succeeds if a position is provided manually', function () {
-            $author = User::factory()->teacher()->create();
-            Sanctum::actingAs($author);
-
-            $course = Course::factory()->for($author, 'author')->create();
-            $manualPosition = 99;
-
-            postJson(route('course.lesson.store', $course), creatingLessonPayload($course->type, [
-                'position' => $manualPosition
-            ]))
-                ->assertCreated()
-                ->assertJsonFragment(['position' => $manualPosition])
-                ->assertJsonStructure([
-                    'data' => lessonJsonStructure($course->type),
-                ]);
-            $this->assertDatabaseHas('lessons', [
-                'course_id' => $course->id,
-                'position' => $manualPosition,
-            ]);
-        });
-
         it('fails if the course does not exist', function () {
             $author = User::factory()->teacher()->create();
             Sanctum::actingAs($author);
 
             $course = Course::factory()->for($author, 'author')->create();
+            $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            postJson(route('course.lesson.store', 'non-existing-slug'), creatingLessonPayload($course->type))
+            patchJson(route('course.lesson.update', ['non-existing-slug', $lesson]))
+                ->assertNotFound();
+        });
+
+        it('fails if the lesson does not exist', function () {
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
+
+            $course = Course::factory()->for($author, 'author')->create();
+
+            patchJson(route('course.lesson.update', [$course, 'non-existing-slug']))
                 ->assertNotFound();
         });
     });
@@ -198,21 +193,23 @@ describe('LessonController -> store', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('fails if unauthenticated user tries to create a lesson', function () {
+        it('fails if unauthenticated user tries to update a lesson', function () {
             $course = Course::factory()->create();
+            $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            postJson(route('course.lesson.store', $course), creatingLessonPayload($course->type))
+            patchJson(route('course.lesson.update', [$course, $lesson]), updatingLessonPayload($course->type, ['title' => 'Updated Title']))
                 ->assertUnauthorized();
         });
 
-        it('fails if users without permissions tries to create a lesson', function ($user) {
+        it('fails if users without permissions tries to update a lesson', function ($user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }
 
             $course = Course::factory()->create();
+            $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            postJson(route('course.lesson.store', $course), creatingLessonPayload($course->type))
+            patchJson(route('course.lesson.update', [$course, $lesson]), updatingLessonPayload($course->type, ['title' => 'Updated Title']))
                 ->assertForbidden();
         })->with([
             'student' => fn() => User::factory()->student()->create(),
@@ -221,34 +218,36 @@ describe('LessonController -> store', function () {
             'admin' => fn() => User::factory()->admin()->create(),
         ]);
 
-        it('allows if user is the course author to create a lesson', function () {
+        it('allows if user is the course author to update a lesson', function () {
             $author = User::factory()->teacher()->create();
             Sanctum::actingAs($author);
 
             $course = Course::factory()->for($author, 'author')->create();
-            $data = creatingLessonPayload($course->type);
+            $lesson = Lesson::factory()->for($course, 'course')->create();
+            $data = updatingLessonPayload($course->type, ['title' => 'Updated Title']);
 
-            postJson(route('course.lesson.store', $course), $data)
-                ->assertCreated()
-                ->assertJsonStructure([
-                    'data' => lessonJsonStructure($course->type),
-                ]);
+            patchJson(route('course.lesson.update', [$course, $lesson]), $data)
+                ->assertOk()
+                ->assertJsonPath('data.title', $data['title'])
+                ->assertJsonStructure(['data' => lessonJsonStructure($course->type)]);
             $this->assertDatabaseHas('lessons', [
+                'id' => $lesson->id,
                 'title' => $data['title'],
-                'course_id' => $course->id,
             ]);
         });
 
-        it('allows users with permissions to create a lesson', function ($user) {
+        it('allows users with permissions to update a lesson', function ($user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }
 
             $course = Course::factory()->create();
-            $data = creatingLessonPayload($course->type);
+            $lesson = Lesson::factory()->for($course, 'course')->create();
+            $data = updatingLessonPayload($course->type, ['title' => 'Updated Title']);
 
-            postJson(route('course.lesson.store', $course), $data)
-                ->assertCreated()
+            patchJson(route('course.lesson.update', [$course, $lesson]), $data)
+                ->assertOk()
+                ->assertJsonPath('data.title', $data['title'])
                 ->assertJsonStructure([
                     'data' => lessonJsonStructure($course->type),
                 ]);
@@ -267,11 +266,13 @@ describe('LessonController -> store', function () {
     |--------------------------------------------------------------------------
     */
     describe('caching', function () {
-        it('flushes the lesson cache when a new lesson is created', function () {
+        it('flushes the cache when a lesson is updated', function () {
             $author = User::factory()->teacher()->create();
             Sanctum::actingAs($author);
 
             $course = Course::factory()->for($author, 'author')->create();
+            $lesson = Lesson::factory()->for($course, 'course')->create();
+
             Cache::tags([
                 config('cache.tags.lesson_list'),
                 config('cache.tags.course') . ':' . $course->id
@@ -282,8 +283,8 @@ describe('LessonController -> store', function () {
                 config('cache.tags.course') . ':' . $course->id
             ])->get('lessons'))->not->toBeNull();
 
-            postJson(route('course.lesson.store', $course), creatingLessonPayload($course->type))
-                ->assertCreated()
+            patchJson(route('course.lesson.update', [$course, $lesson]), updatingLessonPayload($course->type, ['title' => 'New Title']))
+                ->assertOk()
                 ->assertJsonStructure(['data' => lessonJsonStructure($course->type)]);
             expect(Cache::tags([
                 config('cache.tags.lesson_list'),

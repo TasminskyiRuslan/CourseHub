@@ -129,7 +129,7 @@ Route::prefix('courses')->group(function () {
             ->name('course.lesson.show');
 
         // Update lesson action
-        Route::put('/{lesson}', [LessonController::class, 'update'])
+        Route::patch('/{lesson}', [LessonController::class, 'update'])
             ->middleware(['auth:sanctum', 'verified'])
             ->name('course.lesson.update');
 

@@ -117,7 +117,7 @@ describe('CourseImageController -> update', function () {
             Storage::disk('courses')->assertMissing($course->image_path);
         });
 
-        it('fails if users tries to update someone else\'s course image', function ($user) {
+        it('fails if users without permissions tries to update someone else\'s course image', function ($user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }
@@ -147,13 +147,14 @@ describe('CourseImageController -> update', function () {
                 ->assertOk()
                 ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
             $course->refresh();
-            expect($course->image_path)->not()->toBeNull();
+            expect($course->image_path)->not->toBeNull();
             Storage::disk('courses')->assertExists($course->image_path);
         });
 
-        it('allows super-admin to update any course image', function () {
-            $superAdmin = User::whereEmail(config('super-admin.email'))->first();
-            Sanctum::actingAs($superAdmin);
+        it('allows users with permissions to update any course image', function ($user) {
+            if ($user) {
+                Sanctum::actingAs($user);
+            }
 
             $course = Course::factory()->create();
             $data = imagePayload();
@@ -162,9 +163,11 @@ describe('CourseImageController -> update', function () {
                 ->assertOk()
                 ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
             $course->refresh();
-            expect($course->image_path)->not()->toBeNull();
+            expect($course->image_path)->not->toBeNull();
             Storage::disk('courses')->assertExists($course->image_path);
-        });
+        })->with([
+            'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first()
+        ]);
     });
 
     /*
@@ -178,7 +181,8 @@ describe('CourseImageController -> update', function () {
             Sanctum::actingAs($author);
 
             $course = Course::factory()->for($author, 'author')->create();
-            Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.books'));
+            Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.course'));
+            expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->not->toBeNull();
 
             postJson(route('course.image.update', $course), imagePayload())
                 ->assertOk()

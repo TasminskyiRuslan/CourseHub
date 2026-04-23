@@ -34,7 +34,7 @@ describe('CourseController -> store', function () {
                 ->assertJsonValidationErrors(['title', 'type', 'price']);
         });
 
-        it('fails if fields are too long', function () {
+        it('fails if fields are invalid', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
 
@@ -42,27 +42,11 @@ describe('CourseController -> store', function () {
                 'title' => str_repeat('A', 256),
                 'slug' => str_repeat('B', 256),
                 'description' => str_repeat('C', 5001),
+                'type' => 'invalid-type',
+                'price' => 'invalid-price'
             ]))
                 ->assertUnprocessable()
-                ->assertJsonValidationErrors(['title', 'slug', 'description']);
-        });
-
-        it('fails if type is invalid', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
-
-            postJson(route('course.store'), creatingCoursePayload(['type' => 'invalid-type']))
-                ->assertUnprocessable()
-                ->assertJsonValidationErrors(['type']);
-        });
-
-        it('fails if price is not numeric', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
-
-            postJson(route('course.store'), creatingCoursePayload(['price' => 'invalid-price']))
-                ->assertUnprocessable()
-                ->assertJsonValidationErrors(['price']);
+                ->assertJsonValidationErrors(['title', 'slug', 'description', 'type', 'price']);
         });
 
         it('fails if price is out of range', function () {
@@ -77,9 +61,10 @@ describe('CourseController -> store', function () {
         it('fails if slug is not unique', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
+
             $course = Course::factory()->create(['slug' => 'existing-slug']);
 
-            postJson(route('course.store'), creatingCoursePayload(['slug' => 'existing-slug']))
+            postJson(route('course.store'), creatingCoursePayload(['slug' => $course->slug]))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['slug']);
         });
@@ -96,6 +81,7 @@ describe('CourseController -> store', function () {
         it('succeeds if a slug is provided manually', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
+
             $slug = 'test-slug';
 
             postJson(route('course.store'), creatingCoursePayload(['slug' => $slug]))
@@ -116,10 +102,11 @@ describe('CourseController -> store', function () {
                 ->assertUnauthorized();
         });
 
-        it('fails if users without course:create tries to create a course', function ($user) {
+        it('fails if users without permissions tries to create a course', function ($user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }
+
             postJson(route('course.store'), creatingCoursePayload())
                 ->assertForbidden();
         })->with([
@@ -128,16 +115,16 @@ describe('CourseController -> store', function () {
             'admin' => fn() => User::factory()->admin()->create(),
         ]);
 
-        it('allows users with course:create to create a course', function ($user) {
+        it('allows users with permission to create a course', function ($user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }
+
             $data = creatingCoursePayload();
 
             postJson(route('course.store'), $data)
                 ->assertCreated()
                 ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
-
             $this->assertDatabaseHas('courses', [
                 'title' => $data['title'],
                 'author_id' => $user->id,
@@ -158,12 +145,11 @@ describe('CourseController -> store', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
 
-            Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.books'));
+            Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.course'));
             expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->not->toBeNull();
 
             postJson(route('course.store'), creatingCoursePayload())
                 ->assertCreated();
-
             expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->toBeNull();
         });
     });

@@ -121,7 +121,7 @@ describe('CourseController -> update', function () {
                 ->assertJsonValidationErrors(['price']);
         });
 
-        it('fails if the book does not exist', function () {
+        it('fails if the course does not exist', function () {
             $author = User::factory()->teacher()->create();
             Sanctum::actingAs($author);
 
@@ -143,7 +143,7 @@ describe('CourseController -> update', function () {
                 ->assertUnauthorized();
         });
 
-        it('fails if users tries to update someone else\'s course', function ($user) {
+        it('fails if users without permissions tries to update someone else\'s course', function ($user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }
@@ -177,9 +177,10 @@ describe('CourseController -> update', function () {
             ]);
         });
 
-        it('allows super-admin to update any course', function () {
-            $superAdmin = User::whereEmail(config('super-admin.email'))->first();
-            Sanctum::actingAs($superAdmin);
+        it('allows users with permissions to update any course', function ($user) {
+            if ($user) {
+                Sanctum::actingAs($user);
+            }
 
             $course = Course::factory()->create(['title' => 'Original Title']);
             $data = updatingCoursePayload();
@@ -193,7 +194,9 @@ describe('CourseController -> update', function () {
                 'title' => $data['title'],
                 'description' => $data['description'],
             ]);
-        });
+        })->with([
+            'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
+        ]);
     });
 
     /*
@@ -207,6 +210,7 @@ describe('CourseController -> update', function () {
 
         $course = Course::factory()->for($author, 'author')->create();
         Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.course'));
+        expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->not->toBeNull();
 
         patchJson(route('course.update', $course), updatingCoursePayload())
             ->assertOk()

@@ -30,7 +30,7 @@ class LessonObserver
      */
     public function created(Lesson $lesson): void
     {
-        Cache::tags([config('cache.tags.course') . $lesson->course_id])->flush();
+        Cache::tags([config('cache.tags.course') . ':' . $lesson->course_id])->flush();
     }
 
     /**
@@ -41,7 +41,7 @@ class LessonObserver
      */
     public function updated(Lesson $lesson): void
     {
-        Cache::tags([config('cache.tags.course') . $lesson->course_id])->flush();
+        Cache::tags([config('cache.tags.course') . ':' . $lesson->course_id])->flush();
     }
 
     /**
@@ -63,6 +63,6 @@ class LessonObserver
      */
     public function deleted(Lesson $lesson): void
     {
-        Cache::tags([config('cache.tags.course') . $lesson->course_id])->flush();
+        Cache::tags([config('cache.tags.course') . ':' . $lesson->course_id])->flush();
     }
 }

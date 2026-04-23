@@ -13,6 +13,7 @@
 
 use App\Enums\CourseType;
 use App\Enums\UserRole;
+use App\Models\Course;
 use Illuminate\Http\UploadedFile;
 
 pest()->extend(Tests\TestCase::class)
@@ -99,7 +100,7 @@ function authorJsonStructure(): array {
  * @param CourseType|null $courseType
  * @return array
  */
-function lessonJsonStructure(?CourseType $courseType = null): array {
+function lessonJsonStructure(?CourseType $courseType): array {
     return [
         'id',
         'course_id',
@@ -134,8 +135,6 @@ function lessonJsonStructure(?CourseType $courseType = null): array {
  *
  * @param bool $withAuthor
  * @param bool $withLessonsCount
- * @param bool $withLessons
- * @param CourseType|null $courseType
  * @return array
  */
 function courseJsonStructure(bool $withAuthor = false, bool $withLessonsCount = false): array {
@@ -234,4 +233,37 @@ function imagePayload(array $overrides = []): array
         'image'     => UploadedFile::fake()->image('image.jpg'),
         '_method' => 'PUT',
     ], $overrides);
+}
+
+/**
+ * Generate a creation lesson payload with optional overrides.
+ *
+ * @param CourseType $courseType
+ * @param array $overrides
+ * @return array
+ */
+function creatingLessonPayload(CourseType $courseType, array $overrides = []): array
+{
+    $startTime = now()->addDay();
+    $typeSpecific = match ($courseType) {
+        CourseType::OFFLINE => [
+            'start_time' => $startTime->toIso8601String(),
+            'end_time' => $startTime->copy()->addHour()->toIso8601String(),
+            'address' => fake()->address(),
+            'room_number' => fake()->randomLetter(),
+        ],
+        CourseType::ONLINE => [
+            'start_time' => $startTime->toIso8601String(),
+            'end_time' => $startTime->copy()->addHour()->toIso8601String(),
+            'meeting_link' => fake()->url(),
+        ],
+        CourseType::VIDEO => [
+            'video_url' => fake()->url(),
+            'provider' => fake()->word(),
+        ],
+    };
+
+    return array_merge([
+        'title' => fake()->sentence(3)
+    ], $typeSpecific, $overrides);
 }

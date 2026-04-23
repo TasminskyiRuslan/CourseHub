@@ -24,7 +24,7 @@ describe('UnpublishCourseController', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-        it('returns not found for non-existing course', function () {
+        it('fails if the course does not exist', function () {
             $author = User::factory()->teacher()->create();
             Sanctum::actingAs($author);
 
@@ -48,7 +48,7 @@ describe('UnpublishCourseController', function () {
             expect($course->is_published)->toBeTrue();
         });
 
-        it('fails if users tries to unpublish someone else\'s course', function ($user) {
+        it('fails if users without permissions tries to unpublish someone else\'s course', function ($user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }
@@ -78,7 +78,7 @@ describe('UnpublishCourseController', function () {
             expect($course->is_published)->toBeFalse();
         });
 
-        it('allows admins to unpublish any course', function ($user) {
+        it('allows users with permissions to unpublish any course', function ($user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }
@@ -107,7 +107,8 @@ describe('UnpublishCourseController', function () {
             Sanctum::actingAs($author);
 
             $course = Course::factory()->for($author, 'author')->create();
-            Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.books'));
+            Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.course'));
+            expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->not->toBeNull();
 
             patchJson(route('course.unpublish', $course))
                 ->assertOK()

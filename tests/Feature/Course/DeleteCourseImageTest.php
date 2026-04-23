@@ -47,7 +47,7 @@ describe('CourseImageController -> destroy', function () {
             deleteJson(route('course.image.destroy', $course))
                 ->assertUnauthorized();
             $course->refresh();
-            expect($course->image_path)->not()->toBeNull();
+            expect($course->image_path)->not->toBeNull();
             Storage::disk('courses')->assertExists($course->image_path);
         });
 
@@ -62,7 +62,7 @@ describe('CourseImageController -> destroy', function () {
             deleteJson(route('course.image.destroy', $course))
                 ->assertForbidden();
             $course->refresh();
-            expect($course->image_path)->not()->toBeNull();
+            expect($course->image_path)->not->toBeNull();
             Storage::disk('courses')->assertExists($course->image_path);
         })->with([
             'student' => fn() => User::factory()->student()->create(),
@@ -84,9 +84,10 @@ describe('CourseImageController -> destroy', function () {
             Storage::disk('courses')->assertMissing($course->image_path);
         });
 
-        it('allows super-admin to update any course image', function () {
-            $superAdmin = User::whereEmail(config('super-admin.email'))->first();
-            Sanctum::actingAs($superAdmin);
+        it('allows users with permissions to update any course image', function ($user) {
+            if ($user) {
+                Sanctum::actingAs($user);
+            }
 
             $course = Course::factory()->create();
 
@@ -95,7 +96,9 @@ describe('CourseImageController -> destroy', function () {
             $course->refresh();
             expect($course->image_path)->toBeNull();
             Storage::disk('courses')->assertMissing($course->image_path);
-        });
+        })->with([
+            'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
+        ]);
     });
 
     /*
@@ -109,7 +112,8 @@ describe('CourseImageController -> destroy', function () {
             Sanctum::actingAs($author);
 
             $course = Course::factory()->for($author, 'author')->withImage()->create();
-            Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.books'));
+            Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.course'));
+            expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->not->toBeNull();
 
             deleteJson(route('course.image.update', $course))
                 ->assertNoContent();

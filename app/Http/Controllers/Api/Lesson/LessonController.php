@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Lesson;
 
+use App\Actions\Lesson\CreateLessonAction;
 use App\Data\Lesson\CreateLessonData;
 use App\Data\Lesson\UpdateLessonData;
 use App\Http\Controllers\Controller;
@@ -153,13 +154,21 @@ class LessonController extends Controller
         ]
     )]
     /**
+     * Create a new lesson.
+     *
+     * @param CreateLessonData $lessonData
+     * @param Course $course
+     * @param CreateLessonAction $createLessonAction
+     * @return JsonResponse
      * @throws Throwable
      */
-    public function store(CreateLessonData $data, Course $course): LessonResource
+    public function store(CreateLessonData $lessonData, Course $course, CreateLessonAction $createLessonAction): JsonResponse
     {
         $this->authorize('create', [Lesson::class, $course]);
-        $newLesson = $this->lessonService->create($data, $course);
-        return new LessonResource($newLesson);
+        $lesson = $createLessonAction->handle($lessonData, $course);
+        return LessonResource::make($lesson)
+            ->response()
+            ->setStatusCode(SymfonyResponse::HTTP_CREATED);
     }
 
     #[OA\Get(

@@ -23,7 +23,7 @@ describe('CourseController -> show', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-        it('returns not found for non-existing course', function () {
+        it('fails if the course does not exist', function () {
             getJson(route('course.show', 'non-existing-slug'))
                 ->assertNotFound();
         });
@@ -65,7 +65,7 @@ describe('CourseController -> show', function () {
                 ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
         });
 
-        it('allows admins to retrieve any unpublished course', function ($user) {
+        it('allows users with permissions to retrieve any unpublished course', function ($user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }

@@ -2,7 +2,6 @@
 
 namespace App\Data\Lesson;
 
-use App\Data\Casts\SlugCast;
 use App\Enums\CourseType;
 use Carbon\CarbonImmutable;
 use Illuminate\Validation\Rule;
@@ -10,29 +9,31 @@ use Spatie\LaravelData\Attributes\Validation\IntegerType;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\Validation\Nullable;
+use Spatie\LaravelData\Attributes\Validation\Regex;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\StringType;
-use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 
 class CreateLessonData extends Data
 {
+    /**
+     * @param string $title
+     * @param string|null $slug
+     * @param int|null $position
+     * @param CarbonImmutable|null $start_time
+     * @param CarbonImmutable|null $end_time
+     * @param string|null $address
+     * @param string|null $room_number
+     * @param string|null $meeting_link
+     * @param string|null $video_url
+     * @param string|null $provider
+     */
     public function __construct(
-        #[Required]
-        #[StringType]
-        #[Max(255)]
         public string           $title,
 
-        #[Nullable]
-        #[StringType]
-        #[Max(255)]
-        #[WithCast(SlugCast::class)]
         public ?string          $slug,
 
-        #[Nullable]
-        #[IntegerType]
-        #[Min(0)]
         public ?int             $position,
 
         public ?CarbonImmutable $start_time,
@@ -55,31 +56,44 @@ class CreateLessonData extends Data
     public static function rules(?ValidationContext $context = null): array
     {
         $course = request()->route('course');
-        $type = $course->type;
 
         $rules = [
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+            ],
             'slug' => [
+                'nullable',
+                'string',
+                'max:255',
+                'regex:/^[a-z0-9-]+$/',
                 Rule::unique('lessons', 'slug')->where('course_id', $course->id),
+            ],
+            'position' => [
+                'nullable',
+                'integer',
+                'min:0',
             ],
         ];
 
-        $typeRules = match ($type) {
-            CourseType::OFFLINE => [
+        return match ($course->type) {
+            CourseType::OFFLINE => array_merge($rules, [
                 'start_time' => ['nullable', 'date', 'after_or_equal:today'],
                 'end_time' => ['nullable', 'date', 'after:start_time'],
                 'address' => ['nullable', 'string', 'max:255'],
                 'room_number' => ['nullable', 'string', 'max:50'],
-            ],
-            CourseType::ONLINE => [
+            ]),
+            CourseType::ONLINE => array_merge($rules, [
                 'start_time' => ['nullable', 'date', 'after_or_equal:today'],
                 'end_time' => ['nullable', 'date', 'after:start_time'],
                 'meeting_link' => ['nullable', 'url', 'max:2048'],
-            ],
-            CourseType::VIDEO => [
+            ]),
+            CourseType::VIDEO => array_merge($rules, [
                 'video_url' => ['nullable', 'url', 'max:2048'],
                 'provider' => ['nullable', 'string', 'max:50'],
-            ],
+            ]),
+            default => $rules,
         };
-        return array_merge($rules, $typeRules);
     }
 }

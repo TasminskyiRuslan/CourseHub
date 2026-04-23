@@ -24,7 +24,7 @@ describe('PublishCourseController', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-        it('returns not found for non-existing course', function () {
+        it('fails if the course does not exist', function () {
             $author = User::factory()->teacher()->create();
             Sanctum::actingAs($author);
 
@@ -48,7 +48,7 @@ describe('PublishCourseController', function () {
             expect($course->is_published)->toBeFalse();
         });
 
-        it('fails if users tries to publish someone else\'s course', function ($user) {
+        it('fails if users without permissions tries to publish someone else\'s course', function ($user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }
@@ -79,7 +79,7 @@ describe('PublishCourseController', function () {
             expect($course->is_published)->toBeTrue();
         });
 
-        it('allows super-admin to publish any course', function () {
+        it('allows users with permissions to publish any course', function () {
             $superAdmin = User::whereEmail(config('super-admin.email'))->first();
             Sanctum::actingAs($superAdmin);
 
@@ -104,7 +104,8 @@ describe('PublishCourseController', function () {
             Sanctum::actingAs($author);
 
             $course = Course::factory()->for($author, 'author')->unpublished()->create();
-            Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.books'));
+            Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.course'));
+            expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->not->toBeNull();
 
             patchJson(route('course.publish', $course))
                 ->assertOK()

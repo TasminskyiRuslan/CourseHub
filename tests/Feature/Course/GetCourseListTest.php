@@ -65,7 +65,7 @@ describe('CourseController -> index', function () {
                 ->assertJsonCount($publishedCourses->count() + $ownUnpublishedCourses->count(), 'data');
         });
 
-        it('allows admins to retrieve all unpublished courses', function ($user) {
+        it('allows users with permissions to retrieve all unpublished courses', function ($user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }
@@ -270,7 +270,7 @@ describe('CourseController -> index', function () {
                 ->assertJsonMissing(['title' => $newTitle]);
         });
 
-        it('does not store the course list in the cache users with course:view-unpublished and course:create permission', function ($user) {
+        it('does not store the course list in the cache users with permissions', function ($user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }

@@ -8,7 +8,6 @@ use OpenApi\Attributes as OA;
     schema: 'UpdateCourseRequest',
     title: 'Update Course Request',
     description: 'Request payload for updating the course.',
-    required: [],
     properties: [
         new OA\Property(
             property: 'title',
@@ -29,6 +28,7 @@ use OpenApi\Attributes as OA;
             property: 'description',
             description: 'Description of the course.',
             type: 'string',
+            maxLength: 5000,
             example: 'A basic mathematics course',
             nullable: true
         ),

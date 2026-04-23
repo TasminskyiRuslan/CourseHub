@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Swagger\Lesson\Responses;
+namespace App\Swagger\Lesson\Requests;
 
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
-    schema: 'OfflineLessonResponse',
-    title: 'Offline Lesson Response',
-    description: 'Content of a specific offline lesson.',
+    schema: 'CreateOfflineLessonRequest',
+    title: 'Create Offline Lesson Request',
+    description: 'Offline part of request payload for creating a new lesson.',
     properties: [
         new OA\Property(
             property: 'start_time',
@@ -29,6 +29,7 @@ use OpenApi\Attributes as OA;
             property: 'address',
             description: 'Address of the offline lesson.',
             type: 'string',
+            maxLength: 255,
             example: '123 Main St, Springfield',
             nullable: true
         ),
@@ -36,13 +37,13 @@ use OpenApi\Attributes as OA;
             property: 'room_number',
             description: 'Room number of the offline lesson.',
             type: 'string',
+            maxLength: 50,
             example: 'Room 101',
             nullable: true
-        )
+        ),
     ],
     type: 'object'
 )]
-class OfflineLessonResponseSchema
+class CreateOfflineLessonRequestSchema
 {
-
 }

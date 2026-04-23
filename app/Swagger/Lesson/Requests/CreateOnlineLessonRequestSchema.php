@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Swagger\Lesson\Responses;
+namespace App\Swagger\Lesson\Requests;
 
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
-    schema: 'OnlineLessonResponse',
-    title: 'Online Lesson Response',
-    description: 'Content of a specific online lesson.',
+    schema: 'CreateOnlineLessonRequest',
+    title: 'Create Online Lesson Request',
+    description: 'Online part of request payload for creating a new lesson.',
     properties: [
         new OA\Property(
             property: 'start_time',
@@ -27,16 +27,16 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'meeting_link',
-            description: 'Link of the online lesson.',
+            description: 'Meeting link of the lesson.',
             type: 'string',
             format: 'uri',
+            maxLength: 2048,
             example: 'https://meet.example.com/lesson123',
             nullable: true
         ),
     ],
     type: 'object'
 )]
-class OnlineLessonResponseSchema
+class CreateOnlineLessonRequestSchema
 {
-
 }

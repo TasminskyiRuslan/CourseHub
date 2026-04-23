@@ -244,7 +244,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ForgotPasswordRequest"
+                                "$ref": "#/components/schemas/SendPasswordResetEmailRequest"
                             }
                         }
                     }
@@ -431,7 +431,12 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/CourseResponse"
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CourseResponse"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -800,7 +805,7 @@
         "/courses/{course}/lessons": {
             "get": {
                 "tags": [
-                    "Lessons"
+                    "Lesson"
                 ],
                 "summary": "Retrieve a list of course lessons",
                 "description": "Retrieve a paginated list of course lessons.",
@@ -888,19 +893,20 @@
             },
             "post": {
                 "tags": [
-                    "Lessons"
+                    "Lesson"
                 ],
-                "summary": "Create lessons",
-                "description": "Create a new lesson for a specific course.",
+                "summary": "Create a lesson",
+                "description": "Create a new lesson.",
                 "operationId": "3688868ff5b41c7b976a7a0c10e012d3",
                 "parameters": [
                     {
                         "name": "course",
                         "in": "path",
-                        "description": "Course identifier (slug)",
+                        "description": "Course identifier (slug).",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "math-101"
                         }
                     }
                 ],
@@ -909,201 +915,38 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/StoreLessonRequest"
+                                "$ref": "#/components/schemas/CreateLessonRequest"
                             }
                         }
                     }
                 },
                 "responses": {
                     "201": {
-                        "description": "Lesson created",
+                        "description": "Lesson created successfully.",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Lesson"
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/LessonResponse"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course not found."
                     },
                     "422": {
-                        "description": "Validation error"
-                    },
-                    "401": {
-                        "description": "Authentication required"
-                    },
-                    "403": {
-                        "description": "Access denied"
-                    },
-                    "404": {
-                        "description": "Course not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/courses/{course}/lessons/{lesson}": {
-            "get": {
-                "tags": [
-                    "Lessons"
-                ],
-                "summary": "Get lesson",
-                "description": "Retrieve a specific lesson for a specific course.",
-                "operationId": "44edac41fc34e68e26d87d0e6a01ba10",
-                "parameters": [
-                    {
-                        "name": "course",
-                        "in": "path",
-                        "description": "Course identifier (slug)",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "lesson",
-                        "in": "path",
-                        "description": "Lesson identifier (slug)",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Lesson details",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Lesson"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Access denied"
-                    },
-                    "404": {
-                        "description": "Course or Lesson not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    },
-                    {}
-                ]
-            },
-            "put": {
-                "tags": [
-                    "Lessons"
-                ],
-                "summary": "Update lesson",
-                "description": "Update a specific lesson for a specific course.",
-                "operationId": "19eef4647ae27f9c616744c34e7b7ccb",
-                "parameters": [
-                    {
-                        "name": "course",
-                        "in": "path",
-                        "description": "Course identifier (slug)",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "lesson",
-                        "in": "path",
-                        "description": "Lesson identifier (slug)",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateLessonRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Lesson updated",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Lesson"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation error"
-                    },
-                    "401": {
-                        "description": "Authentication required"
-                    },
-                    "403": {
-                        "description": "Access denied"
-                    },
-                    "404": {
-                        "description": "Course or Lesson not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Lessons"
-                ],
-                "summary": "Delete lesson",
-                "description": "Delete a specific lesson from a specific course.",
-                "operationId": "f0874920178e45bebf1598a0907b5698",
-                "parameters": [
-                    {
-                        "name": "course",
-                        "in": "path",
-                        "description": "Course identifier (slug)",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "lesson",
-                        "in": "path",
-                        "description": "Lesson identifier (slug)",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Lesson deleted"
-                    },
-                    "401": {
-                        "description": "Authentication required"
-                    },
-                    "403": {
-                        "description": "Access denied"
-                    },
-                    "404": {
-                        "description": "Course or Lesson not found"
+                        "description": "Validation error."
                     }
                 },
                 "security": [
@@ -1116,23 +959,6 @@
     },
     "components": {
         "schemas": {
-            "ForgotPasswordRequest": {
-                "title": "Forgot Password Request",
-                "description": "Request payload for sending password reset link.",
-                "required": [
-                    "email"
-                ],
-                "properties": {
-                    "email": {
-                        "description": "Email address of the user.",
-                        "type": "string",
-                        "format": "email",
-                        "maxLength": 255,
-                        "example": "john@example.com"
-                    }
-                },
-                "type": "object"
-            },
             "LoginUserRequest": {
                 "title": "Login User Request",
                 "description": "Request payload for authenticating a user.",
@@ -1158,7 +984,8 @@
                         "description": "Remember me flag of the user.",
                         "type": "boolean",
                         "default": false,
-                        "example": true
+                        "example": true,
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -1253,6 +1080,23 @@
                 },
                 "type": "object"
             },
+            "SendPasswordResetEmailRequest": {
+                "title": "Send Password Reset Email Request",
+                "description": "Request payload for sending password reset link.",
+                "required": [
+                    "email"
+                ],
+                "properties": {
+                    "email": {
+                        "description": "Email address of the user.",
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255,
+                        "example": "john@example.com"
+                    }
+                },
+                "type": "object"
+            },
             "AuthResponse": {
                 "title": "Auth Response",
                 "description": "Data returned after user login or registration.",
@@ -1293,7 +1137,6 @@
                     "name",
                     "slug",
                     "email",
-                    "email_verified_at",
                     "role"
                 ],
                 "properties": {
@@ -1392,8 +1235,7 @@
                 "title": "Update Course Image Request",
                 "description": "Request payload for updating a course image.",
                 "required": [
-                    "image",
-                    "_method"
+                    "image"
                 ],
                 "properties": {
                     "image": {
@@ -1416,7 +1258,6 @@
             "UpdateCourseRequest": {
                 "title": "Update Course Request",
                 "description": "Request payload for updating the course.",
-                "required": [],
                 "properties": {
                     "title": {
                         "description": "Title of the course.",
@@ -1434,6 +1275,7 @@
                     "description": {
                         "description": "Description of the course.",
                         "type": "string",
+                        "maxLength": 5000,
                         "example": "A basic mathematics course",
                         "nullable": true
                     },
@@ -1483,10 +1325,8 @@
                     "author_id",
                     "title",
                     "slug",
-                    "description",
                     "type",
                     "price",
-                    "image_url",
                     "is_published",
                     "created_at",
                     "updated_at"
@@ -1546,7 +1386,7 @@
                     "image_url": {
                         "description": "Image url of the course",
                         "type": "string",
-                        "format": "url",
+                        "format": "uri",
                         "example": "http://loclhost:8080/storage/courses/course1.png",
                         "nullable": true
                     },
@@ -1572,6 +1412,133 @@
                         "type": "string",
                         "format": "date-time",
                         "example": "2026-01-25T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "CreateLessonRequest": {
+                "title": "Create Lesson Request",
+                "description": "Request payload for creating a new lesson.",
+                "required": [
+                    "title"
+                ],
+                "properties": {
+                    "title": {
+                        "description": "Title of the lesson.",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Introduction to Algebra"
+                    },
+                    "slug": {
+                        "description": "Slug of the lesson. (optional, must be unique if provided)",
+                        "type": "string",
+                        "maxLength": 255,
+                        "pattern": "^[a-z0-9-]+$",
+                        "example": "introduction-to-algebra",
+                        "nullable": true
+                    },
+                    "position": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "example": 1,
+                        "nullable": true
+                    }
+                },
+                "type": "object",
+                "oneOf": [
+                    {
+                        "$ref": "#/components/schemas/CreateOfflineLessonRequest"
+                    },
+                    {
+                        "$ref": "#/components/schemas/CreateOnlineLessonRequest"
+                    },
+                    {
+                        "$ref": "#/components/schemas/CreateVideoLessonRequest"
+                    }
+                ]
+            },
+            "CreateOfflineLessonRequest": {
+                "title": "Create Offline Lesson Request",
+                "description": "Offline part of request payload for creating a new lesson.",
+                "properties": {
+                    "start_time": {
+                        "description": "Start time of the offline lesson.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2027-02-01T10:00:00Z",
+                        "nullable": true
+                    },
+                    "end_time": {
+                        "description": "End time of the offline lesson.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2027-02-01T12:00:00Z",
+                        "nullable": true
+                    },
+                    "address": {
+                        "description": "Address of the offline lesson.",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "123 Main St, Springfield",
+                        "nullable": true
+                    },
+                    "room_number": {
+                        "description": "Room number of the offline lesson.",
+                        "type": "string",
+                        "maxLength": 50,
+                        "example": "Room 101",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "CreateOnlineLessonRequest": {
+                "title": "Create Online Lesson Request",
+                "description": "Online part of request payload for creating a new lesson.",
+                "properties": {
+                    "start_time": {
+                        "description": "Start time of the online lesson.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2027-02-01T10:00:00Z",
+                        "nullable": true
+                    },
+                    "end_time": {
+                        "description": "End time of the online lesson.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2027-02-01T12:00:00Z",
+                        "nullable": true
+                    },
+                    "meeting_link": {
+                        "description": "Meeting link of the lesson.",
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 2048,
+                        "example": "https://meet.example.com/lesson123",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "CreateVideoLessonRequest": {
+                "title": "Create Video Lesson Request",
+                "description": "Video part of request payload for creating a new lesson.",
+                "properties": {
+                    "video_url": {
+                        "description": "Link of the video lesson.",
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 2048,
+                        "example": "https://videos.example.com/lesson123.mp4",
+                        "nullable": true
+                    },
+                    "provider": {
+                        "description": "Provider of the video lesson.",
+                        "type": "string",
+                        "maxLength": 50,
+                        "example": "youtube",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -1646,12 +1613,6 @@
             "OfflineLessonResponse": {
                 "title": "Offline Lesson Response",
                 "description": "Content of a specific offline lesson.",
-                "required": [
-                    "start_time",
-                    "end_time",
-                    "address",
-                    "room_number"
-                ],
                 "properties": {
                     "start_time": {
                         "description": "Start time of the offline lesson.",
@@ -1685,11 +1646,6 @@
             "OnlineLessonResponse": {
                 "title": "Online Lesson Response",
                 "description": "Content of a specific online lesson.",
-                "required": [
-                    "start_time",
-                    "end_time",
-                    "meeting_link"
-                ],
                 "properties": {
                     "start_time": {
                         "description": "Start time of the online lesson.",
@@ -1718,10 +1674,6 @@
             "VideoLessonResponse": {
                 "title": "Video Lesson Response",
                 "description": "Content of a specific video lesson.",
-                "required": [
-                    "video_url",
-                    "provider"
-                ],
                 "properties": {
                     "video_url": {
                         "description": "Link of the video lesson.",
@@ -1738,148 +1690,6 @@
                     }
                 },
                 "type": "object"
-            },
-            "StoreLessonBaseRequest": {
-                "title": "Store Lesson Base Request",
-                "required": [
-                    "title"
-                ],
-                "properties": {
-                    "title": {
-                        "type": "string",
-                        "maxLength": 255,
-                        "example": "Introduction to Algebra"
-                    },
-                    "slug": {
-                        "type": "string",
-                        "maxLength": 255,
-                        "example": "introduction-to-algebra",
-                        "nullable": true
-                    },
-                    "position": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "example": 1,
-                        "nullable": true
-                    }
-                },
-                "type": "object"
-            },
-            "StoreLessonRequest": {
-                "title": "Store Lesson Request",
-                "description": "Schema for creating a lesson depending on course type",
-                "oneOf": [
-                    {
-                        "$ref": "#/components/schemas/StoreOfflineLessonRequest"
-                    },
-                    {
-                        "$ref": "#/components/schemas/StoreOnlineLessonRequest"
-                    },
-                    {
-                        "$ref": "#/components/schemas/StoreVideoLessonRequest"
-                    }
-                ]
-            },
-            "StoreOfflineLessonRequest": {
-                "title": "Store Offline Lesson Request",
-                "allOf": [
-                    {
-                        "$ref": "#/components/schemas/StoreLessonBaseRequest"
-                    },
-                    {
-                        "required": [
-                            "start_time",
-                            "end_time",
-                            "address",
-                            "room_number"
-                        ],
-                        "properties": {
-                            "start_time": {
-                                "type": "string",
-                                "format": "date-time",
-                                "example": "2027-02-01T10:00:00Z"
-                            },
-                            "end_time": {
-                                "type": "string",
-                                "format": "date-time",
-                                "example": "2027-02-01T12:00:00Z"
-                            },
-                            "address": {
-                                "type": "string",
-                                "maxLength": 255,
-                                "example": "123 Main St, Springfield"
-                            },
-                            "room_number": {
-                                "type": "string",
-                                "maxLength": 50,
-                                "example": "Room 101"
-                            }
-                        },
-                        "type": "object"
-                    }
-                ]
-            },
-            "StoreOnlineLessonRequest": {
-                "title": "Store Online Lesson Request",
-                "allOf": [
-                    {
-                        "$ref": "#/components/schemas/StoreLessonBaseRequest"
-                    },
-                    {
-                        "required": [
-                            "start_time",
-                            "end_time",
-                            "meeting_link"
-                        ],
-                        "properties": {
-                            "start_time": {
-                                "type": "string",
-                                "format": "date-time",
-                                "example": "2027-02-01T10:00:00Z"
-                            },
-                            "end_time": {
-                                "type": "string",
-                                "format": "date-time",
-                                "example": "2027-02-01T12:00:00Z"
-                            },
-                            "meeting_link": {
-                                "type": "string",
-                                "format": "uri",
-                                "maxLength": 2048,
-                                "example": "https://meet.example.com/lesson123"
-                            }
-                        },
-                        "type": "object"
-                    }
-                ]
-            },
-            "StoreVideoLessonRequest": {
-                "title": "Store Video Lesson Request",
-                "allOf": [
-                    {
-                        "$ref": "#/components/schemas/StoreLessonBaseRequest"
-                    },
-                    {
-                        "required": [
-                            "video_url",
-                            "provider"
-                        ],
-                        "properties": {
-                            "video_url": {
-                                "type": "string",
-                                "format": "uri",
-                                "maxLength": 2048,
-                                "example": "https://videos.example.com/lesson123.mp4"
-                            },
-                            "provider": {
-                                "type": "string",
-                                "maxLength": 50,
-                                "example": "youtube"
-                            }
-                        },
-                        "type": "object"
-                    }
-                ]
             },
             "UpdateLessonBaseRequest": {
                 "title": "Update Lesson Base Request",
@@ -2023,237 +1833,6 @@
                         "type": "object"
                     }
                 ]
-            },
-            "LessonCollection": {
-                "title": "Lesson collection",
-                "description": "Collection of lessons",
-                "required": [
-                    "data"
-                ],
-                "properties": {
-                    "data": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/LessonData"
-                        }
-                    }
-                },
-                "type": "object"
-            },
-            "LessonData": {
-                "title": "Lesson data schema",
-                "required": [
-                    "id",
-                    "course_id",
-                    "title",
-                    "slug",
-                    "position",
-                    "content",
-                    "created_at",
-                    "updated_at"
-                ],
-                "properties": {
-                    "id": {
-                        "description": "The ID of the lesson",
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "course_id": {
-                        "description": "The ID of the course",
-                        "type": "integer",
-                        "example": 10
-                    },
-                    "title": {
-                        "description": "The title of the lesson",
-                        "type": "string",
-                        "example": "Introduction to Algebra"
-                    },
-                    "slug": {
-                        "description": "The slug of the lesson",
-                        "type": "string",
-                        "example": "introduction-to-algebra"
-                    },
-                    "position": {
-                        "description": "The position of the lesson",
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "content": {
-                        "description": "The content of the lesson",
-                        "oneOf": [
-                            {
-                                "$ref": "#/components/schemas/OfflineLesson"
-                            },
-                            {
-                                "$ref": "#/components/schemas/OnlineLesson"
-                            },
-                            {
-                                "$ref": "#/components/schemas/VideoLesson"
-                            }
-                        ]
-                    },
-                    "created_at": {
-                        "description": "The creation date of the lesson",
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2026-01-01T12:00:00Z"
-                    },
-                    "updated_at": {
-                        "description": "The modification date of the lesson",
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2026-01-10T12:00:00Z"
-                    }
-                },
-                "type": "object"
-            },
-            "Lesson": {
-                "title": "Lesson schema",
-                "description": "Details of a lesson returned by the API",
-                "required": [
-                    "data"
-                ],
-                "properties": {
-                    "data": {
-                        "$ref": "#/components/schemas/LessonData"
-                    }
-                },
-                "type": "object"
-            },
-            "OfflineLesson": {
-                "title": "Offline lesson schema",
-                "description": "Offline content of a lesson returned by the API",
-                "required": [
-                    "start_time",
-                    "end_time",
-                    "address",
-                    "room_number"
-                ],
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "start_time": {
-                                "description": "The start time of the lesson",
-                                "type": "string",
-                                "format": "date-time",
-                                "example": "2027-02-01T10:00:00Z"
-                            },
-                            "end_time": {
-                                "description": "The end time of the lesson",
-                                "type": "string",
-                                "format": "date-time",
-                                "example": "2027-02-01T12:00:00Z"
-                            },
-                            "address": {
-                                "description": "The address of the lesson",
-                                "type": "string",
-                                "example": "123 Main St, Springfield"
-                            },
-                            "room_number": {
-                                "description": "The room number of the lesson",
-                                "type": "string",
-                                "example": "Room 101"
-                            }
-                        },
-                        "type": "object"
-                    }
-                },
-                "type": "object"
-            },
-            "OnlineLesson": {
-                "title": "Online lesson schema",
-                "description": "Online content of a lesson returned by the API",
-                "required": [
-                    "start_time",
-                    "end_time",
-                    "meeting_link"
-                ],
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "start_time": {
-                                "description": "The start time of the lesson",
-                                "type": "string",
-                                "format": "date-time",
-                                "example": "2027-02-01T10:00:00Z"
-                            },
-                            "end_time": {
-                                "description": "The end time of the lesson",
-                                "type": "string",
-                                "format": "date-time",
-                                "example": "2027-02-01T12:00:00Z"
-                            },
-                            "meeting_link": {
-                                "description": "The link of the lesson",
-                                "type": "string",
-                                "format": "uri",
-                                "example": "https://meet.example.com/lesson123"
-                            }
-                        },
-                        "type": "object"
-                    }
-                },
-                "type": "object"
-            },
-            "VideoLesson": {
-                "title": "Video lesson schema",
-                "description": "Video content of a lesson returned by the API",
-                "required": [
-                    "video_url",
-                    "provider"
-                ],
-                "properties": {
-                    "data": {
-                        "properties": {
-                            "video_url": {
-                                "description": "The link of the video",
-                                "type": "string",
-                                "format": "uri",
-                                "example": "https://videos.example.com/lesson123.mp4"
-                            },
-                            "provider": {
-                                "description": "The provider of the video",
-                                "type": "string",
-                                "example": "youtube"
-                            }
-                        },
-                        "type": "object"
-                    }
-                },
-                "type": "object"
-            },
-            "PaginationMeta": {
-                "title": "Pagination meta schema",
-                "description": "Metadata about pagination",
-                "required": [
-                    "current_page",
-                    "last_page",
-                    "per_page",
-                    "total"
-                ],
-                "properties": {
-                    "current_page": {
-                        "description": "The current page",
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "last_page": {
-                        "description": "The last page",
-                        "type": "integer",
-                        "example": 10
-                    },
-                    "per_page": {
-                        "description": "The number of items per page",
-                        "type": "integer",
-                        "example": 15
-                    },
-                    "total": {
-                        "description": "The total number of items",
-                        "type": "integer",
-                        "example": 150
-                    }
-                },
-                "type": "object"
             }
         },
         "securitySchemes": {
@@ -2277,8 +1856,8 @@
             "description": "Course"
         },
         {
-            "name": "Lessons",
-            "description": "Lessons"
+            "name": "Lesson",
+            "description": "Lesson"
         }
     ]
 }

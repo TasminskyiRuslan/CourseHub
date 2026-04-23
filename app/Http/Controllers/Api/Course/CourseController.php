@@ -109,7 +109,14 @@ class CourseController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_CREATED,
                 description: 'Course created successfully.',
-                content: new OA\JsonContent(ref: '#/components/schemas/CourseResponse')
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/CourseResponse'
+                        )
+                    ]
+                )
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNAUTHORIZED,

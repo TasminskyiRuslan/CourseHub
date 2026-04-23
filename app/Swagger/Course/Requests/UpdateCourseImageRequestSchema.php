@@ -8,7 +8,7 @@ use OpenApi\Attributes as OA;
     schema: 'UpdateCourseImageRequest',
     title: 'Update Course Image Request',
     description: 'Request payload for updating a course image.',
-    required: ['image', '_method'],
+    required: ['image'],
     properties: [
         new OA\Property(
             property: 'image',

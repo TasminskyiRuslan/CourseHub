@@ -33,7 +33,7 @@ class LessonController extends Controller
         description: 'Retrieve a paginated list of course lessons.',
         summary: 'Retrieve a list of course lessons',
         security: [['sanctum' => []], []],
-        tags: ['Lessons'],
+        tags: ['Lesson'],
         parameters: [
             new OA\Parameter(
                 name: 'course',
@@ -112,45 +112,55 @@ class LessonController extends Controller
 
     #[OA\Post(
         path: '/courses/{course}/lessons',
-        description: 'Create a new lesson for a specific course.',
-        summary: 'Create lessons',
+        description: 'Create a new lesson.',
+        summary: 'Create a lesson',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
             required: true,
-            content: new OA\JsonContent(ref: '#/components/schemas/StoreLessonRequest')
+            content: new OA\JsonContent(ref: '#/components/schemas/CreateLessonRequest')
         ),
-        tags: ['Lessons'],
+        tags: ['Lesson'],
         parameters: [
             new OA\Parameter(
                 name: 'course',
-                description: 'Course identifier (slug)',
+                description: 'Course identifier (slug).',
                 in: 'path',
                 required: true,
-                schema: new OA\Schema(type: 'string')
-            ),
+                schema: new OA\Schema(
+                    type: 'string',
+                    example: 'math-101'
+                )
+            )
         ],
         responses: [
             new OA\Response(
                 response: SymfonyResponse::HTTP_CREATED,
-                description: 'Lesson created',
-                content: new OA\JsonContent(ref: '#/components/schemas/Lesson')
-            ),
-            new OA\Response(
-                response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
-                description: 'Validation error'
+                description: 'Lesson created successfully.',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/LessonResponse'
+                        )
+                    ]
+                )
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNAUTHORIZED,
-                description: 'Authentication required'
+                description: 'User is unauthenticated.'
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_FORBIDDEN,
-                description: 'Access denied'
+                description: 'User does not have permissions.'
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
-                description: 'Course not found'
+                description: 'Course not found.'
             ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
+                description: 'Validation error.'
+            )
         ]
     )]
     /**
@@ -170,159 +180,159 @@ class LessonController extends Controller
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_CREATED);
     }
-
-    #[OA\Get(
-        path: '/courses/{course}/lessons/{lesson}',
-        description: 'Retrieve a specific lesson for a specific course.',
-        summary: 'Get lesson',
-        security: [['sanctum' => []], []],
-        tags: ['Lessons'],
-        parameters: [
-            new OA\Parameter(
-                name: 'course',
-                description: 'Course identifier (slug)',
-                in: 'path',
-                required: true,
-                schema: new OA\Schema(type: 'string')
-            ),
-            new OA\Parameter(
-                name: 'lesson',
-                description: 'Lesson identifier (slug)',
-                in: 'path',
-                required: true,
-                schema: new OA\Schema(type: 'string')
-            )
-        ],
-        responses: [
-            new OA\Response(
-                response: SymfonyResponse::HTTP_OK,
-                description: 'Lesson details',
-                content: new OA\JsonContent(ref: '#/components/schemas/Lesson')
-            ),
-            new OA\Response(
-                response: SymfonyResponse::HTTP_FORBIDDEN,
-                description: 'Access denied'
-            ),
-            new OA\Response(
-                response: SymfonyResponse::HTTP_NOT_FOUND,
-                description: 'Course or Lesson not found'
-            ),
-        ]
-    )]
-    public function show(Course $course, Lesson $lesson): LessonResource
-    {
-        $this->authorize('view', $lesson);
-        return new LessonResource($lesson->loadMissing('lessonable'));
-    }
-
-    #[OA\Put(
-        path: '/courses/{course}/lessons/{lesson}',
-        description: 'Update a specific lesson for a specific course.',
-        summary: 'Update lesson',
-        security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(ref: '#/components/schemas/UpdateLessonRequest')
-        ),
-        tags: ['Lessons'],
-        parameters: [
-            new OA\Parameter(
-                name: 'course',
-                description: 'Course identifier (slug)',
-                in: 'path',
-                required: true,
-                schema: new OA\Schema(type: 'string')
-            ),
-            new OA\Parameter(
-                name: 'lesson',
-                description: 'Lesson identifier (slug)',
-                in: 'path',
-                required: true,
-                schema: new OA\Schema(type: 'string')
-            )
-        ],
-        responses: [
-            new OA\Response(
-                response: SymfonyResponse::HTTP_OK,
-                description: 'Lesson updated',
-                content: new OA\JsonContent(ref: '#/components/schemas/Lesson')
-            ),
-            new OA\Response(
-                response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
-                description: 'Validation error'
-            ),
-            new OA\Response(
-                response: SymfonyResponse::HTTP_UNAUTHORIZED,
-                description: 'Authentication required'
-            ),
-            new OA\Response(
-                response: SymfonyResponse::HTTP_FORBIDDEN,
-                description: 'Access denied'
-            ),
-            new OA\Response(
-                response: SymfonyResponse::HTTP_NOT_FOUND,
-                description: 'Course or Lesson not found'
-            ),
-        ]
-    )]
-    /**
-     * @throws Throwable
-     */
-    public function update(UpdateLessonData $data, Course $course, Lesson $lesson): LessonResource
-    {
-        $this->authorize('update', $lesson);
-        $updatedLesson = $this->lessonService->update($data, $lesson);
-        return new LessonResource($updatedLesson);
-    }
-
-    #[OA\Delete(
-        path: '/courses/{course}/lessons/{lesson}',
-        description: 'Delete a specific lesson from a specific course.',
-        summary: 'Delete lesson',
-        security: [['sanctum' => []]],
-        tags: ['Lessons'],
-        parameters: [
-            new OA\Parameter(
-                name: 'course',
-                description: 'Course identifier (slug)',
-                in: 'path',
-                required: true,
-                schema: new OA\Schema(type: 'string')
-            ),
-            new OA\Parameter(
-                name: 'lesson',
-                description: 'Lesson identifier (slug)',
-                in: 'path',
-                required: true,
-                schema: new OA\Schema(type: 'string')
-            )
-        ],
-        responses: [
-            new OA\Response(
-                response: SymfonyResponse::HTTP_NO_CONTENT,
-                description: 'Lesson deleted'
-            ),
-            new OA\Response(
-                response: SymfonyResponse::HTTP_UNAUTHORIZED,
-                description: 'Authentication required'
-            ),
-            new OA\Response(
-                response: SymfonyResponse::HTTP_FORBIDDEN,
-                description: 'Access denied'
-            ),
-            new OA\Response(
-                response: SymfonyResponse::HTTP_NOT_FOUND,
-                description: 'Course or Lesson not found'
-            ),
-        ]
-    )]
-    /**
-     * @throws Throwable
-     */
-    public function destroy(Course $course, Lesson $lesson): Response
-    {
-        $this->authorize('delete', $lesson);
-        $this->lessonService->delete($lesson);
-        return response()->noContent();
-    }
+//
+//    #[OA\Get(
+//        path: '/courses/{course}/lessons/{lesson}',
+//        description: 'Retrieve a specific lesson for a specific course.',
+//        summary: 'Get lesson',
+//        security: [['sanctum' => []], []],
+//        tags: ['Lessons'],
+//        parameters: [
+//            new OA\Parameter(
+//                name: 'course',
+//                description: 'Course identifier (slug)',
+//                in: 'path',
+//                required: true,
+//                schema: new OA\Schema(type: 'string')
+//            ),
+//            new OA\Parameter(
+//                name: 'lesson',
+//                description: 'Lesson identifier (slug)',
+//                in: 'path',
+//                required: true,
+//                schema: new OA\Schema(type: 'string')
+//            )
+//        ],
+//        responses: [
+//            new OA\Response(
+//                response: SymfonyResponse::HTTP_OK,
+//                description: 'Lesson details',
+//                content: new OA\JsonContent(ref: '#/components/schemas/Lesson')
+//            ),
+//            new OA\Response(
+//                response: SymfonyResponse::HTTP_FORBIDDEN,
+//                description: 'Access denied'
+//            ),
+//            new OA\Response(
+//                response: SymfonyResponse::HTTP_NOT_FOUND,
+//                description: 'Course or Lesson not found'
+//            ),
+//        ]
+//    )]
+//    public function show(Course $course, Lesson $lesson): LessonResource
+//    {
+//        $this->authorize('view', $lesson);
+//        return new LessonResource($lesson->loadMissing('lessonable'));
+//    }
+//
+//    #[OA\Put(
+//        path: '/courses/{course}/lessons/{lesson}',
+//        description: 'Update a specific lesson for a specific course.',
+//        summary: 'Update lesson',
+//        security: [['sanctum' => []]],
+//        requestBody: new OA\RequestBody(
+//            required: true,
+//            content: new OA\JsonContent(ref: '#/components/schemas/UpdateLessonRequest')
+//        ),
+//        tags: ['Lessons'],
+//        parameters: [
+//            new OA\Parameter(
+//                name: 'course',
+//                description: 'Course identifier (slug)',
+//                in: 'path',
+//                required: true,
+//                schema: new OA\Schema(type: 'string')
+//            ),
+//            new OA\Parameter(
+//                name: 'lesson',
+//                description: 'Lesson identifier (slug)',
+//                in: 'path',
+//                required: true,
+//                schema: new OA\Schema(type: 'string')
+//            )
+//        ],
+//        responses: [
+//            new OA\Response(
+//                response: SymfonyResponse::HTTP_OK,
+//                description: 'Lesson updated',
+//                content: new OA\JsonContent(ref: '#/components/schemas/Lesson')
+//            ),
+//            new OA\Response(
+//                response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
+//                description: 'Validation error'
+//            ),
+//            new OA\Response(
+//                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+//                description: 'Authentication required'
+//            ),
+//            new OA\Response(
+//                response: SymfonyResponse::HTTP_FORBIDDEN,
+//                description: 'Access denied'
+//            ),
+//            new OA\Response(
+//                response: SymfonyResponse::HTTP_NOT_FOUND,
+//                description: 'Course or Lesson not found'
+//            ),
+//        ]
+//    )]
+//    /**
+//     * @throws Throwable
+//     */
+//    public function update(UpdateLessonData $data, Course $course, Lesson $lesson): LessonResource
+//    {
+//        $this->authorize('update', $lesson);
+//        $updatedLesson = $this->lessonService->update($data, $lesson);
+//        return new LessonResource($updatedLesson);
+//    }
+//
+//    #[OA\Delete(
+//        path: '/courses/{course}/lessons/{lesson}',
+//        description: 'Delete a specific lesson from a specific course.',
+//        summary: 'Delete lesson',
+//        security: [['sanctum' => []]],
+//        tags: ['Lessons'],
+//        parameters: [
+//            new OA\Parameter(
+//                name: 'course',
+//                description: 'Course identifier (slug)',
+//                in: 'path',
+//                required: true,
+//                schema: new OA\Schema(type: 'string')
+//            ),
+//            new OA\Parameter(
+//                name: 'lesson',
+//                description: 'Lesson identifier (slug)',
+//                in: 'path',
+//                required: true,
+//                schema: new OA\Schema(type: 'string')
+//            )
+//        ],
+//        responses: [
+//            new OA\Response(
+//                response: SymfonyResponse::HTTP_NO_CONTENT,
+//                description: 'Lesson deleted'
+//            ),
+//            new OA\Response(
+//                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+//                description: 'Authentication required'
+//            ),
+//            new OA\Response(
+//                response: SymfonyResponse::HTTP_FORBIDDEN,
+//                description: 'Access denied'
+//            ),
+//            new OA\Response(
+//                response: SymfonyResponse::HTTP_NOT_FOUND,
+//                description: 'Course or Lesson not found'
+//            ),
+//        ]
+//    )]
+//    /**
+//     * @throws Throwable
+//     */
+//    public function destroy(Course $course, Lesson $lesson): Response
+//    {
+//        $this->authorize('delete', $lesson);
+//        $this->lessonService->delete($lesson);
+//        return response()->noContent();
+//    }
 }

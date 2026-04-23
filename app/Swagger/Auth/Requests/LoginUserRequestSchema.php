@@ -30,7 +30,8 @@ use OpenApi\Attributes as OA;
             description: 'Remember me flag of the user.',
             type: 'boolean',
             default: false,
-            example: true
+            example: true,
+            nullable: true
         )
     ],
     type: 'object'

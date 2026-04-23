@@ -20,7 +20,7 @@ class SendPasswordResetEmailController extends Controller
         summary: 'Send password reset link',
         requestBody: new OA\RequestBody(
             required: true,
-            content: new OA\JsonContent(ref: '#/components/schemas/ForgotPasswordRequest')
+            content: new OA\JsonContent(ref: '#/components/schemas/SendPasswordResetEmailRequest')
         ),
         tags: ['Auth'],
         responses: [

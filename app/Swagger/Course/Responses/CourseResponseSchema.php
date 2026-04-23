@@ -9,7 +9,7 @@ use OpenApi\Attributes as OA;
     schema: 'CourseResponse',
     title: 'Course Response',
     description: 'Data of a specific course.',
-    required: ['id', 'author_id', 'title', 'slug', 'description', 'type', 'price', 'image_url', 'is_published', 'created_at', 'updated_at'],
+    required: ['id', 'author_id', 'title', 'slug', 'type', 'price', 'is_published', 'created_at', 'updated_at'],
     properties: [
         new OA\Property(
             property: 'id',
@@ -66,7 +66,7 @@ use OpenApi\Attributes as OA;
             property: 'image_url',
             description: 'Image url of the course',
             type: 'string',
-            format: 'url',
+            format: 'uri',
             example: 'http://loclhost:8080/storage/courses/course1.png',
             nullable: true
         ),

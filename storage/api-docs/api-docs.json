@@ -1139,6 +1139,129 @@
                     }
                 ]
             }
+        },
+        "/users": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Retrieve a list of users",
+                "description": "Retrieve a paginated list of users.",
+                "operationId": "bda0424acf687003f1427ea721f28c1b",
+                "parameters": [
+                    {
+                        "name": "filter[search]",
+                        "in": "query",
+                        "description": "Search users by name or email.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[role]",
+                        "in": "query",
+                        "description": "Filter users by role.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[verified]",
+                        "in": "query",
+                        "description": "Filter users by email status.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "true",
+                                "false"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter[banned]",
+                        "in": "query",
+                        "description": "Filter users by account status.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "true",
+                                "false"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter[trashed]",
+                        "in": "query",
+                        "description": "Filter users by account existence.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "only",
+                                "with"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort courses by field. Use \"-\" prefix for descending order.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "name",
+                                "-name",
+                                "email_verified_at",
+                                "-email_verified_at",
+                                "banned_at",
+                                "-banned_at",
+                                "created_at",
+                                "-created_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User list retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/UserResponse"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -1305,61 +1428,10 @@
                         "example": "Bearer"
                     },
                     "expires_at": {
-                        "description": "Time of the token expiration.",
+                        "description": "Expiration time of the token.",
                         "type": "string",
                         "format": "date-time",
                         "example": "2026-01-28T12:00:00+02:00"
-                    }
-                },
-                "type": "object"
-            },
-            "UserResponse": {
-                "title": "User Response",
-                "description": "Data of a specific user.",
-                "required": [
-                    "id",
-                    "name",
-                    "slug",
-                    "email",
-                    "role"
-                ],
-                "properties": {
-                    "id": {
-                        "description": "Unique identifier of the user.",
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "name": {
-                        "description": "Full name of the user.",
-                        "type": "string",
-                        "example": "John Doe"
-                    },
-                    "slug": {
-                        "description": "Slug of the user.",
-                        "type": "string",
-                        "example": "john-doe"
-                    },
-                    "email": {
-                        "description": "Email address of the user.",
-                        "type": "string",
-                        "format": "email",
-                        "example": "john@example.com"
-                    },
-                    "role": {
-                        "description": "Role of the user.",
-                        "type": "string",
-                        "enum": [
-                            "student",
-                            "teacher"
-                        ],
-                        "example": "student"
-                    },
-                    "email_verified_at": {
-                        "description": "Time of the email verified at.",
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2026-01-01T12:00:00Z",
-                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -1484,17 +1556,17 @@
                 ],
                 "properties": {
                     "id": {
-                        "description": "The user ID",
+                        "description": "Unique identifier of the user.",
                         "type": "integer",
                         "example": 1
                     },
                     "name": {
-                        "description": "The user name",
+                        "description": "Name of the user.",
                         "type": "string",
                         "example": "John Doe"
                     },
                     "slug": {
-                        "description": "The user slug",
+                        "description": "Slug of the user.",
                         "type": "string",
                         "example": "john-doe"
                     }
@@ -1517,12 +1589,12 @@
                 ],
                 "properties": {
                     "id": {
-                        "description": "Unique identifier of the course",
+                        "description": "Unique identifier of the course.",
                         "type": "integer",
                         "example": 1
                     },
                     "author_id": {
-                        "description": "Author unique identifier of the course",
+                        "description": "Author unique identifier of the course.",
                         "type": "integer",
                         "example": 1
                     },
@@ -1533,26 +1605,26 @@
                             }
                         ],
                         "nullable": true,
-                        "description": "Author of the course"
+                        "description": "Author of the course."
                     },
                     "title": {
-                        "description": "Title of the course",
+                        "description": "Title of the course.",
                         "type": "string",
                         "example": "Math 101"
                     },
                     "slug": {
-                        "description": "Slug of the course",
+                        "description": "Slug of the course.",
                         "type": "string",
                         "example": "math-101"
                     },
                     "description": {
-                        "description": "Description of the course",
+                        "description": "Description of the course.",
                         "type": "string",
                         "example": "A basic mathematics course",
                         "nullable": true
                     },
                     "type": {
-                        "description": "Type of the course",
+                        "description": "Type of the course.",
                         "type": "string",
                         "enum": [
                             "online",
@@ -1562,37 +1634,37 @@
                         "example": "online"
                     },
                     "price": {
-                        "description": "Price of the course",
+                        "description": "Price of the course.",
                         "type": "string",
                         "format": "float",
                         "example": 99.99
                     },
                     "image_url": {
-                        "description": "Image url of the course",
+                        "description": "Image url of the course.",
                         "type": "string",
                         "format": "uri",
                         "example": "http://loclhost:8080/storage/courses/course1.png",
                         "nullable": true
                     },
                     "is_published": {
-                        "description": "Status of the course",
+                        "description": "Status of the course.",
                         "type": "boolean",
                         "example": true
                     },
                     "lessons_count": {
-                        "description": "Total number of course lessons",
+                        "description": "Total number of course lessons.",
                         "type": "integer",
                         "example": 10,
                         "nullable": true
                     },
                     "created_at": {
-                        "description": "Creation date of the course",
+                        "description": "Creation time of the course.",
                         "type": "string",
                         "format": "date-time",
                         "example": "2026-01-20T12:00:00Z"
                     },
                     "updated_at": {
-                        "description": "Modification date of the course",
+                        "description": "Modification time of the course.",
                         "type": "string",
                         "format": "date-time",
                         "example": "2026-01-25T12:00:00Z"
@@ -1622,6 +1694,7 @@
                         "nullable": true
                     },
                     "position": {
+                        "description": "Position of the lesson.",
                         "type": "integer",
                         "minimum": 0,
                         "example": 1,
@@ -1901,13 +1974,13 @@
                         ]
                     },
                     "created_at": {
-                        "description": "Creation date of the lesson.",
+                        "description": "Creation time of the lesson.",
                         "type": "string",
                         "format": "date-time",
                         "example": "2026-01-01T12:00:00Z"
                     },
                     "updated_at": {
-                        "description": "Modification date of the lesson.",
+                        "description": "Modification time of the lesson.",
                         "type": "string",
                         "format": "date-time",
                         "example": "2026-01-10T12:00:00Z"
@@ -1995,6 +2068,82 @@
                     }
                 },
                 "type": "object"
+            },
+            "UserResponse": {
+                "title": "User Response",
+                "description": "Data of a specific user.",
+                "required": [
+                    "id",
+                    "name",
+                    "slug",
+                    "email",
+                    "role"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier of the user.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Full name of the user.",
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "slug": {
+                        "description": "Slug of the user.",
+                        "type": "string",
+                        "example": "john-doe"
+                    },
+                    "email": {
+                        "description": "Email address of the user.",
+                        "type": "string",
+                        "format": "email",
+                        "example": "john@example.com"
+                    },
+                    "email_verified_at": {
+                        "description": "Verification time of the user.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-01T12:00:00Z",
+                        "nullable": true
+                    },
+                    "role": {
+                        "description": "Role of the user.",
+                        "type": "string",
+                        "enum": [
+                            "student",
+                            "teacher"
+                        ],
+                        "example": "student"
+                    },
+                    "banned_at": {
+                        "description": "Banning time of the user.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-01T12:00:00Z",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "description": "Creation time of the user.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-01T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "description": "Modification time of the user.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-10T12:00:00Z"
+                    },
+                    "deleted_at": {
+                        "description": "Deletion time of the user.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-10T12:00:00Z"
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -2020,6 +2169,10 @@
         {
             "name": "Lesson",
             "description": "Lesson"
+        },
+        {
+            "name": "User",
+            "description": "User"
         }
     ]
 }

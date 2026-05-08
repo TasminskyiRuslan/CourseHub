@@ -29,7 +29,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'expires_at',
-            description: 'Time of the token expiration.',
+            description: 'Expiration time of the token.',
             type: 'string',
             format: 'date-time',
             example: '2026-01-28T12:00:00+02:00'

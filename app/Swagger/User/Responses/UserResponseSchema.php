@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Swagger\Auth\Responses;
+namespace App\Swagger\User\Responses;
 
 use App\Enums\UserRole;
 use OpenApi\Attributes as OA;
@@ -37,6 +37,14 @@ use OpenApi\Attributes as OA;
             example: 'john@example.com'
         ),
         new OA\Property(
+            property: 'email_verified_at',
+            description: 'Verification time of the user.',
+            type: 'string',
+            format: 'date-time',
+            example: '2026-01-01T12:00:00Z',
+            nullable: true
+        ),
+        new OA\Property(
             property: 'role',
             description: 'Role of the user.',
             type: 'string',
@@ -44,12 +52,33 @@ use OpenApi\Attributes as OA;
             example: UserRole::STUDENT->value
         ),
         new OA\Property(
-            property: 'email_verified_at',
-            description: 'Time of the email verified at.',
+            property: 'banned_at',
+            description: 'Banning time of the user.',
             type: 'string',
             format: 'date-time',
             example: '2026-01-01T12:00:00Z',
             nullable: true
+        ),
+        new OA\Property(
+            property: 'created_at',
+            description: 'Creation time of the user.',
+            type: 'string',
+            format: 'date-time',
+            example: '2026-01-01T12:00:00Z'
+        ),
+        new OA\Property(
+            property: 'updated_at',
+            description: 'Modification time of the user.',
+            type: 'string',
+            format: 'date-time',
+            example: '2026-01-10T12:00:00Z'
+        ),
+        new OA\Property(
+            property: 'deleted_at',
+            description: 'Deletion time of the user.',
+            type: 'string',
+            format: 'date-time',
+            example: '2026-01-10T12:00:00Z'
         )
     ],
     type: 'object'

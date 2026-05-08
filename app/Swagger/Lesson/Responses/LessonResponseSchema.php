@@ -50,18 +50,18 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'created_at',
-            description: 'Creation date of the lesson.',
+            description: 'Creation time of the lesson.',
             type: 'string',
             format: 'date-time',
             example: '2026-01-01T12:00:00Z'
         ),
         new OA\Property(
             property: 'updated_at',
-            description: 'Modification date of the lesson.',
+            description: 'Modification time of the lesson.',
             type: 'string',
             format: 'date-time',
             example: '2026-01-10T12:00:00Z'
-        ),
+        )
     ],
     type: 'object'
 )]

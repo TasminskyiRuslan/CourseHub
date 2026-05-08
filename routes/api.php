@@ -149,5 +149,6 @@ Route::prefix('courses')->group(function () {
 Route::prefix('users')->group(function () {
     // Get users list action
     Route::get('/', [UserController::class, 'index'])
+        ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
         ->name('user.index');
 });

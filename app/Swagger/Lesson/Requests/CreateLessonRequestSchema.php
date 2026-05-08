@@ -28,6 +28,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'position',
+            description: 'Position of the lesson.',
             type: 'integer',
             minimum: 0,
             example: 1,

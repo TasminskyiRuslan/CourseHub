@@ -12,19 +12,19 @@ use OpenApi\Attributes as OA;
     properties: [
         new OA\Property(
             property: 'id',
-            description: 'The user ID',
+            description: 'Unique identifier of the user.',
             type: 'integer',
             example: 1
         ),
         new OA\Property(
             property: 'name',
-            description: 'The user name',
+            description: 'Name of the user.',
             type: 'string',
             example: 'John Doe'
         ),
         new OA\Property(
             property: 'slug',
-            description: 'The user slug',
+            description: 'Slug of the user.',
             type: 'string',
             example: 'john-doe'
         ),

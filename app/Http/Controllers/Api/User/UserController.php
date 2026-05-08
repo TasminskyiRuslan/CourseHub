@@ -117,19 +117,17 @@ class UserController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Retrieve detailed information about a specific user.
+     *
+     * @param User $user
+     * @return JsonResponse
      */
-    public function store(Request $request)
+    public function show(User $user): JsonResponse
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+        $this->authorize('view', $user);
+        return UserResource::make($user)
+            ->response()
+            ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 
     /**

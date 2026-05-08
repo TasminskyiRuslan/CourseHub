@@ -151,4 +151,9 @@ Route::prefix('users')->group(function () {
     Route::get('/', [UserController::class, 'index'])
         ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
         ->name('user.index');
+
+    // Show user action
+    Route::get('/{user}', [UserController::class, 'show'])
+        ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
+        ->name('user.show');
 });

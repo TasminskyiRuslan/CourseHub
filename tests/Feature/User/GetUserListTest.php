@@ -23,17 +23,23 @@ describe('UserController -> index', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
+        it('fails if unauthenticated user tries to retrieve users', function () {
+            $users = User::factory()->count(3)->create();
+
+            getJson(route('user.index'))
+                ->assertUnauthorized();
+        });
+
         it('fails if users without permissions tries to retrieve users', function ($user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }
 
-            User::factory()->count(3)->create();
+            $users = User::factory()->count(3)->create();
 
             getJson(route('user.index'))
                 ->assertForbidden();
         })->with([
-            'guest' => null,
             'unverified' => fn() => User::factory()->unverified()->create(),
             'student' => fn() => User::factory()->student()->create(),
             'teacher' => fn() => User::factory()->teacher()->create(),
@@ -44,15 +50,13 @@ describe('UserController -> index', function () {
                 Sanctum::actingAs($user);
             }
 
-            User::factory()->count(3)->create();
+            $users = User::factory()->count(3)->create();
 
             getJson(route('user.index'))
                 ->assertOk()
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => [
-                            'id', 'name', 'slug', 'email', 'email_verified_at', 'role'
-                        ]
+                        '*' => userJsonStructure()
                     ]
                 ]);
         })->with([

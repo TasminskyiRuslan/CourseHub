@@ -1237,6 +1237,12 @@
                     }
                 ],
                 "responses": {
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
                     "200": {
                         "description": "User list retrieved successfully.",
                         "content": {
@@ -1254,6 +1260,59 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/users/{user}": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Retrieve user details",
+                "description": "Retrieve detailed information about a specific user.",
+                "operationId": "5d070ea37265b50551f44596d2508cda",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "User identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "john-doe"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User details retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "User not found."
                     }
                 },
                 "security": [

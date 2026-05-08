@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
@@ -36,7 +37,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property UserRole $role
- * @property-read Collection<int, \App\Models\Course> $courses
+ * @property-read Collection<int, Course> $courses
  * @property-read int|null $courses_count
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
@@ -46,7 +47,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property-read int|null $roles_count
  * @property-read Collection<int, PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
- * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
+ * @method static UserFactory factory($count = null, $state = [])
  * @method static Builder<static>|User newModelQuery()
  * @method static Builder<static>|User newQuery()
  * @method static Builder<static>|User permission($permissions, bool $without = false)
@@ -68,7 +69,7 @@ use Spatie\Sluggable\SlugOptions;
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasApiTokens, Notifiable, HasSlug, HasRoles;
+    use HasFactory, HasApiTokens, Notifiable, HasSlug, HasRoles, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -79,6 +80,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'banned_at',
     ];
 
     /**
@@ -164,5 +166,16 @@ class User extends Authenticatable implements MustVerifyEmail
     public function courses(): HasMany
     {
         return $this->hasMany(Course::class, 'author_id');
+    }
+
+
+    /**
+     * Check if the user is banned.
+     *
+     * @return bool
+     */
+    public function isBanned(): bool
+    {
+        return $this->banned_at !== null;
     }
 }

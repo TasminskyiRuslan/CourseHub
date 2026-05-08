@@ -99,7 +99,7 @@ class LessonController extends Controller
     public function index(Course $course, GetLessonListQuery $getLessonListQuery): JsonResponse
     {
         $this->authorize('view-any', [Lesson::class, $course]);
-        $lessons = $getLessonListQuery->get($course, auth()->user());
+        $lessons = $getLessonListQuery->handle($course, auth()->user());
         return LessonResource::collection($lessons)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);

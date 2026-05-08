@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Api\Auth;
+namespace App\Http\Resources\Api\User;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -12,6 +12,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read mixed $email
  * @property-read mixed $roles
  * @property-read mixed $email_verified_at
+ * @property mixed $banned_at
+ * @property mixed $created_at
+ * @property mixed $updated_at
+ * @property mixed $deleted_at
  */
 class UserResource extends JsonResource
 {
@@ -29,6 +33,10 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'email_verified_at' => $this->email_verified_at,
             'role' => $this->roles->first()?->name,
+            'banned_at' => $this->banned_at,
+            'created_at' => $this->created_at,
+            'updated_at'     => $this->updated_at,
+            'deleted_at' => $this->deleted_at,
         ];
     }
 }

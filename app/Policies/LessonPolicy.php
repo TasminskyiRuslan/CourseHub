@@ -26,11 +26,11 @@ class LessonPolicy
             return false;
         }
 
-        if ($user->is($course->author)) {
+        if ($user->can(UserPermission::COURSE_VIEW_ANY_UNPUBLISHED->value)) {
             return true;
         }
 
-        return $user->can(UserPermission::COURSE_VIEW_UNPUBLISHED->value);
+        return $user->is($course->author);
     }
 
     /**
@@ -50,11 +50,11 @@ class LessonPolicy
             return false;
         }
 
-        if ($user->is($lesson->course->author)) {
+        if ($user->can(UserPermission::COURSE_VIEW_ANY_UNPUBLISHED->value)) {
             return true;
         }
 
-        return $user->can(UserPermission::COURSE_VIEW_UNPUBLISHED->value);
+        return $user->is($lesson->course->author);
     }
 
     /**
@@ -78,7 +78,7 @@ class LessonPolicy
      */
     public function update(User $user, Lesson $lesson): bool
     {
-        return $user->can(UserPermission::LESSON_EDIT_OWN->value) && $user->is($lesson->course->author);
+        return $user->is($lesson->course->author);
     }
 
     /**
@@ -94,6 +94,6 @@ class LessonPolicy
             return true;
         }
 
-        return $user->can(UserPermission::LESSON_DELETE_OWN->value) && $user->is($lesson->course->author);
+        return $user->is($lesson->course->author);
     }
 }

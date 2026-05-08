@@ -34,6 +34,7 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'banned_at' => null,
         ];
     }
 
@@ -62,6 +63,18 @@ class UserFactory extends Factory
     {
         return $this->state(fn() => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is banned.
+     *
+     * @return $this
+     */
+    public function banned(): static
+    {
+        return $this->state(fn() => [
+            'banned_at' => now(),
         ]);
     }
 

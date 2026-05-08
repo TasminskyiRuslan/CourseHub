@@ -108,8 +108,13 @@ describe('LessonController -> index', function () {
 
             getJson(route('course.lesson.index', [$course, 'filter[search]' => $searchString]))
                 ->assertOk()
-                ->assertJsonCount(1, 'data')
-                ->assertJsonFragment(['id' => $lesson1->id]);
+                ->assertJsonFragment(['id' => $lesson1->id])
+                ->assertJsonMissing(['id' => $lesson2->id])
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => lessonJsonStructure($lesson1->course->type)
+                    ]
+                ]);
         });
 
         it('sorts lessons by position (asc) by default', function () {
@@ -119,8 +124,12 @@ describe('LessonController -> index', function () {
 
             getJson(route('course.lesson.index', $course))
                 ->assertOk()
-                ->assertJsonPath('data.0.id', $lesson1->id)
-                ->assertJsonPath('data.1.id', $lesson2->id);
+                ->assertSeeInOrder([$lesson1->id, $lesson2->id])
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => lessonJsonStructure($lesson1->course->type)
+                    ]
+                ]);
         });
 
         it('sorts lessons by created_at (asc and desc)', function () {
@@ -132,13 +141,20 @@ describe('LessonController -> index', function () {
 
             getJson(route('course.lesson.index', [$course, 'sort' => 'created_at']))
                 ->assertOk()
-                ->assertJsonPath('data.0.id', $oldLesson->id)
-                ->assertJsonPath('data.1.id', $newLesson->id);
-
+                ->assertSeeInOrder([$oldLesson->id, $newLesson->id])
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => lessonJsonStructure($oldLesson->course->type)
+                    ]
+                ]);
             getJson(route('course.lesson.index', [$course, 'sort' => '-created_at']))
                 ->assertOk()
-                ->assertJsonPath('data.0.id', $newLesson->id)
-                ->assertJsonPath('data.1.id', $oldLesson->id);
+                ->assertSeeInOrder([$newLesson->id, $oldLesson->id])
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => lessonJsonStructure($oldLesson->course->type)
+                    ]
+                ]);
         });
 
         it('sorts lessons by title (asc and desc)', function () {
@@ -149,15 +165,20 @@ describe('LessonController -> index', function () {
 
             getJson(route('course.lesson.index', [$course, 'sort' => 'title']))
                 ->assertOk()
-                ->assertJsonPath('data.0.id', $lessonA->id)
-                ->assertJsonPath('data.1.id', $lessonB->id)
-                ->assertJsonPath('data.2.id', $lessonC->id);
-
+                ->assertSeeInOrder([$lessonA->id, $lessonB->id, $lessonC->id])
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => lessonJsonStructure($lessonA->course->type)
+                    ]
+                ]);
             getJson(route('course.lesson.index', [$course, 'sort' => '-title']))
                 ->assertOk()
-                ->assertJsonPath('data.0.id', $lessonC->id)
-                ->assertJsonPath('data.1.id', $lessonB->id)
-                ->assertJsonPath('data.2.id', $lessonA->id);
+                ->assertSeeInOrder([$lessonC->id, $lessonB->id, $lessonA->id])
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => lessonJsonStructure($lessonA->course->type)
+                    ]
+                ]);
         });
 
         it('returns empty data when no lessons match the search', function () {

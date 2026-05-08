@@ -100,8 +100,8 @@ describe('CourseController -> index', function () {
 
             getJson(route('course.index', ['filter[search]' => $searchString]))
                 ->assertOk()
-                ->assertJsonCount(1, 'data')
                 ->assertJsonFragment(['id' => $course1->id])
+                ->assertJsonMissing(['id' => $course2->id])
                 ->assertJsonStructure([
                     'data' => [
                         '*' => courseJsonStructure()
@@ -116,8 +116,8 @@ describe('CourseController -> index', function () {
 
             getJson(route('course.index', ['filter[author]' => $author]))
                 ->assertOk()
-                ->assertJsonCount(1, 'data')
                 ->assertJsonFragment(['id' => $course1->id])
+                ->assertJsonMissing(['id' => $course2->id])
                 ->assertJsonStructure([
                     'data' => [
                         '*' => courseJsonStructure()
@@ -133,8 +133,7 @@ describe('CourseController -> index', function () {
 
             getJson(route('course.index'))
                 ->assertOk()
-                ->assertJsonPath('data.0.id', $newCourse->id)
-                ->assertJsonPath('data.1.id', $oldCourse->id)
+                ->assertSeeInOrder([$newCourse->id, $oldCourse->id])
                 ->assertJsonStructure([
                     'data' => [
                         '*' => courseJsonStructure()
@@ -150,8 +149,7 @@ describe('CourseController -> index', function () {
 
             getJson(route('course.index', ['sort' => 'created_at']))
                 ->assertOk()
-                ->assertJsonFragment(['id' => $oldCourse->id])
-                ->assertJsonFragment(['id' => $newCourse->id])
+                ->assertSeeInOrder([$oldCourse->id, $newCourse->id])
                 ->assertJsonStructure([
                     'data' => [
                         '*' => courseJsonStructure()
@@ -159,8 +157,7 @@ describe('CourseController -> index', function () {
                 ]);
             getJson(route('course.index', ['sort' => '-created_at']))
                 ->assertOk()
-                ->assertJsonFragment(['id' => $newCourse->id])
-                ->assertJsonFragment(['id' => $oldCourse->id])
+                ->assertSeeInOrder([$newCourse->id, $oldCourse->id])
                 ->assertJsonStructure([
                     'data' => [
                         '*' => courseJsonStructure()
@@ -175,9 +172,7 @@ describe('CourseController -> index', function () {
 
             getJson(route('course.index', ['sort' => 'title']))
                 ->assertOk()
-                ->assertJsonPath('data.0.id', $courseA->id)
-                ->assertJsonPath('data.1.id', $courseB->id)
-                ->assertJsonPath('data.2.id', $courseC->id)
+                ->assertSeeInOrder([$courseA->id, $courseB->id, $courseC->id])
                 ->assertJsonStructure([
                     'data' => [
                         '*' => courseJsonStructure()
@@ -185,9 +180,7 @@ describe('CourseController -> index', function () {
                 ]);
             getJson(route('course.index', ['sort' => '-title']))
                 ->assertOk()
-                ->assertJsonPath('data.0.id', $courseC->id)
-                ->assertJsonPath('data.1.id', $courseB->id)
-                ->assertJsonPath('data.2.id', $courseA->id)
+                ->assertSeeInOrder([$courseC->id, $courseB->id, $courseA->id])
                 ->assertJsonStructure([
                     'data' => [
                         '*' => courseJsonStructure()
@@ -201,8 +194,7 @@ describe('CourseController -> index', function () {
 
             getJson(route('course.index', ['sort' => 'price']))
                 ->assertOk()
-                ->assertJsonPath('data.0.id', $cheap->id)
-                ->assertJsonPath('data.1.id', $expensive->id)
+                ->assertSeeInOrder([$cheap->id, $expensive->id])
                 ->assertJsonStructure([
                     'data' => [
                         '*' => courseJsonStructure()
@@ -210,8 +202,7 @@ describe('CourseController -> index', function () {
                 ]);
             getJson(route('course.index', ['sort' => '-price']))
                 ->assertOk()
-                ->assertJsonPath('data.0.id', $expensive->id)
-                ->assertJsonPath('data.1.id', $cheap->id)
+                ->assertSeeInOrder([$expensive->id, $cheap->id])
                 ->assertJsonStructure([
                     'data' => [
                         '*' => courseJsonStructure()

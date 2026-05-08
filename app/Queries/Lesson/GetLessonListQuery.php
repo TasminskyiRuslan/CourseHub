@@ -16,13 +16,13 @@ class GetLessonListQuery
     use HasCacheBypass;
 
     /**
-     * Retrieve paginated lessons with conditional caching.
+     * Retrieve paginated list of lessons with conditional caching.
      *
      * @param Course $course
      * @param User|null $user
      * @return LengthAwarePaginator
      */
-    public function get(Course $course, ?User $user): LengthAwarePaginator
+    public function handle(Course $course, ?User $user): LengthAwarePaginator
     {
         if ($this->shouldBypassCache($user) || request()->hasAny(['filter', 'sort', 'include'])) {
             return $this->fetchFromDatabase($course, $user);

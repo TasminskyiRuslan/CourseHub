@@ -121,28 +121,30 @@ describe('LessonController -> destroy', function () {
     | caching
     |--------------------------------------------------------------------------
     */
-    it('flushes the lesson cache when a lesson is deleted', function () {
-        $author = User::factory()->teacher()->create();
-        Sanctum::actingAs($author);
+    describe('caching', function () {
+        it('flushes the lesson cache when a lesson is deleted', function () {
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-        $course = Course::factory()->for($author, 'author')->create();
-        $lesson = Lesson::factory()->for($course, 'course')->create();
+            $course = Course::factory()->for($author, 'author')->create();
+            $lesson = Lesson::factory()->for($course, 'course')->create();
 
-        Cache::tags([
-            config('cache.tags.lesson_list'),
-            config('cache.tags.course') . ':' . $course->id
-        ])
-            ->put('lessons', 'test_value', config('cache.ttl.lesson'));
-        expect(Cache::tags([
-            config('cache.tags.lesson_list'),
-            config('cache.tags.course') . ':' . $course->id
-        ])->get('lessons'))->not->toBeNull();
+            Cache::tags([
+                config('cache.tags.lesson_list'),
+                config('cache.tags.course') . ':' . $course->id
+            ])
+                ->put('lessons', 'test_value', config('cache.ttl.lesson'));
+            expect(Cache::tags([
+                config('cache.tags.lesson_list'),
+                config('cache.tags.course') . ':' . $course->id
+            ])->get('lessons'))->not->toBeNull();
 
-        deleteJson(route('course.lesson.destroy', [$course, $lesson]))
-            ->assertNoContent();
-        expect(Cache::tags([
-            config('cache.tags.lesson_list'),
-            config('cache.tags.course') . ':' . $course->id
-        ])->get('lessons'))->toBeNull();
+            deleteJson(route('course.lesson.destroy', [$course, $lesson]))
+                ->assertNoContent();
+            expect(Cache::tags([
+                config('cache.tags.lesson_list'),
+                config('cache.tags.course') . ':' . $course->id
+            ])->get('lessons'))->toBeNull();
+        });
     });
 })->group('lesson');

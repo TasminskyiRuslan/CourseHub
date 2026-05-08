@@ -30,14 +30,14 @@ use Spatie\Sluggable\SlugOptions;
  * @property bool $is_published
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read \App\Models\User $author
- * @property-read Collection<int, \App\Models\Lesson> $lessons
+ * @property-read User $author
+ * @property-read Collection<int, Lesson> $lessons
  * @property-read int|null $lessons_count
- * @method static \Database\Factories\CourseFactory factory($count = null, $state = [])
+ * @method static CourseFactory factory($count = null, $state = [])
  * @method static Builder<static>|Course newModelQuery()
  * @method static Builder<static>|Course newQuery()
  * @method static Builder<static>|Course query()
- * @method static Builder<static>|Course visibleFor(?\App\Models\User $user)
+ * @method static Builder<static>|Course visibleFor(?User $user)
  * @method static Builder<static>|Course whereAuthorId($value)
  * @method static Builder<static>|Course whereCreatedAt($value)
  * @method static Builder<static>|Course whereDescription($value)
@@ -178,7 +178,7 @@ class Course extends Model
      */
     public function scopeVisibleFor(Builder $query, ?User $user): Builder
     {
-        if ($user?->hasPermissionTo(UserPermission::COURSE_VIEW_UNPUBLISHED->value) || $user?->hasRole(UserRole::SUPER_ADMIN->value)) {
+        if ($user?->hasPermissionTo(UserPermission::COURSE_VIEW_ANY_UNPUBLISHED->value) || $user?->hasRole(UserRole::SUPER_ADMIN->value)) {
             return $query;
         }
         return $query->where(function ($q) use ($user) {

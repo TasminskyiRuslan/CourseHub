@@ -16,12 +16,12 @@ class GetCourseListQuery
     use HasCacheBypass;
 
     /**
-     * Get paginated courses with conditional caching.
+     * Retrieve paginated list of courses with conditional caching.
      *
      * @param User|null $author
      * @return LengthAwarePaginator
      */
-    public function get(?User $author): LengthAwarePaginator
+    public function handle(?User $author): LengthAwarePaginator
     {
         if ($this->shouldBypassCache($author) || request()->hasAny(['filter', 'sort', 'include'])) {
             return $this->fetchFromDatabase($author);

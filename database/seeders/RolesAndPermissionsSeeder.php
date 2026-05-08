@@ -31,20 +31,21 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $teacher->syncPermissions([
             UserPermission::COURSE_CREATE->value,
-            UserPermission::COURSE_EDIT_OWN->value,
-            UserPermission::COURSE_DELETE_OWN->value,
-            UserPermission::COURSE_PUBLISH_OWN->value,
-            UserPermission::COURSE_UNPUBLISH_OWN->value,
 
             UserPermission::LESSON_CREATE->value,
-            UserPermission::LESSON_EDIT_OWN->value,
-            UserPermission::LESSON_DELETE_OWN->value,
         ]);
         $admin->syncPermissions([
-            UserPermission::COURSE_VIEW_UNPUBLISHED->value,
+            UserPermission::COURSE_VIEW_ANY_UNPUBLISHED->value,
             UserPermission::COURSE_DELETE_ANY->value,
             UserPermission::COURSE_UNPUBLISH_ANY->value,
+
             UserPermission::LESSON_DELETE_ANY->value,
+
+            UserPermission::USER_VIEW_ANY->value,
+            UserPermission::USER_DELETE_ANY->value,
+            UserPermission::USER_ROLE_EDIT_ANY->value,
+            UserPermission::USER_BAN_ANY->value,
+            UserPermission::USER_UNBAN_ANY->value,
         ]);
     }
 }

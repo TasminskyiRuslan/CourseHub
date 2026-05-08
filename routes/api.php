@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\Course\CourseImageController;
 use App\Http\Controllers\Api\Course\PublishCourseController;
 use App\Http\Controllers\Api\Course\UnpublishCourseController;
 use App\Http\Controllers\Api\Lesson\LessonController;
+use App\Http\Controllers\Api\User\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -77,7 +78,7 @@ Route::prefix('courses')->group(function () {
 
     // Create course action
     Route::post('/', [CourseController::class, 'store'])
-        ->middleware(['auth:sanctum', 'verified'])
+        ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
         ->name('course.store');
 
     // Show course action
@@ -86,32 +87,32 @@ Route::prefix('courses')->group(function () {
 
     // Update course action
     Route::patch('/{course}', [CourseController::class, 'update'])
-        ->middleware(['auth:sanctum', 'verified'])
+        ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
         ->name('course.update');
 
     // Delete course action
     Route::delete('/{course}', [CourseController::class, 'destroy'])
-        ->middleware(['auth:sanctum', 'verified'])
+        ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
         ->name('course.destroy');
 
     // Update course image action
     Route::put('/{course}/image', [CourseImageController::class, 'update'])
-        ->middleware(['auth:sanctum', 'verified'])
+        ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
         ->name('course.image.update');
 
     // Delete course image action
     Route::delete('/{course}/image', [CourseImageController::class, 'destroy'])
-        ->middleware(['auth:sanctum', 'verified'])
+        ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
         ->name('course.image.destroy');
 
     // Publish course actions
     Route::patch('/{course}/publish', PublishCourseController::class)
-        ->middleware(['auth:sanctum', 'verified'])
+        ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
         ->name('course.publish');
 
     // Unpublish course action
     Route::patch('/{course}/unpublish', UnpublishCourseController::class)
-        ->middleware(['auth:sanctum', 'verified'])
+        ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
         ->name('course.unpublish');
 
     Route::prefix('/{course}/lessons')->group(function () {
@@ -121,7 +122,7 @@ Route::prefix('courses')->group(function () {
 
         // Create lesson action
         Route::post('/', [LessonController::class, 'store'])
-            ->middleware(['auth:sanctum', 'verified'])
+            ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
             ->name('course.lesson.store');
 
         // Show lesson action
@@ -130,12 +131,23 @@ Route::prefix('courses')->group(function () {
 
         // Update lesson action
         Route::patch('/{lesson}', [LessonController::class, 'update'])
-            ->middleware(['auth:sanctum', 'verified'])
+            ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
             ->name('course.lesson.update');
 
         // Delete lesson action
         Route::delete('/{lesson}', [LessonController::class, 'destroy'])
-            ->middleware(['auth:sanctum', 'verified'])
+            ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
             ->name('course.lesson.destroy');
     });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Authentication actions
+|--------------------------------------------------------------------------
+*/
+Route::prefix('users')->group(function () {
+    // Get users list action
+    Route::get('/', [UserController::class, 'index'])
+        ->name('user.index');
 });

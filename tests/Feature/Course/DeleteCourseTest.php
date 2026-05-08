@@ -1,9 +1,9 @@
 <?php
 
 use App\Enums\CourseType;
+use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\User;
-use App\Models\Course;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -137,17 +137,19 @@ describe('CourseController -> destroy', function () {
     | caching
     |--------------------------------------------------------------------------
     */
-    it('flushes the course cache when a course is updated', function () {
-        $author = User::factory()->teacher()->create();
-        Sanctum::actingAs($author);
+    describe('caching', function () {
+        it('flushes the course cache when a course is updated', function () {
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-        $course = Course::factory()->for($author, 'author')->create();
-        Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.course'));
-        expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->not->toBeNull();
+            $course = Course::factory()->for($author, 'author')->create();
+            Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.course'));
+            expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->not->toBeNull();
 
-        deleteJson(route('course.destroy', $course))
-            ->assertNoContent();
+            deleteJson(route('course.destroy', $course))
+                ->assertNoContent();
 
-        expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->toBeNull();
+            expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->toBeNull();
+        });
     });
 })->group('course');

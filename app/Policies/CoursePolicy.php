@@ -36,11 +36,11 @@ class CoursePolicy
             return false;
         }
 
-        if ($user->is($course->author)) {
+        if ($user->can(UserPermission::COURSE_VIEW_ANY_UNPUBLISHED->value)) {
             return true;
         }
 
-        return $user->can(UserPermission::COURSE_VIEW_UNPUBLISHED->value);
+        return $user->is($course->author);
     }
 
     /**
@@ -63,7 +63,7 @@ class CoursePolicy
      */
     public function update(User $user, Course $course): bool
     {
-        return $user->can(UserPermission::COURSE_EDIT_OWN->value) && $user->is($course->author);
+        return $user->is($course->author);
     }
 
     /**
@@ -79,7 +79,7 @@ class CoursePolicy
             return true;
         }
 
-        return $user->can(UserPermission::COURSE_DELETE_OWN->value) && $user->is($course->author);
+        return $user->is($course->author);
     }
 
     /**
@@ -91,7 +91,7 @@ class CoursePolicy
      */
     public function publish(User $user, Course $course): bool
     {
-        return $user->can(UserPermission::COURSE_PUBLISH_OWN->value) && $user->is($course->author);
+        return $user->is($course->author);
     }
 
     /**
@@ -107,6 +107,6 @@ class CoursePolicy
             return true;
         }
 
-        return $user->can(UserPermission::COURSE_PUBLISH_OWN->value) && $user->is($course->author);
+        return $user->is($course->author);
     }
 }

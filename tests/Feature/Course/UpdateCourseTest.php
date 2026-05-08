@@ -204,17 +204,19 @@ describe('CourseController -> update', function () {
     | caching
     |--------------------------------------------------------------------------
     */
-    it('flushes the course cache when a course is updated', function () {
-        $author = User::factory()->teacher()->create();
-        Sanctum::actingAs($author);
+    describe('caching', function () {
+        it('flushes the course cache when a course is updated', function () {
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-        $course = Course::factory()->for($author, 'author')->create();
-        Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.course'));
-        expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->not->toBeNull();
+            $course = Course::factory()->for($author, 'author')->create();
+            Cache::tags([config('cache.tags.course_list')])->put('courses', 'test_value', config('cache.ttl.course'));
+            expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->not->toBeNull();
 
-        patchJson(route('course.update', $course), updatingCoursePayload())
-            ->assertOk()
-            ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
-        expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->toBeNull();
+            patchJson(route('course.update', $course), updatingCoursePayload())
+                ->assertOk()
+                ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
+            expect(Cache::tags([config('cache.tags.course_list')])->get('courses'))->toBeNull();
+        });
     });
 })->group('course');

@@ -270,7 +270,7 @@ class CourseController extends Controller
     {
         $this->authorize('update', $course);
         $course = $updateCourseAction->handle($courseData, $course);
-        return CourseResource::make($course->loadCount('lessons')->loadMissing(['author']))
+        return CourseResource::make($course->loadCount('lessons')->load(['author']))
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }

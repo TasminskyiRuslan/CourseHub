@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\Course\PublishCourseController;
 use App\Http\Controllers\Api\Course\UnpublishCourseController;
 use App\Http\Controllers\Api\Lesson\LessonController;
 use App\Http\Controllers\Api\User\UserController;
+use App\Http\Controllers\Api\User\UserRoleController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -143,7 +144,7 @@ Route::prefix('courses')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Authentication actions
+| User actions
 |--------------------------------------------------------------------------
 */
 Route::prefix('users')->group(function () {
@@ -161,4 +162,9 @@ Route::prefix('users')->group(function () {
     Route::delete('/{user}', [UserController::class, 'destroy'])
         ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
         ->name('user.destroy');
+
+    // Update user role action
+    Route::put('/{user}/role', [UserRoleController::class, 'update'])
+        ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
+        ->name('user.role.update');
 });

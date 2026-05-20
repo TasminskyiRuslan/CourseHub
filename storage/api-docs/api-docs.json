@@ -1360,6 +1360,69 @@
                     }
                 ]
             }
+        },
+        "/users/{user}/role": {
+            "put": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update user role",
+                "description": "Update the role of the specified user.",
+                "operationId": "4d67b946e638df793a31e9452f38a21e",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "User identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "john-doe"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateUserRoleRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User role updated successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -2163,6 +2226,26 @@
                         "type": "string",
                         "example": "youtube",
                         "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateUserRoleRequest": {
+                "title": "Update User Role Request",
+                "description": "Request payload for updating of the specified user.",
+                "required": [
+                    "role"
+                ],
+                "properties": {
+                    "role": {
+                        "description": "Role of the user.",
+                        "type": "string",
+                        "enum": [
+                            "student",
+                            "teacher",
+                            "admin"
+                        ],
+                        "example": "teacher"
                     }
                 },
                 "type": "object"

@@ -184,6 +184,43 @@ class UserController extends Controller
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 
+    #[OA\Delete(
+        path: '/users/{user}',
+        description: 'Remove the specified user.',
+        summary: 'Remove a user',
+        security: [['sanctum' => []]],
+        tags: ['User'],
+        parameters: [
+            new OA\Parameter(
+                name: 'user',
+                description: 'User identifier (slug).',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(
+                    type: 'string',
+                    example: 'john-doe'
+                )
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: SymfonyResponse::HTTP_NO_CONTENT,
+                description: 'User deleted successfully.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+                description: 'User is unauthenticated.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_FORBIDDEN,
+                description: 'User does not have permissions.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_NOT_FOUND,
+                description: 'User not found.'
+            ),
+        ]
+    )]
     /**
      * Remove the specified user.
      *

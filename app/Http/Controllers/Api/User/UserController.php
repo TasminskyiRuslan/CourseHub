@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Api\User;
 
+use App\Actions\User\DeleteUserAction;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\User\UserResource;
 use App\Models\User;
 use App\Queries\User\GetUserListQuery;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use OpenApi\Attributes as OA;
 
@@ -184,18 +185,16 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Remove the specified user.
+     *
+     * @param User $user
+     * @param DeleteUserAction $deleteUserAction
+     * @return Response
      */
-    public function update(Request $request, string $id)
+    public function destroy(User $user, DeleteUserAction $deleteUserAction): Response
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $this->authorize('delete', $user);
+        $deleteUserAction->handle($user);
+        return response()->noContent();
     }
 }

@@ -156,4 +156,9 @@ Route::prefix('users')->group(function () {
     Route::get('/{user}', [UserController::class, 'show'])
         ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
         ->name('user.show');
+
+    // Delete user action
+    Route::delete('/{user}', [UserController::class, 'destroy'])
+        ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
+        ->name('user.destroy');
 });

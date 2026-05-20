@@ -40,7 +40,7 @@ class UserPolicy
      */
     public function delete(User $user, User $targetUser): bool
     {
-        return $user->can(UserPermission::USER_DELETE_ANY->value) && !$user->is($targetUser) && !$targetUser->hasAnyRole([UserRole::ADMIN->value, UserRole::SUPER_ADMIN->value]);
+        return $user->can(UserPermission::USER_DELETE_ANY->value) && !$user->is($targetUser) && !$targetUser->hasAnyRole([UserRole::ADMIN->value, UserRole::SUPER_ADMIN->value]) && !$targetUser->courses()->exists();
     }
 
     /**

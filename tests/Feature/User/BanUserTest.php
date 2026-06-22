@@ -107,5 +107,19 @@ describe('BanUserController', function () {
             'teacher'      => fn() => User::factory()->teacher()->create(),
             'admin'        => fn() => User::factory()->admin()->create(),
         ]);
+
+        it('does not send a notification if the user is already banned', function () {
+            Notification::fake();
+
+            $superAdmin = User::whereEmail(config('super-admin.email'))->first();
+            Sanctum::actingAs($superAdmin);
+
+            $targetUser = User::factory()->banned()->create();
+
+            patchJson(route('user.ban', $targetUser))
+                ->assertNoContent();
+
+            Notification::assertNotSentTo($targetUser, UserBannedNotification::class);
+        });
     });
 })->group('user');

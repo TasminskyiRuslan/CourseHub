@@ -14,6 +14,10 @@ class UnbanUserAction
      */
     public function handle(User $user): void
     {
+        if (!$user->isBanned()) {
+            return;
+        }
+
         $user->unban()->save();
         $user->sendUnbanNotification();
     }

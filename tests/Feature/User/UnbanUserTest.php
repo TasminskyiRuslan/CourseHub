@@ -103,5 +103,19 @@ describe('UnbanUserController', function () {
             'teacher'      => fn() => User::factory()->teacher()->banned()->create(),
             'admin'        => fn() => User::factory()->admin()->banned()->create(),
         ]);
+
+        it('does not send a notification if the user is already unbanned', function () {
+            Notification::fake();
+
+            $superAdmin = User::whereEmail(config('super-admin.email'))->first();
+            Sanctum::actingAs($superAdmin);
+
+            $targetUser = User::factory()->create();
+
+            patchJson(route('user.unban', $targetUser))
+                ->assertNoContent();
+
+            Notification::assertNotSentTo($targetUser, UserUnbannedNotification::class);
+        });
     });
 })->group('user');

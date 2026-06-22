@@ -1181,6 +1181,47 @@
                 ]
             }
         },
+        "/users/{user}/unban": {
+            "patch": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Unban a user",
+                "description": "Unban the specified user.",
+                "operationId": "4b78c703c3a9279b6286fc8ba0b6c727",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "User identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "john-doe"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User unbanned successfully."
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/users": {
             "get": {
                 "tags": [

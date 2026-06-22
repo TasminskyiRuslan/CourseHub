@@ -22,6 +22,10 @@ class BanUserAction
      */
     public function handle(User $user): void
     {
+        if ($user->isBanned()) {
+            return;
+        }
+
         $user->ban()->save();
         $this->revokeAllTokensAction->handle($user);
         $user->sendBanNotification();

@@ -7,17 +7,16 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class QueuedResetPasswordNotification extends Notification implements ShouldQueue
+class UserBanNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      *
-     * @param string $token
      * @return void
      */
-    public function __construct(public string $token)
+    public function __construct()
     {
         $this->onQueue('high');
     }
@@ -28,7 +27,7 @@ class QueuedResetPasswordNotification extends Notification implements ShouldQueu
      * @param mixed $notifiable
      * @return array<int, string>
      */
-    public function via($notifiable): array
+    public function via(mixed $notifiable): array
     {
         return ['mail'];
     }
@@ -39,11 +38,10 @@ class QueuedResetPasswordNotification extends Notification implements ShouldQueu
      * @param mixed $notifiable
      * @return MailMessage
      */
-    public function toMail($notifiable): MailMessage
+    public function toMail(mixed $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Reset Password')
-            ->line('Please use the link below to reset your password.')
-            ->action('Token for reset password', $this->token);
+            ->subject('Account Banned')
+            ->markdown('emails.user.banned');
     }
 }

@@ -114,6 +114,7 @@ describe('RegisterController', function () {
         ]);
 
         it('sets a short token expiration by default', function () {
+            $this->withoutExceptionHandling();
             $response = postJson(route('auth.register'), registrationPayload())
                 ->assertCreated();
 

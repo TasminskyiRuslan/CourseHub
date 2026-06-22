@@ -2,7 +2,7 @@
 
 use App\Enums\UserRole;
 use App\Models\User;
-use App\Notifications\QueuedResetPasswordNotification;
+use App\Notifications\ResetPasswordNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -63,7 +63,7 @@ describe('SendPasswordResetEmailController', function () {
 
             Notification::assertSentTo(
                 $user,
-                QueuedResetPasswordNotification::class,
+                ResetPasswordNotification::class,
                 fn($notification) => !empty($notification->token)
             );
 

@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
-use App\Notifications\QueuedResetPasswordNotification;
-use App\Notifications\QueuedVerifyEmailNotification;
+use App\Notifications\ResetPasswordNotification;
+use App\Notifications\UserBanNotification;
+use App\Notifications\VerifyEmailNotification;
 use Database\Factories\UserFactory;
 use Eloquent;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -111,6 +112,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
             'role' => UserRole::class,
             'email_verified_at' => 'datetime',
+            'banned_at' => 'datetime',
         ];
     }
 
@@ -138,13 +140,13 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Send the email verification notification.
+     * Send verify email notification.
      *
      * @return void
      */
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify(new QueuedVerifyEmailNotification());
+        $this->notify(new VerifyEmailNotification());
     }
 
     /**
@@ -155,7 +157,17 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendPasswordResetNotification($token): void
     {
-        $this->notify(new QueuedResetPasswordNotification($token));
+        $this->notify(new ResetPasswordNotification($token));
+    }
+
+    /**
+     * Send user banned notification.
+     *
+     * @return void
+     */
+    public function sendBanNotification(): void
+    {
+        $this->notify(new UserBanNotification());
     }
 
     /**
@@ -177,5 +189,27 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isBanned(): bool
     {
         return $this->banned_at !== null;
+    }
+
+    /**
+     * Ban the user.
+     *
+     * @return User
+     */
+    public function ban(): static
+    {
+        $this->banned_at = $this->freshTimestamp();
+        return $this;
+    }
+
+    /**
+     * Unban the user.
+     *
+     * @return User
+     */
+    public function unban(): static
+    {
+        $this->banned_at = null;
+        return $this;
     }
 }

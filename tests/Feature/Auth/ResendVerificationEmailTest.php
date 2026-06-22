@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Notifications\QueuedVerifyEmailNotification;
+use App\Notifications\VerifyEmailNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\Middleware\ThrottleRequests;
@@ -42,7 +42,7 @@ describe('ResendVerificationEmailController', function () {
 
             postJson(route('auth.verification.resend'))
                 ->assertNoContent();
-            Notification::assertSentTo($user, QueuedVerifyEmailNotification::class);
+            Notification::assertSentTo($user, VerifyEmailNotification::class);
         });
 
         it('does nothing if email is already verified', function () {

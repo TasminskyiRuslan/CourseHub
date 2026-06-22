@@ -10,7 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\URL;
 
-class QueuedVerifyEmailNotification extends VerifyEmail implements ShouldQueue
+class VerifyEmailNotification extends VerifyEmail implements ShouldQueue
 {
     use Queueable;
 
@@ -44,10 +44,12 @@ class QueuedVerifyEmailNotification extends VerifyEmail implements ShouldQueue
     public function toMail($notifiable): MailMessage
     {
         $url = $this->verificationUrl($notifiable);
+
         return (new MailMessage)
             ->subject('Verify Your Email Address')
-            ->line('Please, confirm your email address.')
-            ->action('Confirm email', $url);
+            ->markdown('emails.auth.verify', [
+                'url' => $url,
+            ]);
     }
 
     /**

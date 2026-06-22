@@ -4,12 +4,11 @@ use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
-use Tests\Support\UserJsonStructure;
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class);
 
-describe('MeController', function () {
+describe('AccountController -> show', function () {
     beforeEach(function () {
         $this->seed(RolesAndPermissionsSeeder::class);
     });
@@ -21,7 +20,7 @@ describe('MeController', function () {
     */
     describe('permissions', function () {
         it('fails for unauthenticated user', function () {
-            getJson(route('auth.me'))
+            getJson(route('auth.account.show'))
                 ->assertUnauthorized();
         });
     });
@@ -36,7 +35,7 @@ describe('MeController', function () {
             $user = User::factory()->create();
             Sanctum::actingAs($user);
 
-            getJson(route('auth.me'))
+            getJson(route('auth.account.show'))
                 ->assertOk()
                 ->assertJsonFragment(['email' => $user->email])
                 ->assertJsonStructure(['data' => userJsonStructure()]);

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Auth\AccountController;
 use App\Http\Controllers\Api\Auth\SendPasswordResetEmailController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\LogoutAllController;
@@ -34,10 +35,10 @@ Route::prefix('auth')->group(function () {
     Route::post('/login', LoginController::class)
         ->name('auth.login');
 
-    // Me action
-    Route::get('/me', MeController::class)
+    // Show account action
+    Route::get('/account', [AccountController::class, 'show'])
         ->middleware('auth:sanctum')
-        ->name('auth.me');
+        ->name('auth.account.show');
 
     // Logout action
     Route::delete('/logout', LogoutController::class)

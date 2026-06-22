@@ -52,6 +52,39 @@ class AccountController extends Controller
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 
+    #[OA\Patch(
+        path: '/auth/account',
+        description: 'Update the current user account.',
+        summary: 'Update current user account',
+        security: [['sanctum' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: '#/components/schemas/UpdateAccountRequest')
+        ),
+        tags: ['Auth'],
+        responses: [
+            new OA\Response(
+                response: SymfonyResponse::HTTP_OK,
+                description: 'User account updated successfully.',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/UserResponse'
+                        )
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+                description: 'User is unauthenticated.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
+                description: 'Validation error.'
+            ),
+        ]
+    )]
     /**
      * Update the specified user account.
      *

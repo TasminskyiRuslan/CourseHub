@@ -49,6 +49,52 @@
                         "sanctum": []
                     }
                 ]
+            },
+            "patch": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Update current user account",
+                "description": "Update the current user account.",
+                "operationId": "99ba7dcdcccc1e3b0d1e53f7fbe9f6c8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateAccountRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User account updated successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
         "/auth/login": {
@@ -1643,6 +1689,31 @@
                         "format": "email",
                         "maxLength": 255,
                         "example": "john@example.com"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateAccountRequest": {
+                "title": "Update Account Request",
+                "description": "Request payload for updating an account.",
+                "required": [
+                    "name",
+                    "slug"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "Full name of the user.",
+                        "type": "string",
+                        "maxLength": 100,
+                        "minLength": 2,
+                        "example": "John Doe"
+                    },
+                    "slug": {
+                        "description": "Slug of the user. (optional, must be unique if provided)",
+                        "type": "string",
+                        "maxLength": 100,
+                        "pattern": "^[a-z0-9-]+$",
+                        "example": "john-doe"
                     }
                 },
                 "type": "object"

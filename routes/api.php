@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\Course\PublishCourseController;
 use App\Http\Controllers\Api\Course\UnpublishCourseController;
 use App\Http\Controllers\Api\Lesson\LessonController;
 use App\Http\Controllers\Api\User\BanUserController;
+use App\Http\Controllers\Api\User\UnbanUserController;
 use App\Http\Controllers\Api\User\UserController;
 use App\Http\Controllers\Api\User\UserRoleController;
 use Illuminate\Support\Facades\Route;
@@ -173,4 +174,9 @@ Route::prefix('users')->group(function () {
     Route::patch('/{user}/ban', BanUserController::class)
         ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
         ->name('user.ban');
+
+    // Unban user action
+    Route::patch('/{user}/unban', UnbanUserController::class)
+        ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
+        ->name('user.unban');
 });

@@ -1,5 +1,5 @@
 @component('mail::message')
-    # Account Suspended
+    # Account Banned
 
     Your account has been banned. Please contact support for more information.
 

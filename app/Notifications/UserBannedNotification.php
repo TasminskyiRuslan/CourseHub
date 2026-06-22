@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class UserBanNotification extends Notification implements ShouldQueue
+class UserBannedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -42,6 +42,6 @@ class UserBanNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject('Account Banned')
-            ->markdown('emails.user.banned');
+            ->markdown('emails.user.ban');
     }
 }

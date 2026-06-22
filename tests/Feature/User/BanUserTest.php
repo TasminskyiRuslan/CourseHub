@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Notifications\UserBanNotification;
+use App\Notifications\UserBannedNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -39,7 +39,6 @@ describe('BanUserController', function () {
     */
     describe('permissions', function () {
         it('fails if an unauthenticated user tries to ban the user', function () {
-//            $this->withoutExceptionHandling();
             $targetUser = User::factory()->create();
 
             patchJson(route('user.ban', $targetUser))
@@ -87,13 +86,12 @@ describe('BanUserController', function () {
             'super admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
         ]);
 
-        it('allows users with permissions to ban any user', function () {
+        it('allows users with permissions to ban any user', function ($targetUser) {
             Notification::fake();
 
             $superAdmin = User::whereEmail(config('super-admin.email'))->first();
             Sanctum::actingAs($superAdmin);
 
-            $targetUser = User::factory()->create();
             $targetUser->createToken('access_token');
 
             patchJson(route('user.ban', $targetUser))
@@ -103,7 +101,11 @@ describe('BanUserController', function () {
             expect($targetUser->isBanned())->toBeTrue()
                 ->and($targetUser->tokens()->count())->toBe(0);
 
-            Notification::assertSentTo($targetUser, UserBanNotification::class);
-        });
+            Notification::assertSentTo($targetUser, UserBannedNotification::class);
+        })->with([
+            'student'      => fn() => User::factory()->student()->create(),
+            'teacher'      => fn() => User::factory()->teacher()->create(),
+            'admin'        => fn() => User::factory()->admin()->create(),
+        ]);
     });
 })->group('user');

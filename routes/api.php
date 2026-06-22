@@ -40,6 +40,11 @@ Route::prefix('auth')->group(function () {
         ->middleware('auth:sanctum')
         ->name('auth.account.show');
 
+    // Update account action
+    Route::patch('/account', [AccountController::class, 'update'])
+        ->middleware(['auth:sanctum', 'restrict.banned.user'])
+        ->name('auth.account.update');
+
     // Logout action
     Route::delete('/logout', LogoutController::class)
         ->middleware('auth:sanctum')

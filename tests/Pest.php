@@ -65,6 +65,7 @@ function userJsonStructure(): array {
         'email_verified_at',
         'role',
         'banned_at',
+        'avatar_url',
         'created_at',
         'updated_at',
         'deleted_at',

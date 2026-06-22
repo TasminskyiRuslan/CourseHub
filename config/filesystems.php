@@ -68,6 +68,15 @@ return [
             'throw' => false,
             'report' => false,
         ],
+
+        'users' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/users'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage/users',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
     ],
 
     /*

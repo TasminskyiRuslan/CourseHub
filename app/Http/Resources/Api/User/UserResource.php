@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\User;
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -12,6 +13,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read mixed $email
  * @property-read mixed $roles
  * @property-read mixed $email_verified_at
+ * @property mixed $avatar_path
  * @property mixed $banned_at
  * @property mixed $created_at
  * @property mixed $updated_at
@@ -34,6 +36,7 @@ class UserResource extends JsonResource
             'email_verified_at' => $this->email_verified_at,
             'role' => $this->roles->first()?->name,
             'banned_at' => $this->banned_at,
+            'avatar_url' => $this->avatar_path ? Storage::disk('users')->url($this->avatar_path) : null,
             'created_at' => $this->created_at,
             'updated_at'     => $this->updated_at,
             'deleted_at' => $this->deleted_at,

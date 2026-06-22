@@ -7,9 +7,35 @@ use App\Http\Resources\Api\User\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use OpenApi\Attributes as OA;
 
 class AccountController extends Controller
 {
+    #[OA\Get(
+        path: '/auth/account',
+        description: 'Retrieve the current user account.',
+        summary: 'Retrieve current user account',
+        security: [['sanctum' => []]],
+        tags: ['Auth'],
+        responses: [
+            new OA\Response(
+                response: SymfonyResponse::HTTP_OK,
+                description: 'User account retrieved successfully.',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/UserResponse'
+                        )
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+                description: 'User account is unauthenticated.'
+            )
+        ]
+    )]
     /**
      * Retrieve the current user account.
      *

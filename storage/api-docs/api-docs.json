@@ -16,6 +16,41 @@
         }
     ],
     "paths": {
+        "/auth/account": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Retrieve current user account",
+                "description": "Retrieve the current user account.",
+                "operationId": "04807985bff60fb3723c2bdac7ec66ed",
+                "responses": {
+                    "200": {
+                        "description": "User account retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User account is unauthenticated."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/auth/login": {
             "post": {
                 "tags": [
@@ -90,41 +125,6 @@
                 "responses": {
                     "204": {
                         "description": "User logged out successfully."
-                    },
-                    "401": {
-                        "description": "User is unauthenticated."
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/auth/me": {
-            "get": {
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Retrieve current user",
-                "description": "Retrieve the currently authenticated user.",
-                "operationId": "a27984a716a6787c8b8537aee958673c",
-                "responses": {
-                    "200": {
-                        "description": "User retrieved successfully.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/UserResponse"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
                     },
                     "401": {
                         "description": "User is unauthenticated."
@@ -2385,6 +2385,13 @@
                         "type": "string",
                         "format": "date-time",
                         "example": "2026-01-01T12:00:00Z",
+                        "nullable": true
+                    },
+                    "avatar_url": {
+                        "description": "Avatar url of the user.",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "http://loclhost:8080/storage/users/user1.png",
                         "nullable": true
                     },
                     "created_at": {

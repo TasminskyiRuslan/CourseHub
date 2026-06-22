@@ -35,6 +35,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'banned_at' => null,
+            'avatar_path' => null,
         ];
     }
 
@@ -111,6 +112,19 @@ class UserFactory extends Factory
     {
         return $this->afterCreating(function (User $user) {
             $user->syncRoles(UserRole::ADMIN->value);
+        });
+    }
+
+    /**
+     * Add an avatar to the user.
+     *
+     * @param string|null $path
+     * @return static
+     */
+    public function withAvatar(?string $path = null): static
+    {
+        return $this->state(function (array $attributes) use ($path) {
+            return ['avatar_path' => $path ?? 'users/' . fake()->uuid() . '.jpg'];
         });
     }
 }

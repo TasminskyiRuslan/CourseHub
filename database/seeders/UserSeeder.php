@@ -36,5 +36,10 @@ class UserSeeder extends Seeder
             ->count(3)
             ->banned()
             ->create();
+
+        User::factory()
+            ->count(15)
+            ->withAvatar()
+            ->create();
     }
 }

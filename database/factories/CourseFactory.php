@@ -54,7 +54,7 @@ class CourseFactory extends Factory
     }
 
     /**
-     * Add an image to the book.
+     * Add an image to the course.
      *
      * @param string|null $path
      * @return static

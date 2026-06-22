@@ -83,6 +83,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'banned_at',
+        'avatar_path',
     ];
 
     /**
@@ -220,6 +221,28 @@ class User extends Authenticatable implements MustVerifyEmail
     public function unban(): static
     {
         $this->banned_at = null;
+        return $this;
+    }
+
+    /**
+     * Set the avatar path.
+     *
+     * @return $this
+     */
+    public function setAvatar(string $path): static
+    {
+        $this->avatar_path = $path;
+        return $this;
+    }
+
+    /**
+     * Remove the avatar path.
+     *
+     * @return $this
+     */
+    public function removeAvatar(): static
+    {
+        $this->avatar_path = null;
         return $this;
     }
 }

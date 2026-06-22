@@ -1140,6 +1140,47 @@
                 ]
             }
         },
+        "/users/{user}/ban": {
+            "patch": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Ban a user",
+                "description": "Ban the specified user.",
+                "operationId": "bcbfa8f74738f86ff5c5caca2566b215",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "User identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "john-doe"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User banned successfully."
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/users": {
             "get": {
                 "tags": [

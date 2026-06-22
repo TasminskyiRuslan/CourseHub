@@ -30,11 +30,11 @@ class GetUserListQuery
                     });
                 }),
                 AllowedFilter::callback('verified', function ($query, $value) {
-                    $value = boolval($value);
+                    $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
                     $value ? $query->whereNotNull('email_verified_at') : $query->whereNull('email_verified_at');
                 }),
                 AllowedFilter::callback('banned', function ($query, $value) {
-                    $value = boolval($value);
+                    $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
                     $value ? $query->whereNotNull('banned_at') : $query->whereNull('banned_at');
                 }),
                 AllowedFilter::trashed(),

@@ -62,7 +62,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UpdateAccountRequest"
+                                "$ref": "#/components/schemas/UpdateUserAccountRequest"
                             }
                         }
                     }
@@ -70,6 +70,54 @@
                 "responses": {
                     "200": {
                         "description": "User account updated successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/auth/account/image": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Update current user account image",
+                "description": "Update the current user account image.",
+                "operationId": "97274dfbf6fa088864b655a5682a2db7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateUserAccountImageRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User account image updated successfully.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1693,23 +1741,47 @@
                 },
                 "type": "object"
             },
-            "UpdateAccountRequest": {
-                "title": "Update Account Request",
-                "description": "Request payload for updating an account.",
+            "UpdateUserAccountImageRequest": {
+                "title": "Update User Account Image Request",
+                "description": "Request payload for updating a user account image.",
+                "required": [
+                    "image"
+                ],
+                "properties": {
+                    "image": {
+                        "description": "Image of the user account.",
+                        "type": "string",
+                        "format": "binary"
+                    },
+                    "_method": {
+                        "description": "Method spoofing to treat POST as PUT.",
+                        "type": "string",
+                        "default": "PUT",
+                        "enum": [
+                            "PUT"
+                        ],
+                        "example": "PUT"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateUserAccountRequest": {
+                "title": "Update User Account Request",
+                "description": "Request payload for updating a user account.",
                 "required": [
                     "name",
                     "slug"
                 ],
                 "properties": {
                     "name": {
-                        "description": "Full name of the user.",
+                        "description": "Full name of the user account.",
                         "type": "string",
                         "maxLength": 100,
                         "minLength": 2,
                         "example": "John Doe"
                     },
                     "slug": {
-                        "description": "Slug of the user. (optional, must be unique if provided)",
+                        "description": "Slug of the user account. (optional, must be unique if provided)",
                         "type": "string",
                         "maxLength": 100,
                         "pattern": "^[a-z0-9-]+$",

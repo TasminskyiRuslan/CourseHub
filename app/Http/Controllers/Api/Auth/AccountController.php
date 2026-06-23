@@ -59,7 +59,7 @@ class AccountController extends Controller
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
             required: true,
-            content: new OA\JsonContent(ref: '#/components/schemas/UpdateAccountRequest')
+            content: new OA\JsonContent(ref: '#/components/schemas/UpdateUserAccountRequest')
         ),
         tags: ['Auth'],
         responses: [

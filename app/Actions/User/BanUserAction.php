@@ -4,6 +4,8 @@ namespace App\Actions\User;
 
 use App\Actions\Auth\RevokeAllTokensAction;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class BanUserAction
 {
@@ -19,6 +21,7 @@ class BanUserAction
      *
      * @param User $user
      * @return void
+     * @throws Throwable
      */
     public function handle(User $user): void
     {
@@ -26,8 +29,13 @@ class BanUserAction
             return;
         }
 
-        $user->ban()->save();
-        $this->revokeAllTokensAction->handle($user);
-        $user->sendBanNotification();
+        DB::transaction(function () use ($user) {
+            $user->ban()->save();
+            $this->revokeAllTokensAction->handle($user);
+
+            DB::afterCommit(function () use ($user) {
+                $user->sendBanNotification();
+            });
+        });
     }
 }

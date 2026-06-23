@@ -49,6 +49,8 @@ use Spatie\Sluggable\SlugOptions;
  * @method static Builder<static>|Course whereTitle($value)
  * @method static Builder<static>|Course whereType($value)
  * @method static Builder<static>|Course whereUpdatedAt($value)
+ * @property string|null $deleted_at
+ * @method static Builder<static>|Course whereDeletedAt($value)
  * @mixin Eloquent
  */
 class Course extends Model

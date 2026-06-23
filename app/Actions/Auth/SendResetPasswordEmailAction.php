@@ -21,7 +21,9 @@ class SendResetPasswordEmailAction
     {
         $user = User::whereEmail($passwordResetEmailData->email)->first();
         if ($user?->hasRole(UserRole::SUPER_ADMIN->value)) {
-            return;
+            throw ValidationException::withMessages([
+                'email' => [__('passwords.protected')],
+            ]);
         }
 
         $status = Password::sendResetLink(['email' => $passwordResetEmailData->email]);

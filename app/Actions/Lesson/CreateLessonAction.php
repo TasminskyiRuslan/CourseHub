@@ -27,7 +27,7 @@ class CreateLessonAction
             $lesson = $course->lessons()->make($lessonData->all());
             $lesson->lessonable()->associate($lessonContent);
             $lesson->save();
-            return $lesson->load('lessonable');
+            return $lesson->setRelation('lessonable', $lessonContent);
         });
     }
 }

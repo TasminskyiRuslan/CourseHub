@@ -16,12 +16,9 @@ class CreateCourseAction
      * @param CreateCourseData $courseData
      * @param User $author
      * @return Course
-     * @throws Throwable
      */
     public function handle(CreateCourseData $courseData, User $author): Course
     {
-        return DB::transaction(function () use ($courseData, $author) {
-            return $author->courses()->create($courseData->all());
-        });
+        return $author->courses()->create($courseData->all());
     }
 }

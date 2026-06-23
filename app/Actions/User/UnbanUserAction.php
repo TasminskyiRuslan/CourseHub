@@ -3,6 +3,7 @@
 namespace App\Actions\User;
 
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class UnbanUserAction
 {
@@ -11,6 +12,7 @@ class UnbanUserAction
      *
      * @param User $user
      * @return void
+     * @throws \Throwable
      */
     public function handle(User $user): void
     {
@@ -18,7 +20,12 @@ class UnbanUserAction
             return;
         }
 
-        $user->unban()->save();
-        $user->sendUnbanNotification();
+        DB::transaction(function () use ($user) {
+            $user->unban()->save();
+
+            DB::afterCommit(function () use ($user) {
+                $user->sendUnbanNotification();
+            });
+        });
     }
 }

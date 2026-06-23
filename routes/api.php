@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\AccountController;
+use App\Http\Controllers\Api\Auth\AccountImageController;
 use App\Http\Controllers\Api\Auth\SendPasswordResetEmailController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\LogoutAllController;
@@ -44,6 +45,11 @@ Route::prefix('auth')->group(function () {
     Route::patch('/account', [AccountController::class, 'update'])
         ->middleware(['auth:sanctum', 'restrict.banned.user'])
         ->name('auth.account.update');
+
+    // Update account image action
+    Route::put('/account/image', [AccountImageController::class, 'update'])
+        ->middleware(['auth:sanctum', 'restrict.banned.user'])
+        ->name('auth.account.image.update');
 
     // Logout action
     Route::delete('/logout', LogoutController::class)

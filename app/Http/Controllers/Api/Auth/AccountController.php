@@ -89,15 +89,13 @@ class AccountController extends Controller
      * Update the specified user account.
      *
      * @param UpdateAccountData $accountData
-     * @param Request $request
      * @param UpdateAccountAction $updateAccountAction
      * @return JsonResponse
-     * @throws Throwable
      */
-    public function update(UpdateAccountData $accountData, Request $request, UpdateAccountAction $updateAccountAction): JsonResponse
+    public function update(UpdateAccountData $accountData, UpdateAccountAction $updateAccountAction): JsonResponse
     {
-        $user = $updateAccountAction->handle($accountData, $request->user());
-        return UserResource::make($user)
+        $account = $updateAccountAction->handle($accountData, auth()->user());
+        return UserResource::make($account)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }

@@ -24,6 +24,8 @@ class LessonResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $this->loadMissing('lessonable');
+
         return [
             'id' => $this->id,
             'course_id' => $this->course_id,

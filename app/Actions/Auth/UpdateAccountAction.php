@@ -13,15 +13,12 @@ class UpdateAccountAction
      * Update the specified user account.
      *
      * @param UpdateAccountData $accountData
-     * @param User $user
+     * @param User $account
      * @return User
-     * @throws Throwable
      */
-    public function handle(UpdateAccountData $accountData, User $user): User
+    public function handle(UpdateAccountData $accountData, User $account): User
     {
-        return DB::transaction(function () use ($accountData, $user) {
-            $user->update($accountData->all());
-            return $user;
-        });
+        $account->update($accountData->all());
+        return $account;
     }
 }

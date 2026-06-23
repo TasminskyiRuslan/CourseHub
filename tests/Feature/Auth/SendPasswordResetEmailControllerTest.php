@@ -82,7 +82,7 @@ describe('SendPasswordResetEmailController', function () {
 
             postJson(route('auth.password.forgot'), [
                 'email' => $superAdmin->email,
-            ])->assertNoContent();
+            ])->assertUnprocessable();
 
             Notification::assertNothingSent();
             $this->assertDatabaseCount('password_reset_tokens', 0);

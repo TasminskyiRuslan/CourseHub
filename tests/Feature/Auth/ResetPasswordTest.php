@@ -133,7 +133,7 @@ describe('ResetPasswordController', function () {
                 'password_confirmation' => $newPassword,
                 'token' => Password::createToken($superAdmin),
             ])
-                ->assertNoContent();
+                ->assertUnprocessable();
 
             $superAdmin->refresh();
             expect(Hash::check(config('super-admin.password'), $superAdmin->password))->toBeTrue()

@@ -22,7 +22,9 @@ class ResetPasswordAction
     {
         $user = User::whereEmail($resetPasswordData->email)->first();
         if ($user?->hasRole(UserRole::SUPER_ADMIN->value)) {
-            return;
+            throw ValidationException::withMessages([
+                'email' => [__('passwords.protected')],
+            ]);
         }
 
         $status = Password::reset([

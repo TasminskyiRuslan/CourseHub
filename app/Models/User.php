@@ -66,6 +66,15 @@ use Spatie\Sluggable\SlugOptions;
  * @method static Builder<static>|User whereUpdatedAt($value)
  * @method static Builder<static>|User withoutPermission($permissions)
  * @method static Builder<static>|User withoutRole($roles, ?string $guard = null)
+ * @property Carbon|null $deleted_at
+ * @property Carbon|null $banned_at
+ * @property string|null $avatar_path
+ * @method static Builder<static>|User onlyTrashed()
+ * @method static Builder<static>|User whereAvatarPath($value)
+ * @method static Builder<static>|User whereBannedAt($value)
+ * @method static Builder<static>|User whereDeletedAt($value)
+ * @method static Builder<static>|User withTrashed(bool $withTrashed = true)
+ * @method static Builder<static>|User withoutTrashed()
  * @mixin Eloquent
  */
 class User extends Authenticatable implements MustVerifyEmail

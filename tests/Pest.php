@@ -152,7 +152,8 @@ function courseJsonStructure(bool $withAuthor = false, bool $withLessonsCount = 
         'type',
         'price',
         'image_url',
-        'is_published',
+        'published_at',
+        'banned_at',
         'created_at',
         'updated_at',
     ];

@@ -28,19 +28,19 @@ class CoursePolicy
      */
     public function view(?User $user, Course $course): bool
     {
-        if ($course->is_published) {
+        if ($user?->hasPermissionTo(UserPermission::COURSE_VIEW_ANY_UNPUBLISHED->value)) {
             return true;
         }
 
-        if (!$user) {
+        if ($course->author->isBanned()) {
             return false;
         }
 
-        if ($user->can(UserPermission::COURSE_VIEW_ANY_UNPUBLISHED->value)) {
-            return true;
+        if ($course->isBanned()) {
+            return $user?->is($course->author);
         }
 
-        return $user->is($course->author);
+        return $course->isPublished() || $user?->is($course->author);
     }
 
     /**

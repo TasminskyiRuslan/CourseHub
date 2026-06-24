@@ -42,7 +42,7 @@ describe('CourseController -> index', function () {
                 ]);
         })->with([
             'guest' => null,
-            'unverified' => fn() => User::factory()->unverified()->create(),
+            'unverified' => fn() => User::factory()->student()->unverified()->create(),
             'student' => fn() => User::factory()->student()->create(),
             'teacher' => fn() => User::factory()->teacher()->create(),
         ]);
@@ -81,6 +81,136 @@ describe('CourseController -> index', function () {
                     ]
                 ])
                 ->assertJsonCount($publishedCourses->count() + $unpublishedCourses->count(), 'data');
+        })->with([
+            'admin' => fn() => User::factory()->admin()->create(),
+            'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
+        ]);
+
+        it('allows users to retrieve only non-banned courses', function ($user) {
+            if ($user) {
+                Sanctum::actingAs($user);
+            }
+
+            $publishedCourses = Course::factory()->count(3)->create();
+            $bannedCourses = Course::factory()->count(2)->banned()->create();
+
+            getJson(route('course.index'))
+                ->assertOk()
+                ->assertJsonCount($publishedCourses->count(), 'data')
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => courseJsonStructure()
+                    ]
+                ]);
+        })->with([
+            'guest' => null,
+            'unverified' => fn() => User::factory()->student()->unverified()->create(),
+            'student' => fn() => User::factory()->student()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
+        ]);
+
+        it('allows the author to retrieve their own banned courses', function () {
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
+
+            $publishedCourses = Course::factory()->count(2)->create();
+            $ownBannedCourses = Course::factory()->count(2)->banned()->for($author, 'author')->create();
+            $bannedCourses = Course::factory()->banned()->create();
+
+            getJson(route('course.index'))
+                ->assertOk()
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => courseJsonStructure()
+                    ]
+                ])
+                ->assertJsonCount($publishedCourses->count() + $ownBannedCourses->count(), 'data');
+        });
+
+        it('allows users with permissions to retrieve all banned courses', function ($user) {
+            if ($user) {
+                Sanctum::actingAs($user);
+            }
+
+            $publishedCourses = Course::factory()->count(2)->create();
+            $bannedCourses = Course::factory()->count(3)->banned()->create();
+
+            getJson(route('course.index'))
+                ->assertOk()
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => courseJsonStructure()
+                    ]
+                ])
+                ->assertJsonCount($publishedCourses->count() + $bannedCourses->count(), 'data');
+        })->with([
+            'admin' => fn() => User::factory()->admin()->create(),
+            'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
+        ]);
+
+        it('allows users to retrieve courses only from non-banned authors', function ($user) {
+            if ($user) {
+                Sanctum::actingAs($user);
+            }
+
+            $publishedCourses = Course::factory()->count(3)->create();
+
+            $bannedAuthor = User::factory()->teacher()->banned()->create();
+            $coursesFromBannedAuthor = Course::factory()->count(2)->for($bannedAuthor, 'author')->create();
+
+            getJson(route('course.index'))
+                ->assertOk()
+                ->assertJsonCount($publishedCourses->count(), 'data')
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => courseJsonStructure()
+                    ]
+                ]);
+        })->with([
+            'guest' => null,
+            'unverified' => fn() => User::factory()->student()->unverified()->create(),
+            'student' => fn() => User::factory()->student()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
+        ]);
+
+        it('does not allow the banned author to retrieve their own courses', function () {
+            $author = User::factory()->teacher()->banned()->create();
+            Sanctum::actingAs($author);
+
+            $publishedCourses = Course::factory()->count(2)->create();
+            $ownCourses = Course::factory()->count(2)->for($author, 'author')->create();
+
+            $bannedAuthor = User::factory()->teacher()->banned()->create();
+            $otherBannedCourses = Course::factory()->for($bannedAuthor, 'author')->create();
+
+            getJson(route('course.index'))
+                ->assertOk()
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => courseJsonStructure()
+                    ]
+                ])
+                ->assertJsonCount($publishedCourses->count(), 'data');
+        });
+
+        it('allows users with permissions to retrieve all courses from banned authors', function ($user) {
+            if ($user) {
+                Sanctum::actingAs($user);
+            }
+
+            $publishedCourses = Course::factory()->count(2)->create();
+
+            $bannedAuthor = User::factory()->teacher()->banned()->create();
+            $coursesFromBannedAuthor = Course::factory()->count(3)->for($bannedAuthor, 'author')->create();
+
+            getJson(route('course.index'))
+                ->assertOk()
+                ->assertJsonStructure([
+                    'data' => [
+                        '*' => courseJsonStructure()
+                    ]
+                ])
+                ->assertJsonCount($publishedCourses->count() + $coursesFromBannedAuthor->count(), 'data');
         })->with([
             'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),

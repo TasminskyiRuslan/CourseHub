@@ -40,7 +40,7 @@ describe('UserController -> index', function () {
             getJson(route('user.index'))
                 ->assertForbidden();
         })->with([
-            'unverified' => fn() => User::factory()->unverified()->create(),
+            'unverified' => fn() => User::factory()->student()->unverified()->create(),
             'student' => fn() => User::factory()->student()->create(),
             'teacher' => fn() => User::factory()->teacher()->create(),
         ]);
@@ -113,7 +113,7 @@ describe('UserController -> index', function () {
             Sanctum::actingAs($admin);
 
             $verified = User::factory()->create();
-            $unverified = User::factory()->unverified()->create();
+            $unverified = User::factory()->student()->unverified()->create();
 
             getJson(route('user.index', ['filter[verified]' => true]))
                 ->assertOk()

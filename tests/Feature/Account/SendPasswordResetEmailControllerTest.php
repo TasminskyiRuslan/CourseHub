@@ -73,7 +73,7 @@ describe('SendPasswordResetEmailController', function () {
         })
         ->with([
             'verified user' => fn() => User::factory()->create(),
-            'unverified user' => fn() => User::factory()->unverified()->create(),
+            'unverified user' => fn() => User::factory()->student()->unverified()->create(),
         ]);
 
         it('silently succeeds if the email does not exist', function () {

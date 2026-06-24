@@ -37,7 +37,7 @@ describe('ResendVerificationEmailController', function () {
     describe('success', function () {
         it('sends verification email if email is unverified', function () {
             Notification::fake();
-            $user = User::factory()->unverified()->create();
+            $user = User::factory()->student()->unverified()->create();
             Sanctum::actingAs($user);
 
             postJson(route('account.verification.resend'))

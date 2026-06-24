@@ -81,8 +81,8 @@ class GetCourseListQuery
             config('cache.ttl.lesson'),
             function () {
                 return Course::query()
-                    ->where('is_published', true)
-                    ->orderByDesc('created_at')
+                    ->visibleFor(null)
+                    ->latest()
                     ->paginate(config('pagination.courses_per_page'))
                     ->withQueryString();
             }

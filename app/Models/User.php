@@ -201,7 +201,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Course::class, 'author_id');
     }
 
-
     /**
      * Check if the user is banned.
      *

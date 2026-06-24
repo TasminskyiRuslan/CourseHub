@@ -25,7 +25,7 @@ describe('VerifyEmailController', function () {
     */
     describe('validation', function () {
         it('fails if the user ID does not exist', function () {
-            $user = User::factory()->unverified()->create();
+            $user = User::factory()->student()->unverified()->create();
 
             getJson(URL::temporarySignedRoute(
                 'account.verification.verify',
@@ -39,7 +39,7 @@ describe('VerifyEmailController', function () {
         });
 
         it('fails when the hash is incorrect', function () {
-            $user = User::factory()->unverified()->create();
+            $user = User::factory()->student()->unverified()->create();
 
             getJson(URL::temporarySignedRoute(
                 'account.verification.verify',
@@ -53,7 +53,7 @@ describe('VerifyEmailController', function () {
         });
 
         it('fails when the signature is missing', function () {
-            $user = User::factory()->unverified()->create();
+            $user = User::factory()->student()->unverified()->create();
 
             getJson(route('account.verification.verify', [
                 'id' => $user->id,
@@ -85,9 +85,9 @@ describe('VerifyEmailController', function () {
             Event::assertDispatched(Verified::class, fn($event) => $event->user->id === $user->id);
         })
             ->with([
-                'student' => fn() => User::factory()->unverified()->student()->create(),
-                'teacher' => fn() => User::factory()->unverified()->teacher()->create(),
-                'admin' => fn() => User::factory()->unverified()->admin()->create(),
+                'student' => fn() => User::factory()->student()->unverified()->create(),
+                'teacher' => fn() => User::factory()->teacher()->unverified()->create(),
+                'admin' => fn() => User::factory()->admin()->unverified()->create(),
             ]);
 
         it('does nothing if the email is already verified', function () {

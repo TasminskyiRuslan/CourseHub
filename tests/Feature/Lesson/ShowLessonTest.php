@@ -60,7 +60,7 @@ describe('LessonController -> show', function () {
                 ]);
         })->with([
             'guest' => null,
-            'unverified' => fn() => User::factory()->unverified()->create(),
+            'unverified' => fn() => User::factory()->student()->unverified()->create(),
             'student' => fn() => User::factory()->student()->create(),
             'teacher' => fn() => User::factory()->teacher()->create(),
             'admin' => fn() => User::factory()->admin()->create(),

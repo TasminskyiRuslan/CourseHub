@@ -50,7 +50,11 @@ use Spatie\Sluggable\SlugOptions;
  * @method static Builder<static>|Course whereType($value)
  * @method static Builder<static>|Course whereUpdatedAt($value)
  * @property string|null $deleted_at
+ * @property Carbon|null $banned_at
  * @method static Builder<static>|Course whereDeletedAt($value)
+ * @property Carbon|null $published_at
+ * @method static Builder<static>|Course whereBannedAt($value)
+ * @method static Builder<static>|Course wherePublishedAt($value)
  * @mixin Eloquent
  */
 class Course extends Model
@@ -70,16 +74,8 @@ class Course extends Model
         'price',
         'type',
         'image_path',
-        'is_published'
-    ];
-
-    /**
-     * The model's default values for attributes.
-     *
-     * @var array<string, mixed>
-     */
-    protected $attributes = [
-        'is_published' => false,
+        'published_at',
+        'banned_at',
     ];
 
     /**
@@ -92,7 +88,8 @@ class Course extends Model
         return [
             'price' => 'decimal:2',
             'type' => CourseType::class,
-            'is_published' => 'boolean',
+            'published_at' => 'datetime',
+            'banned_at' => 'datetime',
         ];
     }
 
@@ -150,13 +147,23 @@ class Course extends Model
     }
 
     /**
+     * Check if the course is published.
+     *
+     * @return bool
+     */
+    public function isPublished(): bool
+    {
+        return $this->published_at !== null;
+    }
+
+    /**
      * Mark the course as published.
      *
      * @return Course
      */
     public function publish(): static
     {
-        $this->is_published = true;
+        $this->published_at = $this->freshTimestamp();
         return $this;
     }
 
@@ -167,7 +174,39 @@ class Course extends Model
      */
     public function unpublish(): static
     {
-        $this->is_published = false;
+        $this->published_at = null;
+        return $this;
+    }
+
+    /**
+     * Check if the course is banned.
+     *
+     * @return bool
+     */
+    public function isBanned(): bool
+    {
+        return $this->banned_at !== null;
+    }
+
+    /**
+     * Ban the course.
+     *
+     * @return Course
+     */
+    public function ban(): static
+    {
+        $this->banned_at = $this->freshTimestamp();
+        return $this;
+    }
+
+    /**
+     * Unban the course.
+     *
+     * @return Course
+     */
+    public function unban(): static
+    {
+        $this->banned_at = null;
         return $this;
     }
 
@@ -183,8 +222,14 @@ class Course extends Model
         if ($user?->hasPermissionTo(UserPermission::COURSE_VIEW_ANY_UNPUBLISHED->value) || $user?->hasRole(UserRole::SUPER_ADMIN->value)) {
             return $query;
         }
+        $query->whereHas('author', function ($q) {
+            $q->whereNull('banned_at');
+        });
+
         return $query->where(function ($q) use ($user) {
-            $q->where('is_published', true);
+            $q->whereNotNull('published_at')
+                ->whereNull('banned_at');
+
             if ($user) {
                 $q->orWhere('author_id', $user->id);
             }

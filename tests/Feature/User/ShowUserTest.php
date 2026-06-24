@@ -55,7 +55,7 @@ describe('UserController -> show', function () {
             getJson(route('user.show', $targetUser))
                 ->assertForbidden();
         })->with([
-            'unverified' => fn() => User::factory()->unverified()->create(),
+            'unverified' => fn() => User::factory()->student()->unverified()->create(),
             'student' => fn() => User::factory()->student()->create(),
             'teacher' => fn() => User::factory()->teacher()->create(),
         ]);

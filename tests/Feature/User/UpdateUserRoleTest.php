@@ -80,7 +80,7 @@ describe('UserRoleController -> update', function () {
             putJson(route('user.role.update', $targetUser), ['role' => UserRole::TEACHER->value])
                 ->assertForbidden();
         })->with([
-            'unverified' => fn() => User::factory()->unverified()->create(),
+            'unverified' => fn() => User::factory()->student()->unverified()->create(),
             'student' => fn() => User::factory()->student()->create(),
             'teacher' => fn() => User::factory()->teacher()->create(),
         ]);

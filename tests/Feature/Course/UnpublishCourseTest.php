@@ -45,7 +45,7 @@ describe('UnpublishCourseController', function () {
             patchJson(route('course.unpublish', $course))
                 ->assertUnauthorized();
             $course->refresh();
-            expect($course->is_published)->toBeTrue();
+            expect($course->isPublished())->toBeTrue();
         });
 
         it('fails if users without permissions tries to unpublish someone else\'s course', function ($user) {
@@ -58,7 +58,7 @@ describe('UnpublishCourseController', function () {
             patchJson(route('course.unpublish', $course))
                 ->assertForbidden();
             $course->refresh();
-            expect($course->is_published)->toBeTrue();
+            expect($course->isPublished())->toBeTrue();
         })->with([
             'student' => fn() => User::factory()->student()->create(),
             'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
@@ -75,7 +75,7 @@ describe('UnpublishCourseController', function () {
                 ->assertOk()
                 ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
             $course->refresh();
-            expect($course->is_published)->toBeFalse();
+            expect($course->isPublished())->toBeFalse();
         });
 
         it('allows users with permissions to unpublish any course', function ($user) {
@@ -89,7 +89,7 @@ describe('UnpublishCourseController', function () {
                 ->assertOk()
                 ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
             $course->refresh();
-            expect($course->is_published)->toBeFalse();
+            expect($course->isPublished())->toBeFalse();
         })->with([
             'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),

@@ -811,7 +811,7 @@ namespace PHPSTORM_META {
             'app.aliases.App' => 'string',
             'app.aliases.Arr' => 'string',
             'app.aliases.Artisan' => 'string',
-            'app.aliases.Account' => 'string',
+            'app.aliases.Auth' => 'string',
             'app.aliases.Benchmark' => 'string',
             'app.aliases.Blade' => 'string',
             'app.aliases.Broadcast' => 'string',
@@ -1273,6 +1273,7 @@ namespace PHPSTORM_META {
             'session.same_site' => 'string',
             'session.partitioned' => 'boolean',
             'super-admin.name' => 'string',
+            'super-admin.slug' => 'string',
             'super-admin.email' => 'string',
             'super-admin.password' => 'string',
             'boost.enabled' => 'boolean',
@@ -1395,7 +1396,7 @@ namespace PHPSTORM_META {
             'app.aliases.App' => 'string',
             'app.aliases.Arr' => 'string',
             'app.aliases.Artisan' => 'string',
-            'app.aliases.Account' => 'string',
+            'app.aliases.Auth' => 'string',
             'app.aliases.Benchmark' => 'string',
             'app.aliases.Blade' => 'string',
             'app.aliases.Broadcast' => 'string',
@@ -1857,6 +1858,7 @@ namespace PHPSTORM_META {
             'session.same_site' => 'string',
             'session.partitioned' => 'boolean',
             'super-admin.name' => 'string',
+            'super-admin.slug' => 'string',
             'super-admin.email' => 'string',
             'super-admin.password' => 'string',
             'boost.enabled' => 'boolean',
@@ -1979,7 +1981,7 @@ namespace PHPSTORM_META {
             'app.aliases.App' => 'string',
             'app.aliases.Arr' => 'string',
             'app.aliases.Artisan' => 'string',
-            'app.aliases.Account' => 'string',
+            'app.aliases.Auth' => 'string',
             'app.aliases.Benchmark' => 'string',
             'app.aliases.Blade' => 'string',
             'app.aliases.Broadcast' => 'string',
@@ -2441,6 +2443,7 @@ namespace PHPSTORM_META {
             'session.same_site' => 'string',
             'session.partitioned' => 'boolean',
             'super-admin.name' => 'string',
+            'super-admin.slug' => 'string',
             'super-admin.email' => 'string',
             'super-admin.password' => 'string',
             'boost.enabled' => 'boolean',
@@ -2535,7 +2538,7 @@ namespace PHPSTORM_META {
     override(\optional(0), type(0));
 
             registerArgumentsSet('auth', );
-        registerArgumentsSet('configs',
+        registerArgumentsSet('configs', 
 'concurrency.default','view.paths','view.compiled','hashing.driver','hashing.bcrypt.rounds',
 'hashing.bcrypt.verify','hashing.bcrypt.limit','hashing.argon.memory','hashing.argon.threads','hashing.argon.time',
 'hashing.argon.verify','hashing.rehash_on_login','broadcasting.default','broadcasting.connections.reverb.driver','broadcasting.connections.reverb.key',
@@ -2548,7 +2551,7 @@ namespace PHPSTORM_META {
 'app.name','app.env','app.debug','app.url','app.frontend_url',
 'app.asset_url','app.timezone','app.locale','app.fallback_locale','app.faker_locale',
 'app.cipher','app.key','app.previous_keys','app.maintenance.driver','app.maintenance.store',
-'app.providers','app.aliases.App','app.aliases.Arr','app.aliases.Artisan','app.aliases.Account',
+'app.providers','app.aliases.App','app.aliases.Arr','app.aliases.Artisan','app.aliases.Auth',
 'app.aliases.Benchmark','app.aliases.Blade','app.aliases.Broadcast','app.aliases.Bus','app.aliases.Cache',
 'app.aliases.Concurrency','app.aliases.Config','app.aliases.Context','app.aliases.Cookie','app.aliases.Crypt',
 'app.aliases.Date','app.aliases.DB','app.aliases.Eloquent','app.aliases.Event','app.aliases.File',
@@ -2641,32 +2644,33 @@ namespace PHPSTORM_META {
 'session.lifetime','session.expire_on_close','session.encrypt','session.files','session.connection',
 'session.table','session.store','session.lottery','session.cookie','session.path',
 'session.domain','session.secure','session.http_only','session.same_site','session.partitioned',
-'super-admin.name','super-admin.email','super-admin.password','boost.enabled','boost.browser_logs_watcher',
-'mcp.redirect_domains','query-builder.parameters.include','query-builder.parameters.filter','query-builder.parameters.sort','query-builder.parameters.fields',
-'query-builder.parameters.append','query-builder.count_suffix','query-builder.exists_suffix','query-builder.disable_invalid_filter_query_exception','query-builder.disable_invalid_sort_query_exception',
-'query-builder.disable_invalid_includes_query_exception','query-builder.convert_relation_names_to_snake_case_plural','query-builder.convert_relation_table_name_strategy','query-builder.convert_field_names_to_snake_case','structure-discoverer.ignored_files',
-'structure-discoverer.structure_scout_directories','structure-discoverer.cache.driver','structure-discoverer.cache.store','ide-helper.filename','ide-helper.models_filename',
-'ide-helper.meta_filename','ide-helper.include_fluent','ide-helper.write_query_methods','ide-helper.write_model_magic_where','ide-helper.write_model_external_builder_methods',
-'ide-helper.write_model_relation_count_properties','ide-helper.write_model_relation_exists_properties','ide-helper.write_eloquent_model_mixins','ide-helper.include_helpers','ide-helper.helper_files',
-'ide-helper.model_locations','ide-helper.ignored_models','ide-helper.model_hooks','ide-helper.extra.Eloquent','ide-helper.extra.Session',
-'ide-helper.magic','ide-helper.interfaces','ide-helper.model_camel_case_properties','ide-helper.type_overrides.integer','ide-helper.type_overrides.boolean',
-'ide-helper.include_class_docblocks','ide-helper.force_fqn','ide-helper.use_generics_annotations','ide-helper.macro_default_return_types.Illuminate\\Http\\Client\\Factory','ide-helper.additional_relation_types',
-'ide-helper.additional_relation_return_types','ide-helper.enforce_nullable_relationships','ide-helper.soft_deletes_force_nullable','ide-helper.post_migrate','tinker.commands',
-'tinker.alias','tinker.dont_alias',);
-        registerArgumentsSet('middleware',
+'super-admin.name','super-admin.slug','super-admin.email','super-admin.password','boost.enabled',
+'boost.browser_logs_watcher','mcp.redirect_domains','query-builder.parameters.include','query-builder.parameters.filter','query-builder.parameters.sort',
+'query-builder.parameters.fields','query-builder.parameters.append','query-builder.count_suffix','query-builder.exists_suffix','query-builder.disable_invalid_filter_query_exception',
+'query-builder.disable_invalid_sort_query_exception','query-builder.disable_invalid_includes_query_exception','query-builder.convert_relation_names_to_snake_case_plural','query-builder.convert_relation_table_name_strategy','query-builder.convert_field_names_to_snake_case',
+'structure-discoverer.ignored_files','structure-discoverer.structure_scout_directories','structure-discoverer.cache.driver','structure-discoverer.cache.store','ide-helper.filename',
+'ide-helper.models_filename','ide-helper.meta_filename','ide-helper.include_fluent','ide-helper.write_query_methods','ide-helper.write_model_magic_where',
+'ide-helper.write_model_external_builder_methods','ide-helper.write_model_relation_count_properties','ide-helper.write_model_relation_exists_properties','ide-helper.write_eloquent_model_mixins','ide-helper.include_helpers',
+'ide-helper.helper_files','ide-helper.model_locations','ide-helper.ignored_models','ide-helper.model_hooks','ide-helper.extra.Eloquent',
+'ide-helper.extra.Session','ide-helper.magic','ide-helper.interfaces','ide-helper.model_camel_case_properties','ide-helper.type_overrides.integer',
+'ide-helper.type_overrides.boolean','ide-helper.include_class_docblocks','ide-helper.force_fqn','ide-helper.use_generics_annotations','ide-helper.macro_default_return_types.Illuminate\\Http\\Client\\Factory',
+'ide-helper.additional_relation_types','ide-helper.additional_relation_return_types','ide-helper.enforce_nullable_relationships','ide-helper.soft_deletes_force_nullable','ide-helper.post_migrate',
+'tinker.commands','tinker.alias','tinker.dont_alias',);
+        registerArgumentsSet('middleware', 
 'web','api','auth','auth.basic','auth.session',
 'cache.headers','can','guest','password.confirm','precognitive',
 'signed','throttle','verified','restrict.banned.user',);
-        registerArgumentsSet('routes',
+        registerArgumentsSet('routes', 
 'l5-swagger.default.api','l5-swagger.default.docs','l5-swagger.default.asset','l5-swagger.default.oauth2_callback','boost.browser-logs',
-'sanctum.csrf-cookie','auth.register','auth.login','auth.account.show','auth.account.update',
-'auth.logout','auth.logout.all','auth.password.forgot','auth.password.reset','auth.verification.verify',
-'auth.verification.resend','course.index','course.store','course.show','course.update',
-'course.destroy','course.image.update','course.image.destroy','course.publish','course.unpublish',
-'course.lesson.index','course.lesson.store','course.lesson.show','course.lesson.update','course.lesson.destroy',
-'user.index','user.show','user.destroy','user.role.update','user.ban',
-'user.unban','storage.local',);
-        registerArgumentsSet('views',
+'sanctum.csrf-cookie','account.register','account.login','account.show','account.update',
+'account.avatar.update','account.avatar.destroy','account.token.destroy','account.tokens.destroy','account.password.forgot',
+'account.password.reset','account.verification.verify','account.verification.resend','course.index','course.store',
+'course.show','course.update','course.destroy','course.image.update','course.image.destroy',
+'course.publish','course.unpublish','course.lesson.index','course.lesson.store','course.lesson.show',
+'course.lesson.update','course.lesson.destroy','user.index','user.show','user.destroy',
+'user.role.update','user.ban','user.unban',
+'storage.local',);
+        registerArgumentsSet('views', 
 'emails.auth.reset','emails.auth.verify','emails.user.ban','emails.user.unban','l5-swagger::index',
 'vendor.l5-swagger.index','welcome','l5-swagger::index','laravel-exceptions-renderer::components.badge','laravel-exceptions-renderer::components.empty-state',
 'laravel-exceptions-renderer::components.file-with-line','laravel-exceptions-renderer::components.formatted-source','laravel-exceptions-renderer::components.frame','laravel-exceptions-renderer::components.frame-code','laravel-exceptions-renderer::components.header',
@@ -2681,7 +2685,7 @@ namespace PHPSTORM_META {
 'laravel-exceptions::503','laravel-exceptions::layout','laravel-exceptions::minimal','notifications::email','pagination::bootstrap-4',
 'pagination::bootstrap-5','pagination::default','pagination::semantic-ui','pagination::simple-bootstrap-4','pagination::simple-bootstrap-5',
 'pagination::simple-default','pagination::simple-tailwind','pagination::tailwind',);
-        registerArgumentsSet('translations',
+        registerArgumentsSet('translations', 
 'auth.failed','auth.password','auth.throttle','pagination.previous','pagination.next',
 'passwords.reset','passwords.sent','passwords.throttled','passwords.token','passwords.user',
 'validation.accepted','validation.accepted_if','validation.active_url','validation.after','validation.after_or_equal',
@@ -2711,8 +2715,8 @@ namespace PHPSTORM_META {
 'validation.required_without_all','validation.same','validation.size.array','validation.size.file','validation.size.numeric',
 'validation.size.string','validation.starts_with','validation.string','validation.timezone','validation.unique',
 'validation.uploaded','validation.uppercase','validation.url','validation.ulid','validation.uuid',
-'validation.custom.attribute-name.rule-name','auth.banned',);
-        registerArgumentsSet('env',
+'validation.custom.attribute-name.rule-name','auth.banned','users.protected',);
+        registerArgumentsSet('env', 
 'APP_NAME','APP_ENV','APP_KEY','APP_DEBUG','APP_URL',
 'APP_LOCALE','APP_FALLBACK_LOCALE','APP_FAKER_LOCALE','APP_MAINTENANCE_DRIVER','BCRYPT_ROUNDS',
 'LOG_CHANNEL','LOG_STACK','LOG_DEPRECATIONS_CHANNEL','LOG_LEVEL','DB_CONNECTION',
@@ -2724,11 +2728,11 @@ namespace PHPSTORM_META {
 'REDIS_PASSWORD','REDIS_PORT','REDIS_CACHE_CONNECTION','MAIL_MAILER','MAIL_HOST',
 'MAIL_PORT','MAIL_USERNAME','MAIL_PASSWORD','MAIL_ENCRYPTION','MAIL_FROM_ADDRESS',
 'MAIL_FROM_NAME','AWS_ACCESS_KEY_ID','AWS_SECRET_ACCESS_KEY','AWS_DEFAULT_REGION','AWS_BUCKET',
-'AWS_USE_PATH_STYLE_ENDPOINT','VITE_APP_NAME','SUPER_ADMIN_NAME','SUPER_ADMIN_EMAIL','SUPER_ADMIN_PASSWORD',
-'PAGINATION_COURSES_PER_PAGE','PAGINATION_LESSONS_PER_PAGE','PAGINATION_USERS_PER_PAGE','AUTH_GUARD','L5_SWAGGER_GENERATE_ALWAYS',
-'L5_SWAGGER_CONST_HOST','L5_SWAGGER_USE_ABSOLUTE_PATH','SANCTUM_TOKEN_TTL_DEFAULT','SANCTUM_TOKEN_TTL_REMEMBER','UID',
-'GID',);
-
+'AWS_USE_PATH_STYLE_ENDPOINT','VITE_APP_NAME','SUPER_ADMIN_NAME','SUPER_ADMIN_SLUG','SUPER_ADMIN_EMAIL',
+'SUPER_ADMIN_PASSWORD','PAGINATION_COURSES_PER_PAGE','PAGINATION_LESSONS_PER_PAGE','PAGINATION_USERS_PER_PAGE','AUTH_GUARD',
+'L5_SWAGGER_GENERATE_ALWAYS','L5_SWAGGER_CONST_HOST','L5_SWAGGER_USE_ABSOLUTE_PATH','SANCTUM_TOKEN_TTL_DEFAULT','SANCTUM_TOKEN_TTL_REMEMBER',
+'UID','GID',);
+        
                 expectedArguments(\Illuminate\Support\Facades\Gate::has(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Support\Facades\Gate::allows(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Support\Facades\Gate::denies(), 0, argumentsSet('auth'));
@@ -2792,5 +2796,5 @@ namespace PHPSTORM_META {
                 expectedArguments(\Illuminate\Contracts\Translation\Translator::get(), 0, argumentsSet('translations'));
                 expectedArguments(\env(), 0, argumentsSet('env'));
                 expectedArguments(\Illuminate\Support\Env::get(), 0, argumentsSet('env'));
-
+            
 }

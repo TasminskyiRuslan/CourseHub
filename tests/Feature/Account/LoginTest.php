@@ -78,7 +78,7 @@ describe('LoginController', function () {
                 ]);
         })
         ->with([
-            'unverified user' => fn() => User::factory()->unverified()->create(['password' => 'secret']),
+            'unverified user' => fn() => User::factory()->student()->unverified()->create(['password' => 'secret']),
             'verified user' => fn() => User::factory()->create(['password' => 'secret']),
             'student' => fn() => User::factory()->student()->create(['password' => 'secret']),
             'teacher' => fn() => User::factory()->teacher()->create(['password' => 'secret']),

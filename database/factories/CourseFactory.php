@@ -29,7 +29,8 @@ class CourseFactory extends Factory
             'price' => fake()->randomFloat(2, 0, 500),
             'type' => fake()->randomElement(CourseType::cases()),
             'image_path' => null,
-            'is_published' => true,
+            'published_at' => now(),
+            'banned_at' => null,
         ];
     }
 
@@ -40,7 +41,17 @@ class CourseFactory extends Factory
      */
     public function unpublished(): static
     {
-        return $this->state(fn() => ['is_published' => false]);
+        return $this->state(fn() => ['published_at' => null]);
+    }
+
+    /**
+     * Indicate that the course is unpublished.
+     *
+     * @return $this
+     */
+    public function banned(): static
+    {
+        return $this->state(fn() => ['banned_at' => now()]);
     }
 
     /**

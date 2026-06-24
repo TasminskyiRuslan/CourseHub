@@ -84,6 +84,22 @@ use OpenApi\Attributes as OA;
             nullable: true
         ),
         new OA\Property(
+            property: 'published_at',
+            description: 'Publishing time of the course.',
+            type: 'string',
+            format: 'date-time',
+            example: '2026-01-25T12:00:00Z',
+            nullable: true
+        ),
+        new OA\Property(
+            property: 'banned_at',
+            description: 'Banning time of the course.',
+            type: 'string',
+            format: 'date-time',
+            example: null,
+            nullable: true
+        ),
+        new OA\Property(
             property: 'created_at',
             description: 'Creation time of the course.',
             type: 'string',

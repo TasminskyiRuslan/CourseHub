@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\Storage;
  * @property mixed $description
  * @property mixed $price
  * @property mixed $image_path
- * @property mixed $is_published
+ * @property mixed $published_at
+ * @property mixed $banned_at
  * @property mixed $created_at
  * @property mixed $updated_at
  */
@@ -39,7 +40,8 @@ class CourseResource extends JsonResource
             'type' => $this->type,
             'price' => $this->price,
             'image_url' => $this->image_path ? Storage::disk('courses')->url($this->image_path) : null,
-            'is_published' => $this->is_published,
+            'published_at' => $this->published_at,
+            'banned_at' => $this->banned_at,
             'lessons_count' => $this->whenCounted('lessons_count'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

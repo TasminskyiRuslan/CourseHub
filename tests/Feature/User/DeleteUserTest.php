@@ -58,7 +58,7 @@ describe('UserController -> destroy', function () {
             deleteJson(route('user.destroy', $targetUser))
                 ->assertForbidden();
         })->with([
-            'unverified' => fn() => User::factory()->unverified()->create(),
+            'unverified' => fn() => User::factory()->student()->unverified()->create(),
             'student' => fn() => User::factory()->student()->create(),
             'teacher' => fn() => User::factory()->teacher()->create(),
         ]);

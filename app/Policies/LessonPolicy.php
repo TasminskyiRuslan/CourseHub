@@ -18,19 +18,19 @@ class LessonPolicy
      */
     public function viewAny(?User $user, Course $course): bool
     {
-        if ($course->is_published) {
+        if ($user?->hasPermissionTo(UserPermission::COURSE_VIEW_ANY_UNPUBLISHED->value)) {
             return true;
         }
 
-        if (!$user) {
+        if ($course->author->isBanned()) {
             return false;
         }
 
-        if ($user->can(UserPermission::COURSE_VIEW_ANY_UNPUBLISHED->value)) {
-            return true;
+        if ($course->isBanned()) {
+            return $user?->is($course->author);
         }
 
-        return $user->is($course->author);
+        return $course->isPublished() || $user?->is($course->author);
     }
 
     /**
@@ -42,19 +42,19 @@ class LessonPolicy
      */
     public function view(?User $user, Lesson $lesson): bool
     {
-        if ($lesson->course->is_published) {
+        if ($user?->hasPermissionTo(UserPermission::COURSE_VIEW_ANY_UNPUBLISHED->value)) {
             return true;
         }
 
-        if (!$user) {
+        if ($lesson->course->author->isBanned()) {
             return false;
         }
 
-        if ($user->can(UserPermission::COURSE_VIEW_ANY_UNPUBLISHED->value)) {
-            return true;
+        if ($lesson->course->isBanned()) {
+            return $user?->is($lesson->course->author);
         }
 
-        return $user->is($lesson->course->author);
+        return $lesson->course->isPublished() || $user?->is($lesson->course->author);
     }
 
     /**

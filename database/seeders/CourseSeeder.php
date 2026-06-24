@@ -28,5 +28,11 @@ class CourseSeeder extends Seeder
             ->unpublished()
             ->withImage()
             ->create();
+
+        Course::factory()
+            ->count(2)
+            ->banned()
+            ->withImage()
+            ->create();
     }
 }

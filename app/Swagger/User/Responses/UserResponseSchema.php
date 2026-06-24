@@ -56,7 +56,7 @@ use OpenApi\Attributes as OA;
             description: 'Banning time of the user.',
             type: 'string',
             format: 'date-time',
-            example: '2026-01-01T12:00:00Z',
+            example: null,
             nullable: true
         ),
         new OA\Property(

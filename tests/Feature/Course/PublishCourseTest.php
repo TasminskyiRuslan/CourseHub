@@ -45,7 +45,7 @@ describe('PublishCourseController', function () {
             patchJson(route('course.publish', $course))
                 ->assertUnauthorized();
             $course->refresh();
-            expect($course->is_published)->toBeFalse();
+            expect($course->isPublished())->toBeFalse();
         });
 
         it('fails if users without permissions tries to publish someone else\'s course', function ($user) {
@@ -58,7 +58,7 @@ describe('PublishCourseController', function () {
             patchJson(route('course.publish', $course))
                 ->assertForbidden();
             $course->refresh();
-            expect($course->is_published)->toBeFalse();
+            expect($course->isPublished())->toBeFalse();
         })->with([
             'student' => fn() => User::factory()->student()->create(),
             'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
@@ -76,7 +76,7 @@ describe('PublishCourseController', function () {
                 ->assertOk()
                 ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
             $course->refresh();
-            expect($course->is_published)->toBeTrue();
+            expect($course->isPublished())->toBeTrue();
         });
 
         it('allows users with permissions to publish any course', function () {
@@ -89,7 +89,7 @@ describe('PublishCourseController', function () {
                 ->assertOk()
                 ->assertJsonStructure(['data' => courseJsonStructure(withAuthor: true, withLessonsCount: true)]);
             $course->refresh();
-            expect($course->is_published)->toBeTrue();
+            expect($course->isPublished())->toBeTrue();
         });
     });
 

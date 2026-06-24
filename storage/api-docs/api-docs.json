@@ -16,14 +16,83 @@
         }
     ],
     "paths": {
-        "/auth/account": {
+        "/account/avatar": {
+            "post": {
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Update current user account avatar",
+                "description": "Update the current user account avatar.",
+                "operationId": "1313a9614f838ea86ea270eefea1274a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateAccountAvatarRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User account avatar updated successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Remove current user account avatar",
+                "description": "Remove the current user account avatar.",
+                "operationId": "f11dd21efafc9268075f1107301f2304",
+                "responses": {
+                    "204": {
+                        "description": "User account avatar deleted successfully."
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/account": {
             "get": {
                 "tags": [
-                    "Auth"
+                    "Account"
                 ],
                 "summary": "Retrieve current user account",
                 "description": "Retrieve the current user account.",
-                "operationId": "04807985bff60fb3723c2bdac7ec66ed",
+                "operationId": "0ef634622b8d641f5f7e48d6751f3af5",
                 "responses": {
                     "200": {
                         "description": "User account retrieved successfully.",
@@ -52,11 +121,11 @@
             },
             "patch": {
                 "tags": [
-                    "Auth"
+                    "Account"
                 ],
                 "summary": "Update current user account",
                 "description": "Update the current user account.",
-                "operationId": "99ba7dcdcccc1e3b0d1e53f7fbe9f6c8",
+                "operationId": "1247566df501a9e5b441e94b35de249a",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -97,62 +166,14 @@
                 ]
             }
         },
-        "/auth/account/image": {
+        "/account/login": {
             "post": {
                 "tags": [
-                    "Auth"
-                ],
-                "summary": "Update current user account image",
-                "description": "Update the current user account image.",
-                "operationId": "97274dfbf6fa088864b655a5682a2db7",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateUserAccountImageRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "User account image updated successfully.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/UserResponse"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "User is unauthenticated."
-                    },
-                    "422": {
-                        "description": "Validation error."
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/auth/login": {
-            "post": {
-                "tags": [
-                    "Auth"
+                    "Account"
                 ],
                 "summary": "Authenticate user",
                 "description": "Authenticate the user using email and password and issue an access token.",
-                "operationId": "8e026335d25c3df3f6f6cf1f683ac7b8",
+                "operationId": "e82f74d4e6b38ba5056e1621e60914d6",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -171,7 +192,7 @@
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/AuthResponse"
+                                            "$ref": "#/components/schemas/AccountResponse"
                                         }
                                     },
                                     "type": "object"
@@ -185,14 +206,14 @@
                 }
             }
         },
-        "/auth/tokens": {
+        "/account/tokens": {
             "delete": {
                 "tags": [
-                    "Auth"
+                    "Account"
                 ],
                 "summary": "Logout from all devices",
                 "description": "Revoke all access tokens for an authenticated user.",
-                "operationId": "16deaba51e77f3ea7aa0577ff38a4439",
+                "operationId": "852426a941a3c62a2c8066cb44eadb6f",
                 "responses": {
                     "204": {
                         "description": "User logged out successfully."
@@ -208,14 +229,14 @@
                 ]
             }
         },
-        "/auth/logout": {
+        "/account/token": {
             "delete": {
                 "tags": [
-                    "Auth"
+                    "Account"
                 ],
                 "summary": "Logout current device",
                 "description": "Revoke the current access token for an authenticated user.",
-                "operationId": "23a3ec5e2e8d20c9fd2ea568ae96fcd3",
+                "operationId": "9f759f951a40dc3cecdb5bc2002788ed",
                 "responses": {
                     "204": {
                         "description": "User logged out successfully."
@@ -231,14 +252,14 @@
                 ]
             }
         },
-        "/auth/register": {
+        "/account/register": {
             "post": {
                 "tags": [
-                    "Auth"
+                    "Account"
                 ],
                 "summary": "Register a new user",
                 "description": "Register a new user and issue an access token.",
-                "operationId": "8e69ddc577b1650c4a010f798dd6c9d3",
+                "operationId": "7706ebfcd4d4cceef756e46e74a0406a",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -257,7 +278,7 @@
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/AuthResponse"
+                                            "$ref": "#/components/schemas/AccountResponse"
                                         }
                                     },
                                     "type": "object"
@@ -271,14 +292,14 @@
                 }
             }
         },
-        "/auth/email/verification-notification": {
+        "/account/email/verification-notification": {
             "post": {
                 "tags": [
-                    "Auth"
+                    "Account"
                 ],
                 "summary": "Resend verification email",
                 "description": "Resend the email verification notification to the authenticated user.",
-                "operationId": "8b2718ed6f34f9ad7e84e68c3f20cb8d",
+                "operationId": "fa5c07f916c8a6a8b85850665995993b",
                 "responses": {
                     "204": {
                         "description": "Verification email sent successfully."
@@ -297,14 +318,14 @@
                 ]
             }
         },
-        "/auth/password/reset": {
+        "/account/password/reset": {
             "post": {
                 "tags": [
-                    "Auth"
+                    "Account"
                 ],
                 "summary": "Reset password",
                 "description": "Reset the user's password.",
-                "operationId": "033879051100699c9ba3a190913d20c5",
+                "operationId": "06e2a72c05ea806eb33e7ab5c32d58a8",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -325,14 +346,14 @@
                 }
             }
         },
-        "/auth/password/forgot": {
+        "/account/password/forgot": {
             "post": {
                 "tags": [
-                    "Auth"
+                    "Account"
                 ],
                 "summary": "Send password reset link",
                 "description": "Send an email with a link to reset the password.",
-                "operationId": "a6257242c1f3b4c342c2b1ed1cd79b71",
+                "operationId": "2acc598f399b1e3ad01ee83d6157547f",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -356,14 +377,14 @@
                 }
             }
         },
-        "/auth/email/verify/{id}/{hash}": {
+        "/account/email/verify/{id}/{hash}": {
             "get": {
                 "tags": [
-                    "Auth"
+                    "Account"
                 ],
                 "summary": "Verify email address",
                 "description": "Verify the user's email address.",
-                "operationId": "44b8c9b6e3feb78742765f001c607182",
+                "operationId": "18452ad6885bfebe298b53f6ff1e98d6",
                 "parameters": [
                     {
                         "name": "id",
@@ -1619,7 +1640,7 @@
                         "example": "john@example.com"
                     },
                     "password": {
-                        "description": "Account password of the user.",
+                        "description": "Password of the user.",
                         "type": "string",
                         "format": "password",
                         "example": "password123"
@@ -1703,7 +1724,7 @@
                         "example": "john@example.com"
                     },
                     "password": {
-                        "description": "Account password of the user.",
+                        "description": "Password of the user.",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
@@ -1741,15 +1762,15 @@
                 },
                 "type": "object"
             },
-            "UpdateUserAccountImageRequest": {
-                "title": "Update User Account Image Request",
-                "description": "Request payload for updating a user account image.",
+            "UpdateAccountAvatarRequest": {
+                "title": "Update Account Avatar Request",
+                "description": "Request payload for updating a user account avatar.",
                 "required": [
                     "image"
                 ],
                 "properties": {
                     "image": {
-                        "description": "Image of the user account.",
+                        "description": "Avatar of the user account.",
                         "type": "string",
                         "format": "binary"
                     },
@@ -1790,8 +1811,8 @@
                 },
                 "type": "object"
             },
-            "AuthResponse": {
-                "title": "Auth Response",
+            "AccountResponse": {
+                "title": "Account Response",
                 "description": "Data returned after user login or registration.",
                 "required": [
                     "user",
@@ -1955,6 +1976,13 @@
                         "description": "Slug of the user.",
                         "type": "string",
                         "example": "john-doe"
+                    },
+                    "avatar_url": {
+                        "description": "Avatar url of the user.",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "http://loclhost:8080/storage/users/user1.png",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -2572,8 +2600,8 @@
     },
     "tags": [
         {
-            "name": "Auth",
-            "description": "Auth"
+            "name": "Account",
+            "description": "Account"
         },
         {
             "name": "Course",

@@ -5,14 +5,14 @@ namespace App\Swagger\Account\Requests;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
-    schema: 'UpdateUserAccountImageRequest',
-    title: 'Update User Account Image Request',
-    description: 'Request payload for updating a user account image.',
+    schema: 'UpdateAccountAvatarRequest',
+    title: 'Update Account Avatar Request',
+    description: 'Request payload for updating a user account avatar.',
     required: ['image'],
     properties: [
         new OA\Property(
             property: 'image',
-            description: 'Image of the user account.',
+            description: 'Avatar of the user account.',
             type: 'string',
             format: 'binary'
         ),
@@ -27,7 +27,7 @@ use OpenApi\Attributes as OA;
     ],
     type: 'object'
 )]
-class UpdateUserAccountImageRequestSchema
+class UpdateAccountAvatarRequestSchema
 {
 
 }

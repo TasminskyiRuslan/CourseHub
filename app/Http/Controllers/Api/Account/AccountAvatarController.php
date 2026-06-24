@@ -18,21 +18,21 @@ class AccountAvatarController extends Controller
 {
     #[OA\Post(
         path: '/account/avatar',
-        description: 'Update the current user account image.',
-        summary: 'Update current user account image',
+        description: 'Update the current user account avatar.',
+        summary: 'Update current user account avatar',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\MediaType(
                 mediaType: 'multipart/form-data',
-                schema: new OA\Schema(ref: '#/components/schemas/UpdateUserAccountImageRequest')
+                schema: new OA\Schema(ref: '#/components/schemas/UpdateAccountAvatarRequest')
             )
         ),
         tags: ['Account'],
         responses: [
             new OA\Response(
                 response: SymfonyResponse::HTTP_OK,
-                description: 'User account image updated successfully.',
+                description: 'User account avatar updated successfully.',
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(
@@ -68,6 +68,23 @@ class AccountAvatarController extends Controller
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 
+    #[OA\Delete(
+        path: '/account/avatar',
+        description: 'Remove the current user account avatar.',
+        summary: 'Remove current user account avatar',
+        security: [['sanctum' => []]],
+        tags: ['Account'],
+        responses: [
+            new OA\Response(
+                response: SymfonyResponse::HTTP_NO_CONTENT,
+                description: 'User account avatar deleted successfully.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+                description: 'User is unauthenticated.'
+            )
+        ]
+    )]
     /**
      * Remove the current user account image.
      *

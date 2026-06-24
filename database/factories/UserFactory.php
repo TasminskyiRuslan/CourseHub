@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Models\User;
 use Hash;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -49,8 +50,12 @@ class UserFactory extends Factory
         return $this->afterCreating(function (User $user) {
             app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-            if ($user->roles->isEmpty()) {
-                $user->assignRole(UserRole::STUDENT->value);
+            if (!$user->roles()->exists()) {
+                $user->assignRole(Arr::random([
+                    UserRole::STUDENT->value,
+                    UserRole::TEACHER->value,
+                    UserRole::ADMIN->value,
+                ]));
             }
         });
     }

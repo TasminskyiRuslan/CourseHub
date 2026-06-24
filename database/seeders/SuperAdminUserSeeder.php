@@ -20,7 +20,7 @@ class SuperAdminUserSeeder extends Seeder
             ['email' => config('super-admin.email')],
             [
                 'name' => config('super-admin.name'),
-                'slug' => Str::slug(config('super-admin.name')),
+                'slug' => config('super-admin.slug'),
                 'password' => Hash::make(config('super-admin.password')),
                 'email_verified_at' => now(),
             ]

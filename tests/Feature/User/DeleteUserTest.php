@@ -109,5 +109,18 @@ describe('UserController -> destroy', function () {
                 'deleted_at' => null
             ]);
         });
+
+        it('fails if a super-admin tries to delete themselves', function () {
+            $superAdmin = User::whereEmail(config('super-admin.email'))->first();
+            Sanctum::actingAs($superAdmin);
+
+            deleteJson(route('user.destroy', $superAdmin))
+                ->assertUnprocessable();
+
+            $this->assertDatabaseHas('users', [
+                'email' => config('super-admin.email'),
+                'deleted_at' => null
+            ]);
+        });
     });
 })->group('user');

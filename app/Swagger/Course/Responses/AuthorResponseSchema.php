@@ -28,6 +28,14 @@ use OpenApi\Attributes as OA;
             type: 'string',
             example: 'john-doe'
         ),
+        new OA\Property(
+            property: 'avatar_url',
+            description: 'Avatar url of the user.',
+            type: 'string',
+            format: 'uri',
+            example: 'http://loclhost:8080/storage/users/user1.png',
+            nullable: true
+        )
     ],
     type: 'object'
 )]

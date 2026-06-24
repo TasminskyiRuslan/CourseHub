@@ -86,6 +86,17 @@ describe('BanUserController', function () {
             'super admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
         ]);
 
+        it('fails if a super-admin tries to ban their own user', function () {
+            $superAdmin = User::whereEmail(config('super-admin.email'))->first();
+            Sanctum::actingAs($superAdmin);
+
+            patchJson(route('user.ban', $superAdmin))
+                ->assertUnprocessable();
+
+            $superAdmin->refresh();
+            expect($superAdmin->isBanned())->toBeFalse();
+        });
+
         it('allows users with permissions to ban any user', function ($targetUser) {
             Notification::fake();
 

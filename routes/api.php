@@ -1,16 +1,15 @@
 <?php
 
-use App\Http\Controllers\Api\Auth\AccountController;
-use App\Http\Controllers\Api\Auth\AccountImageController;
-use App\Http\Controllers\Api\Auth\SendPasswordResetEmailController;
-use App\Http\Controllers\Api\Auth\LoginController;
-use App\Http\Controllers\Api\Auth\LogoutAllController;
-use App\Http\Controllers\Api\Auth\LogoutController;
-use App\Http\Controllers\Api\Auth\MeController;
-use App\Http\Controllers\Api\Auth\RegisterController;
-use App\Http\Controllers\Api\Auth\ResendVerificationEmailController;
-use App\Http\Controllers\Api\Auth\ResetPasswordController;
-use App\Http\Controllers\Api\Auth\VerifyEmailController;
+use App\Http\Controllers\Api\Account\AccountController;
+use App\Http\Controllers\Api\Account\AccountAvatarController;
+use App\Http\Controllers\Api\Account\SendPasswordResetEmailController;
+use App\Http\Controllers\Api\Account\LoginController;
+use App\Http\Controllers\Api\Account\LogoutAllController;
+use App\Http\Controllers\Api\Account\LogoutController;
+use App\Http\Controllers\Api\Account\RegisterController;
+use App\Http\Controllers\Api\Account\ResendVerificationEmailController;
+use App\Http\Controllers\Api\Account\ResetPasswordController;
+use App\Http\Controllers\Api\Account\VerifyEmailController;
 use App\Http\Controllers\Api\Course\CourseController;
 use App\Http\Controllers\Api\Course\CourseImageController;
 use App\Http\Controllers\Api\Course\PublishCourseController;
@@ -24,61 +23,66 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Authentication actions
+| Account actions
 |--------------------------------------------------------------------------
 */
-Route::prefix('auth')->group(function () {
+Route::prefix('account')->group(function () {
     // Register action
     Route::post('/register', RegisterController::class)
-        ->name('auth.register');
+        ->name('account.register');
 
     // Login action
     Route::post('/login', LoginController::class)
-        ->name('auth.login');
+        ->name('account.login');
 
     // Show account action
-    Route::get('/account', [AccountController::class, 'show'])
+    Route::get('/', [AccountController::class, 'show'])
         ->middleware('auth:sanctum')
-        ->name('auth.account.show');
+        ->name('account.show');
 
     // Update account action
-    Route::patch('/account', [AccountController::class, 'update'])
+    Route::patch('/', [AccountController::class, 'update'])
         ->middleware(['auth:sanctum', 'restrict.banned.user'])
-        ->name('auth.account.update');
+        ->name('account.update');
 
-    // Update account image action
-    Route::put('/account/image', [AccountImageController::class, 'update'])
+    // Update account avatar action
+    Route::put('/avatar', [AccountAvatarController::class, 'update'])
         ->middleware(['auth:sanctum', 'restrict.banned.user'])
-        ->name('auth.account.image.update');
+        ->name('account.avatar.update');
+
+    // Delete account avatar action
+    Route::delete('/avatar', [AccountAvatarController::class, 'destroy'])
+        ->middleware(['auth:sanctum', 'restrict.banned.user'])
+        ->name('account.avatar.destroy');
 
     // Logout action
-    Route::delete('/logout', LogoutController::class)
+    Route::delete('/token', LogoutController::class)
         ->middleware('auth:sanctum')
-        ->name('auth.logout');
+        ->name('account.token.destroy');
 
     // Logout all action
-    Route::delete('/logout/all', LogoutAllController::class)
+    Route::delete('/tokens', LogoutAllController::class)
         ->middleware('auth:sanctum')
-        ->name('auth.logout.all');
+        ->name('account.tokens.destroy');
 
     // Send password reset email action
     Route::post('/password/forgot', SendPasswordResetEmailController::class)
         ->middleware('throttle:5,1')
-        ->name('auth.password.forgot');
+        ->name('account.password.forgot');
 
     // Reset password action
     Route::post('/password/reset', ResetPasswordController::class)
-        ->name('auth.password.reset');
+        ->name('account.password.reset');
 
     // Verify email actions
     Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)
         ->middleware(['signed', 'throttle:6,1'])
-        ->name('auth.verification.verify');
+        ->name('account.verification.verify');
 
     // Resend verification email action
     Route::post('/email/verification-notification', ResendVerificationEmailController::class)
         ->middleware(['auth:sanctum', 'throttle:6,1'])
-        ->name('auth.verification.resend');
+        ->name('account.verification.resend');
 });
 
 /*

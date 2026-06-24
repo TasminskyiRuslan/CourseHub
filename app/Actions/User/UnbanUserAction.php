@@ -4,6 +4,7 @@ namespace App\Actions\User;
 
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class UnbanUserAction
 {
@@ -12,7 +13,7 @@ class UnbanUserAction
      *
      * @param User $user
      * @return void
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function handle(User $user): void
     {

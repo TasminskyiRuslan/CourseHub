@@ -113,6 +113,17 @@ describe('UserRoleController -> update', function () {
                 ->assertForbidden();
         });
 
+        it('fails if a super-admin tries to update their own role', function () {
+            $superAdmin = User::whereEmail(config('super-admin.email'))->first();
+            Sanctum::actingAs($superAdmin);
+
+            putJson(route('user.role.update', $superAdmin), ['role' => UserRole::TEACHER->value])
+                ->assertUnprocessable();
+
+            $superAdmin->refresh();
+            expect($superAdmin->hasRole(UserRole::SUPER_ADMIN))->toBeTrue();
+        });
+
         it('allows an admin to update a user\'s role', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);

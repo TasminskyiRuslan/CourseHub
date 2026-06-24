@@ -15,6 +15,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Super Admin Slug
+    |--------------------------------------------------------------------------
+    |
+    | This value is the unique slug of the system's root user. This slug will
+    | be assigned to the super admin account during the database seeding
+    | process if the user does not already exist.
+    |
+    */
+    'slug' => env('SUPER_ADMIN_SLUG', 'super-admin'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Super Admin Email Address
     |--------------------------------------------------------------------------
     |

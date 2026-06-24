@@ -77,7 +77,7 @@ function userJsonStructure(): array {
  *
  * @return array
  */
-function authJsonStructure(): array {
+function accountJsonStructure(): array {
     return [
         'user' => userJsonStructure(),
         'access_token',

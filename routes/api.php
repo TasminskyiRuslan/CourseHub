@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\Course\BanCourseController;
 use App\Http\Controllers\Api\Course\CourseController;
 use App\Http\Controllers\Api\Course\CourseImageController;
 use App\Http\Controllers\Api\Course\PublishCourseController;
+use App\Http\Controllers\Api\Course\UnbanCourseController;
 use App\Http\Controllers\Api\Course\UnpublishCourseController;
 use App\Http\Controllers\Api\Lesson\LessonController;
 use App\Http\Controllers\Api\User\BanUserController;
@@ -139,6 +140,11 @@ Route::prefix('courses')->group(function () {
     Route::patch('/{course}/ban', BanCourseController::class)
         ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
         ->name('course.ban');
+
+    // Unban user action
+    Route::patch('/{course}/unban', UnbanCourseController::class)
+        ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
+        ->name('course.unban');
 
     Route::prefix('/{course}/lessons')->group(function () {
         // Get course lessons list action

@@ -440,6 +440,47 @@
                 }
             }
         },
+        "/courses/{course}/ban": {
+            "patch": {
+                "tags": [
+                    "Course"
+                ],
+                "summary": "Ban a course",
+                "description": "Ban the specified course.",
+                "operationId": "37c2d4a9398153cc1bc47de04f7df9cd",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Course banned successfully."
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course not found."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/courses": {
             "get": {
                 "tags": [
@@ -2071,6 +2112,20 @@
                         "example": 10,
                         "nullable": true
                     },
+                    "published_at": {
+                        "description": "Publishing time of the course.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-25T12:00:00Z",
+                        "nullable": true
+                    },
+                    "banned_at": {
+                        "description": "Banning time of the course.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": null,
+                        "nullable": true
+                    },
                     "created_at": {
                         "description": "Creation time of the course.",
                         "type": "string",
@@ -2555,7 +2610,7 @@
                         "description": "Banning time of the user.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2026-01-01T12:00:00Z",
+                        "example": null,
                         "nullable": true
                     },
                     "avatar_url": {

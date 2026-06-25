@@ -6,6 +6,7 @@ use App\Enums\UserPermission;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 
 class LessonPolicy
 {
@@ -18,19 +19,7 @@ class LessonPolicy
      */
     public function viewAny(?User $user, Course $course): bool
     {
-        if ($user?->hasPermissionTo(UserPermission::COURSE_VIEW_ANY_UNPUBLISHED->value)) {
-            return true;
-        }
-
-        if ($course->author->isBanned()) {
-            return false;
-        }
-
-        if ($course->isBanned()) {
-            return $user?->is($course->author);
-        }
-
-        return $course->isPublished() || $user?->is($course->author);
+        return Gate::allows('view', $course);
     }
 
     /**
@@ -42,19 +31,7 @@ class LessonPolicy
      */
     public function view(?User $user, Lesson $lesson): bool
     {
-        if ($user?->hasPermissionTo(UserPermission::COURSE_VIEW_ANY_UNPUBLISHED->value)) {
-            return true;
-        }
-
-        if ($lesson->course->author->isBanned()) {
-            return false;
-        }
-
-        if ($lesson->course->isBanned()) {
-            return $user?->is($lesson->course->author);
-        }
-
-        return $lesson->course->isPublished() || $user?->is($lesson->course->author);
+        return Gate::allows('view', $lesson->course);
     }
 
     /**

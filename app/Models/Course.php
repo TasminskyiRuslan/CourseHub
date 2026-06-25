@@ -6,6 +6,7 @@ use App\Enums\CourseType;
 use App\Enums\UserPermission;
 use App\Enums\UserRole;
 use App\Notifications\Course\CourseBannedNotification;
+use App\Notifications\Course\CourseUnbannedNotification;
 use App\Observers\Course\CourseObserver;
 use Database\Factories\CourseFactory;
 use Eloquent;
@@ -136,6 +137,16 @@ class Course extends Model
     public function sendBanNotification(): void
     {
         $this->author->notify(new CourseBannedNotification($this));
+    }
+
+    /**
+     * Send course unbanned notification.
+     *
+     * @return void
+     */
+    public function sendUnbanNotification(): void
+    {
+        $this->author->notify(new CourseUnbannedNotification($this));
     }
 
     /**

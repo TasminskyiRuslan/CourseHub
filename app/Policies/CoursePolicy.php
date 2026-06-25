@@ -38,10 +38,10 @@ class CoursePolicy
         }
 
         if ($course->isBanned()) {
-            return $user?->is($course->author);
+            return $user?->is($course->author) ?? false;
         }
 
-        return $course->isPublished() || $user?->is($course->author);
+        return $course->isPublished() || ($user && $user->is($course->author));
     }
 
     /**

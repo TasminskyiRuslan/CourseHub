@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\Account\RegisterController;
 use App\Http\Controllers\Api\Account\ResendVerificationEmailController;
 use App\Http\Controllers\Api\Account\ResetPasswordController;
 use App\Http\Controllers\Api\Account\VerifyEmailController;
+use App\Http\Controllers\Api\Course\BanCourseController;
 use App\Http\Controllers\Api\Course\CourseController;
 use App\Http\Controllers\Api\Course\CourseImageController;
 use App\Http\Controllers\Api\Course\PublishCourseController;
@@ -133,6 +134,11 @@ Route::prefix('courses')->group(function () {
     Route::patch('/{course}/unpublish', UnpublishCourseController::class)
         ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
         ->name('course.unpublish');
+
+    // Ban user action
+    Route::patch('/{course}/ban', BanCourseController::class)
+        ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
+        ->name('course.ban');
 
     Route::prefix('/{course}/lessons')->group(function () {
         // Get course lessons list action

@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Notifications\VerifyEmailNotification;
+use App\Notifications\Account\VerifyEmailNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\Middleware\ThrottleRequests;

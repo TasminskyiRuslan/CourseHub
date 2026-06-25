@@ -32,12 +32,12 @@ class LoginUserAction
         $user = User::whereEmail($userData->email)->first();
         if (!$user || !Hash::check($userData->password, $user->password)) {
             throw ValidationException::withMessages([
-                'email' => [__('auth.failed')],
+                'email' => [__('account.failed')],
             ]);
         }
 
         $accessTokenData = $this->issueAccessTokenAction->handle($user, $userData->remember);
-        event(new Login(config('auth.defaults.guard'), $user, $userData->remember));
+        event(new Login(config('account.defaults.guard'), $user, $userData->remember));
         return new AccountData(
             user: $user,
             accessToken: $accessTokenData->plainTextToken,

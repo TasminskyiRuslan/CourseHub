@@ -9,6 +9,8 @@ enum UserPermission: string
     case COURSE_CREATE = 'course:create';
     case COURSE_DELETE_ANY = 'course:delete-any';
     case COURSE_UNPUBLISH_ANY = 'course:unpublish-any';
+    case COURSE_BAN_ANY = 'course:ban-any';
+    case COURSE_UNBAN_ANY = 'course:unban-any';
 
     // Lesson
     case LESSON_CREATE = 'lesson:create';

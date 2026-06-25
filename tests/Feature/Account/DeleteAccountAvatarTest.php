@@ -60,4 +60,4 @@ describe('AccountAvatarController -> destroy', function () {
                 ->assertUnprocessable();
         });
     });
-})->group('auth');
+})->group('account');

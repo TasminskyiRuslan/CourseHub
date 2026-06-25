@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\Account;
 
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Bus\Queueable;
@@ -47,8 +47,9 @@ class VerifyEmailNotification extends VerifyEmail implements ShouldQueue
 
         return (new MailMessage)
             ->subject('Verify Your Email Address')
-            ->markdown('emails.auth.verify', [
+            ->markdown('emails.account.verify', [
                 'url' => $url,
+                'user' => $notifiable,
             ]);
     }
 
@@ -65,8 +66,8 @@ class VerifyEmailNotification extends VerifyEmail implements ShouldQueue
         }
 
         return URL::temporarySignedRoute(
-            'auth.verification.verify',
-            Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
+            'account.verification.verify',
+            Carbon::now()->addMinutes(Config::get('account.verification.expire', 60)),
             [
                 'id' => $notifiable->getKey(),
                 'hash' => sha1($notifiable->getEmailForVerification()),

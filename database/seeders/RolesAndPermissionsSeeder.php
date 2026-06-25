@@ -38,6 +38,8 @@ class RolesAndPermissionsSeeder extends Seeder
             UserPermission::COURSE_VIEW_ANY_UNPUBLISHED->value,
             UserPermission::COURSE_DELETE_ANY->value,
             UserPermission::COURSE_UNPUBLISH_ANY->value,
+            UserPermission::COURSE_BAN_ANY->value,
+            UserPermission::COURSE_UNBAN_ANY->value,
 
             UserPermission::LESSON_DELETE_ANY->value,
 

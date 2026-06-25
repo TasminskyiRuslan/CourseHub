@@ -28,9 +28,9 @@ namespace PHPSTORM_META {
             'Illuminate\Routing\Contracts\ControllerDispatcher' => \Illuminate\Routing\ControllerDispatcher::class,
             'Spatie\Permission\Contracts\Permission' => \Spatie\Permission\Models\Permission::class,
             'Spatie\Permission\Contracts\Role' => \Spatie\Permission\Models\Role::class,
-            'auth' => \Illuminate\Auth\AuthManager::class,
-            'auth.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
-            'auth.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
+            'account' => \Illuminate\Auth\AuthManager::class,
+            'account.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
+            'account.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
             'blade.compiler' => \Illuminate\View\Compilers\BladeCompiler::class,
             'cache' => \Illuminate\Cache\CacheManager::class,
             'cache.store' => \Illuminate\Cache\Repository::class,
@@ -93,9 +93,9 @@ namespace PHPSTORM_META {
             'Illuminate\Routing\Contracts\ControllerDispatcher' => \Illuminate\Routing\ControllerDispatcher::class,
             'Spatie\Permission\Contracts\Permission' => \Spatie\Permission\Models\Permission::class,
             'Spatie\Permission\Contracts\Role' => \Spatie\Permission\Models\Role::class,
-            'auth' => \Illuminate\Auth\AuthManager::class,
-            'auth.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
-            'auth.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
+            'account' => \Illuminate\Auth\AuthManager::class,
+            'account.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
+            'account.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
             'blade.compiler' => \Illuminate\View\Compilers\BladeCompiler::class,
             'cache' => \Illuminate\Cache\CacheManager::class,
             'cache.store' => \Illuminate\Cache\Repository::class,
@@ -158,9 +158,9 @@ namespace PHPSTORM_META {
             'Illuminate\Routing\Contracts\ControllerDispatcher' => \Illuminate\Routing\ControllerDispatcher::class,
             'Spatie\Permission\Contracts\Permission' => \Spatie\Permission\Models\Permission::class,
             'Spatie\Permission\Contracts\Role' => \Spatie\Permission\Models\Role::class,
-            'auth' => \Illuminate\Auth\AuthManager::class,
-            'auth.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
-            'auth.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
+            'account' => \Illuminate\Auth\AuthManager::class,
+            'account.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
+            'account.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
             'blade.compiler' => \Illuminate\View\Compilers\BladeCompiler::class,
             'cache' => \Illuminate\Cache\CacheManager::class,
             'cache.store' => \Illuminate\Cache\Repository::class,
@@ -223,9 +223,9 @@ namespace PHPSTORM_META {
             'Illuminate\Routing\Contracts\ControllerDispatcher' => \Illuminate\Routing\ControllerDispatcher::class,
             'Spatie\Permission\Contracts\Permission' => \Spatie\Permission\Models\Permission::class,
             'Spatie\Permission\Contracts\Role' => \Spatie\Permission\Models\Role::class,
-            'auth' => \Illuminate\Auth\AuthManager::class,
-            'auth.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
-            'auth.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
+            'account' => \Illuminate\Auth\AuthManager::class,
+            'account.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
+            'account.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
             'blade.compiler' => \Illuminate\View\Compilers\BladeCompiler::class,
             'cache' => \Illuminate\Cache\CacheManager::class,
             'cache.store' => \Illuminate\Cache\Repository::class,
@@ -288,9 +288,9 @@ namespace PHPSTORM_META {
             'Illuminate\Routing\Contracts\ControllerDispatcher' => \Illuminate\Routing\ControllerDispatcher::class,
             'Spatie\Permission\Contracts\Permission' => \Spatie\Permission\Models\Permission::class,
             'Spatie\Permission\Contracts\Role' => \Spatie\Permission\Models\Role::class,
-            'auth' => \Illuminate\Auth\AuthManager::class,
-            'auth.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
-            'auth.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
+            'account' => \Illuminate\Auth\AuthManager::class,
+            'account.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
+            'account.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
             'blade.compiler' => \Illuminate\View\Compilers\BladeCompiler::class,
             'cache' => \Illuminate\Cache\CacheManager::class,
             'cache.store' => \Illuminate\Cache\Repository::class,
@@ -353,9 +353,9 @@ namespace PHPSTORM_META {
             'Illuminate\Routing\Contracts\ControllerDispatcher' => \Illuminate\Routing\ControllerDispatcher::class,
             'Spatie\Permission\Contracts\Permission' => \Spatie\Permission\Models\Permission::class,
             'Spatie\Permission\Contracts\Role' => \Spatie\Permission\Models\Role::class,
-            'auth' => \Illuminate\Auth\AuthManager::class,
-            'auth.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
-            'auth.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
+            'account' => \Illuminate\Auth\AuthManager::class,
+            'account.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
+            'account.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
             'blade.compiler' => \Illuminate\View\Compilers\BladeCompiler::class,
             'cache' => \Illuminate\Cache\CacheManager::class,
             'cache.store' => \Illuminate\Cache\Repository::class,
@@ -418,9 +418,9 @@ namespace PHPSTORM_META {
             'Illuminate\Routing\Contracts\ControllerDispatcher' => \Illuminate\Routing\ControllerDispatcher::class,
             'Spatie\Permission\Contracts\Permission' => \Spatie\Permission\Models\Permission::class,
             'Spatie\Permission\Contracts\Role' => \Spatie\Permission\Models\Role::class,
-            'auth' => \Illuminate\Auth\AuthManager::class,
-            'auth.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
-            'auth.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
+            'account' => \Illuminate\Auth\AuthManager::class,
+            'account.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
+            'account.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
             'blade.compiler' => \Illuminate\View\Compilers\BladeCompiler::class,
             'cache' => \Illuminate\Cache\CacheManager::class,
             'cache.store' => \Illuminate\Cache\Repository::class,
@@ -483,9 +483,9 @@ namespace PHPSTORM_META {
             'Illuminate\Routing\Contracts\ControllerDispatcher' => \Illuminate\Routing\ControllerDispatcher::class,
             'Spatie\Permission\Contracts\Permission' => \Spatie\Permission\Models\Permission::class,
             'Spatie\Permission\Contracts\Role' => \Spatie\Permission\Models\Role::class,
-            'auth' => \Illuminate\Auth\AuthManager::class,
-            'auth.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
-            'auth.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
+            'account' => \Illuminate\Auth\AuthManager::class,
+            'account.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
+            'account.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
             'blade.compiler' => \Illuminate\View\Compilers\BladeCompiler::class,
             'cache' => \Illuminate\Cache\CacheManager::class,
             'cache.store' => \Illuminate\Cache\Repository::class,
@@ -548,9 +548,9 @@ namespace PHPSTORM_META {
             'Illuminate\Routing\Contracts\ControllerDispatcher' => \Illuminate\Routing\ControllerDispatcher::class,
             'Spatie\Permission\Contracts\Permission' => \Spatie\Permission\Models\Permission::class,
             'Spatie\Permission\Contracts\Role' => \Spatie\Permission\Models\Role::class,
-            'auth' => \Illuminate\Auth\AuthManager::class,
-            'auth.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
-            'auth.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
+            'account' => \Illuminate\Auth\AuthManager::class,
+            'account.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
+            'account.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
             'blade.compiler' => \Illuminate\View\Compilers\BladeCompiler::class,
             'cache' => \Illuminate\Cache\CacheManager::class,
             'cache.store' => \Illuminate\Cache\Repository::class,
@@ -613,9 +613,9 @@ namespace PHPSTORM_META {
             'Illuminate\Routing\Contracts\ControllerDispatcher' => \Illuminate\Routing\ControllerDispatcher::class,
             'Spatie\Permission\Contracts\Permission' => \Spatie\Permission\Models\Permission::class,
             'Spatie\Permission\Contracts\Role' => \Spatie\Permission\Models\Role::class,
-            'auth' => \Illuminate\Auth\AuthManager::class,
-            'auth.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
-            'auth.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
+            'account' => \Illuminate\Auth\AuthManager::class,
+            'account.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
+            'account.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
             'blade.compiler' => \Illuminate\View\Compilers\BladeCompiler::class,
             'cache' => \Illuminate\Cache\CacheManager::class,
             'cache.store' => \Illuminate\Cache\Repository::class,
@@ -678,9 +678,9 @@ namespace PHPSTORM_META {
             'Illuminate\Routing\Contracts\ControllerDispatcher' => \Illuminate\Routing\ControllerDispatcher::class,
             'Spatie\Permission\Contracts\Permission' => \Spatie\Permission\Models\Permission::class,
             'Spatie\Permission\Contracts\Role' => \Spatie\Permission\Models\Role::class,
-            'auth' => \Illuminate\Auth\AuthManager::class,
-            'auth.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
-            'auth.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
+            'account' => \Illuminate\Auth\AuthManager::class,
+            'account.password' => \Illuminate\Auth\Passwords\PasswordBrokerManager::class,
+            'account.password.broker' => \Illuminate\Auth\Passwords\PasswordBroker::class,
             'blade.compiler' => \Illuminate\View\Compilers\BladeCompiler::class,
             'cache' => \Illuminate\Cache\CacheManager::class,
             'cache.store' => \Illuminate\Cache\Repository::class,
@@ -854,21 +854,21 @@ namespace PHPSTORM_META {
             'app.aliases.Validator' => 'string',
             'app.aliases.View' => 'string',
             'app.aliases.Vite' => 'string',
-            'auth.defaults.guard' => 'string',
-            'auth.defaults.passwords' => 'string',
-            'auth.guards.web.driver' => 'string',
-            'auth.guards.web.provider' => 'string',
-            'auth.guards.api.driver' => 'string',
-            'auth.guards.api.provider' => 'string',
-            'auth.guards.sanctum.driver' => 'string',
-            'auth.guards.sanctum.provider' => 'NULL',
-            'auth.providers.users.driver' => 'string',
-            'auth.providers.users.model' => 'string',
-            'auth.passwords.users.provider' => 'string',
-            'auth.passwords.users.table' => 'string',
-            'auth.passwords.users.expire' => 'integer',
-            'auth.passwords.users.throttle' => 'integer',
-            'auth.password_timeout' => 'integer',
+            'account.defaults.guard' => 'string',
+            'account.defaults.passwords' => 'string',
+            'account.guards.web.driver' => 'string',
+            'account.guards.web.provider' => 'string',
+            'account.guards.api.driver' => 'string',
+            'account.guards.api.provider' => 'string',
+            'account.guards.sanctum.driver' => 'string',
+            'account.guards.sanctum.provider' => 'NULL',
+            'account.providers.users.driver' => 'string',
+            'account.providers.users.model' => 'string',
+            'account.passwords.users.provider' => 'string',
+            'account.passwords.users.table' => 'string',
+            'account.passwords.users.expire' => 'integer',
+            'account.passwords.users.throttle' => 'integer',
+            'account.password_timeout' => 'integer',
             'cache.default' => 'string',
             'cache.stores.array.driver' => 'string',
             'cache.stores.array.serialize' => 'boolean',
@@ -1439,21 +1439,21 @@ namespace PHPSTORM_META {
             'app.aliases.Validator' => 'string',
             'app.aliases.View' => 'string',
             'app.aliases.Vite' => 'string',
-            'auth.defaults.guard' => 'string',
-            'auth.defaults.passwords' => 'string',
-            'auth.guards.web.driver' => 'string',
-            'auth.guards.web.provider' => 'string',
-            'auth.guards.api.driver' => 'string',
-            'auth.guards.api.provider' => 'string',
-            'auth.guards.sanctum.driver' => 'string',
-            'auth.guards.sanctum.provider' => 'NULL',
-            'auth.providers.users.driver' => 'string',
-            'auth.providers.users.model' => 'string',
-            'auth.passwords.users.provider' => 'string',
-            'auth.passwords.users.table' => 'string',
-            'auth.passwords.users.expire' => 'integer',
-            'auth.passwords.users.throttle' => 'integer',
-            'auth.password_timeout' => 'integer',
+            'account.defaults.guard' => 'string',
+            'account.defaults.passwords' => 'string',
+            'account.guards.web.driver' => 'string',
+            'account.guards.web.provider' => 'string',
+            'account.guards.api.driver' => 'string',
+            'account.guards.api.provider' => 'string',
+            'account.guards.sanctum.driver' => 'string',
+            'account.guards.sanctum.provider' => 'NULL',
+            'account.providers.users.driver' => 'string',
+            'account.providers.users.model' => 'string',
+            'account.passwords.users.provider' => 'string',
+            'account.passwords.users.table' => 'string',
+            'account.passwords.users.expire' => 'integer',
+            'account.passwords.users.throttle' => 'integer',
+            'account.password_timeout' => 'integer',
             'cache.default' => 'string',
             'cache.stores.array.driver' => 'string',
             'cache.stores.array.serialize' => 'boolean',
@@ -2024,21 +2024,21 @@ namespace PHPSTORM_META {
             'app.aliases.Validator' => 'string',
             'app.aliases.View' => 'string',
             'app.aliases.Vite' => 'string',
-            'auth.defaults.guard' => 'string',
-            'auth.defaults.passwords' => 'string',
-            'auth.guards.web.driver' => 'string',
-            'auth.guards.web.provider' => 'string',
-            'auth.guards.api.driver' => 'string',
-            'auth.guards.api.provider' => 'string',
-            'auth.guards.sanctum.driver' => 'string',
-            'auth.guards.sanctum.provider' => 'NULL',
-            'auth.providers.users.driver' => 'string',
-            'auth.providers.users.model' => 'string',
-            'auth.passwords.users.provider' => 'string',
-            'auth.passwords.users.table' => 'string',
-            'auth.passwords.users.expire' => 'integer',
-            'auth.passwords.users.throttle' => 'integer',
-            'auth.password_timeout' => 'integer',
+            'account.defaults.guard' => 'string',
+            'account.defaults.passwords' => 'string',
+            'account.guards.web.driver' => 'string',
+            'account.guards.web.provider' => 'string',
+            'account.guards.api.driver' => 'string',
+            'account.guards.api.provider' => 'string',
+            'account.guards.sanctum.driver' => 'string',
+            'account.guards.sanctum.provider' => 'NULL',
+            'account.providers.users.driver' => 'string',
+            'account.providers.users.model' => 'string',
+            'account.passwords.users.provider' => 'string',
+            'account.passwords.users.table' => 'string',
+            'account.passwords.users.expire' => 'integer',
+            'account.passwords.users.throttle' => 'integer',
+            'account.password_timeout' => 'integer',
             'cache.default' => 'string',
             'cache.stores.array.driver' => 'string',
             'cache.stores.array.serialize' => 'boolean',
@@ -2537,8 +2537,8 @@ namespace PHPSTORM_META {
     override(\tap(0), type(0));
     override(\optional(0), type(0));
 
-            registerArgumentsSet('auth', );
-        registerArgumentsSet('configs', 
+            registerArgumentsSet('account', );
+        registerArgumentsSet('configs',
 'concurrency.default','view.paths','view.compiled','hashing.driver','hashing.bcrypt.rounds',
 'hashing.bcrypt.verify','hashing.bcrypt.limit','hashing.argon.memory','hashing.argon.threads','hashing.argon.time',
 'hashing.argon.verify','hashing.rehash_on_login','broadcasting.default','broadcasting.connections.reverb.driver','broadcasting.connections.reverb.key',
@@ -2560,10 +2560,10 @@ namespace PHPSTORM_META {
 'app.aliases.Process','app.aliases.Queue','app.aliases.RateLimiter','app.aliases.Redirect','app.aliases.Request',
 'app.aliases.Response','app.aliases.Route','app.aliases.Schedule','app.aliases.Schema','app.aliases.Session',
 'app.aliases.Storage','app.aliases.Str','app.aliases.Uri','app.aliases.URL','app.aliases.Validator',
-'app.aliases.View','app.aliases.Vite','auth.defaults.guard','auth.defaults.passwords','auth.guards.web.driver',
-'auth.guards.web.provider','auth.guards.api.driver','auth.guards.api.provider','auth.guards.sanctum.driver','auth.guards.sanctum.provider',
-'auth.providers.users.driver','auth.providers.users.model','auth.passwords.users.provider','auth.passwords.users.table','auth.passwords.users.expire',
-'auth.passwords.users.throttle','auth.password_timeout','cache.default','cache.stores.array.driver','cache.stores.array.serialize',
+'app.aliases.View','app.aliases.Vite','account.defaults.guard','account.defaults.passwords','account.guards.web.driver',
+'account.guards.web.provider','account.guards.api.driver','account.guards.api.provider','account.guards.sanctum.driver','account.guards.sanctum.provider',
+'account.providers.users.driver','account.providers.users.model','account.passwords.users.provider','account.passwords.users.table','account.passwords.users.expire',
+'account.passwords.users.throttle','account.password_timeout','cache.default','cache.stores.array.driver','cache.stores.array.serialize',
 'cache.stores.session.driver','cache.stores.session.key','cache.stores.database.driver','cache.stores.database.connection','cache.stores.database.table',
 'cache.stores.database.lock_connection','cache.stores.database.lock_table','cache.stores.file.driver','cache.stores.file.path','cache.stores.file.lock_path',
 'cache.stores.memcached.driver','cache.stores.memcached.persistent_id','cache.stores.memcached.sasl','cache.stores.memcached.options','cache.stores.memcached.servers.0.host',
@@ -2656,11 +2656,11 @@ namespace PHPSTORM_META {
 'ide-helper.type_overrides.boolean','ide-helper.include_class_docblocks','ide-helper.force_fqn','ide-helper.use_generics_annotations','ide-helper.macro_default_return_types.Illuminate\\Http\\Client\\Factory',
 'ide-helper.additional_relation_types','ide-helper.additional_relation_return_types','ide-helper.enforce_nullable_relationships','ide-helper.soft_deletes_force_nullable','ide-helper.post_migrate',
 'tinker.commands','tinker.alias','tinker.dont_alias',);
-        registerArgumentsSet('middleware', 
-'web','api','auth','auth.basic','auth.session',
+        registerArgumentsSet('middleware',
+'web','api','account','account.basic','account.session',
 'cache.headers','can','guest','password.confirm','precognitive',
 'signed','throttle','verified','restrict.banned.user',);
-        registerArgumentsSet('routes', 
+        registerArgumentsSet('routes',
 'l5-swagger.default.api','l5-swagger.default.docs','l5-swagger.default.asset','l5-swagger.default.oauth2_callback','boost.browser-logs',
 'sanctum.csrf-cookie','account.register','account.login','account.show','account.update',
 'account.avatar.update','account.avatar.destroy','account.token.destroy','account.tokens.destroy','account.password.forgot',
@@ -2670,8 +2670,8 @@ namespace PHPSTORM_META {
 'course.lesson.update','course.lesson.destroy','user.index','user.show','user.destroy',
 'user.role.update','user.ban','user.unban',
 'storage.local',);
-        registerArgumentsSet('views', 
-'emails.auth.reset','emails.auth.verify','emails.user.ban','emails.user.unban','l5-swagger::index',
+        registerArgumentsSet('views',
+'emails.account.reset','emails.account.verify','emails.user.ban','emails.user.unban','l5-swagger::index',
 'vendor.l5-swagger.index','welcome','l5-swagger::index','laravel-exceptions-renderer::components.badge','laravel-exceptions-renderer::components.empty-state',
 'laravel-exceptions-renderer::components.file-with-line','laravel-exceptions-renderer::components.formatted-source','laravel-exceptions-renderer::components.frame','laravel-exceptions-renderer::components.frame-code','laravel-exceptions-renderer::components.header',
 'laravel-exceptions-renderer::components.http-method','laravel-exceptions-renderer::components.icons.alert','laravel-exceptions-renderer::components.icons.check','laravel-exceptions-renderer::components.icons.chevron-left','laravel-exceptions-renderer::components.icons.chevron-right',
@@ -2685,8 +2685,8 @@ namespace PHPSTORM_META {
 'laravel-exceptions::503','laravel-exceptions::layout','laravel-exceptions::minimal','notifications::email','pagination::bootstrap-4',
 'pagination::bootstrap-5','pagination::default','pagination::semantic-ui','pagination::simple-bootstrap-4','pagination::simple-bootstrap-5',
 'pagination::simple-default','pagination::simple-tailwind','pagination::tailwind',);
-        registerArgumentsSet('translations', 
-'auth.failed','auth.password','auth.throttle','pagination.previous','pagination.next',
+        registerArgumentsSet('translations',
+'account.failed','account.password','account.throttle','pagination.previous','pagination.next',
 'passwords.reset','passwords.sent','passwords.throttled','passwords.token','passwords.user',
 'validation.accepted','validation.accepted_if','validation.active_url','validation.after','validation.after_or_equal',
 'validation.alpha','validation.alpha_dash','validation.alpha_num','validation.any_of','validation.array',
@@ -2715,8 +2715,8 @@ namespace PHPSTORM_META {
 'validation.required_without_all','validation.same','validation.size.array','validation.size.file','validation.size.numeric',
 'validation.size.string','validation.starts_with','validation.string','validation.timezone','validation.unique',
 'validation.uploaded','validation.uppercase','validation.url','validation.ulid','validation.uuid',
-'validation.custom.attribute-name.rule-name','auth.banned','users.protected',);
-        registerArgumentsSet('env', 
+'validation.custom.attribute-name.rule-name','account.banned','users.protected',);
+        registerArgumentsSet('env',
 'APP_NAME','APP_ENV','APP_KEY','APP_DEBUG','APP_URL',
 'APP_LOCALE','APP_FALLBACK_LOCALE','APP_FAKER_LOCALE','APP_MAINTENANCE_DRIVER','BCRYPT_ROUNDS',
 'LOG_CHANNEL','LOG_STACK','LOG_DEPRECATIONS_CHANNEL','LOG_LEVEL','DB_CONNECTION',
@@ -2732,25 +2732,25 @@ namespace PHPSTORM_META {
 'SUPER_ADMIN_PASSWORD','PAGINATION_COURSES_PER_PAGE','PAGINATION_LESSONS_PER_PAGE','PAGINATION_USERS_PER_PAGE','AUTH_GUARD',
 'L5_SWAGGER_GENERATE_ALWAYS','L5_SWAGGER_CONST_HOST','L5_SWAGGER_USE_ABSOLUTE_PATH','SANCTUM_TOKEN_TTL_DEFAULT','SANCTUM_TOKEN_TTL_REMEMBER',
 'UID','GID',);
-        
-                expectedArguments(\Illuminate\Support\Facades\Gate::has(), 0, argumentsSet('auth'));
-    expectedArguments(\Illuminate\Support\Facades\Gate::allows(), 0, argumentsSet('auth'));
-    expectedArguments(\Illuminate\Support\Facades\Gate::denies(), 0, argumentsSet('auth'));
-    expectedArguments(\Illuminate\Support\Facades\Gate::check(), 0, argumentsSet('auth'));
-    expectedArguments(\Illuminate\Support\Facades\Gate::any(), 0, argumentsSet('auth'));
-    expectedArguments(\Illuminate\Support\Facades\Gate::none(), 0, argumentsSet('auth'));
-    expectedArguments(\Illuminate\Support\Facades\Gate::authorize(), 0, argumentsSet('auth'));
-    expectedArguments(\Illuminate\Support\Facades\Gate::inspect(), 0, argumentsSet('auth'));
-                expectedArguments(\Illuminate\Support\Facades\Route::can(), 0, argumentsSet('auth'));
-    expectedArguments(\Illuminate\Support\Facades\Route::cannot(), 0, argumentsSet('auth'));
-    expectedArguments(\Illuminate\Support\Facades\Route::cant(), 0, argumentsSet('auth'));
-    expectedArguments(\Illuminate\Support\Facades\Auth::can(), 0, argumentsSet('auth'));
-    expectedArguments(\Illuminate\Support\Facades\Auth::cannot(), 0, argumentsSet('auth'));
-    expectedArguments(\Illuminate\Support\Facades\Auth::cant(), 0, argumentsSet('auth'));
-    expectedArguments(\Illuminate\Foundation\Auth\Access\Authorizable::can(), 0, argumentsSet('auth'));
-    expectedArguments(\Illuminate\Foundation\Auth\Access\Authorizable::cannot(), 0, argumentsSet('auth'));
-    expectedArguments(\Illuminate\Foundation\Auth\Access\Authorizable::cant(), 0, argumentsSet('auth'));
-                expectedArguments(\Illuminate\Contracts\Auth\Access\Authorizable::can(), 0, argumentsSet('auth'));
+
+                expectedArguments(\Illuminate\Support\Facades\Gate::has(), 0, argumentsSet('account'));
+    expectedArguments(\Illuminate\Support\Facades\Gate::allows(), 0, argumentsSet('account'));
+    expectedArguments(\Illuminate\Support\Facades\Gate::denies(), 0, argumentsSet('account'));
+    expectedArguments(\Illuminate\Support\Facades\Gate::check(), 0, argumentsSet('account'));
+    expectedArguments(\Illuminate\Support\Facades\Gate::any(), 0, argumentsSet('account'));
+    expectedArguments(\Illuminate\Support\Facades\Gate::none(), 0, argumentsSet('account'));
+    expectedArguments(\Illuminate\Support\Facades\Gate::authorize(), 0, argumentsSet('account'));
+    expectedArguments(\Illuminate\Support\Facades\Gate::inspect(), 0, argumentsSet('account'));
+                expectedArguments(\Illuminate\Support\Facades\Route::can(), 0, argumentsSet('account'));
+    expectedArguments(\Illuminate\Support\Facades\Route::cannot(), 0, argumentsSet('account'));
+    expectedArguments(\Illuminate\Support\Facades\Route::cant(), 0, argumentsSet('account'));
+    expectedArguments(\Illuminate\Support\Facades\Auth::can(), 0, argumentsSet('account'));
+    expectedArguments(\Illuminate\Support\Facades\Auth::cannot(), 0, argumentsSet('account'));
+    expectedArguments(\Illuminate\Support\Facades\Auth::cant(), 0, argumentsSet('account'));
+    expectedArguments(\Illuminate\Foundation\Auth\Access\Authorizable::can(), 0, argumentsSet('account'));
+    expectedArguments(\Illuminate\Foundation\Auth\Access\Authorizable::cannot(), 0, argumentsSet('account'));
+    expectedArguments(\Illuminate\Foundation\Auth\Access\Authorizable::cant(), 0, argumentsSet('account'));
+                expectedArguments(\Illuminate\Contracts\Auth\Access\Authorizable::can(), 0, argumentsSet('account'));
                 expectedArguments(\Illuminate\Config\Repository::getMany(), 0, argumentsSet('configs'));
     expectedArguments(\Illuminate\Config\Repository::set(), 0, argumentsSet('configs'));
     expectedArguments(\Illuminate\Config\Repository::string(), 0, argumentsSet('configs'));
@@ -2796,5 +2796,5 @@ namespace PHPSTORM_META {
                 expectedArguments(\Illuminate\Contracts\Translation\Translator::get(), 0, argumentsSet('translations'));
                 expectedArguments(\env(), 0, argumentsSet('env'));
                 expectedArguments(\Illuminate\Support\Env::get(), 0, argumentsSet('env'));
-            
+
 }

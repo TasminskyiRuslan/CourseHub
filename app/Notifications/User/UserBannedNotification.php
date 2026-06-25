@@ -1,23 +1,22 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\User;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ResetPasswordNotification extends Notification implements ShouldQueue
+class UserBannedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      *
-     * @param string $token
      * @return void
      */
-    public function __construct(public string $token)
+    public function __construct()
     {
         $this->onQueue('high');
     }
@@ -41,13 +40,8 @@ class ResetPasswordNotification extends Notification implements ShouldQueue
      */
     public function toMail(mixed $notifiable): MailMessage
     {
-        $resetUrl = url('/password/reset?token=' . $this->token);
-
         return (new MailMessage)
-            ->subject('Reset Password')
-            ->markdown('emails.auth.reset', [
-                'url' => $resetUrl,
-                'token' => $this->token,
-            ]);
+            ->subject('Account Banned')
+            ->markdown('emails.user.ban', ['user' => $notifiable]);
     }
 }

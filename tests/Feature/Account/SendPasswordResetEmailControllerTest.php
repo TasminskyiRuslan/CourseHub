@@ -1,8 +1,7 @@
 <?php
 
-use App\Enums\UserRole;
 use App\Models\User;
-use App\Notifications\ResetPasswordNotification;
+use App\Notifications\Account\ResetPasswordNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;

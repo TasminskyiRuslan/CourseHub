@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\CourseType;
 use App\Enums\UserPermission;
 use App\Enums\UserRole;
+use App\Notifications\Course\CourseBannedNotification;
 use App\Observers\Course\CourseObserver;
 use Database\Factories\CourseFactory;
 use Eloquent;
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
@@ -104,16 +106,6 @@ class Course extends Model
     }
 
     /**
-     * Get the route key name for the model.
-     *
-     * @return string
-     */
-    public function getRouteKeyName(): string
-    {
-        return 'slug';
-    }
-
-    /**
      * Configure the slug generation options for the Author model.
      *
      * @return SlugOptions
@@ -124,6 +116,26 @@ class Course extends Model
             ->generateSlugsFrom('title')
             ->saveSlugsTo('slug')
             ->doNotGenerateSlugsOnUpdate();
+    }
+
+    /**
+     * Get the route key name for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    /**
+     * Send course banned notification.
+     *
+     * @return void
+     */
+    public function sendBanNotification(): void
+    {
+        $this->author->notify(new CourseBannedNotification($this));
     }
 
     /**

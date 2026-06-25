@@ -1,6 +1,8 @@
 @component('mail::message')
     # Verify Email Address
 
+    Hello, {{ $user->name }} ({{ $user->email }}).
+
     Please click the button below to confirm your email address.
 
     @component('mail::button', ['url' => $url, 'color' => 'primary'])

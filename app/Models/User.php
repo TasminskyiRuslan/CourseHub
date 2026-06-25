@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
-use App\Notifications\ResetPasswordNotification;
-use App\Notifications\UserBannedNotification;
-use App\Notifications\UserUnbannedNotification;
-use App\Notifications\VerifyEmailNotification;
+use App\Notifications\Account\ResetPasswordNotification;
+use App\Notifications\Account\VerifyEmailNotification;
+use App\Notifications\User\UserBannedNotification;
+use App\Notifications\User\UserUnbannedNotification;
 use Database\Factories\UserFactory;
 use Eloquent;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -191,6 +191,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $this->notify(new UserUnbannedNotification());
     }
+
     /**
      * Get the courses authored by the user.
      *

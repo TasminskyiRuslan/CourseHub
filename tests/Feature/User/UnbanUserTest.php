@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Notifications\UserUnbannedNotification;
+use App\Notifications\User\UserUnbannedNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;

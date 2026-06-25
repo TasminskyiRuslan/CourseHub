@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Enums\UserPermission;
+use App\Enums\UserRole;
 use App\Models\Course;
 use App\Models\User;
 
@@ -108,5 +109,29 @@ class CoursePolicy
         }
 
         return $user->is($course->author);
+    }
+
+    /**
+     * Determine whether the user can ban the course.
+     *
+     * @param User $user
+     * @param Course $course
+     * @return bool
+     */
+    public function ban(User $user, Course $course): bool
+    {
+        return $user->can(UserPermission::COURSE_BAN_ANY->value) && !$user->is($course->author);
+    }
+
+    /**
+     * Determine whether the user can unban the course.
+     *
+     * @param User $user
+     * @param Course $course
+     * @return bool
+     */
+    public function unban(User $user, Course $course): bool
+    {
+        return $user->can(UserPermission::COURSE_UNBAN_ANY->value) && !$user->is($course->author);
     }
 }

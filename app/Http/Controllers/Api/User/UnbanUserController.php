@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use OpenApi\Attributes as OA;
+use Throwable;
 
 class UnbanUserController extends Controller
 {
@@ -59,6 +60,7 @@ class UnbanUserController extends Controller
      * @param User $user
      * @param UnbanUserAction $unbanUserAction
      * @return Response
+     * @throws Throwable
      */
     public function __invoke(Request $request, User $user, UnbanUserAction $unbanUserAction): Response
     {

@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\Course;
 
+use App\Models\Course;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class UserUnbannedNotification extends Notification implements ShouldQueue
+class CourseBannedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -16,7 +17,7 @@ class UserUnbannedNotification extends Notification implements ShouldQueue
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(protected Course $course)
     {
         $this->onQueue('high');
     }
@@ -27,7 +28,7 @@ class UserUnbannedNotification extends Notification implements ShouldQueue
      * @param mixed $notifiable
      * @return array<int, string>
      */
-    public function via(mixed $notifiable): array
+    public function via(object $notifiable): array
     {
         return ['mail'];
     }
@@ -38,10 +39,14 @@ class UserUnbannedNotification extends Notification implements ShouldQueue
      * @param mixed $notifiable
      * @return MailMessage
      */
-    public function toMail(mixed $notifiable): MailMessage
+    public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Account Unbanned')
-            ->markdown('emails.user.unban');
+            ->line('Course Banned')
+            ->markdown('emails.course.ban', [
+                'user' => $notifiable,
+                'course' => $this->course,
+                'url' => route('course.show', $this->course->slug),
+            ]);
     }
 }

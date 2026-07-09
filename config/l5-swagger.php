@@ -188,7 +188,7 @@ return [
                     //'tokenUrl' => 'http://example.com/auth' // The authorization URL to be used for (password/application/accessCode)
                     'scopes' => [
                         'read:projects' => 'read your projects',
-                        'write:projects' => 'modify projects in your account',
+                        'write:projects' => 'modify projects in your auth',
                     ]
                 ],
                 */

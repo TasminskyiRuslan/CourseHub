@@ -7,18 +7,18 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'UpdateCourseImageRequest',
     title: 'Update Course Image Request',
-    description: 'Request payload for updating a course image.',
-    required: ['image'],
+    description: 'Multipart form data payload for uploading a new image via PUT spoofing.',
+    required: ['image', '_method'],
     properties: [
         new OA\Property(
             property: 'image',
-            description: 'Image of the course.',
+            description: 'Image file.',
             type: 'string',
             format: 'binary'
         ),
         new OA\Property(
             property: '_method',
-            description: 'Method spoofing to treat POST as PUT.',
+            description: 'Method spoofing to handle multipart/form-data in PUT requests.',
             type: 'string',
             default: 'PUT',
             enum: ['PUT'],

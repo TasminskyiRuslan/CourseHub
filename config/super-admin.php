@@ -7,7 +7,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | This value is the name of the system's root user. This name will be
-    | assigned to the super admin account during the database seeding
+    | assigned to the super admin auth during the database seeding
     | process if the user does not already exist.
     |
     */
@@ -19,7 +19,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | This value is the unique slug of the system's root user. This slug will
-    | be assigned to the super admin account during the database seeding
+    | be assigned to the super admin auth during the database seeding
     | process if the user does not already exist.
     |
     */
@@ -31,7 +31,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | This is the email address that will be used to identify the unique
-    | super admin account. This email is also used by the seeder to
+    | super admin auth. This email is also used by the seeder to
     | find or create the root administrator record.
     |
     */

@@ -10,13 +10,13 @@ class UpdateCourseAction
     /**
      * Update the specified course.
      *
-     * @param UpdateCourseData $courseData
+     * @param UpdateCourseData $data
      * @param Course $course
      * @return Course
      */
-    public function handle(UpdateCourseData $courseData, Course $course): Course
+    public function handle(UpdateCourseData $data, Course $course): Course
     {
-        $course->update($courseData->all());
+        $course->update($data->all());
         return $course;
     }
 }

@@ -24,30 +24,28 @@ class RolesAndPermissionsSeeder extends Seeder
 
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $student = Role::findOrCreate(UserRole::STUDENT->value);
         $teacher = Role::findOrCreate(UserRole::TEACHER->value);
         $admin = Role::findOrCreate(UserRole::ADMIN->value);
         $superAdmin = Role::findOrCreate(UserRole::SUPER_ADMIN->value);
 
         $teacher->syncPermissions([
-            UserPermission::COURSE_CREATE->value,
-
-            UserPermission::LESSON_CREATE->value,
+            UserPermission::TEACHER_PANEL_ACCESS->value,
+            UserPermission::COURSES_CREATE->value,
+            UserPermission::COURSES_UPDATE_OWN->value,
+            UserPermission::COURSES_DELETE_OWN->value,
+            UserPermission::COURSES_PUBLISH_OWN->value,
+            UserPermission::LESSONS_CREATE->value,
+            UserPermission::LESSONS_UPDATE_OWN->value,
+            UserPermission::LESSONS_DELETE_OWN->value,
         ]);
         $admin->syncPermissions([
-            UserPermission::COURSE_VIEW_ANY_UNPUBLISHED->value,
-            UserPermission::COURSE_DELETE_ANY->value,
-            UserPermission::COURSE_UNPUBLISH_ANY->value,
-            UserPermission::COURSE_BAN_ANY->value,
-            UserPermission::COURSE_UNBAN_ANY->value,
-
-            UserPermission::LESSON_DELETE_ANY->value,
-
-            UserPermission::USER_VIEW_ANY->value,
-            UserPermission::USER_DELETE_ANY->value,
-            UserPermission::USER_ROLE_EDIT_ANY->value,
-            UserPermission::USER_BAN_ANY->value,
-            UserPermission::USER_UNBAN_ANY->value,
+            UserPermission::ADMIN_PANEL_ACCESS->value,
+            UserPermission::COURSES_DELETE_ALL->value,
+            UserPermission::COURSES_BAN_ALL->value,
+            UserPermission::LESSONS_DELETE_ALL->value,
+            UserPermission::USERS_UPDATE_ROLES_ALL->value,
+            UserPermission::USERS_DELETE_ALL->value,
+            UserPermission::USERS_BAN_ALL->value,
         ]);
     }
 }

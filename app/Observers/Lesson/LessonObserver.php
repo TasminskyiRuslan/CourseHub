@@ -13,11 +13,12 @@ class LessonObserver
      * @param Lesson $lesson
      * @return void
      */
-    public function creating(Lesson $lesson) : void
+    public function creating(Lesson $lesson): void
     {
         if (!is_null($lesson->position)) {
             return;
         }
+
         $maxPosition = Lesson::where('course_id', $lesson->course_id)->max('position');
         $lesson->position = $maxPosition + 1;
     }
@@ -30,7 +31,7 @@ class LessonObserver
      */
     public function created(Lesson $lesson): void
     {
-        Cache::tags([config('cache.tags.course') . ':' . $lesson->course_id])->flush();
+        $this->flushCourseCache($lesson);
     }
 
     /**
@@ -41,7 +42,7 @@ class LessonObserver
      */
     public function updated(Lesson $lesson): void
     {
-        Cache::tags([config('cache.tags.course') . ':' . $lesson->course_id])->flush();
+        $this->flushCourseCache($lesson);
     }
 
     /**
@@ -62,6 +63,17 @@ class LessonObserver
      * @return void
      */
     public function deleted(Lesson $lesson): void
+    {
+        $this->flushCourseCache($lesson);
+    }
+
+    /**
+     * Flush specific course cache.
+     *
+     * @param Lesson $lesson
+     * @return void
+     */
+    protected function flushCourseCache(Lesson $lesson): void
     {
         Cache::tags([config('cache.tags.course') . ':' . $lesson->course_id])->flush();
     }

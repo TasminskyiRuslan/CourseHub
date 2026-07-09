@@ -12,8 +12,10 @@
 */
 
 use App\Enums\CourseType;
+use App\Enums\UserPermission;
 use App\Enums\UserRole;
 use App\Models\Course;
+use App\Models\User;
 use Illuminate\Http\UploadedFile;
 
 pest()->extend(Tests\TestCase::class)
@@ -52,34 +54,70 @@ function something()
 }
 
 /**
- * Get the expected JSON structure for a user object.
+ * Get the expected JSON structure for a user object (public).
  *
  * @return array
  */
-function userJsonStructure(): array {
+function publicUserJsonStructure(): array {
+    return [
+        'id',
+        'name',
+        'slug',
+        'roles',
+        'avatar_url',
+        'courses_count'
+    ];
+}
+
+/**
+ * Get the expected JSON structure for a user object (auth).
+ *
+ * @return array
+ */
+function accountUserJsonStructure(): array {
     return [
         'id',
         'name',
         'slug',
         'email',
         'email_verified_at',
-        'role',
-        'banned_at',
+        'roles',
         'avatar_url',
+        'banned_at',
         'created_at',
         'updated_at',
-        'deleted_at',
     ];
 }
 
+/**
+ * Get the expected JSON structure for a user object (admin).
+ *
+ * @return array
+ */
+function adminUserJsonStructure(): array {
+    return [
+        'id',
+        'name',
+        'slug',
+        'email',
+        'email_verified_at',
+        'roles',
+        'avatar_url',
+        'banned_at',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'courses_count',
+    ];
+}
 /**
  * Get the expected JSON structure for an authentication response.
  *
  * @return array
  */
-function accountJsonStructure(): array {
+function authJsonStructure(): array {
     return [
-        'user' => userJsonStructure(),
+        'user' => accountUserJsonStructure(),
         'access_token',
         'token_type',
         'expires_at',
@@ -100,12 +138,12 @@ function authorJsonStructure(): array {
 }
 
 /**
- * Get the expected JSON structure for a lesson object.
+ * Get the expected JSON structure for a lesson object (teacher).
  *
  * @param CourseType|null $courseType
  * @return array
  */
-function lessonJsonStructure(?CourseType $courseType): array {
+function teacherLessonJsonStructure(?CourseType $courseType): array {
     return [
         'id',
         'course_id',
@@ -128,7 +166,6 @@ function lessonJsonStructure(?CourseType $courseType): array {
                 'video_url',
                 'provider',
             ],
-            null => [],
         },
         'created_at',
         'updated_at',
@@ -136,14 +173,69 @@ function lessonJsonStructure(?CourseType $courseType): array {
 }
 
 /**
- * Get the expected JSON structure for a course object.
+ * Get the expected JSON structure for a lesson object (admin).
  *
- * @param bool $withAuthor
- * @param bool $withLessonsCount
+ * @param CourseType|null $courseType
  * @return array
  */
-function courseJsonStructure(bool $withAuthor = false, bool $withLessonsCount = false): array {
-    $base = [
+function adminLessonJsonStructure(?CourseType $courseType): array {
+    return [
+        'id',
+        'course_id',
+        'title',
+        'slug',
+        'position',
+        'content' => match ($courseType) {
+            CourseType::OFFLINE => [
+                'start_time',
+                'end_time',
+                'address',
+                'room_number'
+            ],
+            CourseType::ONLINE => [
+                'start_time',
+                'end_time',
+                'meeting_link',
+            ],
+            CourseType::VIDEO => [
+                'video_url',
+                'provider',
+            ],
+        },
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
+}
+
+/**
+ * Get the expected JSON structure for course resource (public).
+ *
+ * @return array
+ */
+function publicCourseJsonStructure(): array {
+    return [
+        'id',
+        'author_id',
+        'author',
+        'title',
+        'slug',
+        'description',
+        'type',
+        'price',
+        'image_url',
+        'lessons_count',
+        'published_at',
+    ];
+}
+
+/**
+ * Get the expected JSON structure for course resource (teacher).
+ *
+ * @return array
+ */
+function teacherCourseJsonStructure(): array {
+    return [
         'id',
         'author_id',
         'title',
@@ -152,18 +244,37 @@ function courseJsonStructure(bool $withAuthor = false, bool $withLessonsCount = 
         'type',
         'price',
         'image_url',
+        'lessons_count',
         'published_at',
         'banned_at',
         'created_at',
         'updated_at',
     ];
-    if ($withAuthor) {
-        $base['author'] = authorJsonStructure();
-    }
-    if ($withLessonsCount) {
-        $base[] = 'lessons_count';
-    }
-    return $base;
+}
+
+/**
+ * Get the expected JSON structure for course resource (admin).
+ *
+ * @return array
+ */
+function adminCourseJsonStructure(): array {
+    return [
+        'id',
+        'author_id',
+        'author',
+        'title',
+        'slug',
+        'description',
+        'type',
+        'price',
+        'image_url',
+        'lessons_count',
+        'published_at',
+        'banned_at',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 }
 
 /**
@@ -192,7 +303,6 @@ function registrationPayload(array $overrides = []): array
         'email'    => fake()->unique()->safeEmail(),
         'password' => 'password123',
         'password_confirmation' => 'password123',
-        'role' => UserRole::STUDENT->value,
     ], $overrides);
 }
 
@@ -237,6 +347,20 @@ function imagePayload(array $overrides = []): array
 {
     return array_merge([
         'image'     => UploadedFile::fake()->image('image.jpg'),
+        '_method' => 'PUT',
+    ], $overrides);
+}
+
+/**
+ * Generate an avatar payload with optional overrides.
+ *
+ * @param array $overrides
+ * @return array
+ */
+function avatarPayload(array $overrides = []): array
+{
+    return array_merge([
+        'avatar'     => UploadedFile::fake()->image('avatar.jpg'),
         '_method' => 'PUT',
     ], $overrides);
 }

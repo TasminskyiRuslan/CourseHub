@@ -2,11 +2,12 @@
 
 namespace App\Actions\User;
 
-use App\Actions\Account\RevokeAllTokensAction;
+use App\Actions\Auth\RevokeAllTokensAction;
 use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Throwable;
 
 class BanUserAction
@@ -28,9 +29,7 @@ class BanUserAction
     public function handle(User $user): void
     {
         if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
-            throw ValidationException::withMessages([
-                'email' => [__('users.protected')],
-            ]);
+            throw new AccessDeniedHttpException(__('users.protected'));
         }
 
         if ($user->isBanned()) {

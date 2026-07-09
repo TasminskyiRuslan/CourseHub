@@ -41,7 +41,7 @@ class UserUnbannedNotification extends Notification implements ShouldQueue
     public function toMail(mixed $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Account Unbanned')
+            ->subject('Auth Unbanned')
             ->markdown('emails.user.unban', ['user' => $notifiable]);
     }
 }

@@ -4,21 +4,11 @@ namespace App\Actions\Course;
 
 use App\Models\Course;
 use Illuminate\Support\Facades\Storage;
-use Throwable;
 
 class DeleteCourseAction
 {
     /**
-     * @param DeleteCourseImageAction $deleteCourseImageAction
-     */
-    public function __construct(
-        protected DeleteCourseImageAction $deleteCourseImageAction
-    )
-    {
-    }
-
-    /**
-     * Remove the specified course and its image.
+     * Delete the specified course and its image.
      *
      * @param Course $course
      * @return void
@@ -27,7 +17,7 @@ class DeleteCourseAction
     {
         $imagePath = $course->image_path;
         $course->delete();
-        if ($imagePath) {
+        if ($imagePath && Storage::disk('courses')->exists($imagePath)) {
             Storage::disk('courses')->delete($imagePath);
         }
     }

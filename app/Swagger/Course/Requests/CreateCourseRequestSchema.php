@@ -8,19 +8,19 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'CreateCourseRequest',
     title: 'Create Course Request',
-    description: 'Request payload for creating a new course.',
+    description: 'Payload for creating a new course.',
     required: ['title', 'type', 'price'],
     properties: [
         new OA\Property(
             property: 'title',
-            description: 'Title of the course.',
+            description: 'Title.',
             type: 'string',
             maxLength: 255,
             example: 'Math 101'
         ),
         new OA\Property(
             property: 'slug',
-            description: 'Slug of the course. (optional, must be unique if provided)',
+            description: 'Course slug.',
             type: 'string',
             maxLength: 255,
             pattern: '^[a-z0-9-]+$',
@@ -29,7 +29,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'description',
-            description: 'Description of the course.',
+            description: 'Description.',
             type: 'string',
             maxLength: 5000,
             example: 'A basic mathematics course',
@@ -37,7 +37,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'type',
-            description: 'Type of the course.',
+            description: 'Type.',
             type: 'string',
             enum: [
                 CourseType::OFFLINE->value,
@@ -48,13 +48,12 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'price',
-            description: 'Price of the course.',
+            description: 'Price.',
             type: 'string',
-            format: 'float',
             maximum: 99999999.99,
             minimum: 0,
-            example: 199.99
-        )
+            example: '199.99'
+        ),
     ],
     type: 'object'
 )]

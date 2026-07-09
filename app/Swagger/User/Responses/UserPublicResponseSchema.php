@@ -1,0 +1,65 @@
+<?php
+
+namespace App\Swagger\User\Responses;
+
+use App\Enums\UserRole;
+use OpenApi\Attributes as OA;
+
+#[OA\Schema(
+    schema: 'UserPublicResponse',
+    title: 'User Public Response',
+    description: 'Public profile data of a user.',
+    required: ['id', 'name', 'slug'],
+    properties: [
+        new OA\Property(
+            property: 'id',
+            description: 'Unique identifier.',
+            type: 'integer',
+            example: 1
+        ),
+        new OA\Property(
+            property: 'name',
+            description: 'Full name.',
+            type: 'string',
+            example: 'John Doe'
+        ),
+        new OA\Property(
+            property: 'slug',
+            description: 'User slug.',
+            type: 'string',
+            example: 'john-doe'
+        ),
+        new OA\Property(
+            property: 'roles',
+            description: 'List of assigned roles.',
+            type: 'array',
+            items: new OA\Items(
+                type: 'string',
+                enum: [
+                    UserRole::TEACHER->value,
+                    UserRole::ADMIN->value,
+                    UserRole::SUPER_ADMIN->value,
+                ]
+            ),
+            example: [UserRole::TEACHER->value]
+        ),
+        new OA\Property(
+            property: 'avatar_url',
+            description: 'Public URL to the avatar image.',
+            type: 'string',
+            format: 'uri',
+            example: 'http://localhost:8080/storage/users/avatar.png',
+            nullable: true
+        ),
+        new OA\Property(
+            property: 'courses_count',
+            description: 'Total number of published courses.',
+            type: 'integer',
+            example: 5
+        )
+    ],
+    type: 'object'
+)]
+class UserPublicResponseSchema
+{
+}

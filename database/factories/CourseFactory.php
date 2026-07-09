@@ -22,7 +22,7 @@ class CourseFactory extends Factory
     {
         $title = fake()->sentence(3);
         return [
-            'author_id' => User::factory()->lazy(),
+            'author_id' => User::factory()->teacher()->lazy(),
             'title' => $title,
             'slug' => Str::slug($title),
             'description' => fake()->sentence(10),

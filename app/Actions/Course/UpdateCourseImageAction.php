@@ -6,22 +6,21 @@ use App\Data\Course\Requests\UpdateCourseImageData;
 use App\Models\Course;
 use Exception;
 use Illuminate\Support\Facades\Storage;
-use Throwable;
 
 class UpdateCourseImageAction
 {
     /**
      * Update the specified course image.
      *
-     * @param UpdateCourseImageData $courseImageData
+     * @param UpdateCourseImageData $data
      * @param Course $course
      * @return Course
      * @throws Exception
      */
-    public function handle(UpdateCourseImageData $courseImageData, Course $course): Course
+    public function handle(UpdateCourseImageData $data, Course $course): Course
     {
         $oldPath = $course->image_path;
-        $newPath = $courseImageData->image->store('/', 'courses');
+        $newPath = $data->image->store('/', 'courses');
 
         try {
             $course->setImage($newPath)->save();

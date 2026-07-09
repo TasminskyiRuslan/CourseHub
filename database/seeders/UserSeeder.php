@@ -19,12 +19,17 @@ class UserSeeder extends Seeder
 
         User::factory()
             ->count(20)
-            ->student()
             ->create();
 
         User::factory()
             ->count(3)
             ->admin()
+            ->create();
+
+        User::factory()
+            ->count(3)
+            ->teacher()
+            ->unverified()
             ->create();
 
         User::factory()

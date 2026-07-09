@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
@@ -40,12 +41,17 @@ use Spatie\Sluggable\SlugOptions;
  * @method static Builder<static>|Lesson whereSlug($value)
  * @method static Builder<static>|Lesson whereTitle($value)
  * @method static Builder<static>|Lesson whereUpdatedAt($value)
+ * @property Carbon|null $deleted_at
+ * @method static Builder<static>|Lesson onlyTrashed()
+ * @method static Builder<static>|Lesson whereDeletedAt($value)
+ * @method static Builder<static>|Lesson withTrashed(bool $withTrashed = true)
+ * @method static Builder<static>|Lesson withoutTrashed()
  * @mixin Eloquent
  */
 class Lesson extends Model
 {
     /** @use HasFactory<LessonFactory> */
-    use HasSlug, HasFactory;
+    use HasSlug, HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.

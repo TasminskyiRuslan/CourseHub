@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
-use App\Notifications\Account\ResetPasswordNotification;
-use App\Notifications\Account\VerifyEmailNotification;
+use App\Notifications\Auth\ResetPasswordNotification;
+use App\Notifications\Auth\VerifyEmailNotification;
 use App\Notifications\User\UserBannedNotification;
 use App\Notifications\User\UserUnbannedNotification;
+use App\Observers\User\UserObserver;
 use Database\Factories\UserFactory;
 use Eloquent;
+use GeneaLabs\LaravelPivotEvents\Traits\PivotEventTrait;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -75,12 +77,13 @@ use Spatie\Sluggable\SlugOptions;
  * @method static Builder<static>|User whereDeletedAt($value)
  * @method static Builder<static>|User withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|User withoutTrashed()
+ * @method static Builder<static>|User active()
  * @mixin Eloquent
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasApiTokens, Notifiable, HasSlug, HasRoles, SoftDeletes;
+    use HasFactory, HasApiTokens, Notifiable, HasSlug, HasRoles, SoftDeletes, PivotEventTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -92,8 +95,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'slug',
         'email',
         'password',
-        'banned_at',
         'avatar_path',
+        'banned_at',
     ];
 
     /**
@@ -149,6 +152,16 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted(): void
+    {
+        static::observe(UserObserver::class);
     }
 
     /**
@@ -232,6 +245,17 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $this->banned_at = null;
         return $this;
+    }
+
+    /**
+     * Scope a query to only include active users.
+     *
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->whereNull('banned_at');
     }
 
     /**

@@ -20,7 +20,7 @@ class RestrictBannedUsers
         $user = $request->user();
         if ($user && $user->isBanned()) {
             return response()->json([
-                'message' => __('account.banned'),
+                'message' => __('auth.banned'),
             ])->setStatusCode(SymfonyResponse::HTTP_FORBIDDEN);
         }
         return $next($request);

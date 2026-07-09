@@ -9,26 +9,23 @@ use App\Models\User;
 class UserPolicy
 {
     /**
-     * Determine whether the user can view the list of users.
-     *
-     * @param User $user
-     * @return bool
-     */
-    public function viewAny(User $user): bool
-    {
-        return $user->can(UserPermission::USER_VIEW_ANY->value);
-    }
-
-    /**
-     * Determine whether the user can view the specific user's details.
+     * Determine whether the user can update the target user roles.
      *
      * @param User $user
      * @param User $targetUser
      * @return bool
      */
-    public function view(User $user, User $targetUser): bool
+    public function updateRoles(User $user, User $targetUser): bool
     {
-        return $user->can(UserPermission::USER_VIEW_ANY->value);
+        if ($targetUser->hasAnyRole([UserRole::ADMIN->value, UserRole::SUPER_ADMIN->value])) {
+            return false;
+        }
+
+        if ($user->is($targetUser)) {
+            return false;
+        }
+
+        return $user->can(UserPermission::USERS_UPDATE_ROLES_ALL->value);
     }
 
     /**
@@ -40,19 +37,15 @@ class UserPolicy
      */
     public function delete(User $user, User $targetUser): bool
     {
-        return $user->can(UserPermission::USER_DELETE_ANY->value) && !$user->is($targetUser) && !$targetUser->hasAnyRole([UserRole::ADMIN->value, UserRole::SUPER_ADMIN->value]) && !$targetUser->courses()->exists();
-    }
+        if ($targetUser->hasAnyRole([UserRole::ADMIN->value, UserRole::SUPER_ADMIN->value])) {
+            return false;
+        }
 
-    /**
-     * Determine whether the user can update the target user's role.
-     *
-     * @param User $user
-     * @param User $targetUser
-     * @return bool
-     */
-    public function updateRole(User $user, User $targetUser): bool
-    {
-        return $user->can(UserPermission::USER_ROLE_EDIT_ANY->value) && !$user->is($targetUser) && !$targetUser->hasAnyRole([UserRole::ADMIN->value, UserRole::SUPER_ADMIN->value]);
+        if ($user->is($targetUser)) {
+            return false;
+        }
+
+        return $user->can(UserPermission::USERS_DELETE_ALL->value);
     }
 
     /**
@@ -64,18 +57,14 @@ class UserPolicy
      */
     public function ban(User $user, User $targetUser): bool
     {
-        return $user->can(UserPermission::USER_BAN_ANY->value) && !$user->is($targetUser) && !$targetUser->hasAnyRole([UserRole::ADMIN->value, UserRole::SUPER_ADMIN->value]);
-    }
+        if ($targetUser->hasAnyRole([UserRole::ADMIN->value, UserRole::SUPER_ADMIN->value])) {
+            return false;
+        }
 
-    /**
-     * Determine whether the user can unban the target user.
-     *
-     * @param User $user
-     * @param User $targetUser
-     * @return bool
-     */
-    public function unban(User $user, User $targetUser): bool
-    {
-        return $user->can(UserPermission::USER_UNBAN_ANY->value) && !$user->is($targetUser) && !$targetUser->hasAnyRole([UserRole::ADMIN->value, UserRole::SUPER_ADMIN->value]);
+        if ($user->is($targetUser)) {
+            return false;
+        }
+
+        return $user->can(UserPermission::USERS_BAN_ALL->value);
     }
 }

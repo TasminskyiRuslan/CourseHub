@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'protected' => 'This account is protected and cannot be modified.',
+    'protected' => 'This auth is protected and cannot be modified.',
 ];

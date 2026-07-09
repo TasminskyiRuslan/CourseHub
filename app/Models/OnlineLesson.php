@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
 
@@ -30,12 +31,17 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|OnlineLesson whereMeetingLink($value)
  * @method static Builder<static>|OnlineLesson whereStartTime($value)
  * @method static Builder<static>|OnlineLesson whereUpdatedAt($value)
+ * @property Carbon|null $deleted_at
+ * @method static Builder<static>|OnlineLesson onlyTrashed()
+ * @method static Builder<static>|OnlineLesson whereDeletedAt($value)
+ * @method static Builder<static>|OnlineLesson withTrashed(bool $withTrashed = true)
+ * @method static Builder<static>|OnlineLesson withoutTrashed()
  * @mixin Eloquent
  */
 class OnlineLesson extends Model
 {
     /** @use HasFactory<OnlineLessonFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.

@@ -2,11 +2,11 @@
 
 namespace App\Actions\User;
 
-use App\Data\User\UpdateUserRoleData;
+use App\Data\User\Requests\UpdateUserRoleData;
 use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Throwable;
 
 class UpdateUserRoleAction
@@ -14,21 +14,19 @@ class UpdateUserRoleAction
     /**
      * Update the role for the specified user.
      *
-     * @param UpdateUserRoleData $userRoleData
+     * @param UpdateUserRoleData $data
      * @param User $user
      * @return User
      * @throws Throwable
      */
-    public function handle(UpdateUserRoleData $userRoleData, User $user): User
+    public function handle(UpdateUserRoleData $data, User $user): User
     {
         if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
-            throw ValidationException::withMessages([
-                'email' => [__('users.protected')],
-            ]);
+            throw new AccessDeniedHttpException(__('users.protected'));
         }
 
-        return DB::transaction(function () use ($userRoleData, $user) {
-            $user->syncRoles([$userRoleData->role->value]);
+        return DB::transaction(function () use ($data, $user) {
+            $user->syncRoles($data->roles);
             return $user;
         });
     }

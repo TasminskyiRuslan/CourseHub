@@ -7,18 +7,18 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'UpdateCourseRequest',
     title: 'Update Course Request',
-    description: 'Request payload for updating the course.',
+    description: 'Payload for updating a course.',
     properties: [
         new OA\Property(
             property: 'title',
-            description: 'Title of the course.',
+            description: 'Title.',
             type: 'string',
             maxLength: 255,
             example: 'Math 102'
         ),
         new OA\Property(
             property: 'slug',
-            description: 'Slug of the course. (must be unique)',
+            description: 'Course slug.',
             type: 'string',
             maxLength: 255,
             pattern: '^[a-z0-9-]+$',
@@ -26,7 +26,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'description',
-            description: 'Description of the course.',
+            description: 'Description.',
             type: 'string',
             maxLength: 5000,
             example: 'An advanced mathematics course',
@@ -34,12 +34,11 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'price',
-            description: 'Price of the course.',
+            description: 'Price.',
             type: 'string',
-            format: 'float',
             maximum: 99999999.99,
             minimum: 0,
-            example: 299.99
+            example: '299.99'
         )
     ],
     type: 'object'

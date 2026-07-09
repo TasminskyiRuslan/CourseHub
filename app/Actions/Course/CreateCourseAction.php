@@ -5,20 +5,18 @@ namespace App\Actions\Course;
 use App\Data\Course\Requests\CreateCourseData;
 use App\Models\Course;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
 class CreateCourseAction
 {
     /**
      * Create a new course.
      *
-     * @param CreateCourseData $courseData
-     * @param User $author
+     * @param CreateCourseData $data
+     * @param User $teacher
      * @return Course
      */
-    public function handle(CreateCourseData $courseData, User $author): Course
+    public function handle(CreateCourseData $data, User $teacher): Course
     {
-        return $author->courses()->create($courseData->all());
+        return $teacher->courses()->create($data->all());
     }
 }

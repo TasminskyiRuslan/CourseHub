@@ -4,22 +4,21 @@ namespace App\Enums;
 
 enum UserPermission: string
 {
-    // Course
-    case COURSE_VIEW_ANY_UNPUBLISHED = 'course:view-any-unpublished';
-    case COURSE_CREATE = 'course:create';
-    case COURSE_DELETE_ANY = 'course:delete-any';
-    case COURSE_UNPUBLISH_ANY = 'course:unpublish-any';
-    case COURSE_BAN_ANY = 'course:ban-any';
-    case COURSE_UNBAN_ANY = 'course:unban-any';
+    case TEACHER_PANEL_ACCESS = 'teacher-panel:access';
+    case ADMIN_PANEL_ACCESS = 'admin-panel:access';
 
-    // Lesson
-    case LESSON_CREATE = 'lesson:create';
-    case LESSON_DELETE_ANY = 'lesson:delete-any';
+    case COURSES_CREATE      = 'courses:create';
+    case COURSES_UPDATE_OWN  = 'courses:update-own';
+    case COURSES_DELETE_OWN  = 'courses:delete-own';
+    case COURSES_DELETE_ALL  = 'courses:delete-all';
+    case COURSES_PUBLISH_OWN = 'courses:publish-own';
+    case COURSES_BAN_ALL     = 'courses:ban-all';
 
-    // User
-    case USER_VIEW_ANY = 'user:view-any';
-    case USER_DELETE_ANY = 'user:delete-any';
-    case USER_ROLE_EDIT_ANY = 'user:role-edit-any';
-    case USER_BAN_ANY = 'user:ban-any';
-    case USER_UNBAN_ANY = 'user:unban-any';
-}
+    case LESSONS_CREATE      = 'lessons:create';
+    case LESSONS_UPDATE_OWN  = 'lessons:update-own';
+    case LESSONS_DELETE_OWN  = 'lessons:delete-own';
+    case LESSONS_DELETE_ALL  = 'lessons:delete-all';
+
+    case USERS_UPDATE_ROLES_ALL = 'users:update-roles-all';
+    case USERS_DELETE_ALL  = 'users:delete-all';
+    case USERS_BAN_ALL       = 'users:ban-all';}

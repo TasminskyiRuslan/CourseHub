@@ -16,7 +16,10 @@ class DeleteCourseImageAction
     public function handle(Course $course): void
     {
         if ($course->image_path) {
-            Storage::disk('courses')->delete($course->image_path);
+            if (Storage::disk('courses')->exists($course->image_path)) {
+                Storage::disk('courses')->delete($course->image_path);
+            }
+
             $course->removeImage()->save();
         }
     }

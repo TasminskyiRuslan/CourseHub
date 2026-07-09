@@ -14,7 +14,7 @@ use OpenApi\Attributes as OA;
             description: 'Start time of the online lesson.',
             type: 'string',
             format: 'date-time',
-            example: '2027-02-01T10:00:00Z',
+            example: '2027-02-01T10:00:00.000000Z',
             nullable: true
         ),
         new OA\Property(
@@ -22,7 +22,7 @@ use OpenApi\Attributes as OA;
             description: 'End time of the online lesson.',
             type: 'string',
             format: 'date-time',
-            example: '2027-02-01T12:00:00Z',
+            example: '2027-02-01T12:00:00.000000Z',
             nullable: true
         ),
         new OA\Property(

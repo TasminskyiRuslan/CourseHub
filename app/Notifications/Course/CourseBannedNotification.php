@@ -46,7 +46,7 @@ class CourseBannedNotification extends Notification implements ShouldQueue
             ->markdown('emails.course.ban', [
                 'user' => $notifiable,
                 'course' => $this->course,
-                'url' => route('course.show', $this->course->slug),
+                'url' => route('teacher.course.show', $this->course->slug),
             ]);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Actions\Lesson;
 
-use App\Data\Lesson\CreateLessonData;
+use App\Data\Lesson\Requests\CreateLessonData;
 use App\Models\Course;
 use App\Models\Lesson;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -12,22 +12,22 @@ use Throwable;
 class CreateLessonAction
 {
     /**
-     * Create a new lesson.
+     * Create a new lesson for a specific course.
      *
-     * @param CreateLessonData $lessonData
+     * @param CreateLessonData $data
      * @param Course $course
      * @return Lesson
      * @throws Throwable
      */
-    public function handle(CreateLessonData $lessonData, Course $course): Lesson
+    public function handle(CreateLessonData $data, Course $course): Lesson
     {
-        return DB::transaction(function () use ($lessonData, $course) {
+        return DB::transaction(function () use ($data, $course) {
             $lessonContentClass = Relation::getMorphedModel($course->type->value);
-            $lessonContent = $lessonContentClass::create($lessonData->all());
-            $lesson = $course->lessons()->make($lessonData->all());
+            $lessonContent = $lessonContentClass::create($data->all());
+            $lesson = $course->lessons()->make($data->all());
             $lesson->lessonable()->associate($lessonContent);
             $lesson->save();
-            return $lesson->setRelation('lessonable', $lessonContent);
+            return $lesson;
         });
     }
 }

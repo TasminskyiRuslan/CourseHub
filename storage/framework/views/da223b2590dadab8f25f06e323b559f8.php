@@ -1,6 +1,8 @@
 <?php $__env->startComponent('mail::message'); ?>
     # Reset Password
 
+    Hello, <?php echo new \Illuminate\Support\EncodedHtmlString($user->name); ?> (<?php echo new \Illuminate\Support\EncodedHtmlString($user->email); ?>).
+
     Click the button below to reset your password.
 
     <?php $__env->startComponent('mail::button', ['url' => $url, 'color' => 'primary']); ?>

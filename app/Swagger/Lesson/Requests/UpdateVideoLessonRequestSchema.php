@@ -7,11 +7,11 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'UpdateVideoLessonRequest',
     title: 'Update Video Lesson Request',
-    description: 'Video part of request payload for updating the lesson.',
+    description: 'Video part of payload for updating the lesson.',
     properties: [
         new OA\Property(
             property: 'video_url',
-            description: 'Link of the video lesson.',
+            description: 'Video URL.',
             type: 'string',
             format: 'uri',
             maxLength: 2048,
@@ -20,12 +20,12 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'provider',
-            description: 'Provider of the video lesson.',
+            description: 'Video provider.',
             type: 'string',
             maxLength: 50,
             example: 'vimeo',
             nullable: true
-        ),
+        )
     ],
     type: 'object'
 )]

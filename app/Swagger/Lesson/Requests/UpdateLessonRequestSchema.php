@@ -7,17 +7,18 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'UpdateLessonRequest',
     title: 'Update Lesson Request',
+    description: 'Payload for updating an existing lesson.',
     properties: [
         new OA\Property(
             property: 'title',
-            description: 'Title of the lesson.',
+            description: 'Title.',
             type: 'string',
             maxLength: 255,
             example: 'Introduction to Geometry'
         ),
         new OA\Property(
             property: 'slug',
-            description: 'Slug of the lesson. (must be unique)',
+            description: 'Lesson slug.',
             type: 'string',
             maxLength: 255,
             pattern: '^[a-z0-9-]+$',
@@ -25,10 +26,11 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'position',
+            description: 'Position.',
             type: 'integer',
             minimum: 0,
             example: 1
-        ),
+        )
     ],
     type: 'object',
     oneOf: [

@@ -16,164 +16,14 @@
         }
     ],
     "paths": {
-        "/account/avatar": {
+        "/auth/login": {
             "post": {
                 "tags": [
-                    "Account"
-                ],
-                "summary": "Update current user account avatar",
-                "description": "Update the current user account avatar.",
-                "operationId": "1313a9614f838ea86ea270eefea1274a",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateAccountAvatarRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "User account avatar updated successfully.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/UserResponse"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "User is unauthenticated."
-                    },
-                    "422": {
-                        "description": "Validation error."
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Account"
-                ],
-                "summary": "Remove current user account avatar",
-                "description": "Remove the current user account avatar.",
-                "operationId": "f11dd21efafc9268075f1107301f2304",
-                "responses": {
-                    "204": {
-                        "description": "User account avatar deleted successfully."
-                    },
-                    "401": {
-                        "description": "User is unauthenticated."
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/account": {
-            "get": {
-                "tags": [
-                    "Account"
-                ],
-                "summary": "Retrieve current user account",
-                "description": "Retrieve the current user account.",
-                "operationId": "0ef634622b8d641f5f7e48d6751f3af5",
-                "responses": {
-                    "200": {
-                        "description": "User account retrieved successfully.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/UserResponse"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "User account is unauthenticated."
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
-            "patch": {
-                "tags": [
-                    "Account"
-                ],
-                "summary": "Update current user account",
-                "description": "Update the current user account.",
-                "operationId": "1247566df501a9e5b441e94b35de249a",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateUserAccountRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "User account updated successfully.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/UserResponse"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "User is unauthenticated."
-                    },
-                    "422": {
-                        "description": "Validation error."
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/account/login": {
-            "post": {
-                "tags": [
-                    "Account"
+                    "Auth"
                 ],
                 "summary": "Authenticate user",
-                "description": "Authenticate the user using email and password and issue an access token.",
-                "operationId": "e82f74d4e6b38ba5056e1621e60914d6",
+                "description": "Authenticate the user and issue an access token.",
+                "operationId": "8e026335d25c3df3f6f6cf1f683ac7b8",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -192,7 +42,7 @@
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/AccountResponse"
+                                            "$ref": "#/components/schemas/AuthResponse"
                                         }
                                     },
                                     "type": "object"
@@ -206,14 +56,14 @@
                 }
             }
         },
-        "/account/tokens": {
+        "/auth/tokens": {
             "delete": {
                 "tags": [
-                    "Account"
+                    "Auth"
                 ],
                 "summary": "Logout from all devices",
                 "description": "Revoke all access tokens for an authenticated user.",
-                "operationId": "852426a941a3c62a2c8066cb44eadb6f",
+                "operationId": "16deaba51e77f3ea7aa0577ff38a4439",
                 "responses": {
                     "204": {
                         "description": "User logged out successfully."
@@ -229,14 +79,14 @@
                 ]
             }
         },
-        "/account/token": {
+        "/auth/token": {
             "delete": {
                 "tags": [
-                    "Account"
+                    "Auth"
                 ],
                 "summary": "Logout current device",
                 "description": "Revoke the current access token for an authenticated user.",
-                "operationId": "9f759f951a40dc3cecdb5bc2002788ed",
+                "operationId": "d12090675bc7b3de21f5e0f42f7a5343",
                 "responses": {
                     "204": {
                         "description": "User logged out successfully."
@@ -252,14 +102,14 @@
                 ]
             }
         },
-        "/account/register": {
+        "/auth/register": {
             "post": {
                 "tags": [
-                    "Account"
+                    "Auth"
                 ],
                 "summary": "Register a new user",
                 "description": "Register a new user and issue an access token.",
-                "operationId": "7706ebfcd4d4cceef756e46e74a0406a",
+                "operationId": "8e69ddc577b1650c4a010f798dd6c9d3",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -278,7 +128,7 @@
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/AccountResponse"
+                                            "$ref": "#/components/schemas/AuthResponse"
                                         }
                                     },
                                     "type": "object"
@@ -292,40 +142,14 @@
                 }
             }
         },
-        "/account/email/verification-notification": {
+        "/auth/password/reset": {
             "post": {
                 "tags": [
-                    "Account"
-                ],
-                "summary": "Resend verification email",
-                "description": "Resend the email verification notification to the authenticated user.",
-                "operationId": "fa5c07f916c8a6a8b85850665995993b",
-                "responses": {
-                    "204": {
-                        "description": "Verification email sent successfully."
-                    },
-                    "401": {
-                        "description": "User is unauthenticated."
-                    },
-                    "429": {
-                        "description": "Too many requests."
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/account/password/reset": {
-            "post": {
-                "tags": [
-                    "Account"
+                    "Auth"
                 ],
                 "summary": "Reset password",
                 "description": "Reset the user's password.",
-                "operationId": "06e2a72c05ea806eb33e7ab5c32d58a8",
+                "operationId": "033879051100699c9ba3a190913d20c5",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -346,14 +170,14 @@
                 }
             }
         },
-        "/account/password/forgot": {
+        "/auth/password/forgot": {
             "post": {
                 "tags": [
-                    "Account"
+                    "Auth"
                 ],
-                "summary": "Send password reset link",
+                "summary": "Send password reset email",
                 "description": "Send an email with a link to reset the password.",
-                "operationId": "2acc598f399b1e3ad01ee83d6157547f",
+                "operationId": "a6257242c1f3b4c342c2b1ed1cd79b71",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -377,14 +201,43 @@
                 }
             }
         },
-        "/account/email/verify/{id}/{hash}": {
+        "/auth/email/verification-notification": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Send verification email",
+                "description": "Send the email verification notification to the user.",
+                "operationId": "b91df446845f19f52372485c1fe5bcf6",
+                "responses": {
+                    "204": {
+                        "description": "Verification email sent successfully."
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "422": {
+                        "description": "Email is already verified."
+                    },
+                    "429": {
+                        "description": "Too many requests."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/auth/email/verify/{id}/{hash}": {
             "get": {
                 "tags": [
-                    "Account"
+                    "Auth"
                 ],
                 "summary": "Verify email address",
                 "description": "Verify the user's email address.",
-                "operationId": "18452ad6885bfebe298b53f6ff1e98d6",
+                "operationId": "44b8c9b6e3feb78742765f001c607182",
                 "parameters": [
                     {
                         "name": "id",
@@ -413,7 +266,7 @@
                         "required": false,
                         "schema": {
                             "type": "integer",
-                            "example": 1776361972
+                            "example": 1893456000
                         }
                     },
                     {
@@ -440,14 +293,14 @@
                 }
             }
         },
-        "/courses/{course}/ban": {
+        "/admin/courses/{course}/ban": {
             "patch": {
                 "tags": [
                     "Course"
                 ],
-                "summary": "Ban a course",
-                "description": "Ban the specified course.",
-                "operationId": "37c2d4a9398153cc1bc47de04f7df9cd",
+                "summary": "[Admin] Ban a course",
+                "description": "Ban the specified course by administrator.",
+                "operationId": "f5cf7186f095547373145c0788e736b6",
                 "parameters": [
                     {
                         "name": "course",
@@ -481,14 +334,14 @@
                 ]
             }
         },
-        "/courses": {
+        "/admin/courses": {
             "get": {
                 "tags": [
                     "Course"
                 ],
-                "summary": "Retrieve a list of courses",
-                "description": "Retrieve a paginated list of courses.",
-                "operationId": "fb9d5ed8eebcf64545eccbec4e07e665",
+                "summary": "[Admin] Retrieve a list of all courses",
+                "description": "Retrieve a paginated list of all courses by administrator.",
+                "operationId": "751096f15b6871d5042c62cb088a9077",
                 "parameters": [
                     {
                         "name": "filter[search]",
@@ -500,9 +353,71 @@
                         }
                     },
                     {
+                        "name": "filter[type]",
+                        "in": "query",
+                        "description": "Filter courses by type.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "offline",
+                                "online",
+                                "video"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter[author]",
+                        "in": "query",
+                        "description": "Filter courses by author slug.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[banned]",
+                        "in": "query",
+                        "description": "Filter by banned status.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "enum": [
+                                "true",
+                                "false"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter[published]",
+                        "in": "query",
+                        "description": "Filter by publication status.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "enum": [
+                                "true",
+                                "false"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter[trashed]",
+                        "in": "query",
+                        "description": "Filter by trashed state.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "with",
+                                "only"
+                            ]
+                        }
+                    },
+                    {
                         "name": "sort",
                         "in": "query",
-                        "description": "Sort courses by field. Use \"-\" prefix for descending order.",
+                        "description": "Sort courses by field.",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -512,7 +427,15 @@
                                 "price",
                                 "-price",
                                 "created_at",
-                                "-created_at"
+                                "-created_at",
+                                "published_at",
+                                "-published_at",
+                                "banned_at",
+                                "-banned_at",
+                                "deleted_at",
+                                "-deleted_at",
+                                "lessons_count",
+                                "-lessons_count"
                             ]
                         }
                     },
@@ -523,17 +446,8 @@
                         "required": false,
                         "schema": {
                             "type": "integer",
+                            "default": 1,
                             "minimum": 1
-                        }
-                    },
-                    {
-                        "name": "include",
-                        "in": "query",
-                        "description": "Relations to include.",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "author,lessons_count"
                         }
                     }
                 ],
@@ -547,7 +461,245 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/components/schemas/CourseResponse"
+                                                "$ref": "#/components/schemas/CourseAdminResponse"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/courses/{course}": {
+            "get": {
+                "tags": [
+                    "Course"
+                ],
+                "summary": "[Admin] Retrieve course details",
+                "description": "Retrieve detailed information about the specified course by administrator.",
+                "operationId": "0a9395ecb4737a0f7e44cb92c3e72957",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Course details retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CourseAdminResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course not found."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Course"
+                ],
+                "summary": "[Admin] Delete a course",
+                "description": "Delete the specified course by administrator.",
+                "operationId": "27f11fb2dbf0765c21e19c8198ddb6cb",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Course deleted successfully."
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course not found."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/courses/{course}/unban": {
+            "patch": {
+                "tags": [
+                    "Course"
+                ],
+                "summary": "[Admin] Unban a course",
+                "description": "Unban the specified course by administrator.",
+                "operationId": "b73b10b823d7b29faafc7a2b982cb723",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Course unbanned successfully."
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course not found."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/courses": {
+            "get": {
+                "tags": [
+                    "Course"
+                ],
+                "summary": "[Public] Retrieve a list of courses",
+                "description": "Retrieve a paginated list of active courses.",
+                "operationId": "ed60006f09d67fcac30483bf8061bdee",
+                "parameters": [
+                    {
+                        "name": "filter[search]",
+                        "in": "query",
+                        "description": "Search courses by title or description.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[author]",
+                        "in": "query",
+                        "description": "Filter courses by author slug.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[type]",
+                        "in": "query",
+                        "description": "Filter courses by type.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "offline",
+                                "online",
+                                "video"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort courses by field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "title",
+                                "-title",
+                                "price",
+                                "-price",
+                                "published_at",
+                                "-published_at",
+                                "lessons_count",
+                                "-lessons_count"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Course list retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CoursePublicResponse"
                                             }
                                         }
                                     },
@@ -556,21 +708,181 @@
                             }
                         }
                     }
+                }
+            }
+        },
+        "/courses/{course}": {
+            "get": {
+                "tags": [
+                    "Course"
+                ],
+                "summary": "[Public] Retrieve course details",
+                "description": "Retrieve detailed information about the specified active course.",
+                "operationId": "ee7a552cafc079327918be522d4124b9",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Course details retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CoursePublicResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Course not found."
+                    }
+                }
+            }
+        },
+        "/teacher/courses": {
+            "get": {
+                "tags": [
+                    "Course"
+                ],
+                "summary": "[Teacher] Retrieve a list of courses",
+                "description": "Retrieve a paginated list of teacher's courses.",
+                "operationId": "eff32f1c624977edae0c6a84e467cd92",
+                "parameters": [
+                    {
+                        "name": "filter[search]",
+                        "in": "query",
+                        "description": "Search courses by title or description.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[type]",
+                        "in": "query",
+                        "description": "Filter courses by type.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "offline",
+                                "online",
+                                "video"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter[banned]",
+                        "in": "query",
+                        "description": "Filter by banned status.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "enum": [
+                                "true",
+                                "false"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter[published]",
+                        "in": "query",
+                        "description": "Filter by publication status.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "enum": [
+                                "true",
+                                "false"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort courses by field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "title",
+                                "-title",
+                                "price",
+                                "-price",
+                                "created_at",
+                                "-created_at",
+                                "published_at",
+                                "-published_at",
+                                "lessons_count",
+                                "-lessons_count"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Course list retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CourseTeacherResponse"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    }
                 },
                 "security": [
                     {
                         "sanctum": []
-                    },
-                    {}
+                    }
                 ]
             },
             "post": {
                 "tags": [
                     "Course"
                 ],
-                "summary": "Create a course",
-                "description": "Create a new course.",
-                "operationId": "b923cafaec6b13f5d12afd86e8a55be9",
+                "summary": "[Teacher] Create a course",
+                "description": "Create a new teacher's course.",
+                "operationId": "16200464cae25fe0ffb57c12e2cfa954",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -589,7 +901,7 @@
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/CourseResponse"
+                                            "$ref": "#/components/schemas/CourseTeacherResponse"
                                         }
                                     },
                                     "type": "object"
@@ -614,14 +926,14 @@
                 ]
             }
         },
-        "/courses/{course}": {
+        "/teacher/courses/{course}": {
             "get": {
                 "tags": [
                     "Course"
                 ],
-                "summary": "Retrieve course details",
-                "description": "Retrieve detailed information about a specific course.",
-                "operationId": "ac9df8579adf9db70c70ca96b5800656",
+                "summary": "[Teacher] Retrieve course details",
+                "description": "Retrieve detailed information about the specified teacher's course.",
+                "operationId": "28a1245b8f05932d1d02d6f8797779a6",
                 "parameters": [
                     {
                         "name": "course",
@@ -642,13 +954,16 @@
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/CourseResponse"
+                                            "$ref": "#/components/schemas/CourseTeacherResponse"
                                         }
                                     },
                                     "type": "object"
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
                     },
                     "403": {
                         "description": "User does not have permissions."
@@ -660,17 +975,16 @@
                 "security": [
                     {
                         "sanctum": []
-                    },
-                    {}
+                    }
                 ]
             },
             "delete": {
                 "tags": [
                     "Course"
                 ],
-                "summary": "Remove a course",
-                "description": "Remove the specified course.",
-                "operationId": "b2ad98bf222fcb881591892f6ea118cc",
+                "summary": "[Teacher] Delete a course",
+                "description": "Delete the specified teacher's course.",
+                "operationId": "37fa5feb0fe850cb8f480677bda5c1f1",
                 "parameters": [
                     {
                         "name": "course",
@@ -707,9 +1021,9 @@
                 "tags": [
                     "Course"
                 ],
-                "summary": "Update a course",
-                "description": "Update the specified course.",
-                "operationId": "f4c07044a4f22f76356c7c367d19f56d",
+                "summary": "[Teacher] Update a course",
+                "description": "Update the specified teacher's course.",
+                "operationId": "b12b9e8212c1ad90ba32789fc76678e7",
                 "parameters": [
                     {
                         "name": "course",
@@ -740,7 +1054,7 @@
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/CourseResponse"
+                                            "$ref": "#/components/schemas/CourseTeacherResponse"
                                         }
                                     },
                                     "type": "object"
@@ -768,14 +1082,14 @@
                 ]
             }
         },
-        "/courses/{course}/image": {
+        "/teacher/courses/{course}/image": {
             "post": {
                 "tags": [
                     "Course"
                 ],
-                "summary": "Update a course image",
-                "description": "Update the specified course image.",
-                "operationId": "a7d7fd4dc45f82ed33e8aa84b68f6690",
+                "summary": "[Teacher] Update course image",
+                "description": "Update the image of the specified teacher's course.",
+                "operationId": "6ad2f41b3ea458ac6bba0169b4c29c74",
                 "parameters": [
                     {
                         "name": "course",
@@ -806,7 +1120,7 @@
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/CourseResponse"
+                                            "$ref": "#/components/schemas/CourseTeacherResponse"
                                         }
                                     },
                                     "type": "object"
@@ -837,9 +1151,9 @@
                 "tags": [
                     "Course"
                 ],
-                "summary": "Remove a course image",
-                "description": "Remove the specified course image.",
-                "operationId": "e4bb9915f6ce96e6ce307381f97daf9c",
+                "summary": "[Teacher] Remove course image",
+                "description": "Remove the image of the specified teacher's course.",
+                "operationId": "40e55989db0d8d79bc225f7d8013c7f6",
                 "parameters": [
                     {
                         "name": "course",
@@ -864,9 +1178,6 @@
                     },
                     "404": {
                         "description": "Course not found."
-                    },
-                    "422": {
-                        "description": "Validation error."
                     }
                 },
                 "security": [
@@ -876,14 +1187,14 @@
                 ]
             }
         },
-        "/courses/{course}/publish": {
+        "/teacher/courses/{course}/publish": {
             "patch": {
                 "tags": [
                     "Course"
                 ],
-                "summary": "Publish a course",
-                "description": "Publish the specified course.",
-                "operationId": "c8056c77345bb2662b17653c2b9417b1",
+                "summary": "[Teacher] Publish a course",
+                "description": "Publish the specified teacher's course.",
+                "operationId": "18d188b966ed987fdb15809bc285fb57",
                 "parameters": [
                     {
                         "name": "course",
@@ -898,7 +1209,19 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Course published successfully."
+                        "description": "Course published successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CourseTeacherResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "User is unauthenticated."
@@ -917,14 +1240,14 @@
                 ]
             }
         },
-        "/courses/{course}/unpublish": {
+        "/teacher/courses/{course}/unpublish": {
             "patch": {
                 "tags": [
                     "Course"
                 ],
-                "summary": "Unpublish a course",
-                "description": "Unpublish the specified course.",
-                "operationId": "8a0226a3ec517403257dcc9e5b2864e5",
+                "summary": "[Teacher] Unpublish a course",
+                "description": "Unpublish the specified teacher's course.",
+                "operationId": "66017d151ac935e2be3512ba5b169f68",
                 "parameters": [
                     {
                         "name": "course",
@@ -939,7 +1262,19 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Course unpublished successfully."
+                        "description": "Course unpublished successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CourseTeacherResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "User is unauthenticated."
@@ -958,14 +1293,14 @@
                 ]
             }
         },
-        "/courses/{course}/lessons": {
+        "/admin/courses/{course}/lessons": {
             "get": {
                 "tags": [
                     "Lesson"
                 ],
-                "summary": "Retrieve a list of course lessons",
-                "description": "Retrieve a paginated list of course lessons.",
-                "operationId": "235f3dcd29c974b5dfacc6f125487fc1",
+                "summary": "[Admin] Retrieve a list of course lessons",
+                "description": "Retrieve a paginated list of lessons for the specified course by administrator.",
+                "operationId": "eb23cde8b61e9c8dc251adb09fa8a478",
                 "parameters": [
                     {
                         "name": "course",
@@ -987,9 +1322,22 @@
                         }
                     },
                     {
+                        "name": "filter[trashed]",
+                        "in": "query",
+                        "description": "Filter by trashed state.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "only",
+                                "with"
+                            ]
+                        }
+                    },
+                    {
                         "name": "sort",
                         "in": "query",
-                        "description": "Sort lessons by field. Use \"-\" prefix for descending order.",
+                        "description": "Sort by field.",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -999,7 +1347,9 @@
                                 "position",
                                 "-position",
                                 "created_at",
-                                "-created_at"
+                                "-created_at",
+                                "deleted_at",
+                                "-deleted_at"
                             ]
                         }
                     },
@@ -1010,6 +1360,7 @@
                         "required": false,
                         "schema": {
                             "type": "integer",
+                            "default": 1,
                             "minimum": 1
                         }
                     }
@@ -1024,67 +1375,8 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/components/schemas/LessonResponse"
+                                                "$ref": "#/components/schemas/LessonAdminResponse"
                                             }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "User does not have permissions."
-                    },
-                    "404": {
-                        "description": "Course not found."
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    },
-                    {}
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Lesson"
-                ],
-                "summary": "Create a lesson",
-                "description": "Create a new lesson.",
-                "operationId": "3688868ff5b41c7b976a7a0c10e012d3",
-                "parameters": [
-                    {
-                        "name": "course",
-                        "in": "path",
-                        "description": "Course identifier (slug).",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "example": "math-101"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateLessonRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Lesson created successfully.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/LessonResponse"
                                         }
                                     },
                                     "type": "object"
@@ -1100,9 +1392,6 @@
                     },
                     "404": {
                         "description": "Course not found."
-                    },
-                    "422": {
-                        "description": "Validation error."
                     }
                 },
                 "security": [
@@ -1112,14 +1401,14 @@
                 ]
             }
         },
-        "/courses/{course}/lessons/{lesson}": {
+        "/admin/courses/{course}/lessons/{lesson}": {
             "get": {
                 "tags": [
                     "Lesson"
                 ],
-                "summary": "Retrieve lesson details",
-                "description": "Retrieve detailed information about a specific lesson.",
-                "operationId": "44edac41fc34e68e26d87d0e6a01ba10",
+                "summary": "[Admin] Retrieve lesson details",
+                "description": "Retrieve detailed information about the specified lesson by administrator.",
+                "operationId": "a6fd7d27df6c32b3a540d4a335a83b21",
                 "parameters": [
                     {
                         "name": "course",
@@ -1150,13 +1439,16 @@
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/LessonResponse"
+                                            "$ref": "#/components/schemas/LessonAdminResponse"
                                         }
                                     },
                                     "type": "object"
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
                     },
                     "403": {
                         "description": "User does not have permissions."
@@ -1168,17 +1460,285 @@
                 "security": [
                     {
                         "sanctum": []
-                    },
-                    {}
+                    }
                 ]
             },
             "delete": {
                 "tags": [
                     "Lesson"
                 ],
-                "summary": "Remove a lesson",
-                "description": "Remove the specified lesson.",
-                "operationId": "f0874920178e45bebf1598a0907b5698",
+                "summary": "[Admin] Delete a lesson",
+                "description": "Delete the specified lesson by administrator.",
+                "operationId": "b08822b2fe25fb31fb945cb25d8efd64",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    },
+                    {
+                        "name": "lesson",
+                        "in": "path",
+                        "description": "Lesson identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "introduction-to-algebra"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Lesson deleted successfully."
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course or lesson not found."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/teacher/courses/{course}/lessons": {
+            "get": {
+                "tags": [
+                    "Lesson"
+                ],
+                "summary": "[Teacher] Retrieve a list of course lessons",
+                "description": "Retrieve a paginated list of lessons for the specified teacher's course.",
+                "operationId": "5ccf479f9d045f73269647361833f9dc",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    },
+                    {
+                        "name": "filter[search]",
+                        "in": "query",
+                        "description": "Search lessons by title.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort lessons by field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "title",
+                                "-title",
+                                "position",
+                                "-position",
+                                "created_at",
+                                "-created_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lesson list retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/LessonTeacherResponse"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course not found."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Lesson"
+                ],
+                "summary": "[Teacher] Create a lesson",
+                "description": "Create a new lesson for the specified teacher's course.",
+                "operationId": "bf062aec0dd11af73ae735d24c6a9cfd",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateLessonRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Lesson created successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/LessonTeacherResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course not found."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/teacher/courses/{course}/lessons/{lesson}": {
+            "get": {
+                "tags": [
+                    "Lesson"
+                ],
+                "summary": "[Teacher] Retrieve lesson details",
+                "description": "Retrieve detailed information about the specified teacher's lesson.",
+                "operationId": "860d20315084fa69a93093821f2bdf75",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    },
+                    {
+                        "name": "lesson",
+                        "in": "path",
+                        "description": "Lesson identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "introduction-to-algebra"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lesson details retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/LessonTeacherResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course or lesson not found."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Lesson"
+                ],
+                "summary": "[Teacher] Delete a lesson",
+                "description": "Delete the specified teacher's lesson.",
+                "operationId": "bf3736be9d2c8e81252dbc38224f54c6",
                 "parameters": [
                     {
                         "name": "course",
@@ -1225,9 +1785,9 @@
                 "tags": [
                     "Lesson"
                 ],
-                "summary": "Update a lesson",
-                "description": "Update the specified lesson.",
-                "operationId": "e0d04c6dc9bbc03b6e8467050226a24a",
+                "summary": "[Teacher] Update a lesson",
+                "description": "Update the specified teacher's lesson.",
+                "operationId": "85827704efa02685116f1a85306e3268",
                 "parameters": [
                     {
                         "name": "course",
@@ -1268,7 +1828,7 @@
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/LessonResponse"
+                                            "$ref": "#/components/schemas/LessonTeacherResponse"
                                         }
                                     },
                                     "type": "object"
@@ -1296,14 +1856,173 @@
                 ]
             }
         },
-        "/users/{user}/ban": {
+        "/account/avatar": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "[Account] Update user avatar",
+                "description": "Update the current user's account avatar.",
+                "operationId": "98ce90d5c0b5be789ecd58581fcd3998",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateUserAvatarRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User account avatar updated successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserAccountResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "[Account] Remove user avatar",
+                "description": "Remove the current user's account avatar.",
+                "operationId": "611f65952b796dc1838e4cedba276306",
+                "responses": {
+                    "204": {
+                        "description": "User account avatar deleted successfully."
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/account": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "[Account] Retrieve user account",
+                "description": "Retrieve the current user's account.",
+                "operationId": "686ee07cdbed583c86dbb5a9626aadbb",
+                "responses": {
+                    "200": {
+                        "description": "User account retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserAccountResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
             "patch": {
                 "tags": [
                     "User"
                 ],
-                "summary": "Ban a user",
-                "description": "Ban the specified user.",
-                "operationId": "bcbfa8f74738f86ff5c5caca2566b215",
+                "summary": "[Account] Update user account",
+                "description": "Update the current user's account.",
+                "operationId": "c033aa2f3414ae49f7ad714331687ded",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateUserAccountRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User account updated successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserAccountResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/users/{user}/ban": {
+            "patch": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "[Admin] Ban a user",
+                "description": "Ban the specified user by administrator.",
+                "operationId": "f0f07d28454b91784bd878bc71f05af5",
                 "parameters": [
                     {
                         "name": "user",
@@ -1337,14 +2056,14 @@
                 ]
             }
         },
-        "/users/{user}/unban": {
+        "/admin/users/{user}/unban": {
             "patch": {
                 "tags": [
                     "User"
                 ],
-                "summary": "Unban a user",
-                "description": "Unban the specified user.",
-                "operationId": "4b78c703c3a9279b6286fc8ba0b6c727",
+                "summary": "[Admin] Unban a user",
+                "description": "Unban the specified user by administrator.",
+                "operationId": "01ec66809a5458ac6e8b81532f3ac835",
                 "parameters": [
                     {
                         "name": "user",
@@ -1378,19 +2097,19 @@
                 ]
             }
         },
-        "/users": {
+        "/admin/users": {
             "get": {
                 "tags": [
                     "User"
                 ],
-                "summary": "Retrieve a list of users",
-                "description": "Retrieve a paginated list of users.",
-                "operationId": "bda0424acf687003f1427ea721f28c1b",
+                "summary": "[Admin] Retrieve a list of users",
+                "description": "Retrieve a paginated list of users by administrator.",
+                "operationId": "0702e155ae8f6dc91c76b516a2d00f9a",
                 "parameters": [
                     {
                         "name": "filter[search]",
                         "in": "query",
-                        "description": "Search users by name or email.",
+                        "description": "Search by name or email.",
                         "required": false,
                         "schema": {
                             "type": "string"
@@ -1399,16 +2118,21 @@
                     {
                         "name": "filter[role]",
                         "in": "query",
-                        "description": "Filter users by role.",
+                        "description": "Filter by role.",
                         "required": false,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "enum": [
+                                "teacher",
+                                "admin",
+                                "super-admin"
+                            ]
                         }
                     },
                     {
                         "name": "filter[verified]",
                         "in": "query",
-                        "description": "Filter users by email status.",
+                        "description": "Filter by email status.",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -1421,7 +2145,7 @@
                     {
                         "name": "filter[banned]",
                         "in": "query",
-                        "description": "Filter users by account status.",
+                        "description": "Filter by banned status.",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -1434,7 +2158,7 @@
                     {
                         "name": "filter[trashed]",
                         "in": "query",
-                        "description": "Filter users by account existence.",
+                        "description": "Filter by trashed state.",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -1447,7 +2171,7 @@
                     {
                         "name": "sort",
                         "in": "query",
-                        "description": "Sort courses by field. Use \"-\" prefix for descending order.",
+                        "description": "Sort courses by field.",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -1456,10 +2180,14 @@
                                 "-name",
                                 "email_verified_at",
                                 "-email_verified_at",
+                                "courses_count",
+                                "-courses_count",
                                 "banned_at",
                                 "-banned_at",
                                 "created_at",
-                                "-created_at"
+                                "-created_at",
+                                "deleted_at",
+                                "-deleted_at"
                             ]
                         }
                     },
@@ -1470,6 +2198,7 @@
                         "required": false,
                         "schema": {
                             "type": "integer",
+                            "default": 1,
                             "minimum": 1
                         }
                     }
@@ -1490,7 +2219,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/components/schemas/UserResponse"
+                                                "$ref": "#/components/schemas/UserAdminResponse"
                                             }
                                         }
                                     },
@@ -1507,14 +2236,14 @@
                 ]
             }
         },
-        "/users/{user}": {
+        "/admin/users/{user}": {
             "get": {
                 "tags": [
                     "User"
                 ],
-                "summary": "Retrieve user details",
-                "description": "Retrieve detailed information about a specific user.",
-                "operationId": "5d070ea37265b50551f44596d2508cda",
+                "summary": "[Admin] Retrieve user details",
+                "description": "Retrieve detailed information about the specified user by administrator.",
+                "operationId": "3c0ce74acb4a53c748179e4351c03aa9",
                 "parameters": [
                     {
                         "name": "user",
@@ -1535,7 +2264,7 @@
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/UserResponse"
+                                            "$ref": "#/components/schemas/UserAdminResponse"
                                         }
                                     },
                                     "type": "object"
@@ -1563,9 +2292,9 @@
                 "tags": [
                     "User"
                 ],
-                "summary": "Remove a user",
-                "description": "Remove the specified user.",
-                "operationId": "f5763f7370dc575bb7d88d3e39f34e43",
+                "summary": "[Admin] Delete a user",
+                "description": "Delete the specified user by administrator.",
+                "operationId": "865a00c26de0bf148ff61d6cad9c6d87",
                 "parameters": [
                     {
                         "name": "user",
@@ -1599,14 +2328,14 @@
                 ]
             }
         },
-        "/users/{user}/role": {
+        "/admin/users/{user}/role": {
             "put": {
                 "tags": [
                     "User"
                 ],
-                "summary": "Update user role",
-                "description": "Update the role of the specified user.",
-                "operationId": "4d67b946e638df793a31e9452f38a21e",
+                "summary": "[Admin] Update user role",
+                "description": "Update the role of the specified user by administrator.",
+                "operationId": "d3f83b949f1de9bcfea2923d37bb1978",
                 "parameters": [
                     {
                         "name": "user",
@@ -1637,7 +2366,7 @@
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/UserResponse"
+                                            "$ref": "#/components/schemas/UserAdminResponse"
                                         }
                                     },
                                     "type": "object"
@@ -1646,6 +2375,9 @@
                         }
                     },
                     "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
                         "description": "User does not have permissions."
                     },
                     "404": {
@@ -1661,95 +2393,208 @@
                     }
                 ]
             }
+        },
+        "/teachers": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "[Public] Retrieve a list of teachers",
+                "description": "Retrieve a paginated list of teachers.",
+                "operationId": "97f04f06c0c35bcf66f7ef091b9e10af",
+                "parameters": [
+                    {
+                        "name": "filter[search]",
+                        "in": "query",
+                        "description": "Search users by name.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort teachers by field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "name",
+                                "-name",
+                                "courses_count",
+                                "-courses_count",
+                                "created_at",
+                                "-created_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Teacher list retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/UserPublicResponse"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/teachers/{teacher}": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "[Public] Retrieve teacher details",
+                "description": "Retrieve detailed information about the specified teacher.",
+                "operationId": "b91ee72e427911966e80469b442c8fea",
+                "parameters": [
+                    {
+                        "name": "teacher",
+                        "in": "path",
+                        "description": "Teacher identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "john-doe"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Teacher details retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserPublicResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Teacher not found."
+                    }
+                }
+            }
         }
     },
     "components": {
         "schemas": {
             "LoginUserRequest": {
                 "title": "Login User Request",
-                "description": "Request payload for authenticating a user.",
+                "description": "Payload for authenticating an existing user.",
                 "required": [
                     "email",
                     "password"
                 ],
                 "properties": {
                     "email": {
-                        "description": "Email address of the user.",
+                        "description": "Email address.",
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
                         "example": "john@example.com"
                     },
                     "password": {
-                        "description": "Password of the user.",
+                        "description": "Account password.",
                         "type": "string",
                         "format": "password",
                         "example": "password123"
                     },
                     "remember": {
-                        "description": "Remember me flag of the user.",
+                        "description": "Remember me session flag.",
                         "type": "boolean",
                         "default": false,
-                        "example": true,
-                        "nullable": true
+                        "example": true
                     }
                 },
                 "type": "object"
             },
             "RegisterUserRequest": {
                 "title": "Register User Request",
-                "description": "Request payload for registering a new user.",
+                "description": "Payload for registering a new user auth.",
                 "required": [
                     "name",
                     "email",
                     "password",
-                    "password_confirmation",
-                    "role"
+                    "password_confirmation"
                 ],
                 "properties": {
                     "name": {
-                        "description": "Full name of the user.",
+                        "description": "Full name.",
                         "type": "string",
                         "maxLength": 100,
                         "minLength": 2,
                         "example": "John Doe"
                     },
                     "email": {
-                        "description": "Email address of the user.",
+                        "description": "Unique email address.",
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
                         "example": "john@example.com"
                     },
                     "password": {
-                        "description": "Account password of the user.",
+                        "description": "Account password.",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
                         "example": "password123"
                     },
                     "password_confirmation": {
-                        "description": "Password confirmation of the user. (must match password)",
+                        "description": "Password confirmation (must match password).",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
                         "example": "password123"
                     },
-                    "role": {
-                        "description": "Role of the user.",
-                        "type": "string",
-                        "enum": [
-                            "student",
+                    "roles": {
+                        "description": "List of requested roles.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "teacher"
+                            ]
+                        },
+                        "example": [
                             "teacher"
-                        ],
-                        "example": "student"
+                        ]
                     }
                 },
                 "type": "object"
             },
             "ResetPasswordRequest": {
                 "title": "Reset Password Request",
-                "description": "Request payload for resetting password.",
+                "description": "Payload for setting a new password using a token.",
                 "required": [
                     "email",
                     "password",
@@ -1758,21 +2603,21 @@
                 ],
                 "properties": {
                     "email": {
-                        "description": "Email address of the user.",
+                        "description": "Email address.",
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
                         "example": "john@example.com"
                     },
                     "password": {
-                        "description": "Password of the user.",
+                        "description": "New auth password.",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
                         "example": "newPassword123"
                     },
                     "password_confirmation": {
-                        "description": "Password confirmation of the user. (must match password)",
+                        "description": "Password confirmation (must match password).",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
@@ -1788,13 +2633,13 @@
             },
             "SendPasswordResetEmailRequest": {
                 "title": "Send Password Reset Email Request",
-                "description": "Request payload for sending password reset link.",
+                "description": "Payload for requesting a password reset link.",
                 "required": [
                     "email"
                 ],
                 "properties": {
                     "email": {
-                        "description": "Email address of the user.",
+                        "description": "Email address.",
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
@@ -1803,90 +2648,41 @@
                 },
                 "type": "object"
             },
-            "UpdateAccountAvatarRequest": {
-                "title": "Update Account Avatar Request",
-                "description": "Request payload for updating a user account avatar.",
-                "required": [
-                    "image"
-                ],
-                "properties": {
-                    "image": {
-                        "description": "Avatar of the user account.",
-                        "type": "string",
-                        "format": "binary"
-                    },
-                    "_method": {
-                        "description": "Method spoofing to treat POST as PUT.",
-                        "type": "string",
-                        "default": "PUT",
-                        "enum": [
-                            "PUT"
-                        ],
-                        "example": "PUT"
-                    }
-                },
-                "type": "object"
-            },
-            "UpdateUserAccountRequest": {
-                "title": "Update User Account Request",
-                "description": "Request payload for updating a user account.",
-                "required": [
-                    "name",
-                    "slug"
-                ],
-                "properties": {
-                    "name": {
-                        "description": "Full name of the user account.",
-                        "type": "string",
-                        "maxLength": 100,
-                        "minLength": 2,
-                        "example": "John Doe"
-                    },
-                    "slug": {
-                        "description": "Slug of the user account. (optional, must be unique if provided)",
-                        "type": "string",
-                        "maxLength": 100,
-                        "pattern": "^[a-z0-9-]+$",
-                        "example": "john-doe"
-                    }
-                },
-                "type": "object"
-            },
-            "AccountResponse": {
-                "title": "Account Response",
-                "description": "Data returned after user login or registration.",
+            "AuthResponse": {
+                "title": "Auth Response",
+                "description": "Data returned upon successful authentication.",
                 "required": [
                     "user",
                     "access_token",
-                    "token_type",
-                    "expires_at"
+                    "token_type"
                 ],
                 "properties": {
                     "user": {
-                        "$ref": "#/components/schemas/UserResponse"
+                        "$ref": "#/components/schemas/UserAccountResponse"
                     },
                     "access_token": {
-                        "description": "Personal access token for API authentication.",
+                        "description": "Personal access token for API requests.",
                         "type": "string",
                         "example": "1|eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
                     },
                     "token_type": {
-                        "description": "Token type to be used in the Authorization header.",
+                        "description": "Authorization header prefix.",
                         "type": "string",
                         "example": "Bearer"
                     },
                     "expires_at": {
-                        "description": "Expiration time of the token.",
+                        "description": "Token expiration timestamp.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2026-01-28T12:00:00+02:00"
+                        "example": "2026-01-28T12:00:00.000000Z",
+                        "nullable": true
                     }
                 },
                 "type": "object"
             },
             "CreateCourseRequest": {
                 "title": "Create Course Request",
-                "description": "Request payload for creating a new course.",
+                "description": "Payload for creating a new course.",
                 "required": [
                     "title",
                     "type",
@@ -1894,13 +2690,13 @@
                 ],
                 "properties": {
                     "title": {
-                        "description": "Title of the course.",
+                        "description": "Title.",
                         "type": "string",
                         "maxLength": 255,
                         "example": "Math 101"
                     },
                     "slug": {
-                        "description": "Slug of the course. (optional, must be unique if provided)",
+                        "description": "Course slug.",
                         "type": "string",
                         "maxLength": 255,
                         "pattern": "^[a-z0-9-]+$",
@@ -1908,14 +2704,14 @@
                         "nullable": true
                     },
                     "description": {
-                        "description": "Description of the course.",
+                        "description": "Description.",
                         "type": "string",
                         "maxLength": 5000,
                         "example": "A basic mathematics course",
                         "nullable": true
                     },
                     "type": {
-                        "description": "Type of the course.",
+                        "description": "Type.",
                         "type": "string",
                         "enum": [
                             "offline",
@@ -1925,30 +2721,30 @@
                         "example": "offline"
                     },
                     "price": {
-                        "description": "Price of the course.",
+                        "description": "Price.",
                         "type": "string",
-                        "format": "float",
                         "maximum": 99999999.99,
                         "minimum": 0,
-                        "example": 199.99
+                        "example": "199.99"
                     }
                 },
                 "type": "object"
             },
             "UpdateCourseImageRequest": {
                 "title": "Update Course Image Request",
-                "description": "Request payload for updating a course image.",
+                "description": "Multipart form data payload for uploading a new image via PUT spoofing.",
                 "required": [
-                    "image"
+                    "image",
+                    "_method"
                 ],
                 "properties": {
                     "image": {
-                        "description": "Image of the course.",
+                        "description": "Image file.",
                         "type": "string",
                         "format": "binary"
                     },
                     "_method": {
-                        "description": "Method spoofing to treat POST as PUT.",
+                        "description": "Method spoofing to handle multipart/form-data in PUT requests.",
                         "type": "string",
                         "default": "PUT",
                         "enum": [
@@ -1961,76 +2757,41 @@
             },
             "UpdateCourseRequest": {
                 "title": "Update Course Request",
-                "description": "Request payload for updating the course.",
+                "description": "Payload for updating a course.",
                 "properties": {
                     "title": {
-                        "description": "Title of the course.",
+                        "description": "Title.",
                         "type": "string",
                         "maxLength": 255,
                         "example": "Math 102"
                     },
                     "slug": {
-                        "description": "Slug of the course. (must be unique)",
+                        "description": "Course slug.",
                         "type": "string",
                         "maxLength": 255,
                         "pattern": "^[a-z0-9-]+$",
                         "example": "math-102"
                     },
                     "description": {
-                        "description": "Description of the course.",
+                        "description": "Description.",
                         "type": "string",
                         "maxLength": 5000,
                         "example": "An advanced mathematics course",
                         "nullable": true
                     },
                     "price": {
-                        "description": "Price of the course.",
+                        "description": "Price.",
                         "type": "string",
-                        "format": "float",
                         "maximum": 99999999.99,
                         "minimum": 0,
-                        "example": 299.99
+                        "example": "299.99"
                     }
                 },
                 "type": "object"
             },
-            "Author": {
-                "title": "Author Schema",
-                "description": "Details of a author returned by the API",
-                "required": [
-                    "id",
-                    "name",
-                    "slug"
-                ],
-                "properties": {
-                    "id": {
-                        "description": "Unique identifier of the user.",
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "name": {
-                        "description": "Name of the user.",
-                        "type": "string",
-                        "example": "John Doe"
-                    },
-                    "slug": {
-                        "description": "Slug of the user.",
-                        "type": "string",
-                        "example": "john-doe"
-                    },
-                    "avatar_url": {
-                        "description": "Avatar url of the user.",
-                        "type": "string",
-                        "format": "uri",
-                        "example": "http://loclhost:8080/storage/users/user1.png",
-                        "nullable": true
-                    }
-                },
-                "type": "object"
-            },
-            "CourseResponse": {
-                "title": "Course Response",
-                "description": "Data of a specific course.",
+            "CourseAdminResponse": {
+                "title": "Course Admin Response",
+                "description": "Admin panel data of a course.",
                 "required": [
                     "id",
                     "author_id",
@@ -2038,48 +2799,48 @@
                     "slug",
                     "type",
                     "price",
-                    "is_published",
                     "created_at",
                     "updated_at"
                 ],
                 "properties": {
                     "id": {
-                        "description": "Unique identifier of the course.",
+                        "description": "Unique identifier.",
                         "type": "integer",
                         "example": 1
                     },
                     "author_id": {
-                        "description": "Author unique identifier of the course.",
+                        "description": "Author identifier.",
                         "type": "integer",
-                        "example": 1
+                        "example": 1,
+                        "nullable": true
                     },
                     "author": {
                         "oneOf": [
                             {
-                                "$ref": "#/components/schemas/Author"
+                                "$ref": "#/components/schemas/UserAdminResponse"
                             }
                         ],
                         "nullable": true,
-                        "description": "Author of the course."
+                        "description": "Author details."
                     },
                     "title": {
-                        "description": "Title of the course.",
+                        "description": "Title.",
                         "type": "string",
                         "example": "Math 101"
                     },
                     "slug": {
-                        "description": "Slug of the course.",
+                        "description": "Course slug.",
                         "type": "string",
                         "example": "math-101"
                     },
                     "description": {
-                        "description": "Description of the course.",
+                        "description": "Description.",
                         "type": "string",
                         "example": "A basic mathematics course",
                         "nullable": true
                     },
                     "type": {
-                        "description": "Type of the course.",
+                        "description": "Type.",
                         "type": "string",
                         "enum": [
                             "online",
@@ -2089,73 +2850,255 @@
                         "example": "online"
                     },
                     "price": {
-                        "description": "Price of the course.",
+                        "description": "Price.",
                         "type": "string",
-                        "format": "float",
-                        "example": 99.99
+                        "example": "99.99"
                     },
                     "image_url": {
-                        "description": "Image url of the course.",
+                        "description": "Public URL to the image.",
                         "type": "string",
                         "format": "uri",
-                        "example": "http://loclhost:8080/storage/courses/course1.png",
+                        "example": "http://localhost:8080/storage/courses/course1.png",
                         "nullable": true
-                    },
-                    "is_published": {
-                        "description": "Status of the course.",
-                        "type": "boolean",
-                        "example": true
                     },
                     "lessons_count": {
-                        "description": "Total number of course lessons.",
+                        "description": "Total number of lessons.",
                         "type": "integer",
-                        "example": 10,
-                        "nullable": true
+                        "example": 10
                     },
                     "published_at": {
-                        "description": "Publishing time of the course.",
+                        "description": "Publishing time.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2026-01-25T12:00:00Z",
+                        "example": "2026-01-25T12:00:00.000000Z",
                         "nullable": true
                     },
                     "banned_at": {
-                        "description": "Banning time of the course.",
+                        "description": "Banning time.",
                         "type": "string",
                         "format": "date-time",
                         "example": null,
                         "nullable": true
                     },
                     "created_at": {
-                        "description": "Creation time of the course.",
+                        "description": "Creation time.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2026-01-20T12:00:00Z"
+                        "example": "2026-01-20T12:00:00.000000Z"
                     },
                     "updated_at": {
-                        "description": "Modification time of the course.",
+                        "description": "Modification time.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2026-01-25T12:00:00Z"
+                        "example": "2026-01-25T12:00:00.000000Z"
+                    },
+                    "deleted_at": {
+                        "description": "Soft deletion time.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": null,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "CoursePublicResponse": {
+                "title": "Course Public Response",
+                "description": "Public data of a course.",
+                "required": [
+                    "id",
+                    "author_id",
+                    "title",
+                    "slug",
+                    "type",
+                    "price"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "author_id": {
+                        "description": "Author identifier.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "author": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/UserPublicResponse"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Author details."
+                    },
+                    "title": {
+                        "description": "Title.",
+                        "type": "string",
+                        "example": "Math 101"
+                    },
+                    "slug": {
+                        "description": "Course slug.",
+                        "type": "string",
+                        "example": "math-101"
+                    },
+                    "description": {
+                        "description": "Description.",
+                        "type": "string",
+                        "example": "A basic mathematics course",
+                        "nullable": true
+                    },
+                    "type": {
+                        "description": "Type.",
+                        "type": "string",
+                        "enum": [
+                            "online",
+                            "offline",
+                            "video"
+                        ],
+                        "example": "online"
+                    },
+                    "price": {
+                        "description": "Price.",
+                        "type": "string",
+                        "format": "float",
+                        "example": 99.99
+                    },
+                    "image_url": {
+                        "description": "Public URL to the image.",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "http://loclhost:8080/storage/courses/course1.png",
+                        "nullable": true
+                    },
+                    "lessons_count": {
+                        "description": "Total number of lessons.",
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "published_at": {
+                        "description": "Publishing time.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-25T12:00:00.000000Z",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "CourseTeacherResponse": {
+                "title": "Course Teacher Response",
+                "description": "Teacher panel data of a course.",
+                "required": [
+                    "id",
+                    "author_id",
+                    "title",
+                    "slug",
+                    "type",
+                    "price",
+                    "created_at",
+                    "updated_at"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "author_id": {
+                        "description": "Author identifier.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "description": "Title.",
+                        "type": "string",
+                        "example": "Math 101"
+                    },
+                    "slug": {
+                        "description": "Course slug.",
+                        "type": "string",
+                        "example": "math-101"
+                    },
+                    "description": {
+                        "description": "Description.",
+                        "type": "string",
+                        "example": "A basic mathematics course",
+                        "nullable": true
+                    },
+                    "type": {
+                        "description": "Type.",
+                        "type": "string",
+                        "enum": [
+                            "online",
+                            "offline",
+                            "video"
+                        ],
+                        "example": "online"
+                    },
+                    "price": {
+                        "description": "Price.",
+                        "type": "string",
+                        "format": "float",
+                        "example": 99.99
+                    },
+                    "image_url": {
+                        "description": "Public URL to the image.",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "http://loclhost:8080/storage/courses/course1.png",
+                        "nullable": true
+                    },
+                    "lessons_count": {
+                        "description": "Total number of lessons.",
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "published_at": {
+                        "description": "Publishing time.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-25T12:00:00.000000Z",
+                        "nullable": true
+                    },
+                    "banned_at": {
+                        "description": "Banning time.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "description": "Creation time.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-20T12:00:00.000000Z"
+                    },
+                    "updated_at": {
+                        "description": "Modification time.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-25T12:00:00.000000Z"
                     }
                 },
                 "type": "object"
             },
             "CreateLessonRequest": {
                 "title": "Create Lesson Request",
-                "description": "Request payload for creating a new lesson.",
+                "description": "Payload for creating a new lesson.",
                 "required": [
                     "title"
                 ],
                 "properties": {
                     "title": {
-                        "description": "Title of the lesson.",
+                        "description": "Title.",
                         "type": "string",
                         "maxLength": 255,
                         "example": "Introduction to Algebra"
                     },
                     "slug": {
-                        "description": "Slug of the lesson. (optional, must be unique if provided)",
+                        "description": "Lesson slug.",
                         "type": "string",
                         "maxLength": 255,
                         "pattern": "^[a-z0-9-]+$",
@@ -2163,7 +3106,7 @@
                         "nullable": true
                     },
                     "position": {
-                        "description": "Position of the lesson.",
+                        "description": "Position.",
                         "type": "integer",
                         "minimum": 0,
                         "example": 1,
@@ -2185,31 +3128,31 @@
             },
             "CreateOfflineLessonRequest": {
                 "title": "Create Offline Lesson Request",
-                "description": "Offline part of request payload for creating a new lesson.",
+                "description": "Offline part of payload for creating a new lesson.",
                 "properties": {
                     "start_time": {
-                        "description": "Start time of the offline lesson.",
+                        "description": "Start time.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2027-02-01T10:00:00Z",
+                        "example": "2026-02-01T10:00:00Z",
                         "nullable": true
                     },
                     "end_time": {
-                        "description": "End time of the offline lesson.",
+                        "description": "End time.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2027-02-01T12:00:00Z",
+                        "example": "2026-02-01T12:00:00Z",
                         "nullable": true
                     },
                     "address": {
-                        "description": "Address of the offline lesson.",
+                        "description": "Address.",
                         "type": "string",
                         "maxLength": 255,
                         "example": "123 Main St, Springfield",
                         "nullable": true
                     },
                     "room_number": {
-                        "description": "Room number of the offline lesson.",
+                        "description": "Room number.",
                         "type": "string",
                         "maxLength": 50,
                         "example": "Room 101",
@@ -2220,24 +3163,24 @@
             },
             "CreateOnlineLessonRequest": {
                 "title": "Create Online Lesson Request",
-                "description": "Online part of request payload for creating a new lesson.",
+                "description": "Online part of payload for creating a new lesson.",
                 "properties": {
                     "start_time": {
-                        "description": "Start time of the online lesson.",
+                        "description": "Start time.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2027-02-01T10:00:00Z",
+                        "example": "2026-02-01T10:00:00Z",
                         "nullable": true
                     },
                     "end_time": {
-                        "description": "End time of the online lesson.",
+                        "description": "End time.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2027-02-01T12:00:00Z",
+                        "example": "2026-02-01T12:00:00Z",
                         "nullable": true
                     },
                     "meeting_link": {
-                        "description": "Meeting link of the lesson.",
+                        "description": "Meeting link.",
                         "type": "string",
                         "format": "uri",
                         "maxLength": 2048,
@@ -2249,10 +3192,10 @@
             },
             "CreateVideoLessonRequest": {
                 "title": "Create Video Lesson Request",
-                "description": "Video part of request payload for creating a new lesson.",
+                "description": "Video part of payload for creating a new lesson.",
                 "properties": {
                     "video_url": {
-                        "description": "Link of the video lesson.",
+                        "description": "Video URL.",
                         "type": "string",
                         "format": "uri",
                         "maxLength": 2048,
@@ -2260,7 +3203,7 @@
                         "nullable": true
                     },
                     "provider": {
-                        "description": "Provider of the video lesson.",
+                        "description": "Video provider.",
                         "type": "string",
                         "maxLength": 50,
                         "example": "youtube",
@@ -2271,21 +3214,23 @@
             },
             "UpdateLessonRequest": {
                 "title": "Update Lesson Request",
+                "description": "Payload for updating an existing lesson.",
                 "properties": {
                     "title": {
-                        "description": "Title of the lesson.",
+                        "description": "Title.",
                         "type": "string",
                         "maxLength": 255,
                         "example": "Introduction to Geometry"
                     },
                     "slug": {
-                        "description": "Slug of the lesson. (must be unique)",
+                        "description": "Lesson slug.",
                         "type": "string",
                         "maxLength": 255,
                         "pattern": "^[a-z0-9-]+$",
                         "example": "introduction-to-geometry"
                     },
                     "position": {
+                        "description": "Position.",
                         "type": "integer",
                         "minimum": 0,
                         "example": 1
@@ -2306,31 +3251,31 @@
             },
             "UpdateOfflineLessonRequest": {
                 "title": "Update Offline Lesson Request",
-                "description": "Offline part of request payload for updating the lesson.",
+                "description": "Offline part of payload for updating the lesson.",
                 "properties": {
                     "start_time": {
-                        "description": "Start time of the offline lesson.",
+                        "description": "Start time.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2027-02-02T10:00:00Z",
+                        "example": "2026-02-02T10:00:00Z",
                         "nullable": true
                     },
                     "end_time": {
-                        "description": "End time of the offline lesson.",
+                        "description": "End time.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2027-02-02T12:00:00Z",
+                        "example": "2026-02-02T12:00:00Z",
                         "nullable": true
                     },
                     "address": {
-                        "description": "Address of the offline lesson.",
+                        "description": "Address.",
                         "type": "string",
                         "maxLength": 255,
                         "example": "125 Main St, Springfield",
                         "nullable": true
                     },
                     "room_number": {
-                        "description": "Room number of the offline lesson.",
+                        "description": "Room number.",
                         "type": "string",
                         "maxLength": 50,
                         "example": "Room 105",
@@ -2341,24 +3286,24 @@
             },
             "UpdateOnlineLessonRequest": {
                 "title": "Update Online Lesson Request",
-                "description": "Online part of request payload for updating the lesson.",
+                "description": "Online part of payload for updating the lesson.",
                 "properties": {
                     "start_time": {
-                        "description": "Start time of the online lesson.",
+                        "description": "Start time.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2027-02-02T10:00:00Z",
+                        "example": "2026-02-02T10:00:00Z",
                         "nullable": true
                     },
                     "end_time": {
-                        "description": "End time of the online lesson.",
+                        "description": "End time.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2027-02-02T12:00:00Z",
+                        "example": "2026-02-02T12:00:00Z",
                         "nullable": true
                     },
                     "meeting_link": {
-                        "description": "Meeting link of the lesson.",
+                        "description": "Meeting link.",
                         "type": "string",
                         "format": "uri",
                         "maxLength": 2048,
@@ -2370,10 +3315,10 @@
             },
             "UpdateVideoLessonRequest": {
                 "title": "Update Video Lesson Request",
-                "description": "Video part of request payload for updating the lesson.",
+                "description": "Video part of payload for updating the lesson.",
                 "properties": {
                     "video_url": {
-                        "description": "Link of the video lesson.",
+                        "description": "Video URL.",
                         "type": "string",
                         "format": "uri",
                         "maxLength": 2048,
@@ -2381,7 +3326,7 @@
                         "nullable": true
                     },
                     "provider": {
-                        "description": "Provider of the video lesson.",
+                        "description": "Video provider.",
                         "type": "string",
                         "maxLength": 50,
                         "example": "vimeo",
@@ -2390,8 +3335,9 @@
                 },
                 "type": "object"
             },
-            "LessonResponse": {
-                "title": "Data of a specific lesson.",
+            "LessonAdminResponse": {
+                "title": "Lesson Admin Response",
+                "description": "Admin panel data of a lesson.",
                 "required": [
                     "id",
                     "course_id",
@@ -2404,32 +3350,32 @@
                 ],
                 "properties": {
                     "id": {
-                        "description": "Unique identifier of the lesson.",
+                        "description": "Unique identifier.",
                         "type": "integer",
                         "example": 1
                     },
                     "course_id": {
-                        "description": "Course unique identifier of the lesson.",
+                        "description": "Course identifier.",
                         "type": "integer",
                         "example": 1
                     },
                     "title": {
-                        "description": "Title of the lesson.",
+                        "description": "Title.",
                         "type": "string",
                         "example": "Introduction to Algebra"
                     },
                     "slug": {
-                        "description": "Slug of the lesson.",
+                        "description": "Lesson slug.",
                         "type": "string",
                         "example": "introduction-to-algebra"
                     },
                     "position": {
-                        "description": "Position of the lesson.",
+                        "description": "Position.",
                         "type": "integer",
                         "example": 1
                     },
                     "content": {
-                        "description": "Content of the lesson.",
+                        "description": "Polymorphic content of the lesson.",
                         "oneOf": [
                             {
                                 "$ref": "#/components/schemas/OfflineLessonResponse"
@@ -2443,16 +3389,91 @@
                         ]
                     },
                     "created_at": {
-                        "description": "Creation time of the lesson.",
+                        "description": "Creation time.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2026-01-01T12:00:00Z"
+                        "example": "2026-01-01T12:00:00.000000Z"
                     },
                     "updated_at": {
-                        "description": "Modification time of the lesson.",
+                        "description": "Modification time.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2026-01-10T12:00:00Z"
+                        "example": "2026-01-10T12:00:00.000000Z"
+                    },
+                    "deleted_at": {
+                        "description": "Soft-deletion time.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": null,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "LessonTeacherResponse": {
+                "title": "Lesson Teacher Response",
+                "description": "Teacher panel data of a lesson.",
+                "required": [
+                    "id",
+                    "course_id",
+                    "title",
+                    "slug",
+                    "position",
+                    "content",
+                    "created_at",
+                    "updated_at"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "course_id": {
+                        "description": "Course identifier.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "description": "Title.",
+                        "type": "string",
+                        "example": "Introduction to Algebra"
+                    },
+                    "slug": {
+                        "description": "Lesson slug.",
+                        "type": "string",
+                        "example": "introduction-to-algebra"
+                    },
+                    "position": {
+                        "description": "Position.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "content": {
+                        "description": "Polymorphic content of the lesson.",
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/OfflineLessonResponse"
+                            },
+                            {
+                                "$ref": "#/components/schemas/OnlineLessonResponse"
+                            },
+                            {
+                                "$ref": "#/components/schemas/VideoLessonResponse"
+                            }
+                        ]
+                    },
+                    "created_at": {
+                        "description": "Creation time.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-01T12:00:00.000000Z"
+                    },
+                    "updated_at": {
+                        "description": "Modification time.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-10T12:00:00.000000Z"
                     }
                 },
                 "type": "object"
@@ -2465,14 +3486,14 @@
                         "description": "Start time of the offline lesson.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2027-02-01T10:00:00Z",
+                        "example": "2027-02-01T10:00:00.000000Z",
                         "nullable": true
                     },
                     "end_time": {
                         "description": "End time of the offline lesson.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2027-02-01T12:00:00Z",
+                        "example": "2027-02-01T12:00:00.000000Z",
                         "nullable": true
                     },
                     "address": {
@@ -2498,14 +3519,14 @@
                         "description": "Start time of the online lesson.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2027-02-01T10:00:00Z",
+                        "example": "2027-02-01T10:00:00.000000Z",
                         "nullable": true
                     },
                     "end_time": {
                         "description": "End time of the online lesson.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2027-02-01T12:00:00Z",
+                        "example": "2027-02-01T12:00:00.000000Z",
                         "nullable": true
                     },
                     "meeting_link": {
@@ -2538,105 +3559,307 @@
                 },
                 "type": "object"
             },
-            "UpdateUserRoleRequest": {
-                "title": "Update User Role Request",
-                "description": "Request payload for updating of the specified user.",
+            "UpdateUserAvatarRequest": {
+                "title": "Update User Avatar Request",
+                "description": "Multipart form data payload for uploading a new avatar via PUT spoofing.",
                 "required": [
-                    "role"
+                    "avatar",
+                    "_method"
                 ],
                 "properties": {
-                    "role": {
-                        "description": "Role of the user.",
+                    "avatar": {
+                        "description": "The avatar image file.",
                         "type": "string",
+                        "format": "binary"
+                    },
+                    "_method": {
+                        "description": "Method spoofing to handle multipart/form-data in PUT requests.",
+                        "type": "string",
+                        "default": "PUT",
                         "enum": [
-                            "student",
-                            "teacher",
-                            "admin"
+                            "PUT"
                         ],
-                        "example": "teacher"
+                        "example": "PUT"
                     }
                 },
                 "type": "object"
             },
-            "UserResponse": {
-                "title": "User Response",
-                "description": "Data of a specific user.",
+            "UpdateUserAccountRequest": {
+                "title": "Update User Account Request",
+                "description": "Payload for updating a user auth.",
+                "properties": {
+                    "name": {
+                        "description": "Full name.",
+                        "type": "string",
+                        "maxLength": 100,
+                        "minLength": 2,
+                        "example": "John Doe"
+                    },
+                    "slug": {
+                        "description": "Unique auth slug.",
+                        "type": "string",
+                        "maxLength": 100,
+                        "pattern": "^[a-z0-9-]+$",
+                        "example": "john-doe"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateUserRoleRequest": {
+                "title": "Update User Role Request",
+                "description": "Payload for updating a user role.",
+                "required": [
+                    "roles"
+                ],
+                "properties": {
+                    "roles": {
+                        "description": "List of assigned roles.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "",
+                                "teacher",
+                                "admin"
+                            ]
+                        },
+                        "example": [
+                            "teacher"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "UserAccountResponse": {
+                "title": "User Account Response",
+                "description": "Private profile data of the currently authenticated user.",
                 "required": [
                     "id",
                     "name",
                     "slug",
                     "email",
-                    "role"
+                    "created_at",
+                    "updated_at"
                 ],
                 "properties": {
                     "id": {
-                        "description": "Unique identifier of the user.",
+                        "description": "Unique identifier.",
                         "type": "integer",
                         "example": 1
                     },
                     "name": {
-                        "description": "Full name of the user.",
+                        "description": "Full name.",
                         "type": "string",
                         "example": "John Doe"
                     },
                     "slug": {
-                        "description": "Slug of the user.",
+                        "description": "User slug.",
                         "type": "string",
                         "example": "john-doe"
                     },
                     "email": {
-                        "description": "Email address of the user.",
+                        "description": "Email address.",
                         "type": "string",
                         "format": "email",
                         "example": "john@example.com"
                     },
                     "email_verified_at": {
-                        "description": "Verification time of the user.",
+                        "description": "Verification time.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2026-01-01T12:00:00Z",
+                        "example": "2026-01-01T12:00:00.000000Z",
                         "nullable": true
                     },
-                    "role": {
-                        "description": "Role of the user.",
-                        "type": "string",
-                        "enum": [
-                            "student",
+                    "roles": {
+                        "description": "List of assigned roles.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "teacher",
+                                "admin",
+                                "super-admin"
+                            ]
+                        },
+                        "example": [
                             "teacher"
-                        ],
-                        "example": "student"
+                        ]
+                    },
+                    "avatar_url": {
+                        "description": "Public URL to the avatar image.",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "http://localhost:8080/storage/users/avatar.png",
+                        "nullable": true
                     },
                     "banned_at": {
-                        "description": "Banning time of the user.",
+                        "description": "Banning time.",
                         "type": "string",
                         "format": "date-time",
                         "example": null,
                         "nullable": true
                     },
+                    "created_at": {
+                        "description": "Creation timestamp.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-01T12:00:00.000000Z"
+                    },
+                    "updated_at": {
+                        "description": "Modification timestamp.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-10T12:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            },
+            "UserAdminResponse": {
+                "title": "User Admin Response",
+                "description": "Full user data for administrative management.",
+                "required": [
+                    "id",
+                    "name",
+                    "slug",
+                    "email",
+                    "created_at",
+                    "updated_at"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Full name.",
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "slug": {
+                        "description": "User slug.",
+                        "type": "string",
+                        "example": "john-doe"
+                    },
+                    "email": {
+                        "description": "Email address.",
+                        "type": "string",
+                        "format": "email",
+                        "example": "john@example.com"
+                    },
+                    "email_verified_at": {
+                        "description": "Verification time.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-01T12:00:00.000000Z",
+                        "nullable": true
+                    },
+                    "roles": {
+                        "description": "List of assigned roles.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "teacher",
+                                "admin",
+                                "super-admin"
+                            ]
+                        },
+                        "example": [
+                            "teacher"
+                        ]
+                    },
                     "avatar_url": {
-                        "description": "Avatar url of the user.",
+                        "description": "Public URL to the avatar image.",
                         "type": "string",
                         "format": "uri",
-                        "example": "http://loclhost:8080/storage/users/user1.png",
+                        "example": "http://localhost:8080/storage/users/avatar.png",
+                        "nullable": true
+                    },
+                    "courses_count": {
+                        "description": "Total number of published courses.",
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "banned_at": {
+                        "description": "Banning time.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": null,
                         "nullable": true
                     },
                     "created_at": {
-                        "description": "Creation time of the user.",
+                        "description": "Creation timestamp.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2026-01-01T12:00:00Z"
+                        "example": "2026-01-01T12:00:00.000000Z"
                     },
                     "updated_at": {
-                        "description": "Modification time of the user.",
+                        "description": "Modification timestamp.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2026-01-10T12:00:00Z"
+                        "example": "2026-01-10T12:00:00.000000Z"
                     },
                     "deleted_at": {
-                        "description": "Deletion time of the user.",
+                        "description": "Soft deletion timestamp.",
                         "type": "string",
                         "format": "date-time",
-                        "example": "2026-01-10T12:00:00Z"
+                        "example": null,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "UserPublicResponse": {
+                "title": "User Public Response",
+                "description": "Public profile data of a user.",
+                "required": [
+                    "id",
+                    "name",
+                    "slug"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Full name.",
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "slug": {
+                        "description": "User slug.",
+                        "type": "string",
+                        "example": "john-doe"
+                    },
+                    "roles": {
+                        "description": "List of assigned roles.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "teacher",
+                                "admin",
+                                "super-admin"
+                            ]
+                        },
+                        "example": [
+                            "teacher"
+                        ]
+                    },
+                    "avatar_url": {
+                        "description": "Public URL to the avatar image.",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "http://localhost:8080/storage/users/avatar.png",
+                        "nullable": true
+                    },
+                    "courses_count": {
+                        "description": "Total number of published courses.",
+                        "type": "integer",
+                        "example": 5
                     }
                 },
                 "type": "object"
@@ -2655,8 +3878,8 @@
     },
     "tags": [
         {
-            "name": "Account",
-            "description": "Account"
+            "name": "Auth",
+            "description": "Auth"
         },
         {
             "name": "Course",

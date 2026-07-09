@@ -41,7 +41,7 @@ class UserBannedNotification extends Notification implements ShouldQueue
     public function toMail(mixed $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Account Banned')
+            ->subject('Auth Banned')
             ->markdown('emails.user.ban', ['user' => $notifiable]);
     }
 }

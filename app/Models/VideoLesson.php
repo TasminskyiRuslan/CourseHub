@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
 
@@ -28,12 +29,17 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|VideoLesson whereProvider($value)
  * @method static Builder<static>|VideoLesson whereUpdatedAt($value)
  * @method static Builder<static>|VideoLesson whereVideoUrl($value)
+ * @property Carbon|null $deleted_at
+ * @method static Builder<static>|VideoLesson onlyTrashed()
+ * @method static Builder<static>|VideoLesson whereDeletedAt($value)
+ * @method static Builder<static>|VideoLesson withTrashed(bool $withTrashed = true)
+ * @method static Builder<static>|VideoLesson withoutTrashed()
  * @mixin Eloquent
  */
 class VideoLesson extends Model
 {
     /** @use HasFactory<VideoLessonFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.

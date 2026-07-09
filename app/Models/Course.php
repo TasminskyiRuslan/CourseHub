@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Spatie\Sluggable\HasSlug;
@@ -58,12 +59,16 @@ use Spatie\Sluggable\SlugOptions;
  * @property Carbon|null $published_at
  * @method static Builder<static>|Course whereBannedAt($value)
  * @method static Builder<static>|Course wherePublishedAt($value)
+ * @method static Builder<static>|Course active()
+ * @method static Builder<static>|Course onlyTrashed()
+ * @method static Builder<static>|Course withTrashed(bool $withTrashed = true)
+ * @method static Builder<static>|Course withoutTrashed()
  * @mixin Eloquent
  */
 class Course extends Model
 {
     /** @use HasFactory<CourseFactory> */
-    use HasFactory, HasSlug;
+    use HasFactory, HasSlug, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -234,29 +239,16 @@ class Course extends Model
     }
 
     /**
-     * Scope a query to only include courses visible to the given user.
+     * Scope a query to only include active courses.
      *
      * @param Builder $query
-     * @param  User|null  $user
      * @return Builder
      */
-    public function scopeVisibleFor(Builder $query, ?User $user): Builder
+    public function scopeActive(Builder $query): Builder
     {
-        if ($user?->hasPermissionTo(UserPermission::COURSE_VIEW_ANY_UNPUBLISHED->value) || $user?->hasRole(UserRole::SUPER_ADMIN->value)) {
-            return $query;
-        }
-        $query->whereHas('author', function ($q) {
-            $q->whereNull('banned_at');
-        });
-
-        return $query->where(function ($q) use ($user) {
-            $q->whereNotNull('published_at')
-                ->whereNull('banned_at');
-
-            if ($user) {
-                $q->orWhere('author_id', $user->id);
-            }
-        });
+        return $query->whereNotNull('published_at')
+            ->whereNull('banned_at')
+            ->whereHas('author', fn($q) => $q->whereNull('banned_at'));
     }
 
     /**

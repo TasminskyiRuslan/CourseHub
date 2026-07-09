@@ -41,26 +41,6 @@ class UserFactory extends Factory
     }
 
     /**
-     * Configure the model factory.
-     *
-     * @return $this
-     */
-    public function configure(): static
-    {
-        return $this->afterCreating(function (User $user) {
-            app()[PermissionRegistrar::class]->forgetCachedPermissions();
-
-            if (!$user->roles()->exists()) {
-                $user->assignRole(Arr::random([
-                    UserRole::STUDENT->value,
-                    UserRole::TEACHER->value,
-                    UserRole::ADMIN->value,
-                ]));
-            }
-        });
-    }
-
-    /**
      * Indicate that the user is unverified.
      *
      * @return $this
@@ -82,18 +62,6 @@ class UserFactory extends Factory
         return $this->state(fn() => [
             'banned_at' => now(),
         ]);
-    }
-
-    /**
-     * Indicate that the user has the student role.
-     *
-     * @return $this
-     */
-    public function student(): static
-    {
-        return $this->afterCreating(function (User $user) {
-            $user->syncRoles(UserRole::STUDENT->value);
-        });
     }
 
     /**

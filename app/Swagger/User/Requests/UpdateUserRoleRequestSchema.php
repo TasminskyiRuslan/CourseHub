@@ -8,19 +8,22 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'UpdateUserRoleRequest',
     title: 'Update User Role Request',
-    description: 'Request payload for updating of the specified user.',
-    required: ['role'],
+    description: 'Payload for updating a user role.',
+    required: ['roles'],
     properties: [
         new OA\Property(
-            property: 'role',
-            description: 'Role of the user.',
-            type: 'string',
-            enum: [
-                UserRole::STUDENT->value,
-                UserRole::TEACHER->value,
-                UserRole::ADMIN->value,
-            ],
-            example: UserRole::TEACHER->value
+            property: 'roles',
+            description: 'List of assigned roles.',
+            type: 'array',
+            items: new OA\Items(
+                type: 'string',
+                enum: [
+                    '',
+                    UserRole::TEACHER->value,
+                    UserRole::ADMIN->value,
+                ]
+            ),
+            example: [UserRole::TEACHER->value]
         )
     ],
     type: 'object'

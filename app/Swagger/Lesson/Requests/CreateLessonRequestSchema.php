@@ -7,19 +7,19 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'CreateLessonRequest',
     title: 'Create Lesson Request',
-    description: 'Request payload for creating a new lesson.',
+    description: 'Payload for creating a new lesson.',
     required: ['title'],
     properties: [
         new OA\Property(
             property: 'title',
-            description: 'Title of the lesson.',
+            description: 'Title.',
             type: 'string',
             maxLength: 255,
             example: 'Introduction to Algebra'
         ),
         new OA\Property(
             property: 'slug',
-            description: 'Slug of the lesson. (optional, must be unique if provided)',
+            description: 'Lesson slug.',
             type: 'string',
             maxLength: 255,
             pattern: '^[a-z0-9-]+$',
@@ -28,12 +28,12 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'position',
-            description: 'Position of the lesson.',
+            description: 'Position.',
             type: 'integer',
             minimum: 0,
             example: 1,
             nullable: true
-        ),
+        )
     ],
     type: 'object',
     oneOf: [

@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Data\User\Requests;
+
+use App\Enums\UserRole;
+use Illuminate\Validation\Rule;
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Support\Validation\ValidationContext;
+
+class UpdateUserRoleData extends Data
+{
+    /**
+     * @param array $roles
+     */
+    public function __construct(
+        public array $roles,
+    ) {}
+
+    /**
+     * Return the validation rules.
+     *
+     * @param ValidationContext $context
+     * @return array
+     */
+    public static function rules(ValidationContext $context): array
+    {
+        return [
+            'roles'   => ['present', 'array'],
+            'roles.*' => [
+                'string',
+                'distinct',
+                Rule::enum(UserRole::class),
+                Rule::in([
+                    UserRole::TEACHER->value,
+                    UserRole::ADMIN->value
+                ]),
+            ],
+        ];
+    }
+}

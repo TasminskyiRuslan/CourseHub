@@ -17,6 +17,7 @@ class UpdateCourseAction
     public function handle(UpdateCourseData $data, Course $course): Course
     {
         $course->update($data->all());
+
         return $course;
     }
 }

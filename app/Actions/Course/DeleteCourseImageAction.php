@@ -8,19 +8,21 @@ use Illuminate\Support\Facades\Storage;
 class DeleteCourseImageAction
 {
     /**
-     * Remove the specified course image.
+     * Delete the specified course image.
      *
      * @param Course $course
      * @return void
      */
     public function handle(Course $course): void
     {
-        if ($course->image_path) {
-            if (Storage::disk('courses')->exists($course->image_path)) {
-                Storage::disk('courses')->delete($course->image_path);
-            }
-
-            $course->removeImage()->save();
+        if (!$course->image_path) {
+            return;
         }
+
+        if (Storage::disk('courses')->exists($course->image_path)) {
+            Storage::disk('courses')->delete($course->image_path);
+        }
+
+        $course->removeImage()->save();
     }
 }

@@ -63,7 +63,9 @@ class UnbanUserController extends Controller
     public function __invoke(UnbanUserAction $action, User $user): Response
     {
         $this->authorize('ban', $user);
+
         $action->handle($user);
+
         return response()->noContent();
     }
 }

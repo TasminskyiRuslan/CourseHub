@@ -7,7 +7,8 @@
 ![License](https://img.shields.io/badge/license-MIT-brightgreen)
 
 **CourseHub** is a robust LMS (Learning Management System) RESTful API built with Laravel.
-It handles course creation, lesson management, user authentication with email verification, and uses a modern Docker-based infrastructure.
+It handles course creation, lesson management, user authentication with email verification, and uses a modern
+Docker-based infrastructure.
 
 ---
 
@@ -154,7 +155,7 @@ tests/                     # Feature and Unit tests (Pest)
 Running migrations with seeders creates a default **Admin** user (not available via registration):
 
 | Role  | Email                                             | Password |
-| ----- | ------------------------------------------------- | -------- |
+|-------|---------------------------------------------------|----------|
 | admin | [admin@coursehub.com](mailto:admin@coursehub.com) | secret   |
 
 > ⚠ Registration is available only for **STUDENT** and **TEACHER** roles.

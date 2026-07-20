@@ -21,7 +21,7 @@ class RegisterUserAction
     }
 
     /**
-     * Register a new user and issue an access token.
+     * Register a new user, assign roles, and issue an access token.
      *
      * @param RegisterUserData $data
      * @return AuthData
@@ -30,7 +30,8 @@ class RegisterUserAction
     public function handle(RegisterUserData $data): AuthData
     {
         return DB::transaction(function () use ($data) {
-            $user = User::create($data->all());
+            $user = User::query()->create($data->all());
+
             $user->syncRoles($data->roles);
             $user->loadMissing(['roles']);
 

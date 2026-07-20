@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -14,7 +15,7 @@ use Illuminate\Support\Facades\Storage;
  * @property-read string $slug
  * @property-read string $email
  * @property-read Carbon|null $email_verified_at
- * @property-read Collection|null $roles
+ * @property-read Collection|MissingValue $roles
  * @property-read string|null $avatar_path
  * @property-read Carbon|null $banned_at
  * @property-read Carbon $created_at

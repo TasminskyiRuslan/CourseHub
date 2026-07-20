@@ -15,7 +15,7 @@ class CourseUnbannedNotification extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      *
-     * @return void
+     * @param Course $course
      */
     public function __construct(protected Course $course)
     {
@@ -28,7 +28,7 @@ class CourseUnbannedNotification extends Notification implements ShouldQueue
      * @param mixed $notifiable
      * @return array<int, string>
      */
-    public function via(object $notifiable): array
+    public function via(mixed $notifiable): array
     {
         return ['mail'];
     }
@@ -39,7 +39,7 @@ class CourseUnbannedNotification extends Notification implements ShouldQueue
      * @param mixed $notifiable
      * @return MailMessage
      */
-    public function toMail(object $notifiable): MailMessage
+    public function toMail(mixed $notifiable): MailMessage
     {
         return (new MailMessage)
             ->line('Course Unbanned')

@@ -11,7 +11,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 class GetCoursesQuery
 {
     /**
-     * Retrieve a paginated list of all courses for admins.
+     * Retrieve a paginated list of all courses by administrator.
      *
      * @param Request $request
      * @return LengthAwarePaginator
@@ -33,9 +33,9 @@ class GetCoursesQuery
     {
         return QueryBuilder::for(Course::class, $request)
             ->with(['author' => function ($query) {
-                $query->with('roles')->withCount(['courses' => fn ($q) => $q->withTrashed()])->withTrashed();
+                $query->with('roles')->withCount(['courses' => fn($q) => $q->withTrashed()])->withTrashed();
             }])
-            ->withCount(['lessons' => fn ($query) => $query->withTrashed()])
+            ->withCount(['lessons' => fn($query) => $query->withTrashed()])
             ->allowedFilters([
                 'type',
                 AllowedFilter::callback('search', function ($query, $value) {

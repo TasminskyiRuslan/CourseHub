@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Notifications\Auth\ResetPasswordNotification;
+use App\Notifications\Auth\PasswordResetNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -11,7 +11,7 @@ use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class);
 
-describe('Auth -> SendPasswordResetEmailController', function () {
+describe('Auth -> SendPasswordResetLinkController', function () {
     beforeEach(function () {
         $this->withoutMiddleware(ThrottleRequests::class);
         $this->seed(RolesAndPermissionsSeeder::class);
@@ -53,7 +53,7 @@ describe('Auth -> SendPasswordResetEmailController', function () {
     |--------------------------------------------------------------------------
     */
     describe('operations', function () {
-        it('sends a reset link to verify user', function ($user) {
+        it('sends a password reset link to a valid user', function ($user) {
             Notification::fake();
 
             postJson(route('auth.password.forgot'), [
@@ -62,7 +62,7 @@ describe('Auth -> SendPasswordResetEmailController', function () {
 
             Notification::assertSentTo(
                 $user,
-                ResetPasswordNotification::class,
+                PasswordResetNotification::class,
                 fn($notification) => !empty($notification->token)
             );
 
@@ -70,10 +70,10 @@ describe('Auth -> SendPasswordResetEmailController', function () {
                 'email' => $user->email,
             ]);
         })
-        ->with([
-            'verified user' => fn() => User::factory()->create(),
-            'unverified user' => fn() => User::factory()->unverified()->create(),
-        ]);
+            ->with([
+                'verified user' => fn() => User::factory()->create(),
+                'unverified user' => fn() => User::factory()->unverified()->create(),
+            ]);
 
         it('does not send a notification if the email does not exist', function () {
             Notification::fake();

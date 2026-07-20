@@ -52,6 +52,7 @@ class RegisterController extends Controller
     public function __invoke(RegisterUserData $data, RegisterUserAction $action): JsonResponse
     {
         $authData = $action->handle($data);
+
         return AuthResource::make($authData)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_CREATED);

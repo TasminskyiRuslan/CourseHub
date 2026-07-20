@@ -22,7 +22,7 @@ describe('Account -> AccountController -> show', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('fails for unauthenticated user', function () {
+        it('fails if an unauthenticated user tries to retrieve the account data', function () {
             getJson(route('account.show'))
                 ->assertUnauthorized();
         });
@@ -34,7 +34,7 @@ describe('Account -> AccountController -> show', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-        it('returns authenticated user data', function ($user) {
+        it('returns the authenticated user data', function ($user) {
             Sanctum::actingAs($user);
 
             getJson(route('account.show'))
@@ -42,11 +42,11 @@ describe('Account -> AccountController -> show', function () {
                 ->assertJsonFragment(['email' => $user->email])
                 ->assertJsonStructure(['data' => accountUserJsonStructure()]);
         })->with([
-            'user'            => fn() => User::factory()->create(),
-            'teacher'            => fn() => User::factory()->teacher()->create(),
+            'user' => fn() => User::factory()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
             'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'admin'              => fn() => User::factory()->admin()->create(),
-            'super-admin'        => fn() => User::where('email', config('super-admin.email'))->first(),
+            'admin' => fn() => User::factory()->admin()->create(),
+            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ]);
     });
 })->group('user', 'account');

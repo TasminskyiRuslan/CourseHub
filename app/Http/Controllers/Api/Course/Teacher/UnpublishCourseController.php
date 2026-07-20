@@ -61,7 +61,7 @@ class UnpublishCourseController extends Controller
         ]
     )]
     /**
-     * Unpublish the specified teacher\'s course.
+     * Unpublish the specified teacher's course.
      *
      * @param UnpublishCourseAction $action
      * @param Course $course
@@ -70,8 +70,10 @@ class UnpublishCourseController extends Controller
     public function __invoke(UnpublishCourseAction $action, Course $course): JsonResponse
     {
         $this->authorize('publish', $course);
+
         $unpublishedCourse = $action->handle($course);
         $unpublishedCourse->loadCount(['lessons']);
+
         return CourseResource::make($unpublishedCourse)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);

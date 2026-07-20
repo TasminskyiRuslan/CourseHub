@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Notifications\Auth\VerifyEmailNotification;
+use App\Notifications\Auth\EmailVerificationNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\Middleware\ThrottleRequests;
@@ -11,7 +11,7 @@ use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class);
 
-describe('Auth -> SendVerificationEmailController', function () {
+describe('Auth -> SendEmailVerificationNotificationController', function () {
     beforeEach(function () {
         $this->withoutMiddleware(ThrottleRequests::class);
         $this->seed(RolesAndPermissionsSeeder::class);
@@ -42,7 +42,7 @@ describe('Auth -> SendVerificationEmailController', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('fails for unauthenticated user', function () {
+        it('fails if an unauthenticated user tries to request a verification link', function () {
             postJson(route('auth.verification.send'))
                 ->assertUnauthorized();
         });
@@ -54,14 +54,14 @@ describe('Auth -> SendVerificationEmailController', function () {
     |--------------------------------------------------------------------------
     */
     describe('operations', function () {
-        it('sends verification email if email is unverified', function () {
+        it('sends a verification email if the user\'s email is unverified', function () {
             Notification::fake();
             $user = User::factory()->unverified()->create();
             Sanctum::actingAs($user);
 
             postJson(route('auth.verification.send'))
                 ->assertNoContent();
-            Notification::assertSentTo($user, VerifyEmailNotification::class);
+            Notification::assertSentTo($user, EmailVerificationNotification::class);
         });
     });
 })->group('auth');

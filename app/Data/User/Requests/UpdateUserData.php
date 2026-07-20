@@ -2,6 +2,7 @@
 
 namespace App\Data\User\Requests;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
@@ -22,26 +23,30 @@ class UpdateUserData extends Data
         #[StringType]
         #[Min(2)]
         #[Max(100)]
-        public string|Optional   $name,
+        public string|Optional $name,
 
-        public string|Optional      $slug,
-    ) {}
+        public string|Optional $slug,
+    )
+    {
+    }
 
     /**
      * Return the validation rules.
      *
      * @param ValidationContext $context
-     * @return array
+     * @return array<string, array<int, mixed>>
      */
     public static function rules(ValidationContext $context): array
     {
+        $user = Route::current()?->parameter('user') ?? request()->user();
+
         return [
             'slug' => [
                 'sometimes',
                 'string',
                 'max:100',
                 'regex:/^[a-z0-9-]+$/',
-                Rule::unique('users', 'slug')->ignore(auth()->id()),
+                Rule::unique('users', 'slug')->ignore($user),
             ],
         ];
     }

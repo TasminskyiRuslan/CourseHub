@@ -121,6 +121,7 @@ class CourseController extends Controller
     public function index(Request $request, GetCoursesQuery $query): JsonResponse
     {
         $gottenCourses = $query->handle($request);
+
         return CourseResource::collection($gottenCourses)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
@@ -181,6 +182,7 @@ class CourseController extends Controller
     public function show(GetCourseQuery $query, string $course): JsonResponse
     {
         $gottenCourse = $query->handle($course);
+
         return CourseResource::make($gottenCourse)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
@@ -233,7 +235,9 @@ class CourseController extends Controller
     public function destroy(DeleteCourseAction $action, Course $course): Response
     {
         $this->authorize('delete', $course);
+
         $action->handle($course);
+
         return response()->noContent();
     }
 }

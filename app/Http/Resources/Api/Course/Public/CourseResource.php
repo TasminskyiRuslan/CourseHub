@@ -12,14 +12,14 @@ use Illuminate\Support\Facades\Storage;
 /**
  * @property-read int $id
  * @property-read int|null $author_id
- * @property-read UserResource|null|MissingValue $author
+ * @property-read UserResource|MissingValue $author
  * @property-read string $title
  * @property-read string $slug
  * @property-read string|null $description
  * @property-read string $type
  * @property-read float $price
  * @property-read string|null $image_path
- * @property-read int|null $lessons_count
+ * @property-read int|MissingValue $lessons_count
  * @property-read Carbon|null $published_at
  */
 class CourseResource extends JsonResource

@@ -20,7 +20,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'password',
-            description: 'New auth password.',
+            description: 'New account password.',
             type: 'string',
             format: 'password',
             minLength: 8,

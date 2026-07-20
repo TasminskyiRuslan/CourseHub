@@ -2,7 +2,6 @@
 
 namespace App\Queries\User;
 
-use App\Enums\UserPermission;
 use App\Models\User;
 
 class LoadUserRelationsQuery

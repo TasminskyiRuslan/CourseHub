@@ -9,7 +9,7 @@ use App\Models\User;
 class CreateCourseAction
 {
     /**
-     * Create a new course.
+     * Create a new course for the specified teacher.
      *
      * @param CreateCourseData $data
      * @param User $teacher

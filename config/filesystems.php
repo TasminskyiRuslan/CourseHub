@@ -63,7 +63,7 @@ return [
         'courses' => [
             'driver' => 'local',
             'root' => storage_path('app/public/courses'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage/courses',
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/') . '/storage/courses',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
@@ -72,7 +72,7 @@ return [
         'users' => [
             'driver' => 'local',
             'root' => storage_path('app/public/users'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage/users',
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/') . '/storage/users',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,

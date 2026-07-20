@@ -49,7 +49,7 @@ describe('Admin -> UnbanUserController', function () {
             expect($targetUser->isBanned())->toBeTrue();
         });
 
-        it('fails if users without permissions try to unban someone else', function ($user) {
+        it('fails if a user without permissions tries to unban a user', function ($user) {
             Sanctum::actingAs($user);
 
             $targetUser = User::factory()->banned()->create();
@@ -64,7 +64,7 @@ describe('Admin -> UnbanUserController', function () {
             'teacher' => fn() => User::factory()->teacher()->create(),
         ]);
 
-        it('fails if authenticated user tries to unban their own user', function () {
+        it('fails if an authenticated user tries to unban themselves', function () {
             $admin = User::factory()->admin()->banned()->create();
             Sanctum::actingAs($admin);
 
@@ -75,18 +75,18 @@ describe('Admin -> UnbanUserController', function () {
             expect($admin->isBanned())->toBeTrue();
         });
 
-        it('fails if admin tries to unban admin or super admin user', function ($targetUser) {
+        it('fails if an admin tries to unban another admin or super-admin', function ($targetUser) {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
             patchJson(route('admin.user.unban', $targetUser))
                 ->assertForbidden();
         })->with([
-            'admin'       => fn() => User::factory()->admin()->banned()->create(),
+            'admin' => fn() => User::factory()->admin()->banned()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ]);
 
-        it('allows admin to unban non-admin users', function ($targetUser) {
+        it('allows an admin to unban non-admin users', function ($targetUser) {
             Notification::fake();
 
             $admin = User::factory()->admin()->create();
@@ -104,7 +104,7 @@ describe('Admin -> UnbanUserController', function () {
             'teacher' => fn() => User::factory()->teacher()->banned()->create(),
         ]);
 
-        it('allows super-admin to unban any user', function ($targetUser) {
+        it('allows a super-admin to unban any user', function ($targetUser) {
             Notification::fake();
 
             $superAdmin = User::where('email', config('super-admin.email'))->first();
@@ -120,7 +120,7 @@ describe('Admin -> UnbanUserController', function () {
         })->with([
             'user' => fn() => User::factory()->banned()->create(),
             'teacher' => fn() => User::factory()->teacher()->banned()->create(),
-            'admin'   => fn() => User::factory()->admin()->banned()->create(),
+            'admin' => fn() => User::factory()->admin()->banned()->create(),
         ]);
 
         it('does not send a notification if the user is already unbanned', function () {

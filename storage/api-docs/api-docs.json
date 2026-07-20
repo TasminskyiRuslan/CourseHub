@@ -148,7 +148,7 @@
                     "Auth"
                 ],
                 "summary": "Reset password",
-                "description": "Reset the user's password.",
+                "description": "Reset the password for the user identified by the email.",
                 "operationId": "033879051100699c9ba3a190913d20c5",
                 "requestBody": {
                     "required": true,
@@ -170,14 +170,43 @@
                 }
             }
         },
+        "/auth/email/verification-notification": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Send email verification notification",
+                "description": "Send the email verification notification to the authenticated user.",
+                "operationId": "506aaac75bb152b13b434fbc5a4641b9",
+                "responses": {
+                    "204": {
+                        "description": "Email verification notification sent successfully."
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "422": {
+                        "description": "Email is already verified."
+                    },
+                    "429": {
+                        "description": "Too many requests."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/auth/password/forgot": {
             "post": {
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Send password reset email",
-                "description": "Send an email with a link to reset the password.",
-                "operationId": "a6257242c1f3b4c342c2b1ed1cd79b71",
+                "description": "Send a password reset link to the user identified by the email.",
+                "operationId": "31809a008b96942834032f7fe05d16fd",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -201,42 +230,13 @@
                 }
             }
         },
-        "/auth/email/verification-notification": {
-            "post": {
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Send verification email",
-                "description": "Send the email verification notification to the user.",
-                "operationId": "b91df446845f19f52372485c1fe5bcf6",
-                "responses": {
-                    "204": {
-                        "description": "Verification email sent successfully."
-                    },
-                    "401": {
-                        "description": "User is unauthenticated."
-                    },
-                    "422": {
-                        "description": "Email is already verified."
-                    },
-                    "429": {
-                        "description": "Too many requests."
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
         "/auth/email/verify/{id}/{hash}": {
             "get": {
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Verify email address",
-                "description": "Verify the user's email address.",
+                "description": "Verify the email address of the user identified by the id.",
                 "operationId": "44b8c9b6e3feb78742765f001c607182",
                 "parameters": [
                     {
@@ -245,8 +245,7 @@
                         "description": "Unique identifier of the user.",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "type": "integer"
                         }
                     },
                     {
@@ -255,8 +254,7 @@
                         "description": "Hash of the email verification.",
                         "required": true,
                         "schema": {
-                            "type": "string",
-                            "example": "5224cb6fdd5bbe463af1db8ee499e858fcb79f81"
+                            "type": "string"
                         }
                     },
                     {
@@ -265,8 +263,7 @@
                         "description": "Time of the link expiration.",
                         "required": false,
                         "schema": {
-                            "type": "integer",
-                            "example": 1893456000
+                            "type": "integer"
                         }
                     },
                     {
@@ -275,8 +272,7 @@
                         "description": "Signature of the email verification.",
                         "required": true,
                         "schema": {
-                            "type": "string",
-                            "example": "e697b7c8f76cae59e0121fbde183a47f7556ae973b5890d7ac7ee85a0a3e52bc"
+                            "type": "string"
                         }
                     }
                 ],
@@ -1151,8 +1147,8 @@
                 "tags": [
                     "Course"
                 ],
-                "summary": "[Teacher] Remove course image",
-                "description": "Remove the image of the specified teacher's course.",
+                "summary": "[Teacher] Delete course image",
+                "description": "Delete the image of the specified teacher's course.",
                 "operationId": "40e55989db0d8d79bc225f7d8013c7f6",
                 "parameters": [
                     {
@@ -1676,7 +1672,7 @@
                     "Lesson"
                 ],
                 "summary": "[Teacher] Retrieve lesson details",
-                "description": "Retrieve detailed information about the specified teacher's lesson.",
+                "description": "Retrieve detailed information about the specified lesson for the specified teacher's course.",
                 "operationId": "860d20315084fa69a93093821f2bdf75",
                 "parameters": [
                     {
@@ -1737,7 +1733,7 @@
                     "Lesson"
                 ],
                 "summary": "[Teacher] Delete a lesson",
-                "description": "Delete the specified teacher's lesson.",
+                "description": "Delete the specified lesson for the specified teacher's course.",
                 "operationId": "bf3736be9d2c8e81252dbc38224f54c6",
                 "parameters": [
                     {
@@ -1786,7 +1782,7 @@
                     "Lesson"
                 ],
                 "summary": "[Teacher] Update a lesson",
-                "description": "Update the specified teacher's lesson.",
+                "description": "Update the specified lesson for the specified teacher's course.",
                 "operationId": "85827704efa02685116f1a85306e3268",
                 "parameters": [
                     {
@@ -1862,7 +1858,7 @@
                     "User"
                 ],
                 "summary": "[Account] Update user avatar",
-                "description": "Update the current user's account avatar.",
+                "description": "Update the authenticated user's account avatar.",
                 "operationId": "98ce90d5c0b5be789ecd58581fcd3998",
                 "requestBody": {
                     "required": true,
@@ -1911,7 +1907,7 @@
                     "User"
                 ],
                 "summary": "[Account] Remove user avatar",
-                "description": "Remove the current user's account avatar.",
+                "description": "Delete the authenticated user's account avatar.",
                 "operationId": "611f65952b796dc1838e4cedba276306",
                 "responses": {
                     "204": {
@@ -1937,7 +1933,7 @@
                     "User"
                 ],
                 "summary": "[Account] Retrieve user account",
-                "description": "Retrieve the current user's account.",
+                "description": "Retrieve the authenticated user's account.",
                 "operationId": "686ee07cdbed583c86dbb5a9626aadbb",
                 "responses": {
                     "200": {
@@ -1970,7 +1966,7 @@
                     "User"
                 ],
                 "summary": "[Account] Update user account",
-                "description": "Update the current user's account.",
+                "description": "Update the authenticated user's account.",
                 "operationId": "c033aa2f3414ae49f7ad714331687ded",
                 "requestBody": {
                     "required": true,

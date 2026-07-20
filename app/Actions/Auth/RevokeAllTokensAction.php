@@ -7,7 +7,7 @@ use App\Models\User;
 class RevokeAllTokensAction
 {
     /**
-     * Revoke all access tokens for an authenticated user.
+     * Revoke all access tokens for the specified user.
      *
      * @param User $user
      * @return void

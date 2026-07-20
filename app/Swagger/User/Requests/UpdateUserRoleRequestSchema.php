@@ -18,7 +18,6 @@ use OpenApi\Attributes as OA;
             items: new OA\Items(
                 type: 'string',
                 enum: [
-                    '',
                     UserRole::TEACHER->value,
                     UserRole::ADMIN->value,
                 ]

@@ -6,7 +6,6 @@ use App\Actions\Course\UnbanCourseAction;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -64,7 +63,9 @@ class UnbanCourseController extends Controller
     public function __invoke(UnbanCourseAction $action, Course $course): Response
     {
         $this->authorize('ban', $course);
+
         $action->handle($course);
+
         return response()->noContent();
     }
 }

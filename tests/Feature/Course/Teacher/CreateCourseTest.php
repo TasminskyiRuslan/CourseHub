@@ -86,7 +86,7 @@ describe('Teacher -> CourseController -> store', function () {
             postJson(route('teacher.course.store'), creatingCoursePayload(['slug' => $slug]))
                 ->assertCreated()
                 ->assertJsonFragment(['slug' => $slug])
-                ->assertJsonStructure(['data' =>  teacherCourseJsonStructure()]);
+                ->assertJsonStructure(['data' => teacherCourseJsonStructure()]);
         });
     });
 
@@ -96,12 +96,12 @@ describe('Teacher -> CourseController -> store', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('fails if unauthenticated user tries to create a course', function () {
+        it('fails if an unauthenticated user tries to create a course', function () {
             postJson(route('teacher.course.store'), creatingCoursePayload())
                 ->assertUnauthorized();
         });
 
-        it('fails if users without permissions tries to create a course', function ($user) {
+        it('fails if a user without permissions tries to create a course', function ($user) {
             Sanctum::actingAs($user);
 
             postJson(route('teacher.course.store'), creatingCoursePayload())
@@ -112,7 +112,7 @@ describe('Teacher -> CourseController -> store', function () {
             'admin' => fn() => User::factory()->admin()->create(),
         ]);
 
-        it('allows users with permission to create a course', function ($user) {
+        it('allows a user with permission to create a course', function ($user) {
             Sanctum::actingAs($user);
 
             $data = creatingCoursePayload();

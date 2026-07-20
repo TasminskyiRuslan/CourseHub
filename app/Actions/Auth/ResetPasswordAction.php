@@ -10,7 +10,7 @@ use Illuminate\Validation\ValidationException;
 class ResetPasswordAction
 {
     /**
-     * Reset the user's password.
+     * Reset the password for the user identified by the email.
      *
      * @param ResetPasswordData $data
      * @return void

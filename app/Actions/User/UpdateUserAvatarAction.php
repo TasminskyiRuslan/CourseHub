@@ -12,11 +12,12 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class UpdateUserAvatarAction
 {
     /**
-     * Update the specified user auth avatar.
+     * Update the specified user avatar.
      *
      * @param UpdateUserAvatarData $data
      * @param User $user
      * @return User
+     * @throws AccessDeniedHttpException
      * @throws Exception
      */
     public function handle(UpdateUserAvatarData $data, User $user): User

@@ -198,14 +198,14 @@ describe('Teacher -> LessonController -> store', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('fails if unauthenticated user tries to create a lesson', function () {
+        it('fails if an unauthenticated user tries to create a lesson', function () {
             $course = Course::factory()->create();
 
             postJson(route('teacher.course.lesson.store', $course), creatingLessonPayload($course->type))
                 ->assertUnauthorized();
         });
 
-        it('fails if users without permissions tries to create a lesson', function ($user) {
+        it('fails if a user without permissions tries to create a lesson', function ($user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -218,7 +218,7 @@ describe('Teacher -> LessonController -> store', function () {
             'admin' => fn() => User::factory()->admin()->create(),
         ]);
 
-        it('allows users with permission to create a lesson', function ($userClosure, $courseClosure) {
+        it('allows a user with permission to create a lesson', function ($userClosure, $courseClosure) {
             $user = $userClosure();
             Sanctum::actingAs($user);
 
@@ -236,12 +236,12 @@ describe('Teacher -> LessonController -> store', function () {
                 'course_id' => $course->id,
             ]);
         })->with([
-            'teacher'     => fn() => User::factory()->teacher()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ])->with([
-            'published'   => fn() => fn($author) => Course::factory()->for($author, 'author')->create(),
+            'published' => fn() => fn($author) => Course::factory()->for($author, 'author')->create(),
             'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->for($author, 'author')->create(),
-            'banned'      => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
+            'banned' => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
         ]);
     });
 
@@ -258,11 +258,8 @@ describe('Teacher -> LessonController -> store', function () {
             $course = Course::factory()->for($teacher, 'author')->create();
 
             $page = 1;
-            $cacheKey = "lessons:course:{$course->id}:page:{$page}";
-            $tags = [
-                config('cache.tags.lesson_list'),
-                config('cache.tags.course') . ':' . $course->id
-            ];
+            $cacheKey = "courses:page:{$page}";
+            $tags = [config('cache.tags.course_list')];
 
             Cache::tags($tags)->put($cacheKey, 'test_value', config('cache.ttl.lesson'));
             expect(Cache::tags($tags)->get($cacheKey))->not->toBeNull();

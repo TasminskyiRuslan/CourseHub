@@ -50,6 +50,7 @@ class LoginController extends Controller
     public function __invoke(LoginUserData $data, LoginUserAction $action): JsonResponse
     {
         $authData = $action->handle($data);
+
         return AuthResource::make($authData)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);

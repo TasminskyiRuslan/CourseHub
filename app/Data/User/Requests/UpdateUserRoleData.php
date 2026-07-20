@@ -10,22 +10,24 @@ use Spatie\LaravelData\Support\Validation\ValidationContext;
 class UpdateUserRoleData extends Data
 {
     /**
-     * @param array $roles
+     * @param array<int, string> $roles
      */
     public function __construct(
         public array $roles,
-    ) {}
+    )
+    {
+    }
 
     /**
      * Return the validation rules.
      *
      * @param ValidationContext $context
-     * @return array
+     * @return array<string, array<int, mixed>>
      */
     public static function rules(ValidationContext $context): array
     {
         return [
-            'roles'   => ['present', 'array'],
+            'roles' => ['present', 'array'],
             'roles.*' => [
                 'string',
                 'distinct',

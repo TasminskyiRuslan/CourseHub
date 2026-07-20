@@ -47,7 +47,7 @@ describe('Teacher -> UnpublishCourseController', function () {
             expect($course->isPublished())->toBeTrue();
         });
 
-        it('fails if users without permissions tries to unpublish someone else\'s course', function ($user) {
+        it('fails if a user without permissions tries to unpublish someone else\'s course', function ($user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -63,7 +63,7 @@ describe('Teacher -> UnpublishCourseController', function () {
             'admin' => fn() => User::factory()->admin()->create(),
         ]);
 
-        it('allows users to unpublish their own course', function ($userClosure, $courseClosure) {
+        it('allows a user to unpublish their own course', function ($userClosure, $courseClosure) {
             $user = $userClosure();
 
             Sanctum::actingAs($user);
@@ -78,12 +78,12 @@ describe('Teacher -> UnpublishCourseController', function () {
             $course->refresh();
             expect($course->isPublished())->toBeFalse();
         })->with([
-            'teacher'     => fn() => User::factory()->teacher()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ])->with([
-            'published'   => fn() => fn($author) => Course::factory()->for($author, 'author')->create(),
+            'published' => fn() => fn($author) => Course::factory()->for($author, 'author')->create(),
             'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->for($author, 'author')->create(),
-            'banned'      => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
+            'banned' => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
         ]);
     });
 

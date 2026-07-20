@@ -7,7 +7,7 @@ use App\Models\Lesson;
 class GetLessonQuery
 {
     /**
-     * Retrieve detailed information about a specific lesson for admin.
+     * Retrieve detailed information about the specified lesson for the specified course.
      *
      * @param string $courseSlug
      * @param string $lessonSlug
@@ -21,7 +21,7 @@ class GetLessonQuery
                 $query->where('slug', $courseSlug)->withTrashed();
             })
             ->withTrashed()
-            ->with(['lessonable' => fn ($morphTo) => $morphTo->withTrashed()])
+            ->with(['lessonable' => fn($morphTo) => $morphTo->withTrashed()])
             ->firstOrFail();
     }
 }

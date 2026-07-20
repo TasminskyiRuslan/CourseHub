@@ -53,6 +53,7 @@ use OpenApi\Attributes as OA;
                     UserRole::TEACHER->value
                 ]
             ),
+            default: [],
             example: [
                 UserRole::TEACHER->value
             ]

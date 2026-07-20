@@ -5,9 +5,9 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Laravel\Sanctum\Sanctum;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Sanctum\Sanctum;
 use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class);
@@ -107,7 +107,7 @@ describe('Account -> AccountAvatarController -> update', function () {
             expect($superAdmin->avatar_path)->toBeNull();
         });
 
-        it('allows authenticated users with any role to update their own auth image', function ($user) {
+        it('allows an authenticated user with any role to update their own avatar', function ($user) {
             Sanctum::actingAs($user);
 
             $oldAvatarPath = $user->avatar_path;
@@ -121,10 +121,10 @@ describe('Account -> AccountAvatarController -> update', function () {
             Storage::disk('users')->assertExists($user->avatar_path);
             Storage::disk('users')->assertMissing($oldAvatarPath);
         })->with([
-            'user'            => fn() => User::factory()->withAvatar()->create(),
-            'teacher'            => fn() => User::factory()->withAvatar()->teacher()->create(),
+            'user' => fn() => User::factory()->withAvatar()->create(),
+            'teacher' => fn() => User::factory()->withAvatar()->teacher()->create(),
             'unverified teacher' => fn() => User::factory()->withAvatar()->teacher()->unverified()->create(),
-            'admin'              => fn() => User::factory()->withAvatar()->admin()->create(),
+            'admin' => fn() => User::factory()->withAvatar()->admin()->create(),
         ]);
     });
 

@@ -19,7 +19,7 @@ describe('Auth -> LogoutController', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('fails for unauthenticated user', function () {
+        it('fails if an unauthenticated user tries to log out', function () {
             deleteJson(route('auth.token.destroy'))
                 ->assertUnauthorized();
         });
@@ -41,7 +41,7 @@ describe('Auth -> LogoutController', function () {
             deleteJson(route('auth.token.destroy'))
                 ->assertNoContent();
 
-            expect($user->tokens()->count())->toBe(4);
+            expect($user->fresh()->tokens()->count())->toBe(4);
         });
     });
 })->group('auth');

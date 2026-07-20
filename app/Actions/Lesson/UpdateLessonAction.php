@@ -22,6 +22,7 @@ class UpdateLessonAction
         return DB::transaction(function () use ($data, $lesson) {
             $lesson->update($data->all());
             $lesson->lessonable->update($data->all());
+
             return $lesson;
         });
     }

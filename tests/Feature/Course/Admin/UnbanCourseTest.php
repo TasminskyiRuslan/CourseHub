@@ -40,7 +40,7 @@ describe('Admin -> UnbanCourseController', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('fails if an unauthenticated user tries to unban the course', function () {
+        it('fails if an unauthenticated user tries to unban a course', function () {
             $course = Course::factory()->banned()->create();
 
             patchJson(route('admin.course.unban', $course))
@@ -50,7 +50,7 @@ describe('Admin -> UnbanCourseController', function () {
             expect($course->isBanned())->toBeTrue();
         });
 
-        it('fails if users without permissions tries to unban the course', function ($user) {
+        it('fails if a user without permissions tries to unban a course', function ($user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->banned()->create();
@@ -61,12 +61,12 @@ describe('Admin -> UnbanCourseController', function () {
             $course->refresh();
             expect($course->isBanned())->toBeTrue();
         })->with([
-            'user'            => fn() => User::factory()->create(),
+            'user' => fn() => User::factory()->create(),
             'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'another teacher'    => fn() => User::factory()->teacher()->create(),
+            'another teacher' => fn() => User::factory()->teacher()->create(),
         ]);
 
-        it('allows users with permissions to unban the course', function ($user) {
+        it('allows a user with permissions to unban a course', function ($user) {
             Notification::fake();
 
             Sanctum::actingAs($user);
@@ -81,7 +81,7 @@ describe('Admin -> UnbanCourseController', function () {
 
             Notification::assertSentTo($course->author, CourseUnbannedNotification::class);
         })->with([
-            'admin'       => fn() => User::factory()->admin()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ]);
 

@@ -15,6 +15,7 @@ class UnpublishCourseAction
     public function handle(Course $course): Course
     {
         $course->unpublish()->save();
+
         return $course;
     }
 }

@@ -63,7 +63,9 @@ class BanCourseController extends Controller
     public function __invoke(BanCourseAction $action, Course $course): Response
     {
         $this->authorize('ban', $course);
+
         $action->handle($course);
+
         return response()->noContent();
     }
 }

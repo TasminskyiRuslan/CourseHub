@@ -39,7 +39,7 @@ describe('Auth -> VerifyEmailController', function () {
             getJson($url)->assertForbidden();
         });
 
-        it('fails when the hash is incorrect', function () {
+        it('fails if the hash is incorrect', function () {
             $user = User::factory()->unverified()->create();
 
             $url = URL::temporarySignedRoute(
@@ -54,7 +54,7 @@ describe('Auth -> VerifyEmailController', function () {
             getJson($url)->assertForbidden();
         });
 
-        it('fails when the signature is missing', function () {
+        it('fails if the signature is missing', function () {
             $user = User::factory()->unverified()->create();
 
             getJson(route('auth.verification.verify', [
@@ -70,7 +70,7 @@ describe('Auth -> VerifyEmailController', function () {
     |--------------------------------------------------------------------------
     */
     describe('operations', function () {
-        it('verifies the email for user', function ($user) {
+        it('verifies the email address for a user', function ($user) {
             Event::fake();
 
             $url = URL::temporarySignedRoute(
@@ -85,12 +85,12 @@ describe('Auth -> VerifyEmailController', function () {
             getJson($url)->assertNoContent();
 
             expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
-            Event::assertDispatched(Verified::class, fn ($event) => $event->user->id === $user->id);
+            Event::assertDispatched(Verified::class, fn($event) => $event->user->id === $user->id);
         })
             ->with([
-                'user' => fn () => User::factory()->unverified()->create(),
-                'teacher' => fn () => User::factory()->teacher()->unverified()->create(),
-                'admin' => fn () => User::factory()->admin()->unverified()->create(),
+                'user' => fn() => User::factory()->unverified()->create(),
+                'teacher' => fn() => User::factory()->teacher()->unverified()->create(),
+                'admin' => fn() => User::factory()->admin()->unverified()->create(),
             ]);
 
         it('does nothing if the email is already verified', function () {

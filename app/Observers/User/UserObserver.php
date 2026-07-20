@@ -15,7 +15,20 @@ class UserObserver
      */
     public function created(User $user): void
     {
-        $this->flushUserCache();
+        $this->flushCache();
+    }
+
+    /**
+     * Flush the user list cache.
+     *
+     * @return void
+     */
+    protected function flushCache(): void
+    {
+        Cache::tags([
+            config('cache.tags.teacher_list'),
+            config('cache.tags.course_list'),
+        ])->flush();
     }
 
     /**
@@ -26,7 +39,7 @@ class UserObserver
      */
     public function updated(User $user): void
     {
-        $this->flushUserCache();
+        $this->flushCache();
     }
 
     /**
@@ -48,7 +61,7 @@ class UserObserver
      */
     public function deleted(User $user): void
     {
-        $this->flushUserCache();
+        $this->flushCache();
     }
 
     /**
@@ -62,7 +75,7 @@ class UserObserver
     public function pivotSynced(User $user, string $relation, array $pivotIds): void
     {
         if ($relation === 'roles') {
-            $this->flushUserCache();
+            $this->flushCache();
         }
     }
 
@@ -77,7 +90,7 @@ class UserObserver
     public function pivotAttached(User $user, string $relation, array $pivotIds): void
     {
         if ($relation === 'roles') {
-            $this->flushUserCache();
+            $this->flushCache();
         }
     }
 
@@ -92,17 +105,7 @@ class UserObserver
     public function pivotDetached(User $user, string $relation, array $pivotIds): void
     {
         if ($relation === 'roles') {
-            $this->flushUserCache();
+            $this->flushCache();
         }
-    }
-
-    /**
-     * Flush the user list cache.
-     *
-     * @return void
-     */
-    protected function flushUserCache(): void
-    {
-        Cache::tags([config('cache.tags.teacher_list')])->flush();
     }
 }

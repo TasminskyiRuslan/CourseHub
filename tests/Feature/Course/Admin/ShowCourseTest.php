@@ -38,14 +38,14 @@ describe('Admin -> CourseController -> show', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('fails if unauthenticated users try to retrieve the course', function () {
+        it('fails if an unauthenticated user tries to retrieve a course', function () {
             $course = Course::factory()->create();
 
             getJson(route('admin.course.show', $course))
                 ->assertUnauthorized();
         });
 
-        it('fails if users without permissions try to retrieve the course', function ($user) {
+        it('fails if a user without permissions tries to retrieve a course', function ($user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -57,7 +57,7 @@ describe('Admin -> CourseController -> show', function () {
             'teacher' => fn() => User::factory()->teacher()->create(),
         ]);
 
-        it('allows users without to retrieve the courses', function ($userClosure, $courseClosure) {
+        it('allows a user with permissions to retrieve a course', function ($userClosure, $courseClosure) {
             $user = $userClosure();
             Sanctum::actingAs($user);
 

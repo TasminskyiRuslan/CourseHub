@@ -21,21 +21,21 @@ use Illuminate\Support\Carbon;
  * @property string|null $room_number
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read \App\Models\Lesson|null $lesson
- * @method static \Database\Factories\OfflineLessonFactory factory($count = null, $state = [])
+ * @property Carbon|null $deleted_at
+ * @property-read Lesson|null $lesson
+ * @method static OfflineLessonFactory factory($count = null, $state = [])
  * @method static Builder<static>|OfflineLesson newModelQuery()
  * @method static Builder<static>|OfflineLesson newQuery()
+ * @method static Builder<static>|OfflineLesson onlyTrashed()
  * @method static Builder<static>|OfflineLesson query()
  * @method static Builder<static>|OfflineLesson whereAddress($value)
  * @method static Builder<static>|OfflineLesson whereCreatedAt($value)
+ * @method static Builder<static>|OfflineLesson whereDeletedAt($value)
  * @method static Builder<static>|OfflineLesson whereEndTime($value)
  * @method static Builder<static>|OfflineLesson whereId($value)
  * @method static Builder<static>|OfflineLesson whereRoomNumber($value)
  * @method static Builder<static>|OfflineLesson whereStartTime($value)
  * @method static Builder<static>|OfflineLesson whereUpdatedAt($value)
- * @property Carbon|null $deleted_at
- * @method static Builder<static>|OfflineLesson onlyTrashed()
- * @method static Builder<static>|OfflineLesson whereDeletedAt($value)
  * @method static Builder<static>|OfflineLesson withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|OfflineLesson withoutTrashed()
  * @mixin Eloquent
@@ -58,19 +58,6 @@ class OfflineLesson extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'start_time' => 'datetime',
-            'end_time' => 'datetime',
-        ];
-    }
-
-    /**
      * Get the lesson associated with the offline lesson.
      *
      * @return MorphOne
@@ -91,5 +78,18 @@ class OfflineLesson extends Model
         return $resourceClass
             ? new $resourceClass($this)
             : new OfflineLessonResource($this);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'start_time' => 'datetime',
+            'end_time' => 'datetime',
+        ];
     }
 }

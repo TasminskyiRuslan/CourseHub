@@ -137,14 +137,14 @@ describe('Teacher -> CourseController -> update', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('fails if unauthenticated user tries to update a course', function () {
+        it('fails if an unauthenticated user tries to update a course', function () {
             $course = Course::factory()->create();
 
             patchJson(route('teacher.course.update', $course), updatingCoursePayload())
                 ->assertUnauthorized();
         });
 
-        it('fails if users without permissions tries to update someone else\'s course', function ($user) {
+        it('fails if a user without permissions tries to update someone else\'s course', function ($user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -158,7 +158,7 @@ describe('Teacher -> CourseController -> update', function () {
             'admin' => fn() => User::factory()->admin()->create(),
         ]);
 
-        it('allows users to update their own course', function ($userClosure, $courseClosure) {
+        it('allows a user to update their own course', function ($userClosure, $courseClosure) {
             $user = $userClosure();
 
             Sanctum::actingAs($user);

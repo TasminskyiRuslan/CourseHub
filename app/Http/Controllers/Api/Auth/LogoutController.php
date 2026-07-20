@@ -38,7 +38,9 @@ class LogoutController extends Controller
     public function __invoke(Request $request, RevokeCurrentTokenAction $action): Response
     {
         $currentUser = $request->user();
+
         $action->handle($currentUser);
+
         return response()->noContent();
     }
 }

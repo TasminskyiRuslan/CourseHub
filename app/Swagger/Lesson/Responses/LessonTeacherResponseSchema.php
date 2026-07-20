@@ -8,7 +8,7 @@ use OpenApi\Attributes as OA;
     schema: 'LessonTeacherResponse',
     title: 'Lesson Teacher Response',
     description: 'Teacher panel data of a lesson.',
-    required: ['id', 'course_id', 'title', 'slug', 'position', 'content', 'created_at', 'updated_at'],
+    required: ['id', 'course_id', 'title', 'slug', 'position', 'created_at', 'updated_at'],
     properties: [
         new OA\Property(
             property: 'id',

@@ -18,11 +18,13 @@ class RestrictBannedUsers
     public function handle(Request $request, Closure $next): SymfonyResponse
     {
         $user = $request->user();
+
         if ($user && $user->isBanned()) {
             return response()->json([
-                'message' => __('auth.banned'),
+                'message' => [__('auth.banned')],
             ])->setStatusCode(SymfonyResponse::HTTP_FORBIDDEN);
         }
+
         return $next($request);
     }
 }

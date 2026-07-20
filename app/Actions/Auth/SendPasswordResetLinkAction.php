@@ -2,20 +2,20 @@
 
 namespace App\Actions\Auth;
 
-use App\Data\Auth\Requests\SendPasswordResetEmailData;
+use App\Data\Auth\Requests\SendPasswordResetLinkData;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 
-class SendPasswordResetEmailAction
+class SendPasswordResetLinkAction
 {
     /**
-     * Send an email with a link to reset the password.
+     * Send a password reset link to the user identified by the email.
      *
-     * @param SendPasswordResetEmailData $data
+     * @param SendPasswordResetLinkData $data
      * @return void
      * @throws ValidationException
      */
-    public function handle(SendPasswordResetEmailData $data): void
+    public function handle(SendPasswordResetLinkData $data): void
     {
         $status = Password::sendResetLink(['email' => $data->email]);
 

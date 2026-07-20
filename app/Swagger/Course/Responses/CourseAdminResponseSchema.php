@@ -9,7 +9,7 @@ use OpenApi\Attributes as OA;
     schema: 'CourseAdminResponse',
     title: 'Course Admin Response',
     description: 'Admin panel data of a course.',
-    required: ['id', 'author_id', 'title', 'slug', 'type', 'price', 'created_at', 'updated_at'],
+    required: ['id', 'author_id', 'title', 'slug', 'type', 'price', 'lessons_count', 'created_at', 'updated_at'],
     properties: [
         new OA\Property(
             property: 'id',
@@ -53,12 +53,16 @@ use OpenApi\Attributes as OA;
             property: 'type',
             description: 'Type.',
             type: 'string',
-            enum: [CourseType::ONLINE->value, CourseType::OFFLINE->value, CourseType::VIDEO->value],
+            enum: [
+                CourseType::ONLINE->value,
+                CourseType::OFFLINE->value,
+                CourseType::VIDEO->value
+            ],
             example: CourseType::ONLINE->value
         ),
         new OA\Property(
             property: 'price',
-            description: 'Price.',
+            description: 'Price value.',
             type: 'string',
             example: '99.99'
         ),

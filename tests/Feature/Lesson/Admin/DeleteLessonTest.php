@@ -74,7 +74,7 @@ describe('Admin -> LessonController -> destroy', function () {
             $this->assertDatabaseHas($course->type->value . '_lessons', ['id' => $lesson->lessonable->id]);
         });
 
-        it('fails if users without permissions try to delete a lesson', function ($user) {
+        it('fails if a user without permissions tries to delete a lesson', function ($user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -86,12 +86,12 @@ describe('Admin -> LessonController -> destroy', function () {
             $this->assertDatabaseHas('lessons', ['id' => $lesson->id]);
             $this->assertDatabaseHas($course->type->value . '_lessons', ['id' => $lesson->lessonable->id]);
         })->with([
-            'user'            => fn() => User::factory()->create(),
-            'teacher'            => fn() => User::factory()->teacher()->create(),
+            'user' => fn() => User::factory()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
             'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
         ]);
 
-        it('allows users with permission to delete a lesson', function ($userClosure, $courseClosure) {
+        it('allows a user with permission to delete a lesson', function ($userClosure, $courseClosure) {
             $user = $userClosure();
             Sanctum::actingAs($user);
 
@@ -105,12 +105,12 @@ describe('Admin -> LessonController -> destroy', function () {
             $this->assertSoftDeleted('lessons', ['id' => $lesson->id]);
             $this->assertSoftDeleted($course->type->value . '_lessons', ['id' => $lesson->lessonable->id]);
         })->with([
-            'admin'       => fn() => User::factory()->admin()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ])->with([
-            'published'   => fn() => fn($author) => Course::factory()->create(),
+            'published' => fn() => fn($author) => Course::factory()->create(),
             'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->create(),
-            'banned'      => fn() => fn($author) => Course::factory()->banned()->create(),
+            'banned' => fn() => fn($author) => Course::factory()->banned()->create(),
         ]);
     });
 
@@ -128,11 +128,8 @@ describe('Admin -> LessonController -> destroy', function () {
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
             $page = 1;
-            $cacheKey = "lessons:course:{$course->id}:page:{$page}";
-            $tags = [
-                config('cache.tags.lesson_list'),
-                config('cache.tags.course') . ':' . $course->id
-            ];
+            $cacheKey = "courses:page:{$page}";
+            $tags = [config('cache.tags.course_list')];
 
             Cache::tags($tags)->put($cacheKey, 'test_value', config('cache.ttl.lesson'));
 

@@ -40,7 +40,7 @@ describe('Admin -> BanCourseController', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('fails if an unauthenticated user tries to ban the course', function () {
+        it('fails if an unauthenticated user tries to ban a course', function () {
             $course = Course::factory()->create();
 
             patchJson(route('admin.course.ban', $course))
@@ -50,7 +50,7 @@ describe('Admin -> BanCourseController', function () {
             expect($course->isBanned())->toBeFalse();
         });
 
-        it('fails if users without permissions tries to ban the course', function ($user) {
+        it('fails if a user without permissions tries to ban a course', function ($user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -63,10 +63,10 @@ describe('Admin -> BanCourseController', function () {
         })->with([
             'user' => fn() => User::factory()->create(),
             'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'another teacher'    => fn() => User::factory()->teacher()->create(),
+            'another teacher' => fn() => User::factory()->teacher()->create(),
         ]);
 
-        it('allows users with permissions to ban the course', function ($userClosure, $courseClosure) {
+        it('allows a user with permissions to ban a course', function ($userClosure, $courseClosure) {
             Notification::fake();
             Sanctum::actingAs($userClosure());
 
@@ -81,10 +81,10 @@ describe('Admin -> BanCourseController', function () {
 
             Notification::assertSentTo($course->author, CourseBannedNotification::class);
         })->with([
-            'admin'       => fn() => User::factory()->admin()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ])->with([
-            'published'   => fn() => fn() => Course::factory()->create(),
+            'published' => fn() => fn() => Course::factory()->create(),
             'unpublished' => fn() => fn() => Course::factory()->unpublished()->create(),
         ]);
 

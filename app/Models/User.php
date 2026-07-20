@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
-use App\Notifications\Auth\ResetPasswordNotification;
-use App\Notifications\Auth\VerifyEmailNotification;
+use App\Notifications\Auth\EmailVerificationNotification;
+use App\Notifications\Auth\PasswordResetNotification;
 use App\Notifications\User\UserBannedNotification;
 use App\Notifications\User\UserUnbannedNotification;
 use App\Observers\User\UserObserver;
@@ -40,6 +40,9 @@ use Spatie\Sluggable\SlugOptions;
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ * @property Carbon|null $banned_at
+ * @property string|null $avatar_path
  * @property UserRole $role
  * @property-read Collection<int, Course> $courses
  * @property-read int|null $courses_count
@@ -51,13 +54,18 @@ use Spatie\Sluggable\SlugOptions;
  * @property-read int|null $roles_count
  * @property-read Collection<int, PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
+ * @method static Builder<static>|User active()
  * @method static UserFactory factory($count = null, $state = [])
  * @method static Builder<static>|User newModelQuery()
  * @method static Builder<static>|User newQuery()
+ * @method static Builder<static>|User onlyTrashed()
  * @method static Builder<static>|User permission($permissions, bool $without = false)
  * @method static Builder<static>|User query()
  * @method static Builder<static>|User role($roles, ?string $guard = null, bool $without = false)
+ * @method static Builder<static>|User whereAvatarPath($value)
+ * @method static Builder<static>|User whereBannedAt($value)
  * @method static Builder<static>|User whereCreatedAt($value)
+ * @method static Builder<static>|User whereDeletedAt($value)
  * @method static Builder<static>|User whereEmail($value)
  * @method static Builder<static>|User whereEmailVerifiedAt($value)
  * @method static Builder<static>|User whereId($value)
@@ -66,18 +74,10 @@ use Spatie\Sluggable\SlugOptions;
  * @method static Builder<static>|User whereRememberToken($value)
  * @method static Builder<static>|User whereSlug($value)
  * @method static Builder<static>|User whereUpdatedAt($value)
+ * @method static Builder<static>|User withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|User withoutPermission($permissions)
  * @method static Builder<static>|User withoutRole($roles, ?string $guard = null)
- * @property Carbon|null $deleted_at
- * @property Carbon|null $banned_at
- * @property string|null $avatar_path
- * @method static Builder<static>|User onlyTrashed()
- * @method static Builder<static>|User whereAvatarPath($value)
- * @method static Builder<static>|User whereBannedAt($value)
- * @method static Builder<static>|User whereDeletedAt($value)
- * @method static Builder<static>|User withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|User withoutTrashed()
- * @method static Builder<static>|User active()
  * @mixin Eloquent
  */
 class User extends Authenticatable implements MustVerifyEmail
@@ -117,18 +117,13 @@ class User extends Authenticatable implements MustVerifyEmail
     protected string $guard_name = 'api';
 
     /**
-     * Get the attributes that should be cast.
+     * The "booted" method of the model.
      *
-     * @return array<string, string>
+     * @return void
      */
-    protected function casts(): array
+    protected static function booted(): void
     {
-        return [
-            'password' => 'hashed',
-            'role' => UserRole::class,
-            'email_verified_at' => 'datetime',
-            'banned_at' => 'datetime',
-        ];
+        static::observe(UserObserver::class);
     }
 
     /**
@@ -155,23 +150,13 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * The "booted" method of the model.
-     *
-     * @return void
-     */
-    protected static function booted(): void
-    {
-        static::observe(UserObserver::class);
-    }
-
-    /**
      * Send verify email notification.
      *
      * @return void
      */
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify(new VerifyEmailNotification());
+        $this->notify(new EmailVerificationNotification());
     }
 
     /**
@@ -182,7 +167,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendPasswordResetNotification($token): void
     {
-        $this->notify(new ResetPasswordNotification($token));
+        $this->notify(new PasswordResetNotification($token));
     }
 
     /**
@@ -278,5 +263,20 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $this->avatar_path = null;
         return $this;
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+            'role' => UserRole::class,
+            'email_verified_at' => 'datetime',
+            'banned_at' => 'datetime',
+        ];
     }
 }

@@ -28,7 +28,7 @@ describe('Public -> CourseController -> show', function () {
                 ->assertNotFound();
         });
 
-        it('fails if users tries to retrieve a restricted course', function ($userClosure, $courseClosure) {
+        it('fails if a user tries to retrieve a restricted course', function ($userClosure, $courseClosure) {
             $user = $userClosure ? $userClosure() : null;
             $course = $courseClosure();
 
@@ -57,7 +57,7 @@ describe('Public -> CourseController -> show', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('allows users to retrieve a published course from an active author', function ($user) {
+        it('allows a user to retrieve a published course from an active author', function ($user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }

@@ -30,22 +30,22 @@ class RegisterUserData extends Data
         #[StringType]
         #[Min(2)]
         #[Max(100)]
-        public string   $name,
+        public string $name,
 
         #[Required]
         #[Email]
         #[Max(255)]
         #[Unique(table: 'users', column: 'email')]
         #[WithCast(castClass: LowercaseCast::class)]
-        public string   $email,
+        public string $email,
 
         #[Required]
         #[StringType]
         #[Confirmed]
         #[Password(min: 8)]
-        public string   $password,
+        public string $password,
 
-        public array $roles = [],
+        public array  $roles = [],
     )
     {
     }
@@ -59,7 +59,7 @@ class RegisterUserData extends Data
     public static function rules(ValidationContext $context): array
     {
         return [
-            'roles'   => ['sometimes', 'array'],
+            'roles' => ['sometimes', 'array'],
             'roles.*' => [
                 'string',
                 'distinct',

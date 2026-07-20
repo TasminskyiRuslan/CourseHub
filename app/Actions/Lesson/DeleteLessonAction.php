@@ -9,7 +9,7 @@ use Throwable;
 class DeleteLessonAction
 {
     /**
-     * Remove the specified lesson.
+     * Delete the specified lesson.
      *
      * @param Lesson $lesson
      * @return void

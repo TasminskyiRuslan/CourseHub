@@ -12,7 +12,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 class GetCoursesQuery
 {
     /**
-     * Retrieve paginated list of courses for a teacher.
+     * Retrieve a paginated list of teacher's courses.
      *
      * @param Request $request
      * @param User $teacher

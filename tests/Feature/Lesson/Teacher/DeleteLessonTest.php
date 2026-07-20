@@ -89,7 +89,7 @@ describe('Teacher -> LessonController -> destroy', function () {
             'user' => fn() => User::factory()->create(),
             'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
             'another teacher' => fn() => User::factory()->teacher()->create(),
-            'admin'           => fn() => User::factory()->admin()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
         ]);
 
         it('allows users with permission to delete a lesson', function ($userClosure, $courseClosure) {
@@ -106,12 +106,12 @@ describe('Teacher -> LessonController -> destroy', function () {
             $this->assertSoftDeleted('lessons', ['id' => $lesson->id]);
             $this->assertSoftDeleted($course->type->value . '_lessons', ['id' => $lesson->lessonable->id]);
         })->with([
-            'teacher'     => fn() => User::factory()->teacher()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ])->with([
-            'published'   => fn() => fn($author) => Course::factory()->for($author, 'author')->create(),
+            'published' => fn() => fn($author) => Course::factory()->for($author, 'author')->create(),
             'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->for($author, 'author')->create(),
-            'banned'      => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
+            'banned' => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
         ]);
     });
 
@@ -129,11 +129,8 @@ describe('Teacher -> LessonController -> destroy', function () {
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
             $page = 1;
-            $cacheKey = "lessons:course:{$course->id}:page:{$page}";
-            $tags = [
-                config('cache.tags.lesson_list'),
-                config('cache.tags.course') . ':' . $course->id
-            ];
+            $cacheKey = "courses:page:{$page}";
+            $tags = [config('cache.tags.course_list')];
 
             Cache::tags($tags)->put($cacheKey, 'test_value', config('cache.ttl.lesson'));
             expect(Cache::tags($tags)->get($cacheKey))->not->toBeNull();

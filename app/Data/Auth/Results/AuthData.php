@@ -15,9 +15,9 @@ final class AuthData extends Data
      * @param string|null $tokenType
      */
     public function __construct(
-        public User   $user,
-        public string $accessToken,
-        public Carbon $expiresAt,
+        public User    $user,
+        public string  $accessToken,
+        public Carbon  $expiresAt,
         public ?string $tokenType = 'Bearer',
     )
     {

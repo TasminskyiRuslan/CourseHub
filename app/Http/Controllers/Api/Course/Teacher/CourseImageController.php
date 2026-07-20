@@ -87,8 +87,10 @@ class CourseImageController extends Controller
     public function update(UpdateCourseImageData $data, UpdateCourseImageAction $action, Course $course): JsonResponse
     {
         $this->authorize('update', $course);
+
         $updatedCourse = $action->handle($data, $course);
         $updatedCourse->loadCount(['lessons']);
+
         return CourseResource::make($updatedCourse)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
@@ -96,8 +98,8 @@ class CourseImageController extends Controller
 
     #[OA\Delete(
         path: '/teacher/courses/{course}/image',
-        description: 'Remove the image of the specified teacher\'s course.',
-        summary: '[Teacher] Remove course image',
+        description: 'Delete the image of the specified teacher\'s course.',
+        summary: '[Teacher] Delete course image',
         security: [['sanctum' => []]],
         tags: ['Course'],
         parameters: [
@@ -132,7 +134,7 @@ class CourseImageController extends Controller
         ]
     )]
     /**
-     * Remove the image of the specified teacher's course.
+     * Delete the image of the specified teacher's course.
      *
      * @param DeleteCourseImageAction $action
      * @param Course $course
@@ -141,7 +143,9 @@ class CourseImageController extends Controller
     public function destroy(DeleteCourseImageAction $action, Course $course): Response
     {
         $this->authorize('update', $course);
+
         $action->handle($course);
+
         return response()->noContent();
     }
 }

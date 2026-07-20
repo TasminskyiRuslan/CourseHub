@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\UserRole;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
@@ -102,7 +101,7 @@ describe('Auth -> ResetPasswordController', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('allows users to reset password', function ($user) {
+        it('allows users to reset their password', function ($user) {
             $newPassword = 'new-password';
 
             postJson(route('auth.password.reset'), [

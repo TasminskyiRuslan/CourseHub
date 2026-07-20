@@ -7,7 +7,7 @@ use App\Models\Course;
 class GetCourseQuery
 {
     /**
-     * Retrieve detailed information about a specific course for an admin.
+     * Retrieve detailed information about the specified course by administrator.
      *
      * @param string $courseSlug
      * @return Course
@@ -17,9 +17,9 @@ class GetCourseQuery
         return Course::query()
             ->where('slug', $courseSlug)
             ->with(['author' => function ($query) {
-                $query->with('roles')->withCount(['courses' => fn ($q) => $q->withTrashed()])->withTrashed();
+                $query->with('roles')->withCount(['courses' => fn($q) => $q->withTrashed()])->withTrashed();
             }])
-            ->withCount(['lessons'  => fn ($query) => $query->withTrashed()])
+            ->withCount(['lessons' => fn($query) => $query->withTrashed()])
             ->withTrashed()
             ->firstOrFail();
     }

@@ -17,6 +17,7 @@ class UpdateUserRoleAction
      * @param UpdateUserRoleData $data
      * @param User $user
      * @return User
+     * @throws AccessDeniedHttpException
      * @throws Throwable
      */
     public function handle(UpdateUserRoleData $data, User $user): User
@@ -27,6 +28,7 @@ class UpdateUserRoleAction
 
         return DB::transaction(function () use ($data, $user) {
             $user->syncRoles($data->roles);
+
             return $user;
         });
     }

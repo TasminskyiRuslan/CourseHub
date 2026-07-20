@@ -13,7 +13,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 class GetCoursesQuery extends CachedListQuery
 {
     /**
-     * Retrieve paginated list of courses for a teacher with conditional caching.
+     * Retrieve a paginated list of active courses with conditional caching.
      *
      * @param Request $request
      * @return LengthAwarePaginator
@@ -26,7 +26,7 @@ class GetCoursesQuery extends CachedListQuery
                 ->withQueryString();
         }
 
-        $page = (int) $request->query('page', 1);
+        $page = (int)$request->query('page', 1);
         $cacheKey = "courses:page:{$page}";
         $tags = [
             config('cache.tags.course_list')
@@ -36,7 +36,7 @@ class GetCoursesQuery extends CachedListQuery
             ->remember(
                 $cacheKey,
                 config('cache.ttl.course'),
-                fn () => $this->query($request)
+                fn() => $this->query($request)
                     ->paginate(config('pagination.courses_per_page'))
                     ->withQueryString()
             );
@@ -65,7 +65,7 @@ class GetCoursesQuery extends CachedListQuery
                     });
                 }),
                 AllowedFilter::callback('author', function ($query, $value) {
-                    $query->whereHas('author', fn ($q) => $q->where('slug', $value));
+                    $query->whereHas('author', fn($q) => $q->where('slug', $value));
                 }),
             ])
             ->allowedSorts([

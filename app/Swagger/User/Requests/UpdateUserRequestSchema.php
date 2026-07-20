@@ -7,7 +7,7 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'UpdateUserAccountRequest',
     title: 'Update User Account Request',
-    description: 'Payload for updating a user auth.',
+    description: 'Payload for updating user account profile details.',
     properties: [
         new OA\Property(
             property: 'name',

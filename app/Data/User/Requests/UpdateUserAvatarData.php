@@ -22,5 +22,7 @@ class UpdateUserAvatarData extends Data
         #[Mimes(['jpg', 'jpeg', 'png', 'webp'])]
         #[Max(2048)]
         public UploadedFile $avatar,
-    ) {}
+    )
+    {
+    }
 }

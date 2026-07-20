@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use App\Enums\CourseType;
-use App\Enums\UserPermission;
-use App\Enums\UserRole;
 use App\Notifications\Course\CourseBannedNotification;
 use App\Notifications\Course\CourseUnbannedNotification;
 use App\Observers\Course\CourseObserver;
@@ -17,7 +15,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
@@ -31,36 +28,33 @@ use Spatie\Sluggable\SlugOptions;
  * @property numeric $price
  * @property string|null $image_path
  * @property CourseType $type
- * @property bool $is_published
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read User $author
+ * @property Carbon|null $deleted_at
+ * @property Carbon|null $published_at
+ * @property Carbon|null $banned_at
+ * @property-read User|null $author
  * @property-read Collection<int, Lesson> $lessons
  * @property-read int|null $lessons_count
+ * @method static Builder<static>|Course active()
  * @method static CourseFactory factory($count = null, $state = [])
  * @method static Builder<static>|Course newModelQuery()
  * @method static Builder<static>|Course newQuery()
+ * @method static Builder<static>|Course onlyTrashed()
  * @method static Builder<static>|Course query()
- * @method static Builder<static>|Course visibleFor(?User $user)
  * @method static Builder<static>|Course whereAuthorId($value)
+ * @method static Builder<static>|Course whereBannedAt($value)
  * @method static Builder<static>|Course whereCreatedAt($value)
+ * @method static Builder<static>|Course whereDeletedAt($value)
  * @method static Builder<static>|Course whereDescription($value)
  * @method static Builder<static>|Course whereId($value)
  * @method static Builder<static>|Course whereImagePath($value)
- * @method static Builder<static>|Course whereIsPublished($value)
  * @method static Builder<static>|Course wherePrice($value)
+ * @method static Builder<static>|Course wherePublishedAt($value)
  * @method static Builder<static>|Course whereSlug($value)
  * @method static Builder<static>|Course whereTitle($value)
  * @method static Builder<static>|Course whereType($value)
  * @method static Builder<static>|Course whereUpdatedAt($value)
- * @property string|null $deleted_at
- * @property Carbon|null $banned_at
- * @method static Builder<static>|Course whereDeletedAt($value)
- * @property Carbon|null $published_at
- * @method static Builder<static>|Course whereBannedAt($value)
- * @method static Builder<static>|Course wherePublishedAt($value)
- * @method static Builder<static>|Course active()
- * @method static Builder<static>|Course onlyTrashed()
  * @method static Builder<static>|Course withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|Course withoutTrashed()
  * @mixin Eloquent
@@ -87,21 +81,6 @@ class Course extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'price' => 'decimal:2',
-            'type' => CourseType::class,
-            'published_at' => 'datetime',
-            'banned_at' => 'datetime',
-        ];
-    }
-
-    /**
      * The "booted" method of the model.
      *
      * @return void
@@ -112,7 +91,7 @@ class Course extends Model
     }
 
     /**
-     * Configure the slug generation options for the Author model.
+     * Get the options for generating the slug.
      *
      * @return SlugOptions
      */
@@ -185,7 +164,7 @@ class Course extends Model
     }
 
     /**
-     * Mark the course as published.
+     * Publish the course.
      *
      * @return Course
      */
@@ -196,7 +175,7 @@ class Course extends Model
     }
 
     /**
-     * Mark the course as unpublished.
+     * Unpublish the course.
      *
      * @return Course
      */
@@ -271,5 +250,20 @@ class Course extends Model
     {
         $this->image_path = null;
         return $this;
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'price' => 'decimal:2',
+            'type' => CourseType::class,
+            'published_at' => 'datetime',
+            'banned_at' => 'datetime',
+        ];
     }
 }

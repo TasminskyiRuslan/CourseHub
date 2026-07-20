@@ -9,7 +9,7 @@ use OpenApi\Attributes as OA;
     schema: 'CoursePublicResponse',
     title: 'Course Public Response',
     description: 'Public data of a course.',
-    required: ['id', 'author_id', 'title', 'slug', 'type', 'price'],
+    required: ['id', 'author_id', 'title', 'slug', 'type', 'price', 'lessons_count'],
     properties: [
         new OA\Property(
             property: 'id',
@@ -57,7 +57,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'price',
-            description: 'Price.',
+            description: 'Price value.',
             type: 'string',
             format: 'float',
             example: 99.99

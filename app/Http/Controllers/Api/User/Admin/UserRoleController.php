@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Throwable;
 
 class UserRoleController extends Controller
@@ -77,13 +78,16 @@ class UserRoleController extends Controller
      * @param UpdateUserRoleAction $action
      * @param User $user
      * @return JsonResponse
+     * @throws AccessDeniedHttpException
      * @throws Throwable
      */
     public function update(UpdateUserRoleData $data, UpdateUserRoleAction $action, User $user): JsonResponse
     {
         $this->authorize('update-roles', $user);
+
         $updatedUser = $action->handle($data, $user);
         $updatedUser->load(['roles']);
+
         return UserResource::make($updatedUser)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);

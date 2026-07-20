@@ -13,7 +13,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 class GetLessonsQuery
 {
     /**
-     * Retrieve a teacher's lessons with conditional caching.
+     * Retrieve a paginated list of lessons for the specified teacher's course.
      *
      * @param Request $request
      * @param string $slug

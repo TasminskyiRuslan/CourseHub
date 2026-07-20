@@ -6,7 +6,6 @@ use App\Enums\UserPermission;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\User;
-use Illuminate\Support\Facades\Gate;
 
 class LessonPolicy
 {

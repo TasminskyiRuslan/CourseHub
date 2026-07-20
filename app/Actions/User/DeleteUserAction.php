@@ -10,10 +10,11 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class DeleteUserAction
 {
     /**
-     * Remove the specified user.
+     * Delete the specified user.
      *
      * @param User $user
      * @return void
+     * @throws AccessDeniedHttpException
      */
     public function handle(User $user): void
     {
@@ -21,11 +22,10 @@ class DeleteUserAction
             throw new AccessDeniedHttpException(__('users.protected'));
         }
 
-        $avatarPath = $user->avatar_path;
-        $user->delete();
-
-        if ($avatarPath && Storage::disk('users')->exists($avatarPath)) {
-            Storage::disk('users')->delete($avatarPath);
+        if ($user->avatar_path && Storage::disk('users')->exists($user->avatar_path)) {
+            Storage::disk('users')->delete($user->avatar_path);
         }
+
+        $user->delete();
     }
 }

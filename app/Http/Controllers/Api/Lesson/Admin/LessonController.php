@@ -99,7 +99,7 @@ class LessonController extends Controller
         ]
     )]
     /**
-     * 'Retrieve a paginated list of lessons for the specified course by administrator.
+     * Retrieve a paginated list of lessons for the specified course by administrator.
      *
      * @param Request $request
      * @param GetLessonsQuery $query
@@ -109,6 +109,7 @@ class LessonController extends Controller
     public function index(Request $request, GetLessonsQuery $query, string $course): JsonResponse
     {
         $lessons = $query->handle($request, $course);
+
         return LessonResource::collection($lessons)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
@@ -180,6 +181,7 @@ class LessonController extends Controller
     public function show(GetLessonQuery $query, string $course, string $lesson): JsonResponse
     {
         $gottenLesson = $query->handle($course, $lesson);
+
         return LessonResource::make($gottenLesson)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
@@ -244,7 +246,9 @@ class LessonController extends Controller
     public function destroy(DeleteLessonAction $action, Course $course, Lesson $lesson): Response
     {
         $this->authorize('delete', $lesson);
+
         $action->handle($lesson);
+
         return response()->noContent();
     }
 }

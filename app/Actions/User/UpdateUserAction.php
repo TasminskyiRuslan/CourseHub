@@ -10,11 +10,12 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class UpdateUserAction
 {
     /**
-     * Update the specified user auth.
+     * Update the specified user.
      *
      * @param UpdateUserData $data
      * @param User $user
      * @return User
+     * @throws AccessDeniedHttpException
      */
     public function handle(UpdateUserData $data, User $user): User
     {
@@ -24,6 +25,7 @@ class UpdateUserAction
         }
 
         $user->update($data->all());
+
         return $user;
     }
 }

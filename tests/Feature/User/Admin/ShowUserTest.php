@@ -38,14 +38,14 @@ describe('Admin -> TeacherController -> show', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('fails if unauthenticated user tries to retrieve the user', function () {
+        it('fails if an unauthenticated user tries to retrieve a user', function () {
             $targetUser = User::factory()->create();
 
             getJson(route('admin.user.show', $targetUser))
                 ->assertUnauthorized();
         });
 
-        it('fails if users without permissions tries to retrieve the user', function ($user) {
+        it('fails if a user without permissions tries to retrieve a user', function ($user) {
             Sanctum::actingAs($user);
 
             $targetUser = User::factory()->create();
@@ -57,7 +57,7 @@ describe('Admin -> TeacherController -> show', function () {
             'teacher' => fn() => User::factory()->teacher()->create(),
         ]);
 
-        it('allows users with permissions to retrieve any user including banned and trashed', function ($userClosure, $targetUserClosure) {
+        it('allows a user with permission to retrieve any user, including banned and soft-deleted', function ($userClosure, $targetUserClosure) {
             $user = $userClosure();
             Sanctum::actingAs($user);
             $targetUser = $targetUserClosure();
@@ -66,7 +66,7 @@ describe('Admin -> TeacherController -> show', function () {
                 ->assertOk()
                 ->assertJsonStructure(['data' => adminUserJsonStructure()]);
         })->with([
-            'admin'       => fn() => User::factory()->admin()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ])->with([
             'user' => fn() => User::factory()->create(),

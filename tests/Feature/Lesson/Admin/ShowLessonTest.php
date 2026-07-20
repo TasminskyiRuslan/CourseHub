@@ -60,7 +60,7 @@ describe('Admin -> LessonController -> show', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('fails if unauthenticated users tries to retrieve the lesson', function () {
+        it('fails if an unauthenticated user tries to retrieve the lesson', function () {
             $course = Course::factory()->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
@@ -68,7 +68,7 @@ describe('Admin -> LessonController -> show', function () {
                 ->assertUnauthorized();
         });
 
-        it('fails if users without permissions tries to retrieve the lesson', function ($user) {
+        it('fails if a user without permissions tries to retrieve the lesson', function ($user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -77,12 +77,12 @@ describe('Admin -> LessonController -> show', function () {
             getJson(route('admin.course.lesson.show', [$course, $lesson]))
                 ->assertForbidden();
         })->with([
-            'user'            => fn() => User::factory()->create(),
-            'teacher'            => fn() => User::factory()->teacher()->create(),
+            'user' => fn() => User::factory()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
             'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
         ]);
 
-        it('allows users with permissions to retrieve the lesson', function ($userClosure, $courseClosure) {
+        it('allows a user with permission to retrieve the lesson', function ($userClosure, $courseClosure) {
             $user = $userClosure();
             Sanctum::actingAs($user);
 
@@ -94,15 +94,15 @@ describe('Admin -> LessonController -> show', function () {
                 ->assertOk()
                 ->assertJsonStructure(['data' => adminLessonJsonStructure($course->type)]);
         })->with([
-            'admin'       => fn() => User::factory()->admin()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ])->with([
-            'published'   => fn() => fn($author) => Course::factory()->create(),
+            'published' => fn() => fn($author) => Course::factory()->create(),
             'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->create(),
-            'banned'      => fn() => fn($author) => Course::factory()->banned()->create(),
+            'banned' => fn() => fn($author) => Course::factory()->banned()->create(),
         ]);
 
-        it('allows users with permissions to retrieve soft-deleted lessons', function ($user) {
+        it('allows a user with permission to retrieve soft-deleted lessons', function ($user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -115,7 +115,7 @@ describe('Admin -> LessonController -> show', function () {
                 ->assertOk()
                 ->assertJsonStructure(['data' => adminLessonJsonStructure($course->type)]);
         })->with([
-            'admin'       => fn() => User::factory()->admin()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ]);
     });

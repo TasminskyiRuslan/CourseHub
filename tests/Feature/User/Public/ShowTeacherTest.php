@@ -36,7 +36,7 @@ describe('Public -> TeacherController -> show', function () {
                 ->assertNotFound();
         });
 
-        it('fails if users tries to retrieve a restricted teacher', function ($userClosure, $targetTeacherClosure) {
+        it('fails if a user tries to retrieve a restricted teacher', function ($userClosure, $targetTeacherClosure) {
             $user = $userClosure ? $userClosure() : null;
             $targetTeacher = $targetTeacherClosure();
 
@@ -65,7 +65,7 @@ describe('Public -> TeacherController -> show', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('allows users to retrieve an active teacher', function ($user) {
+        it('allows any user to retrieve an active teacher', function ($user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }

@@ -5,8 +5,8 @@ namespace App\Swagger\Auth\Requests;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
-    schema: 'SendPasswordResetEmailRequest',
-    title: 'Send Password Reset Email Request',
+    schema: 'SendPasswordResetLinkRequest',
+    title: 'Send Password Reset Link Request',
     description: 'Payload for requesting a password reset link.',
     required: ['email'],
     properties: [
@@ -21,6 +21,6 @@ use OpenApi\Attributes as OA;
     ],
     type: 'object'
 )]
-class SendPasswordResetEmailRequestSchema
+class SendPasswordResetLinkRequestSchema
 {
 }

@@ -48,7 +48,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'price',
-            description: 'Price.',
+            description: 'Price value.',
             type: 'string',
             maximum: 99999999.99,
             minimum: 0,

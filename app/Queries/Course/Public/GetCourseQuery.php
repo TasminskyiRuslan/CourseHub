@@ -7,7 +7,7 @@ use App\Models\Course;
 class GetCourseQuery
 {
     /**
-     * Retrieve detailed information about a specific course.
+     * Retrieve detailed information about the specified active course.
      *
      * @param string $courseSlug
      * @return Course

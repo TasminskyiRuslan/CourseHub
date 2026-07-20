@@ -14,6 +14,6 @@ abstract class CachedListQuery
      */
     protected function shouldUseCache(Request $request): bool
     {
-        return ! $request->hasAny(['filter', 'sort', 'include']);
+        return !$request->hasAny(['filter', 'sort', 'include']);
     }
 }

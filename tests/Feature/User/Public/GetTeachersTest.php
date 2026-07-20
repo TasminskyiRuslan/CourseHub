@@ -24,7 +24,7 @@ describe('Public -> TeacherController -> index', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('allows any user to retrieve active teachers', function ($user) {
+        it('allows any user to retrieve a list of active teachers', function ($user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }
@@ -55,11 +55,11 @@ describe('Public -> TeacherController -> index', function () {
 
             expect($responseDataIds)->not->toContain($bannedTeacher->id);
         })->with([
-            'guest'              => null,
-            'user'            => fn() => User::factory()->create(),
-            'teacher'            => fn() => User::factory()->teacher()->create(),
-            'admin'              => fn() => User::factory()->admin()->create(),
-            'super-admin'        => fn() => User::whereEmail(config('super-admin.email'))->first(),
+            'guest' => null,
+            'user' => fn() => User::factory()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
+            'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
         ]);
     });
 

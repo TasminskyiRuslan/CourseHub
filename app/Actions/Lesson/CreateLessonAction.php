@@ -12,7 +12,7 @@ use Throwable;
 class CreateLessonAction
 {
     /**
-     * Create a new lesson for a specific course.
+     * Create a new lesson for the specified course.
      *
      * @param CreateLessonData $data
      * @param Course $course
@@ -24,9 +24,11 @@ class CreateLessonAction
         return DB::transaction(function () use ($data, $course) {
             $lessonContentClass = Relation::getMorphedModel($course->type->value);
             $lessonContent = $lessonContentClass::create($data->all());
+
             $lesson = $course->lessons()->make($data->all());
             $lesson->lessonable()->associate($lessonContent);
             $lesson->save();
+
             return $lesson;
         });
     }

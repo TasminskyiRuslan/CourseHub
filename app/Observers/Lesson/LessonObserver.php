@@ -20,6 +20,7 @@ class LessonObserver
         }
 
         $maxPosition = Lesson::where('course_id', $lesson->course_id)->max('position');
+
         $lesson->position = $maxPosition + 1;
     }
 
@@ -31,7 +32,19 @@ class LessonObserver
      */
     public function created(Lesson $lesson): void
     {
-        $this->flushCourseCache($lesson);
+        $this->flushCache();
+    }
+
+    /**
+     * Flush cache.
+     *
+     * @return void
+     */
+    protected function flushCache(): void
+    {
+        Cache::tags([
+            config('cache.tags.course_list')
+        ])->flush();
     }
 
     /**
@@ -42,7 +55,7 @@ class LessonObserver
      */
     public function updated(Lesson $lesson): void
     {
-        $this->flushCourseCache($lesson);
+        $this->flushCache();
     }
 
     /**
@@ -64,17 +77,6 @@ class LessonObserver
      */
     public function deleted(Lesson $lesson): void
     {
-        $this->flushCourseCache($lesson);
-    }
-
-    /**
-     * Flush specific course cache.
-     *
-     * @param Lesson $lesson
-     * @return void
-     */
-    protected function flushCourseCache(Lesson $lesson): void
-    {
-        Cache::tags([config('cache.tags.course') . ':' . $lesson->course_id])->flush();
+        $this->flushCache();
     }
 }

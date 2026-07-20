@@ -12,7 +12,7 @@ use OpenApi\Attributes as OA;
     properties: [
         new OA\Property(
             property: 'image',
-            description: 'Image file.',
+            description: 'Image file. Allowed formats: jpg, jpeg, png, webp. Maximum size: 2MB (2048 KB).',
             type: 'string',
             format: 'binary'
         ),

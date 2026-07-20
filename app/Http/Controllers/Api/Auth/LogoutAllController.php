@@ -38,7 +38,9 @@ class LogoutAllController extends Controller
     public function __invoke(Request $request, RevokeAllTokensAction $action): Response
     {
         $currentUser = $request->user();
+
         $action->handle($currentUser);
+
         return response()->noContent();
     }
 }

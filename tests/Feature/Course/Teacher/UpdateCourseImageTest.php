@@ -1,12 +1,12 @@
 <?php
 
+use App\Models\Course;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Laravel\Sanctum\Sanctum;
-use App\Models\Course;
 use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class);
@@ -118,7 +118,7 @@ describe('Teacher -> CourseImageController -> update', function () {
             Storage::disk('courses')->assertMissing($course->image_path);
         });
 
-        it('fails if users without permissions tries to update someone else\'s course image', function ($user) {
+        it('fails if a user without permissions tries to update someone else\'s course image', function ($user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -136,7 +136,7 @@ describe('Teacher -> CourseImageController -> update', function () {
             'admin' => fn() => User::factory()->admin()->create(),
         ]);
 
-        it('allows users to update their own course image', function ($userClosure, $courseClosure) {
+        it('allows a user to update their own course image', function ($userClosure, $courseClosure) {
             $user = $userClosure();
             Sanctum::actingAs($user);
 
@@ -153,12 +153,12 @@ describe('Teacher -> CourseImageController -> update', function () {
             expect($course->image_path)->not->toBeNull();
             Storage::disk('courses')->assertExists($course->image_path);
         })->with([
-            'teacher'     => fn() => User::factory()->teacher()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ])->with([
-            'published'   => fn() => fn($author) => Course::factory()->for($author, 'author')->create(),
+            'published' => fn() => fn($author) => Course::factory()->for($author, 'author')->create(),
             'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->for($author, 'author')->create(),
-            'banned'      => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
+            'banned' => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
         ]);
     });
 

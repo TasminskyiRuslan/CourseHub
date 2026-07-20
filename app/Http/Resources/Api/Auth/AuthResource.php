@@ -6,13 +6,12 @@ use App\Http\Resources\Api\User\Account\UserResource;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Resources\MissingValue;
 
 /**
- * @property-read  UserResource|null|MissingValue $user
- * @property-read  string $accessToken
+ * @property-read UserResource $user
+ * @property-read string $accessToken
  * @property-read string|null $tokenType
- * @property-read  Carbon|null $expiresAt
+ * @property-read Carbon|null $expiresAt
  */
 class AuthResource extends JsonResource
 {

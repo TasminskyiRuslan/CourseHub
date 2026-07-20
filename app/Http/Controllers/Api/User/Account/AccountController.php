@@ -10,12 +10,13 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class AccountController extends Controller
 {
     #[OA\Get(
         path: '/account',
-        description: 'Retrieve the current user\'s account.',
+        description: 'Retrieve the authenticated user\'s account.',
         summary: '[Account] Retrieve user account',
         security: [['sanctum' => []]],
         tags: ['User'],
@@ -39,7 +40,7 @@ class AccountController extends Controller
         ]
     )]
     /**
-     * Retrieve the current user's account.
+     * Retrieve the authenticated user's account.
      *
      * @param Request $request
      * @return JsonResponse
@@ -47,7 +48,9 @@ class AccountController extends Controller
     public function show(Request $request): JsonResponse
     {
         $currentUser = $request->user();
+
         $currentUser->loadMissing(['roles']);
+
         return UserResource::make($currentUser)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
@@ -55,7 +58,7 @@ class AccountController extends Controller
 
     #[OA\Patch(
         path: '/account',
-        description: 'Update the current user\'s account.',
+        description: 'Update the authenticated user\'s account.',
         summary: '[Account] Update user account',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
@@ -91,18 +94,21 @@ class AccountController extends Controller
         ]
     )]
     /**
-     * Update the current user's account.
+     * Update the authenticated user's account.
      *
      * @param Request $request
      * @param UpdateUserData $data
      * @param UpdateUserAction $action
      * @return JsonResponse
+     * @throws AccessDeniedHttpException
      */
     public function update(Request $request, UpdateUserData $data, UpdateUserAction $action): JsonResponse
     {
         $currentUser = $request->user();
+
         $updatedUser = $action->handle($data, $currentUser);
         $updatedUser->loadMissing(['roles']);
+
         return UserResource::make($updatedUser)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);

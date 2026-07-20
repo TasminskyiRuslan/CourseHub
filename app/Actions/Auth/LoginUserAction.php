@@ -21,7 +21,7 @@ class LoginUserAction
     }
 
     /**
-     * Authenticate the user using email and password and issue an access token.
+     * Authenticate a user and issue a new access token.
      *
      * @param LoginUserData $data
      * @return AuthData
@@ -29,7 +29,7 @@ class LoginUserAction
      */
     public function handle(LoginUserData $data): AuthData
     {
-        $user = User::whereEmail($data->email)->first();
+        $user = User::where('email', $data->email)->first();
 
         if (!$user || !Hash::check($data->password, $user->password)) {
             throw ValidationException::withMessages([

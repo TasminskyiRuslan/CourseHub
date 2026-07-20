@@ -25,15 +25,17 @@ use Spatie\Sluggable\SlugOptions;
  * @property int $lessonable_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read \App\Models\Course $course
- * @property-read Model|\Eloquent $lessonable
- * @method static \Database\Factories\LessonFactory factory($count = null, $state = [])
+ * @property Carbon|null $deleted_at
+ * @property-read Course|null $course
+ * @property-read Model|Eloquent $lessonable
+ * @method static LessonFactory factory($count = null, $state = [])
  * @method static Builder<static>|Lesson newModelQuery()
  * @method static Builder<static>|Lesson newQuery()
+ * @method static Builder<static>|Lesson onlyTrashed()
  * @method static Builder<static>|Lesson query()
- * @method static Builder<static>|Lesson visibleFor(?\App\Models\User $user)
  * @method static Builder<static>|Lesson whereCourseId($value)
  * @method static Builder<static>|Lesson whereCreatedAt($value)
+ * @method static Builder<static>|Lesson whereDeletedAt($value)
  * @method static Builder<static>|Lesson whereId($value)
  * @method static Builder<static>|Lesson whereLessonableId($value)
  * @method static Builder<static>|Lesson whereLessonableType($value)
@@ -41,9 +43,6 @@ use Spatie\Sluggable\SlugOptions;
  * @method static Builder<static>|Lesson whereSlug($value)
  * @method static Builder<static>|Lesson whereTitle($value)
  * @method static Builder<static>|Lesson whereUpdatedAt($value)
- * @property Carbon|null $deleted_at
- * @method static Builder<static>|Lesson onlyTrashed()
- * @method static Builder<static>|Lesson whereDeletedAt($value)
  * @method static Builder<static>|Lesson withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|Lesson withoutTrashed()
  * @mixin Eloquent
@@ -63,18 +62,6 @@ class Lesson extends Model
         'slug',
         'position'
     ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'position' => 'integer',
-        ];
-    }
 
     /**
      * The "booted" method of the model.
@@ -131,16 +118,14 @@ class Lesson extends Model
     }
 
     /**
-     * Scope a query to only include lessons of courses visible to the given user.
+     * Get the attributes that should be cast.
      *
-     * @param Builder $query
-     * @param User|null $user
-     * @return Builder
+     * @return array<string, string>
      */
-    public function scopeVisibleFor(Builder $query, ?User $user): Builder
+    protected function casts(): array
     {
-        return $query->whereHas('course', function (Builder $q) use ($user) {
-            $q->visibleFor($user);
-        });
+        return [
+            'position' => 'integer',
+        ];
     }
 }

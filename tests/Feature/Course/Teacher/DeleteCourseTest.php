@@ -50,7 +50,7 @@ describe('Teacher -> CourseController -> destroy', function () {
             ]);
         });
 
-        it('fails if users without permissions tries to delete someone else\'s course', function ($user) {
+        it('fails if a user without permissions tries to delete someone else\'s course', function ($user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -67,7 +67,7 @@ describe('Teacher -> CourseController -> destroy', function () {
             'admin' => fn() => User::factory()->admin()->create(),
         ]);
 
-        it('allows users to delete their own course', function ($userClosure, $courseClosure) {
+        it('allows a user to delete their own course', function ($userClosure, $courseClosure) {
             $user = $userClosure();
 
             Sanctum::actingAs($user);
@@ -96,12 +96,12 @@ describe('Teacher -> CourseController -> destroy', function () {
             }
             Storage::disk('courses')->assertMissing($filename);
         })->with([
-            'teacher'     => fn() => User::factory()->teacher()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ])->with([
-            'published'   => fn() => fn($author, $filename) => Course::factory()->withImage($filename)->for($author, 'author')->create(),
+            'published' => fn() => fn($author, $filename) => Course::factory()->withImage($filename)->for($author, 'author')->create(),
             'unpublished' => fn() => fn($author, $filename) => Course::factory()->unpublished()->withImage($filename)->for($author, 'author')->create(),
-            'banned'      => fn() => fn($author, $filename) => Course::factory()->banned()->withImage($filename)->for($author, 'author')->create(),
+            'banned' => fn() => fn($author, $filename) => Course::factory()->banned()->withImage($filename)->for($author, 'author')->create(),
         ]);
     });
 
@@ -111,7 +111,7 @@ describe('Teacher -> CourseController -> destroy', function () {
     |--------------------------------------------------------------------------
     */
     describe('caching', function () {
-        it('flushes the course cache when a course is updated', function () {
+        it('flushes the course cache when a course is deleted', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
 

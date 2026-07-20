@@ -9,7 +9,7 @@ use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Data;
 
-class SendPasswordResetEmailData extends Data
+class SendPasswordResetLinkData extends Data
 {
     /**
      * @param string $email

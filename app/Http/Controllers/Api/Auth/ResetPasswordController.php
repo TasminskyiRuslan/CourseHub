@@ -14,7 +14,7 @@ class ResetPasswordController extends Controller
 {
     #[OA\Post(
         path: '/auth/password/reset',
-        description: 'Reset the user\'s password.',
+        description: 'Reset the password for the user identified by the email.',
         summary: 'Reset password',
         requestBody: new OA\RequestBody(
             required: true,
@@ -33,7 +33,7 @@ class ResetPasswordController extends Controller
         ]
     )]
     /**
-     * Reset the user's password.
+     * Reset the password for the user identified by the email.
      *
      * @param ResetPasswordData $data
      * @param ResetPasswordAction $action
@@ -43,6 +43,7 @@ class ResetPasswordController extends Controller
     public function __invoke(ResetPasswordData $data, ResetPasswordAction $action): Response
     {
         $action->handle($data);
+
         return response()->noContent();
     }
 }

@@ -18,4 +18,5 @@ return [
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
     'banned' => 'Your auth is banned. Please contact support.',
     'verified' => 'Your email address is already verified.',
+    'invalid_verification_link' => 'The verification link is invalid or expired.',
 ];

@@ -42,7 +42,6 @@ class CreateCourseData extends Data
         public ?string    $description,
 
         #[Required]
-        #[StringType]
         #[Enum(CourseType::class)]
         public CourseType $type,
 

@@ -7,7 +7,7 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'UpdateCourseRequest',
     title: 'Update Course Request',
-    description: 'Payload for updating a course.',
+    description: 'Payload for updating an existing course.',
     properties: [
         new OA\Property(
             property: 'title',
@@ -34,7 +34,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'price',
-            description: 'Price.',
+            description: 'Price value.',
             type: 'string',
             maximum: 99999999.99,
             minimum: 0,

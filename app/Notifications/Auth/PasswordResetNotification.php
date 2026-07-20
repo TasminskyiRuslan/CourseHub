@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ResetPasswordNotification extends Notification implements ShouldQueue
+class PasswordResetNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -15,7 +15,6 @@ class ResetPasswordNotification extends Notification implements ShouldQueue
      * Create a new notification instance.
      *
      * @param string $token
-     * @return void
      */
     public function __construct(public string $token)
     {

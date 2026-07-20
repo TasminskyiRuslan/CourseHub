@@ -27,7 +27,7 @@ describe('Admin -> UserRoleController -> update', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            putJson(route('admin.user.role.update', 'non-existing-slug'), ['role' => UserRole::TEACHER->value])
+            putJson(route('admin.user.role.update', 'non-existing-slug'), ['roles' => [UserRole::TEACHER->value]])
                 ->assertNotFound();
         });
 
@@ -72,7 +72,7 @@ describe('Admin -> UserRoleController -> update', function () {
             Sanctum::actingAs($admin);
             $targetUser = User::factory()->create();
 
-            putJson(route('admin.user.role.update', $targetUser), ['role' => UserRole::SUPER_ADMIN->value])
+            putJson(route('admin.user.role.update', $targetUser), ['roles' => [UserRole::SUPER_ADMIN->value]])
                 ->assertUnprocessable();
         });
     });
@@ -90,7 +90,7 @@ describe('Admin -> UserRoleController -> update', function () {
                 ->assertUnauthorized();
         });
 
-        it('fails if users without permission try to update a user\'s role', function ($user) {
+        it('fails if a user without permission tries to update a user\'s role', function ($user) {
             Sanctum::actingAs($user);
 
             $targetUser = User::factory()->create();
@@ -111,10 +111,10 @@ describe('Admin -> UserRoleController -> update', function () {
                 ->assertForbidden();
         })->with([
             'another admin' => fn() => User::factory()->admin()->create(),
-            'super-admin'   => fn() => User::where('email', config('super-admin.email'))->first(),
+            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ]);
 
-        it('fails if an admin tries to update his own role', function () {
+        it('fails if an admin tries to update their own role', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
@@ -144,7 +144,7 @@ describe('Admin -> UserRoleController -> update', function () {
             $targetUser->refresh();
             expect($targetUser->hasAllRoles([UserRole::TEACHER->value, UserRole::ADMIN->value]))->toBeTrue();
         })->with([
-            'admin'       => fn() => User::factory()->admin()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
         ]);
     });

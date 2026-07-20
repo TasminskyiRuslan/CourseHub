@@ -85,6 +85,7 @@ class CourseController extends Controller
     public function index(Request $request, GetCoursesQuery $query): JsonResponse
     {
         $gottenCourses = $query->handle($request);
+
         return CourseResource::collection($gottenCourses)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
@@ -129,13 +130,14 @@ class CourseController extends Controller
     /**
      * Retrieve detailed information about the specified active course.
      *
-     * @param string $course
      * @param GetCourseQuery $query
+     * @param string $course
      * @return JsonResponse
      */
     public function show(GetCourseQuery $query, string $course): JsonResponse
     {
         $gottenCourse = $query->handle($course);
+
         return CourseResource::make($gottenCourse)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);

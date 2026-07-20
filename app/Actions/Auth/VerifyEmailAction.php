@@ -9,18 +9,19 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class VerifyEmailAction
 {
     /**
-     * Verify the user's email address.
+     * Verify the email address of the user identified by the id.
      *
      * @param string $id
      * @param string $hash
      * @return void
+     * @throws AccessDeniedHttpException
      */
     public function handle(string $id, string $hash): void
     {
-        $user = User::find($id);
+        $user = User::query()->find($id);
 
         if (!$user || !hash_equals($hash, sha1($user->getEmailForVerification()))) {
-            throw new AccessDeniedHttpException();
+            throw new AccessDeniedHttpException(__('auth.invalid_verification_link'));
         }
 
         if ($user->hasVerifiedEmail()) {
@@ -28,6 +29,7 @@ class VerifyEmailAction
         }
 
         $user->markEmailAsVerified();
+
         event(new Verified($user));
     }
 }

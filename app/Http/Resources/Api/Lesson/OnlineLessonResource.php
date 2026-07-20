@@ -2,19 +2,21 @@
 
 namespace App\Http\Resources\Api\Lesson;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property mixed $start_time
- * @property mixed $end_time
- * @property mixed $meeting_link
+ * @property-read Carbon $start_time
+ * @property-read Carbon $end_time
+ * @property-read string $meeting_link
  */
 class OnlineLessonResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
+     * @param Request $request
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array

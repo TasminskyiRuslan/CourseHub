@@ -67,7 +67,7 @@ describe('Admin -> TeacherController -> index', function () {
                 expect($responseDataIds)->toContain($bannedUser->id);
             }
         })->with([
-            'admin'       => fn() => User::factory()->admin()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
         ]);
     });
@@ -177,6 +177,22 @@ describe('Admin -> TeacherController -> index', function () {
             expect(array_search($newUser->id, $ids))->toBeLessThan(array_search($oldUser->id, $ids));
         });
 
+        it('sorts users by name (asc and desc)', function () {
+            $admin = User::factory()->admin()->create();
+            Sanctum::actingAs($admin);
+
+            $firstAlphabeticalUser = User::factory()->create(['name' => 'Aaron']);
+            $lastAlphabeticalUser = User::factory()->create(['name' => 'Zachary']);
+
+            $ascResponse = getJson(route('admin.user.index', ['sort' => 'name']))->assertOk();
+            $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
+            expect(array_search($firstAlphabeticalUser->id, $ascIds))->toBeLessThan(array_search($lastAlphabeticalUser->id, $ascIds));
+
+            $descResponse = getJson(route('admin.user.index', ['sort' => '-name']))->assertOk();
+            $descIds = collect($descResponse->json('data'))->pluck('id')->all();
+            expect(array_search($lastAlphabeticalUser->id, $descIds))->toBeLessThan(array_search($firstAlphabeticalUser->id, $descIds));
+        });
+
         it('sorts users by created_at (asc and desc)', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
@@ -196,7 +212,7 @@ describe('Admin -> TeacherController -> index', function () {
             expect(array_search($newUser->id, $descIds))->toBeLessThan(array_search($oldUser->id, $descIds));
         });
 
-        it('sorts users by name (asc and desc)', function () {
+        it('sorts users by email_verified_at (asc and desc)', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
@@ -215,7 +231,7 @@ describe('Admin -> TeacherController -> index', function () {
             expect(array_search($newVerified->id, $descIds))->toBeLessThan(array_search($oldVerified->id, $descIds));
         });
 
-        it('sorts users by email_verified_at (asc and desc)', function () {
+        it('sorts users by banned_at (asc and desc)', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
@@ -253,7 +269,7 @@ describe('Admin -> TeacherController -> index', function () {
             expect(array_search($teacherWithMany->id, $descIds))->toBeLessThan(array_search($teacherWithFew->id, $descIds));
         });
 
-        it('sorts users by banned_at (asc and desc)', function () {
+        it('sorts users by deleted_at (asc and desc)', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 

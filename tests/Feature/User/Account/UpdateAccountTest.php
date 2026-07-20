@@ -23,7 +23,7 @@ describe('Account -> AccountController -> update', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-        it('fails for unauthenticated user', function () {
+        it('fails if an unauthenticated user tries to update the account data', function () {
             patchJson(route('account.update'), ['name' => 'New Name'])
                 ->assertUnauthorized();
         });
@@ -65,7 +65,7 @@ describe('Account -> AccountController -> update', function () {
                 ->assertJsonValidationErrors(['slug']);
         });
 
-        it('allows user to keep their own current slug', function () {
+        it('allows a user to keep their own current slug', function () {
             $user = User::factory()->create(['slug' => 'my-own-slug']);
             Sanctum::actingAs($user);
 
@@ -92,7 +92,7 @@ describe('Account -> AccountController -> update', function () {
             ])->assertForbidden();
         });
 
-        it('allows authenticated users to update their own auth', function ($user) {
+        it('allows an authenticated user to update their own profile data', function ($user) {
             Sanctum::actingAs($user);
 
             $data = [
@@ -109,10 +109,10 @@ describe('Account -> AccountController -> update', function () {
             expect($user->refresh()->name)->toBe($data['name'])
                 ->and($user->slug)->toBe($data['slug']);
         })->with([
-            'user'            => fn() => User::factory()->create(),
-            'teacher'            => fn() => User::factory()->teacher()->create(),
+            'user' => fn() => User::factory()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
             'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'admin'              => fn() => User::factory()->admin()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
         ]);
     });
 
@@ -122,7 +122,7 @@ describe('Account -> AccountController -> update', function () {
     |--------------------------------------------------------------------------
     */
     describe('caching', function () {
-        it('flushes the user cache when an auth is updated', function () {
+        it('flushes the teacher cache when an auth teacher profile is updated', function () {
             $user = User::factory()->create();
             Sanctum::actingAs($user);
 

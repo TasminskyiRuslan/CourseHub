@@ -33,7 +33,7 @@ class GetUsersQuery
     {
         return QueryBuilder::for(User::class, $request)
             ->with(['roles'])
-            ->withCount(['courses' => fn ($q) => $q->withTrashed()])
+            ->withCount(['courses' => fn($q) => $q->withTrashed()])
             ->allowedFilters([
                 AllowedFilter::callback('search', function ($query, $value) {
                     $query->where(function ($q) use ($value) {

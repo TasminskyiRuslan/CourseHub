@@ -14,7 +14,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 class GetTeachersQuery extends CachedListQuery
 {
     /**
-     * Retrieve paginated list of active teachers with conditional caching.
+     * Retrieve a paginated list of teachers with conditional caching.
      *
      * @param Request $request
      * @return LengthAwarePaginator
@@ -27,7 +27,7 @@ class GetTeachersQuery extends CachedListQuery
                 ->withQueryString();
         }
 
-        $page = (int) $request->query('page', 1);
+        $page = (int)$request->query('page', 1);
         $cacheKey = "teachers:page:{$page}";
         $tags = [
             config('cache.tags.teacher_list')
@@ -37,7 +37,7 @@ class GetTeachersQuery extends CachedListQuery
             ->remember(
                 $cacheKey,
                 config('cache.ttl.teacher'),
-                fn () => $this->query($request)
+                fn() => $this->query($request)
                     ->paginate(config('pagination.users_per_page'))
                     ->withQueryString()
             );
@@ -57,8 +57,7 @@ class GetTeachersQuery extends CachedListQuery
             ->whereHas('roles', function ($query) {
                 $query->where('name', UserRole::TEACHER->value);
             })
-            ->with(['roles'])
-            ->withCount(['courses'])
+            ->withCount(['courses' => fn($query) => $query->active()])
             ->allowedFilters([
                 AllowedFilter::callback('search', function ($query, $value) {
                     $query->where('name', 'like', "%$value%");

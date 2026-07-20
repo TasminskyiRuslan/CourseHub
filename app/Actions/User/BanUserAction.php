@@ -6,7 +6,6 @@ use App\Actions\Auth\RevokeAllTokensAction;
 use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Throwable;
 
@@ -17,13 +16,16 @@ class BanUserAction
      */
     public function __construct(
         protected RevokeAllTokensAction $revokeAllTokensAction
-    ) {}
+    )
+    {
+    }
 
     /**
      * Ban the specified user.
      *
      * @param User $user
      * @return void
+     * @throws AccessDeniedHttpException
      * @throws Throwable
      */
     public function handle(User $user): void
@@ -38,6 +40,7 @@ class BanUserAction
 
         DB::transaction(function () use ($user) {
             $user->ban()->save();
+
             $this->revokeAllTokensAction->handle($user);
 
             DB::afterCommit(function () use ($user) {

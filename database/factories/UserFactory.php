@@ -6,9 +6,7 @@ use App\Enums\UserRole;
 use App\Models\User;
 use Hash;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Spatie\Permission\PermissionRegistrar;
 
 /**
  * @extends Factory<User>

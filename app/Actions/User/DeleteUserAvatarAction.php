@@ -10,10 +10,11 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class DeleteUserAvatarAction
 {
     /**
-     * Remove the specified user auth avatar.
+     * Delete the specified user avatar.
      *
      * @param User $user
      * @return void
+     * @throws AccessDeniedHttpException
      */
     public function handle(User $user): void
     {
@@ -21,12 +22,14 @@ class DeleteUserAvatarAction
             throw new AccessDeniedHttpException(__('users.protected'));
         }
 
-        if ($user->avatar_path) {
-            if (Storage::disk('users')->exists($user->avatar_path)) {
-                Storage::disk('users')->delete($user->avatar_path);
-            }
-
-            $user->removeAvatar()->save();
+        if (!$user->avatar_path) {
+            return;
         }
+
+        if (Storage::disk('users')->exists($user->avatar_path)) {
+            Storage::disk('users')->delete($user->avatar_path);
+        }
+
+        $user->removeAvatar()->save();
     }
 }

@@ -8,7 +8,7 @@ use App\Models\User;
 class GetLessonQuery
 {
     /**
-     * Retrieve detailed information about a specific lesson for teachers.
+     * Retrieve detailed information about the specified lesson for the specified teacher's course.
      *
      * @param string $courseSlug
      * @param string $lessonSlug

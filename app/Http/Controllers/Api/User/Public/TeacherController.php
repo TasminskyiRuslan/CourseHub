@@ -4,10 +4,8 @@ namespace App\Http\Controllers\Api\User\Public;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\User\Public\UserResource;
-use App\Models\User;
 use App\Queries\User\Public\GetTeacherQuery;
 use App\Queries\User\Public\GetTeachersQuery;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
@@ -72,6 +70,7 @@ class TeacherController extends Controller
     public function index(Request $request, GetTeachersQuery $query): JsonResponse
     {
         $gottenUsers = $query->handle($request);
+
         return UserResource::collection($gottenUsers)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
@@ -123,6 +122,7 @@ class TeacherController extends Controller
     public function show(GetTeacherQuery $query, string $teacher): JsonResponse
     {
         $gottenUser = $query->handle($teacher);
+
         return UserResource::make($gottenUser)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);

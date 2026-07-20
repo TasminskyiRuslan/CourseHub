@@ -25,14 +25,14 @@ describe('Teacher -> CourseController -> index', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('fails if unauthenticated users tries to retrieve not own courses', function () {
+        it('fails if an unauthenticated user tries to retrieve courses', function () {
             $course = Course::factory()->create();
 
             getJson(route('teacher.course.show', $course))
                 ->assertUnauthorized();
         });
 
-        it('fails if users without permissions tries to retrieve not own courses', function ($user) {
+        it('fails if a user without permissions tries to retrieve courses', function ($user) {
             Sanctum::actingAs($user);
 
             Course::factory()->count(5)->create();
@@ -41,10 +41,10 @@ describe('Teacher -> CourseController -> index', function () {
                 ->assertForbidden();
         })->with([
             'user' => fn() => User::factory()->create(),
-            'admin'       => fn() => User::factory()->admin()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
         ]);
 
-        it('allows users to retrieve their own courses', function ($user) {
+        it('allows a user to retrieve their own courses', function ($user) {
             Sanctum::actingAs($user);
 
             $ownCourses = Course::factory()->count(3)->for($user, 'author')->create();
@@ -241,7 +241,7 @@ describe('Teacher -> CourseController -> index', function () {
     |--------------------------------------------------------------------------
     */
     describe('pagination', function () {
-        it('returns a paginated list of courses', function () {
+        it('returns a paginated list of course', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
 

@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\CourseType;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\User;
@@ -34,7 +33,7 @@ describe('Teacher -> LessonController -> index', function () {
                 ->assertNotFound();
         });
 
-        it('fails if non-author users tries to retrieve the lessons', function ($user) {
+        it('fails if a non-author user tries to retrieve the lessons', function ($user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -43,7 +42,7 @@ describe('Teacher -> LessonController -> index', function () {
                 ->assertNotFound();
         })->with([
             'other teacher' => fn() => User::factory()->teacher()->create(),
-            'super-admin'   => fn() => User::where('email', config('super-admin.email'))->first(),
+            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ]);
     });
 
@@ -53,14 +52,14 @@ describe('Teacher -> LessonController -> index', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('fails if unauthenticated users tries to retrieve the lessons', function () {
+        it('fails if an unauthenticated user tries to retrieve the lessons', function () {
             $course = Course::factory()->create();
 
             getJson(route('teacher.course.lesson.index', $course))
                 ->assertUnauthorized();
         });
 
-        it('fails if users without permissions tries to retrieve the lessons', function ($user) {
+        it('fails if a user without permissions tries to retrieve the lessons', function ($user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -68,7 +67,7 @@ describe('Teacher -> LessonController -> index', function () {
             getJson(route('teacher.course.lesson.index', $course))
                 ->assertForbidden();
         })->with([
-            'user'            => fn() => User::factory()->create(),
+            'user' => fn() => User::factory()->create(),
             'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
             'admin' => fn() => User::factory()->admin()->create(),
         ]);
@@ -98,9 +97,9 @@ describe('Teacher -> LessonController -> index', function () {
         })->with([
             'teacher' => fn() => User::factory()->teacher()->create(),
         ])->with([
-            'published'   => fn() => fn($author) => Course::factory()->for($author, 'author')->create(),
+            'published' => fn() => fn($author) => Course::factory()->for($author, 'author')->create(),
             'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->for($author, 'author')->create(),
-            'banned'      => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
+            'banned' => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
         ]);
     });
 
@@ -118,7 +117,7 @@ describe('Teacher -> LessonController -> index', function () {
 
             $lesson1 = Lesson::factory()->for($course)->create(['title' => 'Introduction to Laravel']);
             $lesson2 = Lesson::factory()->for($course)->create(['title' => 'Advanced Vue.js']);
-            $searchString = substr($lesson1->title, 4);;
+            $searchString = substr($lesson1->title, 4);
 
             getJson(route('teacher.course.lesson.index', [$course, 'filter[search]' => $searchString]))
                 ->assertOk()

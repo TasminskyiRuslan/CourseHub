@@ -13,12 +13,13 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class AccountAvatarController extends Controller
 {
     #[OA\Post(
         path: '/account/avatar',
-        description: 'Update the current user\'s account avatar.',
+        description: 'Update the authenticated user\'s account avatar.',
         summary: '[Account] Update user avatar',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
@@ -57,7 +58,7 @@ class AccountAvatarController extends Controller
         ]
     )]
     /**
-     * Update the current user's account avatar.
+     * Update the authenticated user\'s account avatar.
      *
      * @param Request $request
      * @param UpdateUserAvatarData $data
@@ -68,8 +69,10 @@ class AccountAvatarController extends Controller
     public function update(Request $request, UpdateUserAvatarData $data, UpdateUserAvatarAction $action): JsonResponse
     {
         $currentUser = $request->user();
+
         $updatedUser = $action->handle($data, $currentUser);
         $updatedUser->loadMissing(['roles']);
+
         return UserResource::make($updatedUser)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
@@ -77,7 +80,7 @@ class AccountAvatarController extends Controller
 
     #[OA\Delete(
         path: '/account/avatar',
-        description: 'Remove the current user\'s account avatar.',
+        description: 'Delete the authenticated user\'s account avatar.',
         summary: '[Account] Remove user avatar',
         security: [['sanctum' => []]],
         tags: ['User'],
@@ -97,16 +100,19 @@ class AccountAvatarController extends Controller
         ]
     )]
     /**
-     * Remove the current user's account avatar.
+     * Delete the authenticated user's account avatar.
      *
      * @param Request $request
      * @param DeleteUserAvatarAction $action
      * @return Response
+     * @throws AccessDeniedHttpException
      */
     public function destroy(Request $request, DeleteUserAvatarAction $action): Response
     {
         $currentUser = $request->user();
+
         $action->handle($currentUser);
+
         return response()->noContent();
     }
 }

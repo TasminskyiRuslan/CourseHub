@@ -7,14 +7,15 @@ use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\User\Admin\UserResource;
 use App\Models\User;
-use App\Queries\User\Admin\GetUsersQuery;
 use App\Queries\User\Admin\GetUserQuery;
+use App\Queries\User\Admin\GetUsersQuery;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class UserController extends Controller
 {
@@ -123,6 +124,7 @@ class UserController extends Controller
     public function index(Request $request, GetUsersQuery $query): JsonResponse
     {
         $gottenUsers = $query->handle($request);
+
         return UserResource::collection($gottenUsers)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
@@ -183,6 +185,7 @@ class UserController extends Controller
     public function show(GetUserQuery $query, string $user): JsonResponse
     {
         $gottenUser = $query->handle($user);
+
         return UserResource::make($gottenUser)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
@@ -228,14 +231,17 @@ class UserController extends Controller
     /**
      * Delete the specified user by administrator.
      *
-     * @param User $user
      * @param DeleteUserAction $action
+     * @param User $user
      * @return Response
+     * @throws AccessDeniedHttpException
      */
     public function destroy(DeleteUserAction $action, User $user): Response
     {
         $this->authorize('delete', $user);
+
         $action->handle($user);
+
         return response()->noContent();
     }
 }

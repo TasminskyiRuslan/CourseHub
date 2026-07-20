@@ -10,14 +10,12 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\URL;
 
-class VerifyEmailNotification extends VerifyEmail implements ShouldQueue
+class EmailVerificationNotification extends VerifyEmail implements ShouldQueue
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -30,7 +28,7 @@ class VerifyEmailNotification extends VerifyEmail implements ShouldQueue
      * @param mixed $notifiable
      * @return array<int, string>
      */
-    public function via($notifiable): array
+    public function via(mixed $notifiable): array
     {
         return ['mail'];
     }
@@ -41,7 +39,7 @@ class VerifyEmailNotification extends VerifyEmail implements ShouldQueue
      * @param mixed $notifiable
      * @return MailMessage
      */
-    public function toMail($notifiable): MailMessage
+    public function toMail(mixed $notifiable): MailMessage
     {
         $url = $this->verificationUrl($notifiable);
 
@@ -56,10 +54,10 @@ class VerifyEmailNotification extends VerifyEmail implements ShouldQueue
     /**
      * Get the verification URL for the given notifiable.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return string
      */
-    protected function verificationUrl($notifiable): string
+    protected function verificationUrl(mixed $notifiable): string
     {
         if (static::$createUrlCallback) {
             return call_user_func(static::$createUrlCallback, $notifiable);

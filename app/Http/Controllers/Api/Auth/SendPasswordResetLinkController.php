@@ -2,24 +2,23 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
-use App\Actions\Auth\SendPasswordResetEmailAction;
-use App\Data\Auth\Requests\SendPasswordResetEmailData;
+use App\Actions\Auth\SendPasswordResetLinkAction;
+use App\Data\Auth\Requests\SendPasswordResetLinkData;
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
-class SendPasswordResetEmailController extends Controller
+class SendPasswordResetLinkController extends Controller
 {
     #[OA\Post(
         path: '/auth/password/forgot',
-        description: 'Send an email with a link to reset the password.',
+        description: 'Send a password reset link to the user identified by the email.',
         summary: 'Send password reset email',
         requestBody: new OA\RequestBody(
             required: true,
-            content: new OA\JsonContent(ref: '#/components/schemas/SendPasswordResetEmailRequest')
+            content: new OA\JsonContent(ref: '#/components/schemas/SendPasswordResetLinkRequest')
         ),
         tags: ['Auth'],
         responses: [
@@ -38,16 +37,17 @@ class SendPasswordResetEmailController extends Controller
         ]
     )]
     /**
-     * Send an email with a link to reset the password.
+     * Send a password reset link to the user identified by the email.
      *
-     * @param SendPasswordResetEmailData $data
-     * @param SendPasswordResetEmailAction $action
+     * @param SendPasswordResetLinkData $data
+     * @param SendPasswordResetLinkAction $action
      * @return Response
      * @throws ValidationException
      */
-    public function __invoke(SendPasswordResetEmailData $data, SendPasswordResetEmailAction $action): Response
+    public function __invoke(SendPasswordResetLinkData $data, SendPasswordResetLinkAction $action): Response
     {
         $action->handle($data);
+
         return response()->noContent();
     }
 }

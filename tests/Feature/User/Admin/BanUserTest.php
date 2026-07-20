@@ -49,7 +49,7 @@ describe('Admin -> BanUserController', function () {
             expect($targetUser->isBanned())->toBeFalse();
         });
 
-        it('fails if users without permissions tries to ban someone else\'s user', function ($user) {
+        it('fails if a user without permissions tries to ban a user', function ($user) {
             Sanctum::actingAs($user);
 
             $targetUser = User::factory()->create();
@@ -64,7 +64,7 @@ describe('Admin -> BanUserController', function () {
             'teacher' => fn() => User::factory()->teacher()->create(),
         ]);
 
-        it('fails if authenticated user tries to ban their own user', function () {
+        it('fails if an authenticated user tries to ban themselves', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
@@ -75,7 +75,7 @@ describe('Admin -> BanUserController', function () {
             expect($admin->isBanned())->toBeFalse();
         });
 
-        it('fails if user tries to ban admin or super admin user', function ($targetUser) {
+        it('fails if an admin tries to ban another admin or super-admin', function ($targetUser) {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
@@ -117,8 +117,8 @@ describe('Admin -> BanUserController', function () {
 
             Notification::assertSentTo($targetUser, UserBannedNotification::class);
         })->with([
-            'user'      => fn() => User::factory()->create(),
-            'teacher'      => fn() => User::factory()->teacher()->create(),
+            'user' => fn() => User::factory()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
         ]);
 
         it('allows super-admin to ban any user', function ($targetUser) {
@@ -138,9 +138,9 @@ describe('Admin -> BanUserController', function () {
 
             Notification::assertSentTo($targetUser, UserBannedNotification::class);
         })->with([
-            'user'      => fn() => User::factory()->create(),
-            'teacher'      => fn() => User::factory()->teacher()->create(),
-            'admin'        => fn() => User::factory()->admin()->create(),
+            'user' => fn() => User::factory()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
         ]);
 
         it('does not send a notification if the user is already banned', function () {

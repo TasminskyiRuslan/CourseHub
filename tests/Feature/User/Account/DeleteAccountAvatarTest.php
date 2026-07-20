@@ -25,7 +25,7 @@ describe('Account -> AccountAvatarController -> destroy', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('fails if an unauthenticated user tries to delete the auth avatar', function () {
+        it('fails if an unauthenticated user tries to delete their avatar', function () {
             $user = User::factory()->withAvatar()->create();
             Storage::disk('users')->put($user->avatar_path, 'fake');
 
@@ -45,7 +45,7 @@ describe('Account -> AccountAvatarController -> destroy', function () {
                 ->assertForbidden();
         });
 
-        it('allows authenticated users to delete their own auth avatar', function ($user) {
+        it('allows an authenticated user to delete their own avatar', function ($user) {
             $avatarPath = $user->avatar_path;
 
             Storage::disk('users')->put($avatarPath, 'fake');
@@ -58,10 +58,10 @@ describe('Account -> AccountAvatarController -> destroy', function () {
             expect($user->avatar_path)->toBeNull();
             Storage::disk('users')->assertMissing($avatarPath);
         })->with([
-            'student'            => fn() => User::factory()->withAvatar()->create(),
-            'teacher'            => fn() => User::factory()->teacher()->withAvatar()->create(),
+            'student' => fn() => User::factory()->withAvatar()->create(),
+            'teacher' => fn() => User::factory()->teacher()->withAvatar()->create(),
             'unverified teacher' => fn() => User::factory()->teacher()->unverified()->withAvatar()->create(),
-            'admin'              => fn() => User::factory()->admin()->withAvatar()->create(),
+            'admin' => fn() => User::factory()->admin()->withAvatar()->create(),
         ]);
     });
 

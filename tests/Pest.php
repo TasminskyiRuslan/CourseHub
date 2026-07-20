@@ -12,10 +12,6 @@
 */
 
 use App\Enums\CourseType;
-use App\Enums\UserPermission;
-use App\Enums\UserRole;
-use App\Models\Course;
-use App\Models\User;
 use Illuminate\Http\UploadedFile;
 
 pest()->extend(Tests\TestCase::class)
@@ -58,12 +54,12 @@ function something()
  *
  * @return array
  */
-function publicUserJsonStructure(): array {
+function publicUserJsonStructure(): array
+{
     return [
         'id',
         'name',
         'slug',
-        'roles',
         'avatar_url',
         'courses_count'
     ];
@@ -74,7 +70,8 @@ function publicUserJsonStructure(): array {
  *
  * @return array
  */
-function accountUserJsonStructure(): array {
+function accountUserJsonStructure(): array
+{
     return [
         'id',
         'name',
@@ -94,7 +91,8 @@ function accountUserJsonStructure(): array {
  *
  * @return array
  */
-function adminUserJsonStructure(): array {
+function adminUserJsonStructure(): array
+{
     return [
         'id',
         'name',
@@ -107,15 +105,16 @@ function adminUserJsonStructure(): array {
         'created_at',
         'updated_at',
         'deleted_at',
-        'courses_count',
     ];
 }
+
 /**
  * Get the expected JSON structure for an authentication response.
  *
  * @return array
  */
-function authJsonStructure(): array {
+function authJsonStructure(): array
+{
     return [
         'user' => accountUserJsonStructure(),
         'access_token',
@@ -125,25 +124,13 @@ function authJsonStructure(): array {
 }
 
 /**
- * Get the expected JSON structure for an author object.
- *
- * @return array
- */
-function authorJsonStructure(): array {
-    return [
-        'id',
-        'name',
-        'slug',
-    ];
-}
-
-/**
  * Get the expected JSON structure for a lesson object (teacher).
  *
  * @param CourseType|null $courseType
  * @return array
  */
-function teacherLessonJsonStructure(?CourseType $courseType): array {
+function teacherLessonJsonStructure(?CourseType $courseType): array
+{
     return [
         'id',
         'course_id',
@@ -178,7 +165,8 @@ function teacherLessonJsonStructure(?CourseType $courseType): array {
  * @param CourseType|null $courseType
  * @return array
  */
-function adminLessonJsonStructure(?CourseType $courseType): array {
+function adminLessonJsonStructure(?CourseType $courseType): array
+{
     return [
         'id',
         'course_id',
@@ -213,7 +201,8 @@ function adminLessonJsonStructure(?CourseType $courseType): array {
  *
  * @return array
  */
-function publicCourseJsonStructure(): array {
+function publicCourseJsonStructure(): array
+{
     return [
         'id',
         'author_id',
@@ -234,7 +223,8 @@ function publicCourseJsonStructure(): array {
  *
  * @return array
  */
-function teacherCourseJsonStructure(): array {
+function teacherCourseJsonStructure(): array
+{
     return [
         'id',
         'author_id',
@@ -257,7 +247,8 @@ function teacherCourseJsonStructure(): array {
  *
  * @return array
  */
-function adminCourseJsonStructure(): array {
+function adminCourseJsonStructure(): array
+{
     return [
         'id',
         'author_id',
@@ -282,7 +273,8 @@ function adminCourseJsonStructure(): array {
  *
  * @return array
  */
-function paginationJsonStructure(): array {
+function paginationJsonStructure(): array
+{
     return [
         'data',
         'links',
@@ -299,8 +291,8 @@ function paginationJsonStructure(): array {
 function registrationPayload(array $overrides = []): array
 {
     return array_merge([
-        'name'     => fake()->name(),
-        'email'    => fake()->unique()->safeEmail(),
+        'name' => fake()->name(),
+        'email' => fake()->unique()->safeEmail(),
         'password' => 'password123',
         'password_confirmation' => 'password123',
     ], $overrides);
@@ -318,7 +310,7 @@ function creatingCoursePayload(array $overrides = []): array
         'title' => fake()->sentence(3),
         'description' => fake()->paragraph(),
         'type' => CourseType::OFFLINE,
-        'price' => (string) fake()->randomFloat(2, 0, 99999999.99),
+        'price' => (string)fake()->randomFloat(2, 0, 99999999.99),
     ], $overrides);
 }
 
@@ -333,7 +325,7 @@ function updatingCoursePayload(array $overrides = []): array
     return array_merge([
         'title' => fake()->sentence(3),
         'description' => fake()->paragraph(),
-        'price' => (string) fake()->randomFloat(2, 0, 99999999.99),
+        'price' => (string)fake()->randomFloat(2, 0, 99999999.99),
     ], $overrides);
 }
 
@@ -346,7 +338,7 @@ function updatingCoursePayload(array $overrides = []): array
 function imagePayload(array $overrides = []): array
 {
     return array_merge([
-        'image'     => UploadedFile::fake()->image('image.jpg'),
+        'image' => UploadedFile::fake()->image('image.jpg'),
         '_method' => 'PUT',
     ], $overrides);
 }
@@ -360,7 +352,7 @@ function imagePayload(array $overrides = []): array
 function avatarPayload(array $overrides = []): array
 {
     return array_merge([
-        'avatar'     => UploadedFile::fake()->image('avatar.jpg'),
+        'avatar' => UploadedFile::fake()->image('avatar.jpg'),
         '_method' => 'PUT',
     ], $overrides);
 }

@@ -110,7 +110,10 @@ class CourseController extends Controller
      */
     public function index(Request $request, GetCoursesQuery $query): JsonResponse
     {
-        $courses = $query->handle($request, $request->user());
+        $currentUser = $request->user();
+
+        $courses = $query->handle($request, $currentUser);
+
         return CourseResource::collection($courses)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
@@ -164,9 +167,12 @@ class CourseController extends Controller
     public function store(Request $request, CreateCourseData $data, CreateCourseAction $action): JsonResponse
     {
         $this->authorize('create', Course::class);
+
         $currentUser = $request->user();
+
         $createdCourse = $action->handle($data, $currentUser);
         $createdCourse->loadCount(['lessons']);
+
         return CourseResource::make($createdCourse)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_CREATED);
@@ -228,7 +234,9 @@ class CourseController extends Controller
     public function show(Request $request, GetCourseQuery $query, string $course): JsonResponse
     {
         $currentUser = $request->user();
+
         $gottenCourse = $query->handle($course, $currentUser);
+
         return CourseResource::make($gottenCourse)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
@@ -298,8 +306,10 @@ class CourseController extends Controller
     public function update(UpdateCourseData $data, UpdateCourseAction $action, Course $course): JsonResponse
     {
         $this->authorize('update', $course);
+
         $updatedCourse = $action->handle($data, $course);
         $updatedCourse->loadCount(['lessons']);
+
         return CourseResource::make($updatedCourse)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
@@ -352,7 +362,9 @@ class CourseController extends Controller
     public function destroy(DeleteCourseAction $action, Course $course): Response
     {
         $this->authorize('delete', $course);
+
         $action->handle($course);
+
         return response()->noContent();
     }
 }

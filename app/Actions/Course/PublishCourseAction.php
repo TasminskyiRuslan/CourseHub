@@ -15,6 +15,7 @@ class PublishCourseAction
     public function handle(Course $course): Course
     {
         $course->publish()->save();
+
         return $course;
     }
 }

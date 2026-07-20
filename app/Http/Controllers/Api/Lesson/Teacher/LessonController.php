@@ -106,7 +106,9 @@ class LessonController extends Controller
     public function index(Request $request, GetLessonsQuery $query, string $course): JsonResponse
     {
         $currentUser = $request->user();
+
         $gottenLessons = $query->handle($request, $course, $currentUser);
+
         return LessonResource::collection($gottenLessons)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
@@ -177,8 +179,10 @@ class LessonController extends Controller
     public function store(CreateLessonData $data, CreateLessonAction $action, Course $course): JsonResponse
     {
         $this->authorize('create', [Lesson::class, $course]);
+
         $createdLesson = $action->handle($data, $course);
         $createdLesson->loadMissing(['lessonable']);
+
         return LessonResource::make($createdLesson)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_CREATED);
@@ -186,7 +190,7 @@ class LessonController extends Controller
 
     #[OA\Get(
         path: '/teacher/courses/{course}/lessons/{lesson}',
-        description: 'Retrieve detailed information about the specified teacher\'s lesson.',
+        description: 'Retrieve detailed information about the specified lesson for the specified teacher\'s course.',
         summary: '[Teacher] Retrieve lesson details',
         security: [['sanctum' => []]],
         tags: ['Lesson'],
@@ -240,7 +244,7 @@ class LessonController extends Controller
         ]
     )]
     /**
-     * Retrieve detailed information about the specified teacher's lesson.
+     * Retrieve detailed information about the specified lesson for the specified teacher's course.
      *
      * @param Request $request
      * @param GetLessonQuery $query
@@ -251,7 +255,9 @@ class LessonController extends Controller
     public function show(Request $request, GetLessonQuery $query, string $course, string $lesson): JsonResponse
     {
         $currentUser = $request->user();
+
         $gottenLesson = $query->handle($course, $lesson, $currentUser);
+
         return LessonResource::make($gottenLesson)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
@@ -259,7 +265,7 @@ class LessonController extends Controller
 
     #[OA\Patch(
         path: '/teacher/courses/{course}/lessons/{lesson}',
-        description: 'Update the specified teacher\'s lesson.',
+        description: 'Update the specified lesson for the specified teacher\'s course.',
         summary: '[Teacher] Update a lesson',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
@@ -321,7 +327,7 @@ class LessonController extends Controller
         ]
     )]
     /**
-     * Update the specified teacher's lesson.
+     * Update the specified lesson for the specified teacher's course.
      *
      * @param UpdateLessonData $data
      * @param UpdateLessonAction $action
@@ -342,7 +348,7 @@ class LessonController extends Controller
 
     #[OA\Delete(
         path: '/teacher/courses/{course}/lessons/{lesson}',
-        description: 'Delete the specified teacher\'s lesson.',
+        description: 'Delete the specified lesson for the specified teacher\'s course.',
         summary: '[Teacher] Delete a lesson',
         security: [['sanctum' => []]],
         tags: ['Lesson'],
@@ -388,18 +394,20 @@ class LessonController extends Controller
         ]
     )]
     /**
-     * Delete the specified teacher's lesson.
+     * Delete the specified lesson for the specified teacher's course.
      *
+     * @param DeleteLessonAction $action
      * @param Course $course
      * @param Lesson $lesson
-     * @param DeleteLessonAction $action
      * @return Response
      * @throws Throwable
      */
     public function destroy(DeleteLessonAction $action, Course $course, Lesson $lesson): Response
     {
         $this->authorize('delete', $lesson);
+
         $action->handle($lesson);
+
         return response()->noContent();
     }
 }

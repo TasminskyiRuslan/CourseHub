@@ -2,9 +2,9 @@
 
 namespace App\Http\Resources\Api\User\Public;
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -12,8 +12,7 @@ use Illuminate\Support\Facades\Storage;
  * @property-read string $name
  * @property-read string $slug
  * @property-read string|null $avatar_path
- * @property-read int|null $courses_count
- * @property-read Collection|null $roles
+ * @property-read int|MissingValue $courses_count
  */
 class UserResource extends JsonResource
 {
@@ -29,9 +28,8 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
-            'roles'      => $this->whenLoaded('roles', fn () => $this->roles->pluck('name')),
             'avatar_url' => $this->avatar_path ? Storage::disk('users')->url($this->avatar_path) : null,
-            'courses_count' => $this->whenCounted('courses', fn () => $this->courses_count, 0),
+            'courses_count' => $this->whenCounted('courses', fn() => $this->courses_count, 0),
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Data\Lesson\Requests;
 
 use App\Enums\CourseType;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
@@ -24,23 +25,14 @@ class CreateLessonData extends Data
      */
     public function __construct(
         public string           $title,
-
         public ?string          $slug,
-
         public ?int             $position,
-
         public ?CarbonImmutable $start_time,
-
         public ?CarbonImmutable $end_time,
-
         public ?string          $address,
-
         public ?string          $room_number,
-
         public ?string          $meeting_link,
-
         public ?string          $video_url,
-
         public ?string          $provider,
     )
     {
@@ -49,12 +41,12 @@ class CreateLessonData extends Data
     /**
      * Return validation rules.
      *
-     * @param ValidationContext|null $context
-     * @return array
+     * @param ValidationContext $context
+     * @return array<string, array<int, mixed>>
      */
-    public static function rules(?ValidationContext $context = null): array
+    public static function rules(ValidationContext $context): array
     {
-        $course = request()->route('course');
+        $course = Route::current()?->parameter('course');
 
         $rules = [
             'title' => [
@@ -67,7 +59,7 @@ class CreateLessonData extends Data
                 'string',
                 'max:255',
                 'regex:/^[a-z0-9-]+$/',
-                Rule::unique('lessons', 'slug')->where('course_id', $course->id),
+                Rule::unique('lessons', 'slug')->where('course_id', $course?->id),
             ],
             'position' => [
                 'nullable',
@@ -75,6 +67,10 @@ class CreateLessonData extends Data
                 'min:0',
             ],
         ];
+
+        if (!$course) {
+            return $rules;
+        }
 
         return match ($course->type) {
             CourseType::OFFLINE => array_merge($rules, [

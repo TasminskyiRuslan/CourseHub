@@ -2,14 +2,13 @@
 
 namespace App\Swagger\User\Responses;
 
-use App\Enums\UserRole;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
     schema: 'UserPublicResponse',
     title: 'User Public Response',
     description: 'Public profile data of a user.',
-    required: ['id', 'name', 'slug'],
+    required: ['id', 'name', 'slug', 'courses_count'],
     properties: [
         new OA\Property(
             property: 'id',
@@ -28,20 +27,6 @@ use OpenApi\Attributes as OA;
             description: 'User slug.',
             type: 'string',
             example: 'john-doe'
-        ),
-        new OA\Property(
-            property: 'roles',
-            description: 'List of assigned roles.',
-            type: 'array',
-            items: new OA\Items(
-                type: 'string',
-                enum: [
-                    UserRole::TEACHER->value,
-                    UserRole::ADMIN->value,
-                    UserRole::SUPER_ADMIN->value,
-                ]
-            ),
-            example: [UserRole::TEACHER->value]
         ),
         new OA\Property(
             property: 'avatar_url',

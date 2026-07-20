@@ -12,7 +12,7 @@ use OpenApi\Attributes as OA;
     properties: [
         new OA\Property(
             property: 'avatar',
-            description: 'The avatar image file.',
+            description: 'The avatar image file. Allowed formats: jpg, jpeg, png, webp. Maximum size: 2MB (2048 KB).',
             type: 'string',
             format: 'binary'
         ),

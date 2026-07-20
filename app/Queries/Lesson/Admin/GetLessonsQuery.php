@@ -12,16 +12,16 @@ use Spatie\QueryBuilder\QueryBuilder;
 class GetLessonsQuery
 {
     /**
-     * Retrieve a paginated list of course lessons for admin with conditional caching.
+     * Retrieve a paginated list of lessons for the specified course with conditional caching.
      *
      * @param Request $request
-     * @param string $lessonSlug
+     * @param string $courseSlug
      * @return LengthAwarePaginator
      */
-    public function handle(Request $request, string $lessonSlug): LengthAwarePaginator
+    public function handle(Request $request, string $courseSlug): LengthAwarePaginator
     {
         $course = Course::query()
-            ->where('slug', $lessonSlug)
+            ->where('slug', $courseSlug)
             ->withTrashed()
             ->firstOrFail();
 
@@ -41,7 +41,7 @@ class GetLessonsQuery
     {
         return QueryBuilder::for(Lesson::class, $request)
             ->whereBelongsTo($course, 'course')
-            ->with(['lessonable' => fn ($morphTo) => $morphTo->withTrashed()])
+            ->with(['lessonable' => fn($morphTo) => $morphTo->withTrashed()])
             ->withTrashed()
             ->allowedFilters([
                 AllowedFilter::callback('search', function ($query, $value) {

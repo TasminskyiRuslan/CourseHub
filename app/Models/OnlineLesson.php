@@ -20,20 +20,20 @@ use Illuminate\Support\Carbon;
  * @property string|null $meeting_link
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read \App\Models\Lesson|null $lesson
- * @method static \Database\Factories\OnlineLessonFactory factory($count = null, $state = [])
+ * @property Carbon|null $deleted_at
+ * @property-read Lesson|null $lesson
+ * @method static OnlineLessonFactory factory($count = null, $state = [])
  * @method static Builder<static>|OnlineLesson newModelQuery()
  * @method static Builder<static>|OnlineLesson newQuery()
+ * @method static Builder<static>|OnlineLesson onlyTrashed()
  * @method static Builder<static>|OnlineLesson query()
  * @method static Builder<static>|OnlineLesson whereCreatedAt($value)
+ * @method static Builder<static>|OnlineLesson whereDeletedAt($value)
  * @method static Builder<static>|OnlineLesson whereEndTime($value)
  * @method static Builder<static>|OnlineLesson whereId($value)
  * @method static Builder<static>|OnlineLesson whereMeetingLink($value)
  * @method static Builder<static>|OnlineLesson whereStartTime($value)
  * @method static Builder<static>|OnlineLesson whereUpdatedAt($value)
- * @property Carbon|null $deleted_at
- * @method static Builder<static>|OnlineLesson onlyTrashed()
- * @method static Builder<static>|OnlineLesson whereDeletedAt($value)
  * @method static Builder<static>|OnlineLesson withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|OnlineLesson withoutTrashed()
  * @mixin Eloquent
@@ -53,19 +53,6 @@ class OnlineLesson extends Model
         'end_time',
         'meeting_link'
     ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'start_time' => 'datetime',
-            'end_time' => 'datetime',
-        ];
-    }
 
     /**
      * Get the lesson associated with the online lesson.
@@ -88,5 +75,18 @@ class OnlineLesson extends Model
         return $resourceClass
             ? new $resourceClass($this)
             : new OnlineLessonResource($this);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'start_time' => 'datetime',
+            'end_time' => 'datetime',
+        ];
     }
 }

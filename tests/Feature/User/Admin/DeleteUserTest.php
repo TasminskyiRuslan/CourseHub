@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Course;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
@@ -32,7 +31,7 @@ describe('Admin -> TeacherController -> destroy', function () {
                 ->assertNotFound();
         });
 
-        it('fails if users try to delete themselves', function ($user) {
+        it('fails if a user tries to delete themselves', function ($user) {
             Sanctum::actingAs($user);
 
             deleteJson(route('admin.user.destroy', $user))
@@ -43,11 +42,11 @@ describe('Admin -> TeacherController -> destroy', function () {
                 'deleted_at' => null,
             ]);
         })->with([
-            'admin'       => fn() => User::factory()->admin()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ]);
 
-        it('fails if users with permissions try to delete admins', function ($targetUser) {
+        it('fails if an admin tries to delete another admin or super-admin', function ($targetUser) {
             $admin = User::factory()->admin()->create();
 
             Sanctum::actingAs($admin);
@@ -60,7 +59,7 @@ describe('Admin -> TeacherController -> destroy', function () {
                 'deleted_at' => null,
             ]);
         })->with([
-            'admin'       => fn() => User::factory()->admin()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ]);
     });
@@ -82,7 +81,7 @@ describe('Admin -> TeacherController -> destroy', function () {
             ]);
         });
 
-        it('fails if users without permissions tries to delete user', function ($user) {
+        it('fails if a user without permissions tries to delete a user', function ($user) {
             Sanctum::actingAs($user);
 
             $targetUser = User::factory()->create();
@@ -94,12 +93,12 @@ describe('Admin -> TeacherController -> destroy', function () {
                 'id' => $targetUser->id,
             ]);
         })->with([
-            'user'            => fn() => User::factory()->create(),
+            'user' => fn() => User::factory()->create(),
             'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'teacher'            => fn() => User::factory()->teacher()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
         ]);
 
-        it('allows users with permissions to delete the user', function ($userClosure, $targetUserClosure) {
+        it('allows a user with permission to delete a user', function ($userClosure, $targetUserClosure) {
             Sanctum::actingAs($userClosure());
 
             $targetUser = $targetUserClosure();
@@ -111,7 +110,7 @@ describe('Admin -> TeacherController -> destroy', function () {
                 'id' => $targetUser->id,
             ]);
         })->with([
-            'admin'       => fn() => User::factory()->admin()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ])->with([
             'active user' => fn() => User::factory()->create(),

@@ -19,19 +19,19 @@ use Illuminate\Support\Carbon;
  * @property string|null $provider
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read \App\Models\Lesson|null $lesson
- * @method static \Database\Factories\VideoLessonFactory factory($count = null, $state = [])
+ * @property Carbon|null $deleted_at
+ * @property-read Lesson|null $lesson
+ * @method static VideoLessonFactory factory($count = null, $state = [])
  * @method static Builder<static>|VideoLesson newModelQuery()
  * @method static Builder<static>|VideoLesson newQuery()
+ * @method static Builder<static>|VideoLesson onlyTrashed()
  * @method static Builder<static>|VideoLesson query()
  * @method static Builder<static>|VideoLesson whereCreatedAt($value)
+ * @method static Builder<static>|VideoLesson whereDeletedAt($value)
  * @method static Builder<static>|VideoLesson whereId($value)
  * @method static Builder<static>|VideoLesson whereProvider($value)
  * @method static Builder<static>|VideoLesson whereUpdatedAt($value)
  * @method static Builder<static>|VideoLesson whereVideoUrl($value)
- * @property Carbon|null $deleted_at
- * @method static Builder<static>|VideoLesson onlyTrashed()
- * @method static Builder<static>|VideoLesson whereDeletedAt($value)
  * @method static Builder<static>|VideoLesson withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|VideoLesson withoutTrashed()
  * @mixin Eloquent

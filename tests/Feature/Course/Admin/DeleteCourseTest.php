@@ -41,7 +41,7 @@ describe('Admin -> CourseController -> destroy', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('fails if an unauthenticated user tries to delete the course', function () {
+        it('fails if an unauthenticated user tries to delete a course', function () {
             $course = Course::factory()->create();
 
             deleteJson(route('admin.course.destroy', $course))
@@ -51,7 +51,7 @@ describe('Admin -> CourseController -> destroy', function () {
             ]);
         });
 
-        it('fails if users without permissions tries to delete course', function ($user) {
+        it('fails if a user without permissions tries to delete a course', function ($user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -67,7 +67,7 @@ describe('Admin -> CourseController -> destroy', function () {
             'another teacher' => fn() => User::factory()->teacher()->create(),
         ]);
 
-        it('allows users with permissions to delete the course', function ($userClosure, $courseClosure) {
+        it('allows a user with permissions to delete a course', function ($userClosure, $courseClosure) {
             $user = $userClosure();
 
             Sanctum::actingAs($user);
@@ -89,8 +89,8 @@ describe('Admin -> CourseController -> destroy', function () {
                 $this->assertSoftDeleted('lessons', ['id' => $lesson->id]);
                 $lessonableTable = match ($course->type) {
                     CourseType::OFFLINE => 'offline_lessons',
-                    CourseType::ONLINE  => 'online_lessons',
-                    CourseType::VIDEO   => 'video_lessons',
+                    CourseType::ONLINE => 'online_lessons',
+                    CourseType::VIDEO => 'video_lessons',
                 };
                 $this->assertSoftDeleted($lessonableTable, [
                     'id' => $lesson->lessonable->id,
@@ -99,12 +99,12 @@ describe('Admin -> CourseController -> destroy', function () {
 
             Storage::disk('courses')->assertMissing($filename);
         })->with([
-            'admin'       => fn() => User::factory()->admin()->create(),
+            'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ])->with([
-            'published'   => fn() => fn($filename) => Course::factory()->withImage($filename)->create(),
+            'published' => fn() => fn($filename) => Course::factory()->withImage($filename)->create(),
             'unpublished' => fn() => fn($filename) => Course::factory()->unpublished()->withImage($filename)->create(),
-            'banned'      => fn() => fn($filename) => Course::factory()->banned()->withImage($filename)->create(),
+            'banned' => fn() => fn($filename) => Course::factory()->banned()->withImage($filename)->create(),
         ]);
     });
 

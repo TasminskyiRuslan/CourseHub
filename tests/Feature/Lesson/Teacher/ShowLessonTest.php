@@ -55,7 +55,7 @@ describe('Teacher -> LessonController -> show', function () {
                 ->assertNotFound();
         });
 
-        it('fails if non-author users tries to retrieve the course', function ($user) {
+        it('fails if a non-author user tries to retrieve the course', function ($user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -65,7 +65,7 @@ describe('Teacher -> LessonController -> show', function () {
                 ->assertNotFound();
         })->with([
             'another teacher' => fn() => User::factory()->teacher()->create(),
-            'super-admin'     => fn() => User::where('email', config('super-admin.email'))->first(),
+            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ]);
     });
 
@@ -75,7 +75,7 @@ describe('Teacher -> LessonController -> show', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('fails if unauthenticated users tries to retrieve the lesson', function () {
+        it('fails if an unauthenticated user tries to retrieve the lesson', function () {
             $course = Course::factory()->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
@@ -83,7 +83,7 @@ describe('Teacher -> LessonController -> show', function () {
                 ->assertUnauthorized();
         });
 
-        it('fails if users without permissions tries to retrieve the lesson', function ($user) {
+        it('fails if a user without permissions tries to retrieve the lesson', function ($user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -97,7 +97,7 @@ describe('Teacher -> LessonController -> show', function () {
             'admin' => fn() => User::factory()->admin()->create(),
         ]);
 
-        it('allows users to retrieve their own lesson', function ($userClosure, $courseClosure) {
+        it('allows an author to retrieve their own lesson', function ($userClosure, $courseClosure) {
             $user = $userClosure();
 
             Sanctum::actingAs($user);
@@ -110,12 +110,12 @@ describe('Teacher -> LessonController -> show', function () {
                 ->assertOk()
                 ->assertJsonStructure(['data' => teacherLessonJsonStructure($course->type)]);
         })->with([
-            'teacher'     => fn() => User::factory()->teacher()->create(),
+            'teacher' => fn() => User::factory()->teacher()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ])->with([
-            'published'   => fn() => fn($author) => Course::factory()->for($author, 'author')->create(),
+            'published' => fn() => fn($author) => Course::factory()->for($author, 'author')->create(),
             'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->for($author, 'author')->create(),
-            'banned'      => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
+            'banned' => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
         ]);
     });
 })->group('lesson', 'teacher');

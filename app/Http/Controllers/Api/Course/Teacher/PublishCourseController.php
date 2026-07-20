@@ -61,7 +61,7 @@ class PublishCourseController extends Controller
         ]
     )]
     /**
-     * Publish the specified teacher\'s course.
+     * Publish the specified teacher's course.
      *
      * @param PublishCourseAction $action
      * @param Course $course
@@ -70,8 +70,10 @@ class PublishCourseController extends Controller
     public function __invoke(PublishCourseAction $action, Course $course): JsonResponse
     {
         $this->authorize('publish', $course);
+
         $publishedCourse = $action->handle($course);
         $publishedCourse->loadCount(['lessons']);
+
         return CourseResource::make($publishedCourse)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);

@@ -8,7 +8,7 @@ use Laravel\Sanctum\NewAccessToken;
 class IssueAccessTokenAction
 {
     /**
-     * Generates a new personal access token for the user.
+     * Issue a new personal access token for the specified user.
      *
      * @param User $user
      * @param bool $remember
@@ -16,7 +16,14 @@ class IssueAccessTokenAction
      */
     public function handle(User $user, bool $remember = false): NewAccessToken
     {
-        $expiresAt = $remember ? now()->addMinutes(config('sanctum.token_ttl.remember')) : now()->addMinutes(config('sanctum.token_ttl.default'));
-        return $user->createToken('access_token', ['*'], $expiresAt);
+        $ttl = $remember
+            ? config('sanctum.token_ttl.remember')
+            : config('sanctum.token_ttl.default');
+
+        return $user->createToken(
+            name: 'access_token',
+            abilities: ['*'],
+            expiresAt: now()->addMinutes($ttl)
+        );
     }
 }

@@ -99,7 +99,7 @@ describe('Auth -> RegisterController', function () {
     |--------------------------------------------------------------------------
     */
     describe('operations', function () {
-        it('registers users successfully and returns an access token', function ($rolePayload, $expectedRoleInJson) {
+        it('registers a user successfully and returns an access token', function ($rolePayload, $expectedRoleInJson) {
             Event::fake();
 
             $data = registrationPayload($rolePayload);

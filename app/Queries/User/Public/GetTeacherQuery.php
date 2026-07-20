@@ -8,7 +8,7 @@ use App\Models\User;
 class GetTeacherQuery
 {
     /**
-     * Retrieve detailed information about a specific active teacher.
+     * Retrieve detailed information about a specific teacher.
      *
      * @param string $teacherSlug
      * @return User
@@ -18,9 +18,10 @@ class GetTeacherQuery
         return User::query()
             ->active()
             ->where('slug', $teacherSlug)
-            ->whereHas('roles', fn ($query) => $query->where('name', UserRole::TEACHER->value))
-            ->with(['roles'])
-            ->withCount(['courses'])
+            ->whereHas('roles', function ($query) {
+                $query->where('name', UserRole::TEACHER->value);
+            })
+            ->withCount(['courses' => fn($query) => $query->active()])
             ->firstOrFail();
     }
 }

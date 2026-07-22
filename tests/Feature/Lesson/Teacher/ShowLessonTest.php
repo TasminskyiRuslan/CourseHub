@@ -30,7 +30,7 @@ describe('Teacher -> LessonController -> show', function () {
 
             $lesson = Lesson::factory()->create();
 
-            getJson(route('teacher.course.lesson.show', ['non-existing-slug', $lesson]))
+            getJson(route('teacher.courses.lessons.show', ['non-existing-slug', $lesson]))
                 ->assertNotFound();
         });
 
@@ -40,7 +40,7 @@ describe('Teacher -> LessonController -> show', function () {
 
             $course = Course::factory()->for($teacher, 'author')->create();
 
-            getJson(route('teacher.course.lesson.show', [$course, 'non-existing-slug']))
+            getJson(route('teacher.courses.lessons.show', [$course, 'non-existing-slug']))
                 ->assertNotFound();
         });
 
@@ -51,7 +51,7 @@ describe('Teacher -> LessonController -> show', function () {
             $course = Course::factory()->for($teacher, 'author')->create();
             $lesson = Lesson::factory()->create();
 
-            getJson(route('teacher.course.lesson.show', [$course, $lesson]))
+            getJson(route('teacher.courses.lessons.show', [$course, $lesson]))
                 ->assertNotFound();
         });
 
@@ -61,7 +61,7 @@ describe('Teacher -> LessonController -> show', function () {
             $course = Course::factory()->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            getJson(route('teacher.course.lesson.show', [$course, $lesson]))
+            getJson(route('teacher.courses.lessons.show', [$course, $lesson]))
                 ->assertNotFound();
         })->with([
             'another teacher' => fn() => User::factory()->teacher()->create(),
@@ -79,7 +79,7 @@ describe('Teacher -> LessonController -> show', function () {
             $course = Course::factory()->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            getJson(route('teacher.course.lesson.show', [$course, $lesson]))
+            getJson(route('teacher.courses.lessons.show', [$course, $lesson]))
                 ->assertUnauthorized();
         });
 
@@ -89,7 +89,7 @@ describe('Teacher -> LessonController -> show', function () {
             $course = Course::factory()->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            getJson(route('teacher.course.lesson.show', [$course, $lesson]))
+            getJson(route('teacher.courses.lessons.show', [$course, $lesson]))
                 ->assertForbidden();
         })->with([
             'user' => fn() => User::factory()->create(),
@@ -106,7 +106,7 @@ describe('Teacher -> LessonController -> show', function () {
             $course = $courseInnerClosure($user);
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            getJson(route('teacher.course.lesson.show', [$course, $lesson]))
+            getJson(route('teacher.courses.lessons.show', [$course, $lesson]))
                 ->assertOk()
                 ->assertJsonStructure(['data' => teacherLessonJsonStructure($course->type)]);
         })->with([

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 
-class ResetPasswordAction
+readonly class ResetPasswordAction
 {
     /**
      * Reset the password for the user identified by the email.

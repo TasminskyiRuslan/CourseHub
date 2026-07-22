@@ -4,7 +4,7 @@ namespace App\Queries\Lesson\Admin;
 
 use App\Models\Lesson;
 
-class GetLessonQuery
+readonly class GetLessonQuery
 {
     /**
      * Retrieve detailed information about the specified lesson for the specified course.

@@ -32,7 +32,7 @@ describe('Teacher -> CourseImageController -> update', function () {
 
             $course = Course::factory()->for($teacher, 'author')->create();
 
-            postJson(route('teacher.course.image.update', $course), ['_method' => 'PUT'])
+            postJson(route('teacher.courses.image.update', $course), ['_method' => 'PUT'])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['image']);
         });
@@ -43,7 +43,7 @@ describe('Teacher -> CourseImageController -> update', function () {
 
             $course = Course::factory()->for($teacher, 'author')->create();
 
-            postJson(route('teacher.course.image.update', $course), imagePayload([
+            postJson(route('teacher.courses.image.update', $course), imagePayload([
                 'image' => 'not-a-file',
             ]))
                 ->assertUnprocessable()
@@ -56,7 +56,7 @@ describe('Teacher -> CourseImageController -> update', function () {
 
             $course = Course::factory()->for($teacher, 'author')->create();
 
-            postJson(route('teacher.course.image.update', $course), imagePayload([
+            postJson(route('teacher.courses.image.update', $course), imagePayload([
                 'image' => UploadedFile::fake()->create('document.pdf'),
             ]))
                 ->assertUnprocessable()
@@ -69,7 +69,7 @@ describe('Teacher -> CourseImageController -> update', function () {
 
             $course = Course::factory()->for($teacher, 'author')->create();
 
-            postJson(route('teacher.course.image.update', $course), imagePayload([
+            postJson(route('teacher.courses.image.update', $course), imagePayload([
                 'image' => UploadedFile::fake()->create('author.jpg')->size(2049),
             ]))
                 ->assertUnprocessable()
@@ -82,7 +82,7 @@ describe('Teacher -> CourseImageController -> update', function () {
 
             $course = Course::factory()->for($teacher, 'author')->create();
 
-            postJson(route('teacher.course.image.update', $course), imagePayload([
+            postJson(route('teacher.courses.image.update', $course), imagePayload([
                 'image' => UploadedFile::fake()->image("author.$ext"),
             ]))
                 ->assertOk()
@@ -96,7 +96,7 @@ describe('Teacher -> CourseImageController -> update', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
 
-            postJson(route('teacher.course.image.update', 'non-existing-slug'), imagePayload())
+            postJson(route('teacher.courses.image.update', 'non-existing-slug'), imagePayload())
                 ->assertNotFound();
         });
     });
@@ -110,7 +110,7 @@ describe('Teacher -> CourseImageController -> update', function () {
         it('fails if an unauthenticated user tries to update the course image', function () {
             $course = Course::factory()->create();
 
-            postJson(route('teacher.course.image.update', $course), imagePayload())
+            postJson(route('teacher.courses.image.update', $course), imagePayload())
                 ->assertUnauthorized();
 
             $course->refresh();
@@ -123,7 +123,7 @@ describe('Teacher -> CourseImageController -> update', function () {
 
             $course = Course::factory()->create();
 
-            postJson(route('teacher.course.image.update', $course), imagePayload())
+            postJson(route('teacher.courses.image.update', $course), imagePayload())
                 ->assertForbidden();
 
             $course->refresh();
@@ -145,7 +145,7 @@ describe('Teacher -> CourseImageController -> update', function () {
 
             $data = imagePayload();
 
-            postJson(route('teacher.course.image.update', $course), $data)
+            postJson(route('teacher.courses.image.update', $course), $data)
                 ->assertOk()
                 ->assertJsonStructure(['data' => teacherCourseJsonStructure()]);
 
@@ -181,7 +181,7 @@ describe('Teacher -> CourseImageController -> update', function () {
             Cache::tags($tags)->put($cacheKey, 'test_value', config('cache.ttl.course'));
             expect(Cache::tags($tags)->has($cacheKey))->toBeTrue();
 
-            postJson(route('teacher.course.image.update', $course), imagePayload())
+            postJson(route('teacher.courses.image.update', $course), imagePayload())
                 ->assertOk();
 
             expect(Cache::tags($tags)->has($cacheKey))->toBeFalse();

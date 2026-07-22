@@ -20,8 +20,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
- * @property-read Lesson|null $lesson
- * @method static VideoLessonFactory factory($count = null, $state = [])
+ * @property-read \App\Models\Lesson|null $lesson
+ * @method static \Database\Factories\VideoLessonFactory factory($count = null, $state = [])
  * @method static Builder<static>|VideoLesson newModelQuery()
  * @method static Builder<static>|VideoLesson newQuery()
  * @method static Builder<static>|VideoLesson onlyTrashed()

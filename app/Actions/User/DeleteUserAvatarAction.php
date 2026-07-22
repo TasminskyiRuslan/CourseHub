@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class DeleteUserAvatarAction
+readonly class DeleteUserAvatarAction
 {
     /**
      * Delete the specified user avatar.

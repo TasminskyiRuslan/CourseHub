@@ -3,31 +3,29 @@
 namespace App\Actions\Auth;
 
 use App\Data\Auth\Requests\LoginUserData;
-use App\Data\Auth\Results\AuthData;
+use App\Data\Auth\Results\AuthResultData;
 use App\Models\User;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
-class LoginUserAction
+readonly class LoginUserAction
 {
     /**
      * @param IssueAccessTokenAction $issueAccessTokenAction
      */
     public function __construct(
         protected IssueAccessTokenAction $issueAccessTokenAction,
-    )
-    {
-    }
+    ) {}
 
     /**
      * Authenticate a user and issue a new access token.
      *
      * @param LoginUserData $data
-     * @return AuthData
+     * @return AuthResultData
      * @throws ValidationException
      */
-    public function handle(LoginUserData $data): AuthData
+    public function handle(LoginUserData $data): AuthResultData
     {
         $user = User::where('email', $data->email)->first();
 
@@ -43,7 +41,7 @@ class LoginUserAction
 
         event(new Login(config('auth.defaults.guard'), $user, $data->remember));
 
-        return new AuthData(
+        return new AuthResultData(
             user: $user,
             accessToken: $accessTokenData->plainTextToken,
             expiresAt: $accessTokenData->accessToken->expires_at,

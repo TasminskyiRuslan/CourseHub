@@ -424,3 +424,21 @@ function updatingLessonPayload(CourseType $courseType, array $overrides = []): a
         'position' => fake()->randomNumber(),
     ], $typeSpecific, $overrides);
 }
+
+/**
+ * Generate a stripe checkout webhook payload with optional overrides.
+ *
+ * @param array $overrides
+ * @return array
+ */
+function stripeCheckoutWebhookPayload(array $overrides = []): array
+{
+    return array_merge([
+        'type' => 'checkout.session.completed',
+        'data' => [
+            'object' => [
+                'metadata' => [],
+            ],
+        ],
+    ], $overrides);
+}

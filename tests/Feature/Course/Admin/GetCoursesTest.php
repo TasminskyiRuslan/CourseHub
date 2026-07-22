@@ -26,14 +26,14 @@ describe('Admin -> CourseController -> index', function () {
     */
     describe('permissions', function () {
         it('fails if an unauthenticated user tries to retrieve all courses', function () {
-            getJson(route('admin.course.index'))
+            getJson(route('admin.courses.index'))
                 ->assertUnauthorized();
         });
 
         it('fails if a user without permissions tries to retrieve all courses', function ($user) {
             Sanctum::actingAs($user);
 
-            getJson(route('admin.course.index'))
+            getJson(route('admin.courses.index'))
                 ->assertForbidden();
         })->with([
             'user' => fn() => User::factory()->create(),
@@ -45,7 +45,7 @@ describe('Admin -> CourseController -> index', function () {
 
             $courses = Course::factory()->count(3)->create();
 
-            $response = getJson(route('admin.course.index'))
+            $response = getJson(route('admin.courses.index'))
                 ->assertOk()
                 ->assertJsonStructure([
                     'data' => [
@@ -77,7 +77,7 @@ describe('Admin -> CourseController -> index', function () {
             $course2 = Course::factory()->create(['title' => 'React Basics']);
             $searchString = substr($course1->title, 8);
 
-            getJson(route('admin.course.index', ['filter[search]' => $searchString]))
+            getJson(route('admin.courses.index', ['filter[search]' => $searchString]))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $course1->id])
                 ->assertJsonMissing(['data' => [['id' => $course2->id]]])
@@ -95,7 +95,7 @@ describe('Admin -> CourseController -> index', function () {
             $onlineCourse = Course::factory()->type(CourseType::ONLINE)->create();
             $videoCourse = Course::factory()->type(CourseType::VIDEO)->create();
 
-            getJson(route('admin.course.index', ['filter[type]' => CourseType::ONLINE->value]))
+            getJson(route('admin.courses.index', ['filter[type]' => CourseType::ONLINE->value]))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $onlineCourse->id])
                 ->assertJsonMissing(['data' => [['id' => $videoCourse->id]]])
@@ -114,7 +114,7 @@ describe('Admin -> CourseController -> index', function () {
             $course1 = Course::factory()->for($teacher, 'author')->create();
             $course2 = Course::factory()->create();
 
-            getJson(route('admin.course.index', ['filter[author]' => $teacher->slug]))
+            getJson(route('admin.courses.index', ['filter[author]' => $teacher->slug]))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $course1->id])
                 ->assertJsonMissing(['data' => [['id' => $course2->id]]])
@@ -132,12 +132,12 @@ describe('Admin -> CourseController -> index', function () {
             $bannedCourse = Course::factory()->banned()->create();
             $activeCourse = Course::factory()->create();
 
-            getJson(route('admin.course.index', ['filter[banned]' => 'true']))
+            getJson(route('admin.courses.index', ['filter[banned]' => 'true']))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $bannedCourse->id])
                 ->assertJsonMissing(['data' => [['id' => $activeCourse->id]]]);
 
-            getJson(route('admin.course.index', ['filter[banned]' => 'false']))
+            getJson(route('admin.courses.index', ['filter[banned]' => 'false']))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $activeCourse->id])
                 ->assertJsonMissing(['data' => [['id' => $bannedCourse->id]]]);
@@ -150,12 +150,12 @@ describe('Admin -> CourseController -> index', function () {
             $publishedCourse = Course::factory()->create();
             $unpublishedCourse = Course::factory()->unpublished()->create();
 
-            getJson(route('admin.course.index', ['filter[published]' => 'true']))
+            getJson(route('admin.courses.index', ['filter[published]' => 'true']))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $publishedCourse->id])
                 ->assertJsonMissing(['data' => [['id' => $unpublishedCourse->id]]]);
 
-            getJson(route('admin.course.index', ['filter[published]' => 'false']))
+            getJson(route('admin.courses.index', ['filter[published]' => 'false']))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $unpublishedCourse->id])
                 ->assertJsonMissing(['data' => [['id' => $publishedCourse->id]]]);
@@ -169,17 +169,17 @@ describe('Admin -> CourseController -> index', function () {
             $trashedCourse = Course::factory()->create();
             $trashedCourse->delete();
 
-            getJson(route('admin.course.index'))
+            getJson(route('admin.courses.index'))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $activeCourse->id])
                 ->assertJsonMissing(['data' => [['id' => $trashedCourse->id]]]);
 
-            getJson(route('admin.course.index', ['filter[trashed]' => 'with']))
+            getJson(route('admin.courses.index', ['filter[trashed]' => 'with']))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $activeCourse->id])
                 ->assertJsonFragment(['id' => $trashedCourse->id]);
 
-            getJson(route('admin.course.index', ['filter[trashed]' => 'only']))
+            getJson(route('admin.courses.index', ['filter[trashed]' => 'only']))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $trashedCourse->id])
                 ->assertJsonMissing(['data' => [['id' => $activeCourse->id]]]);
@@ -194,7 +194,7 @@ describe('Admin -> CourseController -> index', function () {
             $newCourse = Course::factory()->create();
             $newCourse->setCreatedAt(now()->subDay())->save();
 
-            $response = getJson(route('admin.course.index'))->assertOk();
+            $response = getJson(route('admin.courses.index'))->assertOk();
             $ids = collect($response->json('data'))->pluck('id')->all();
 
             expect(array_search($newCourse->id, $ids))->toBeLessThan(array_search($oldCourse->id, $ids));
@@ -209,11 +209,11 @@ describe('Admin -> CourseController -> index', function () {
             $newCourse = Course::factory()->create();
             $newCourse->setCreatedAt(now()->subDay())->save();
 
-            $ascResponse = getJson(route('admin.course.index', ['sort' => 'created_at']))->assertOk();
+            $ascResponse = getJson(route('admin.courses.index', ['sort' => 'created_at']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
             expect(array_search($oldCourse->id, $ascIds))->toBeLessThan(array_search($newCourse->id, $ascIds));
 
-            $descResponse = getJson(route('admin.course.index', ['sort' => '-created_at']))->assertOk();
+            $descResponse = getJson(route('admin.courses.index', ['sort' => '-created_at']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($newCourse->id, $descIds))->toBeLessThan(array_search($oldCourse->id, $descIds));
         });
@@ -225,11 +225,11 @@ describe('Admin -> CourseController -> index', function () {
             $courseA = Course::factory()->create(['title' => 'CourseA']);
             $courseB = Course::factory()->create(['title' => 'CourseB']);
 
-            $ascResponse = getJson(route('admin.course.index', ['sort' => 'title']))->assertOk();
+            $ascResponse = getJson(route('admin.courses.index', ['sort' => 'title']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
             expect(array_search($courseA->id, $ascIds))->toBeLessThan(array_search($courseB->id, $ascIds));
 
-            $descResponse = getJson(route('admin.course.index', ['sort' => '-title']))->assertOk();
+            $descResponse = getJson(route('admin.courses.index', ['sort' => '-title']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($courseB->id, $descIds))->toBeLessThan(array_search($courseA->id, $descIds));
         });
@@ -241,11 +241,11 @@ describe('Admin -> CourseController -> index', function () {
             $cheap = Course::factory()->create(['price' => 100]);
             $expensive = Course::factory()->create(['price' => 500]);
 
-            $ascResponse = getJson(route('admin.course.index', ['sort' => 'price']))->assertOk();
+            $ascResponse = getJson(route('admin.courses.index', ['sort' => 'price']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
             expect(array_search($cheap->id, $ascIds))->toBeLessThan(array_search($expensive->id, $ascIds));
 
-            $descResponse = getJson(route('admin.course.index', ['sort' => '-price']))->assertOk();
+            $descResponse = getJson(route('admin.courses.index', ['sort' => '-price']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($expensive->id, $descIds))->toBeLessThan(array_search($cheap->id, $descIds));
         });
@@ -257,11 +257,11 @@ describe('Admin -> CourseController -> index', function () {
             $oldCourse = Course::factory()->create(['published_at' => now()->subDays(5)]);
             $newCourse = Course::factory()->create(['published_at' => now()->subDay()]);
 
-            $ascResponse = getJson(route('admin.course.index', ['sort' => 'published_at']))->assertOk();
+            $ascResponse = getJson(route('admin.courses.index', ['sort' => 'published_at']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
             expect(array_search($oldCourse->id, $ascIds))->toBeLessThan(array_search($newCourse->id, $ascIds));
 
-            $descResponse = getJson(route('admin.course.index', ['sort' => '-published_at']))->assertOk();
+            $descResponse = getJson(route('admin.courses.index', ['sort' => '-published_at']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($newCourse->id, $descIds))->toBeLessThan(array_search($oldCourse->id, $descIds));
         });
@@ -273,11 +273,11 @@ describe('Admin -> CourseController -> index', function () {
             $oldBanned = Course::factory()->create(['banned_at' => now()->subDays(5)]);
             $newBanned = Course::factory()->create(['banned_at' => now()->subDay()]);
 
-            $ascResponse = getJson(route('admin.course.index', ['sort' => 'banned_at']))->assertOk();
+            $ascResponse = getJson(route('admin.courses.index', ['sort' => 'banned_at']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
             expect(array_search($oldBanned->id, $ascIds))->toBeLessThan(array_search($newBanned->id, $ascIds));
 
-            $descResponse = getJson(route('admin.course.index', ['sort' => '-banned_at']))->assertOk();
+            $descResponse = getJson(route('admin.courses.index', ['sort' => '-banned_at']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($newBanned->id, $descIds))->toBeLessThan(array_search($oldBanned->id, $descIds));
         });
@@ -294,11 +294,11 @@ describe('Admin -> CourseController -> index', function () {
             $newDeleted->delete();
             DB::table('courses')->where('id', $newDeleted->id)->update(['deleted_at' => now()->subDay()]);
 
-            $ascResponse = getJson(route('admin.course.index', ['filter[trashed]' => 'only', 'sort' => 'deleted_at']))->assertOk();
+            $ascResponse = getJson(route('admin.courses.index', ['filter[trashed]' => 'only', 'sort' => 'deleted_at']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
             expect(array_search($oldDeleted->id, $ascIds))->toBeLessThan(array_search($newDeleted->id, $ascIds));
 
-            $descResponse = getJson(route('admin.course.index', ['filter[trashed]' => 'only', 'sort' => '-deleted_at']))->assertOk();
+            $descResponse = getJson(route('admin.courses.index', ['filter[trashed]' => 'only', 'sort' => '-deleted_at']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($newDeleted->id, $descIds))->toBeLessThan(array_search($oldDeleted->id, $descIds));
         });
@@ -309,7 +309,7 @@ describe('Admin -> CourseController -> index', function () {
 
             Course::factory()->create();
 
-            getJson(route('admin.course.index', ['filter[search]' => 'non-existent']))
+            getJson(route('admin.courses.index', ['filter[search]' => 'non-existent']))
                 ->assertOk()
                 ->assertJsonCount(0, 'data');
         });
@@ -327,7 +327,7 @@ describe('Admin -> CourseController -> index', function () {
 
             Course::factory()->count(3)->create();
 
-            getJson(route('admin.course.index'))
+            getJson(route('admin.courses.index'))
                 ->assertOk()
                 ->assertJsonStructure(paginationJsonStructure());
         });

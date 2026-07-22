@@ -212,7 +212,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/SendPasswordResetEmailRequest"
+                                "$ref": "#/components/schemas/SendPasswordResetLinkRequest"
                             }
                         }
                     }
@@ -2581,6 +2581,7 @@
                                 "teacher"
                             ]
                         },
+                        "default": [],
                         "example": [
                             "teacher"
                         ]
@@ -2606,7 +2607,7 @@
                         "example": "john@example.com"
                     },
                     "password": {
-                        "description": "New auth password.",
+                        "description": "New account password.",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
@@ -2627,8 +2628,8 @@
                 },
                 "type": "object"
             },
-            "SendPasswordResetEmailRequest": {
-                "title": "Send Password Reset Email Request",
+            "SendPasswordResetLinkRequest": {
+                "title": "Send Password Reset Link Request",
                 "description": "Payload for requesting a password reset link.",
                 "required": [
                     "email"
@@ -2717,7 +2718,7 @@
                         "example": "offline"
                     },
                     "price": {
-                        "description": "Price.",
+                        "description": "Price value.",
                         "type": "string",
                         "maximum": 99999999.99,
                         "minimum": 0,
@@ -2735,7 +2736,7 @@
                 ],
                 "properties": {
                     "image": {
-                        "description": "Image file.",
+                        "description": "Image file. Allowed formats: jpg, jpeg, png, webp. Maximum size: 2MB (2048 KB).",
                         "type": "string",
                         "format": "binary"
                     },
@@ -2753,7 +2754,7 @@
             },
             "UpdateCourseRequest": {
                 "title": "Update Course Request",
-                "description": "Payload for updating a course.",
+                "description": "Payload for updating an existing course.",
                 "properties": {
                     "title": {
                         "description": "Title.",
@@ -2776,7 +2777,7 @@
                         "nullable": true
                     },
                     "price": {
-                        "description": "Price.",
+                        "description": "Price value.",
                         "type": "string",
                         "maximum": 99999999.99,
                         "minimum": 0,
@@ -2795,6 +2796,7 @@
                     "slug",
                     "type",
                     "price",
+                    "lessons_count",
                     "created_at",
                     "updated_at"
                 ],
@@ -2846,7 +2848,7 @@
                         "example": "online"
                     },
                     "price": {
-                        "description": "Price.",
+                        "description": "Price value.",
                         "type": "string",
                         "example": "99.99"
                     },
@@ -2907,7 +2909,8 @@
                     "title",
                     "slug",
                     "type",
-                    "price"
+                    "price",
+                    "lessons_count"
                 ],
                 "properties": {
                     "id": {
@@ -2956,7 +2959,7 @@
                         "example": "online"
                     },
                     "price": {
-                        "description": "Price.",
+                        "description": "Price value.",
                         "type": "string",
                         "format": "float",
                         "example": 99.99
@@ -2993,6 +2996,7 @@
                     "slug",
                     "type",
                     "price",
+                    "lessons_count",
                     "created_at",
                     "updated_at"
                 ],
@@ -3037,7 +3041,7 @@
                         "description": "Price.",
                         "type": "string",
                         "format": "float",
-                        "example": 99.99
+                        "example": "99.99"
                     },
                     "image_url": {
                         "description": "Public URL to the image.",
@@ -3415,7 +3419,6 @@
                     "title",
                     "slug",
                     "position",
-                    "content",
                     "created_at",
                     "updated_at"
                 ],
@@ -3564,7 +3567,7 @@
                 ],
                 "properties": {
                     "avatar": {
-                        "description": "The avatar image file.",
+                        "description": "The avatar image file. Allowed formats: jpg, jpeg, png, webp. Maximum size: 2MB (2048 KB).",
                         "type": "string",
                         "format": "binary"
                     },
@@ -3582,7 +3585,7 @@
             },
             "UpdateUserAccountRequest": {
                 "title": "Update User Account Request",
-                "description": "Payload for updating a user auth.",
+                "description": "Payload for updating user account profile details.",
                 "properties": {
                     "name": {
                         "description": "Full name.",
@@ -3614,7 +3617,6 @@
                         "items": {
                             "type": "string",
                             "enum": [
-                                "",
                                 "teacher",
                                 "admin"
                             ]
@@ -3812,7 +3814,8 @@
                 "required": [
                     "id",
                     "name",
-                    "slug"
+                    "slug",
+                    "courses_count"
                 ],
                 "properties": {
                     "id": {
@@ -3829,21 +3832,6 @@
                         "description": "User slug.",
                         "type": "string",
                         "example": "john-doe"
-                    },
-                    "roles": {
-                        "description": "List of assigned roles.",
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "enum": [
-                                "teacher",
-                                "admin",
-                                "super-admin"
-                            ]
-                        },
-                        "example": [
-                            "teacher"
-                        ]
                     },
                     "avatar_url": {
                         "description": "Public URL to the avatar image.",

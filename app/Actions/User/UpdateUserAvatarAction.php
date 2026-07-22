@@ -9,7 +9,7 @@ use Exception;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class UpdateUserAvatarAction
+readonly class UpdateUserAvatarAction
 {
     /**
      * Update the specified user avatar.

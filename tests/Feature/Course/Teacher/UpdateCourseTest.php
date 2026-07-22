@@ -30,7 +30,7 @@ describe('Teacher -> CourseController -> update', function () {
 
             $course = Course::factory()->for($teacher, 'author')->create();
 
-            patchJson(route('teacher.course.update', $course), updatingCoursePayload([
+            patchJson(route('teacher.courses.update', $course), updatingCoursePayload([
                 'title' => '',
                 'slug' => '',
                 'price' => ''
@@ -45,7 +45,7 @@ describe('Teacher -> CourseController -> update', function () {
 
             $course = Course::factory()->for($teacher, 'author')->create();
 
-            patchJson(route('teacher.course.update', $course), updatingCoursePayload([
+            patchJson(route('teacher.courses.update', $course), updatingCoursePayload([
                 'title' => null,
                 'slug' => null,
                 'price' => null
@@ -60,7 +60,7 @@ describe('Teacher -> CourseController -> update', function () {
 
             $course = Course::factory()->for($teacher, 'author')->create();
 
-            patchJson(route('teacher.course.update', $course), updatingCoursePayload([
+            patchJson(route('teacher.courses.update', $course), updatingCoursePayload([
                 'title' => str_repeat('A', 256),
                 'slug' => str_repeat('B', 256),
                 'description' => str_repeat('C', 5001),
@@ -77,7 +77,7 @@ describe('Teacher -> CourseController -> update', function () {
             $course = Course::factory()->for($teacher, 'author')->create(['slug' => 'my-slug']);
             $anotherCourse = Course::factory()->for($teacher, 'author')->create(['slug' => 'taken-slug']);
 
-            patchJson(route('teacher.course.update', $course), updatingCoursePayload([
+            patchJson(route('teacher.courses.update', $course), updatingCoursePayload([
                 'slug' => $anotherCourse->slug,
             ]))
                 ->assertUnprocessable()
@@ -90,7 +90,7 @@ describe('Teacher -> CourseController -> update', function () {
 
             $course = Course::factory()->for($teacher, 'author')->create();
 
-            patchJson(route('teacher.course.update', $course), updatingCoursePayload([
+            patchJson(route('teacher.courses.update', $course), updatingCoursePayload([
                 'slug' => 'Invalid Slug!'
             ]))
                 ->assertUnprocessable()
@@ -103,7 +103,7 @@ describe('Teacher -> CourseController -> update', function () {
 
             $course = Course::factory()->for($teacher, 'author')->create();
 
-            patchJson(route('teacher.course.update', $course), [
+            patchJson(route('teacher.courses.update', $course), [
                 'slug' => $course->slug,
             ])
                 ->assertOk()
@@ -117,7 +117,7 @@ describe('Teacher -> CourseController -> update', function () {
 
             $course = Course::factory()->for($teacher, 'author')->create();
 
-            patchJson(route('teacher.course.update', $course), ['price' => 'not-a-number'])
+            patchJson(route('teacher.courses.update', $course), ['price' => 'not-a-number'])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['price']);
         });
@@ -126,7 +126,7 @@ describe('Teacher -> CourseController -> update', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
 
-            patchJson(route('teacher.course.update', 'non-existing-slug'))
+            patchJson(route('teacher.courses.update', 'non-existing-slug'))
                 ->assertNotFound();
         });
     });
@@ -140,7 +140,7 @@ describe('Teacher -> CourseController -> update', function () {
         it('fails if an unauthenticated user tries to update a course', function () {
             $course = Course::factory()->create();
 
-            patchJson(route('teacher.course.update', $course), updatingCoursePayload())
+            patchJson(route('teacher.courses.update', $course), updatingCoursePayload())
                 ->assertUnauthorized();
         });
 
@@ -149,7 +149,7 @@ describe('Teacher -> CourseController -> update', function () {
 
             $course = Course::factory()->create();
 
-            patchJson(route('teacher.course.update', $course), updatingCoursePayload())
+            patchJson(route('teacher.courses.update', $course), updatingCoursePayload())
                 ->assertForbidden();
         })->with([
             'user' => fn() => User::factory()->create(),
@@ -168,7 +168,7 @@ describe('Teacher -> CourseController -> update', function () {
 
             $data = updatingCoursePayload();
 
-            patchJson(route('teacher.course.update', $course), $data)
+            patchJson(route('teacher.courses.update', $course), $data)
                 ->assertOk()
                 ->assertJsonPath('data.title', $data['title'])
                 ->assertJsonStructure(['data' => teacherCourseJsonStructure()]);
@@ -206,7 +206,7 @@ describe('Teacher -> CourseController -> update', function () {
             Cache::tags($tags)->put($cacheKey, 'test_value', config('cache.ttl.course'));
             expect(Cache::tags($tags)->has($cacheKey))->toBeTrue();
 
-            patchJson(route('teacher.course.update', $course), updatingCoursePayload())
+            patchJson(route('teacher.courses.update', $course), updatingCoursePayload())
                 ->assertOk();
 
             expect(Cache::tags($tags)->has($cacheKey))->toBeFalse();

@@ -25,14 +25,14 @@ describe('Public -> TeacherController -> show', function () {
     */
     describe('validation', function () {
         it('fails if the teacher does not exist', function () {
-            getJson(route('teacher.show', 'non-existing-slug'))
+            getJson(route('teachers.show', 'non-existing-slug'))
                 ->assertNotFound();
         });
 
         it('fails if the user is active but is not a teacher', function () {
             $user = User::factory()->create();
 
-            getJson(route('teacher.show', $user))
+            getJson(route('teachers.show', $user))
                 ->assertNotFound();
         });
 
@@ -46,7 +46,7 @@ describe('Public -> TeacherController -> show', function () {
                 Sanctum::actingAs($user);
             }
 
-            getJson(route('teacher.show', $targetTeacher))
+            getJson(route('teachers.show', $targetTeacher))
                 ->assertNotFound();
         })->with([
             'guest' => null,
@@ -73,7 +73,7 @@ describe('Public -> TeacherController -> show', function () {
             $targetTeacher = User::factory()->teacher()->create();
             Course::factory()->for($targetTeacher, 'author')->create();
 
-            getJson(route('teacher.show', $targetTeacher))
+            getJson(route('teachers.show', $targetTeacher))
                 ->assertOk()
                 ->assertJsonStructure(['data' => publicUserJsonStructure()]);
         })->with([

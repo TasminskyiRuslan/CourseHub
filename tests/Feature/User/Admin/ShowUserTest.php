@@ -27,7 +27,7 @@ describe('Admin -> TeacherController -> show', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            getJson(route('admin.user.show', 'non-existing-slug'))
+            getJson(route('admin.users.show', 'non-existing-slug'))
                 ->assertNotFound();
         });
     });
@@ -41,7 +41,7 @@ describe('Admin -> TeacherController -> show', function () {
         it('fails if an unauthenticated user tries to retrieve a user', function () {
             $targetUser = User::factory()->create();
 
-            getJson(route('admin.user.show', $targetUser))
+            getJson(route('admin.users.show', $targetUser))
                 ->assertUnauthorized();
         });
 
@@ -50,7 +50,7 @@ describe('Admin -> TeacherController -> show', function () {
 
             $targetUser = User::factory()->create();
 
-            getJson(route('admin.user.show', $targetUser))
+            getJson(route('admin.users.show', $targetUser))
                 ->assertForbidden();
         })->with([
             'user' => fn() => User::factory()->create(),
@@ -62,7 +62,7 @@ describe('Admin -> TeacherController -> show', function () {
             Sanctum::actingAs($user);
             $targetUser = $targetUserClosure();
 
-            getJson(route('admin.user.show', $targetUser))
+            getJson(route('admin.users.show', $targetUser))
                 ->assertOk()
                 ->assertJsonStructure(['data' => adminUserJsonStructure()]);
         })->with([

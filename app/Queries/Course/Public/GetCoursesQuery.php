@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Cache;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class GetCoursesQuery extends CachedListQuery
+readonly class GetCoursesQuery extends CachedListQuery
 {
     /**
      * Retrieve a paginated list of active courses with conditional caching.
@@ -53,7 +53,7 @@ class GetCoursesQuery extends CachedListQuery
         return QueryBuilder::for(Course::class, $request)
             ->active()
             ->with(['author' => function ($query) {
-                $query->with('roles')->withCount('courses');
+                $query->with(['roles'])->withCount(['courses' => fn ($q) => $q->active()]);
             }])
             ->withCount(['lessons'])
             ->allowedFilters([

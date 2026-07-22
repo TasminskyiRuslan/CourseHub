@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Cache;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class GetTeachersQuery extends CachedListQuery
+readonly class GetTeachersQuery extends CachedListQuery
 {
     /**
      * Retrieve a paginated list of teachers with conditional caching.

@@ -7,7 +7,7 @@ use App\Models\Course;
 use Exception;
 use Illuminate\Support\Facades\Storage;
 
-class UpdateCourseImageAction
+readonly class UpdateCourseImageAction
 {
     /**
      * Update the specified course image.

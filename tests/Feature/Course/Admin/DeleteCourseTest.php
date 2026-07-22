@@ -30,7 +30,7 @@ describe('Admin -> CourseController -> destroy', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            deleteJson(route('admin.course.destroy', 'non-existing-slug'))
+            deleteJson(route('admin.courses.destroy', 'non-existing-slug'))
                 ->assertNotFound();
         });
     });
@@ -44,7 +44,7 @@ describe('Admin -> CourseController -> destroy', function () {
         it('fails if an unauthenticated user tries to delete a course', function () {
             $course = Course::factory()->create();
 
-            deleteJson(route('admin.course.destroy', $course))
+            deleteJson(route('admin.courses.destroy', $course))
                 ->assertUnauthorized();
             $this->assertDatabaseHas('courses', [
                 'id' => $course->id,
@@ -56,7 +56,7 @@ describe('Admin -> CourseController -> destroy', function () {
 
             $course = Course::factory()->create();
 
-            deleteJson(route('admin.course.destroy', $course))
+            deleteJson(route('admin.courses.destroy', $course))
                 ->assertForbidden();
             $this->assertDatabaseHas('courses', [
                 'id' => $course->id,
@@ -78,7 +78,7 @@ describe('Admin -> CourseController -> destroy', function () {
             $lessons = Lesson::factory()->for($course)->count(2)->create();
             Storage::disk('courses')->put($filename, 'fake');
 
-            deleteJson(route('admin.course.destroy', $course))
+            deleteJson(route('admin.courses.destroy', $course))
                 ->assertNoContent();
 
             $this->assertSoftDeleted('courses', [
@@ -127,7 +127,7 @@ describe('Admin -> CourseController -> destroy', function () {
             Cache::tags($tags)->put($cacheKey, 'test_value', config('cache.ttl.course'));
             expect(Cache::tags($tags)->has($cacheKey))->toBeTrue();
 
-            deleteJson(route('admin.course.destroy', $course))
+            deleteJson(route('admin.courses.destroy', $course))
                 ->assertNoContent();
 
             expect(Cache::tags($tags)->has($cacheKey))->toBeFalse();

@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class UnbanUserAction
+readonly class UnbanUserAction
 {
     /**
      * Unban the specified user.

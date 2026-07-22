@@ -27,7 +27,7 @@ describe('Teacher -> UnpublishCourseController', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
 
-            patchJson(route('teacher.course.unpublish', 'non-existing-slug'))
+            patchJson(route('teacher.courses.unpublish', 'non-existing-slug'))
                 ->assertNotFound();
         });
     });
@@ -41,7 +41,7 @@ describe('Teacher -> UnpublishCourseController', function () {
         it('fails if an unauthenticated user tries to unpublish the course', function () {
             $course = Course::factory()->create();
 
-            patchJson(route('teacher.course.unpublish', $course))
+            patchJson(route('teacher.courses.unpublish', $course))
                 ->assertUnauthorized();
             $course->refresh();
             expect($course->isPublished())->toBeTrue();
@@ -52,7 +52,7 @@ describe('Teacher -> UnpublishCourseController', function () {
 
             $course = Course::factory()->create();
 
-            patchJson(route('teacher.course.unpublish', $course))
+            patchJson(route('teacher.courses.unpublish', $course))
                 ->assertForbidden();
             $course->refresh();
             expect($course->isPublished())->toBeTrue();
@@ -71,7 +71,7 @@ describe('Teacher -> UnpublishCourseController', function () {
             $courseInnerClosure = $courseClosure();
             $course = $courseInnerClosure($user);
 
-            patchJson(route('teacher.course.unpublish', $course))
+            patchJson(route('teacher.courses.unpublish', $course))
                 ->assertOk()
                 ->assertJsonStructure(['data' => teacherCourseJsonStructure()]);
 
@@ -106,7 +106,7 @@ describe('Teacher -> UnpublishCourseController', function () {
             Cache::tags($tags)->put($cacheKey, 'test_value', config('cache.ttl.course'));
             expect(Cache::tags($tags)->has($cacheKey))->toBeTrue();
 
-            patchJson(route('teacher.course.unpublish', $course))
+            patchJson(route('teacher.courses.unpublish', $course))
                 ->assertOk();
 
             expect(Cache::tags($tags)->has($cacheKey))->toBeFalse();

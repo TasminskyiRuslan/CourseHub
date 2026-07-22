@@ -3,14 +3,16 @@
 namespace App\Queries\User\Admin;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class GetUserQuery
+readonly class GetUserQuery
 {
     /**
      * Retrieve detailed information about the specified user.
      *
      * @param string $userSlug
      * @return User
+     * @throws ModelNotFoundException
      */
     public function handle(string $userSlug): User
     {

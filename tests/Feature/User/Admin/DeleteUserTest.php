@@ -27,14 +27,14 @@ describe('Admin -> TeacherController -> destroy', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            deleteJson(route('admin.user.destroy', 'non-existing-slug'))
+            deleteJson(route('admin.users.destroy', 'non-existing-slug'))
                 ->assertNotFound();
         });
 
         it('fails if a user tries to delete themselves', function ($user) {
             Sanctum::actingAs($user);
 
-            deleteJson(route('admin.user.destroy', $user))
+            deleteJson(route('admin.users.destroy', $user))
                 ->assertForbidden();
 
             $this->assertDatabaseHas('users', [
@@ -51,7 +51,7 @@ describe('Admin -> TeacherController -> destroy', function () {
 
             Sanctum::actingAs($admin);
 
-            deleteJson(route('admin.user.destroy', $targetUser))
+            deleteJson(route('admin.users.destroy', $targetUser))
                 ->assertForbidden();
 
             $this->assertDatabaseHas('users', [
@@ -73,7 +73,7 @@ describe('Admin -> TeacherController -> destroy', function () {
         it('fails if an unauthenticated user tries to delete the user', function () {
             $targetUser = User::factory()->create();
 
-            deleteJson(route('admin.user.destroy', $targetUser))
+            deleteJson(route('admin.users.destroy', $targetUser))
                 ->assertUnauthorized();
 
             $this->assertDatabaseHas('users', [
@@ -86,7 +86,7 @@ describe('Admin -> TeacherController -> destroy', function () {
 
             $targetUser = User::factory()->create();
 
-            deleteJson(route('admin.user.destroy', $targetUser))
+            deleteJson(route('admin.users.destroy', $targetUser))
                 ->assertForbidden();
 
             $this->assertDatabaseHas('users', [
@@ -103,7 +103,7 @@ describe('Admin -> TeacherController -> destroy', function () {
 
             $targetUser = $targetUserClosure();
 
-            deleteJson(route('admin.user.destroy', $targetUser))
+            deleteJson(route('admin.users.destroy', $targetUser))
                 ->assertNoContent();
 
             $this->assertSoftDeleted('users', [
@@ -137,7 +137,7 @@ describe('Admin -> TeacherController -> destroy', function () {
             Cache::tags($tags)->put($cacheKey, 'test_value', config('cache.ttl.teacher'));
             expect(Cache::tags($tags)->has($cacheKey))->toBeTrue();
 
-            deleteJson(route('admin.user.destroy', $targetUser))
+            deleteJson(route('admin.users.destroy', $targetUser))
                 ->assertNoContent();
 
             expect(Cache::tags($tags)->has($cacheKey))->toBeFalse();

@@ -5,7 +5,7 @@ namespace App\Actions\Auth;
 use App\Models\User;
 use Illuminate\Validation\ValidationException;
 
-class SendEmailVerificationNotificationAction
+readonly class SendEmailVerificationNotificationAction
 {
     /**
      * Send the email verification notification to the specified user.

@@ -4,8 +4,9 @@ namespace App\Queries\Lesson\Teacher;
 
 use App\Models\Lesson;
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class GetLessonQuery
+readonly class GetLessonQuery
 {
     /**
      * Retrieve detailed information about the specified lesson for the specified teacher's course.
@@ -14,6 +15,7 @@ class GetLessonQuery
      * @param string $lessonSlug
      * @param User $teacher
      * @return Lesson
+     * @throws ModelNotFoundException
      */
     public function handle(string $courseSlug, string $lessonSlug, User $teacher): Lesson
     {

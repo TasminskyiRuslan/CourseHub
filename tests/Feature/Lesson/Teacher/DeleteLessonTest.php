@@ -31,7 +31,7 @@ describe('Teacher -> LessonController -> destroy', function () {
 
             $lesson = Lesson::factory()->create();
 
-            deleteJson(route('teacher.course.lesson.destroy', ['non-existing-slug', $lesson]))
+            deleteJson(route('teacher.courses.lessons.destroy', ['non-existing-slug', $lesson]))
                 ->assertNotFound();
         });
 
@@ -41,7 +41,7 @@ describe('Teacher -> LessonController -> destroy', function () {
 
             $course = Course::factory()->create();
 
-            deleteJson(route('teacher.course.lesson.destroy', [$course, 'non-existing-slug']))
+            deleteJson(route('teacher.courses.lessons.destroy', [$course, 'non-existing-slug']))
                 ->assertNotFound();
         });
 
@@ -52,7 +52,7 @@ describe('Teacher -> LessonController -> destroy', function () {
             $course = Course::factory()->for($teacher, 'author')->create();
             $lesson = Lesson::factory()->create();
 
-            deleteJson(route('teacher.course.lesson.destroy', [$course, $lesson]))
+            deleteJson(route('teacher.courses.lessons.destroy', [$course, $lesson]))
                 ->assertNotFound();
         });
     });
@@ -67,7 +67,7 @@ describe('Teacher -> LessonController -> destroy', function () {
             $course = Course::factory()->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            deleteJson(route('teacher.course.lesson.destroy', [$course, $lesson]))
+            deleteJson(route('teacher.courses.lessons.destroy', [$course, $lesson]))
                 ->assertUnauthorized();
 
             $this->assertDatabaseHas('lessons', ['id' => $lesson->id]);
@@ -80,7 +80,7 @@ describe('Teacher -> LessonController -> destroy', function () {
             $course = Course::factory()->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            deleteJson(route('teacher.course.lesson.destroy', [$course, $lesson]))
+            deleteJson(route('teacher.courses.lessons.destroy', [$course, $lesson]))
                 ->assertForbidden();
 
             $this->assertDatabaseHas('lessons', ['id' => $lesson->id]);
@@ -100,7 +100,7 @@ describe('Teacher -> LessonController -> destroy', function () {
             $course = $courseInnerClosure($user);
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            deleteJson(route('teacher.course.lesson.destroy', [$course, $lesson]))
+            deleteJson(route('teacher.courses.lessons.destroy', [$course, $lesson]))
                 ->assertNoContent();
 
             $this->assertSoftDeleted('lessons', ['id' => $lesson->id]);
@@ -135,7 +135,7 @@ describe('Teacher -> LessonController -> destroy', function () {
             Cache::tags($tags)->put($cacheKey, 'test_value', config('cache.ttl.lesson'));
             expect(Cache::tags($tags)->get($cacheKey))->not->toBeNull();
 
-            deleteJson(route('teacher.course.lesson.destroy', ['course' => $course->slug, 'lesson' => $lesson->slug]))
+            deleteJson(route('teacher.courses.lessons.destroy', ['course' => $course->slug, 'lesson' => $lesson->slug]))
                 ->assertNoContent();
 
             expect(Cache::tags($tags)->get($cacheKey))->toBeNull();

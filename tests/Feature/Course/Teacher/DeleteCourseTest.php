@@ -29,7 +29,7 @@ describe('Teacher -> CourseController -> destroy', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
 
-            deleteJson(route('teacher.course.destroy', 'non-existing-slug'))
+            deleteJson(route('teacher.courses.destroy', 'non-existing-slug'))
                 ->assertNotFound();
         });
     });
@@ -43,7 +43,7 @@ describe('Teacher -> CourseController -> destroy', function () {
         it('fails if an unauthenticated user tries to delete the course', function () {
             $course = Course::factory()->create();
 
-            deleteJson(route('teacher.course.destroy', $course))
+            deleteJson(route('teacher.courses.destroy', $course))
                 ->assertUnauthorized();
             $this->assertDatabaseHas('courses', [
                 'id' => $course->id,
@@ -55,7 +55,7 @@ describe('Teacher -> CourseController -> destroy', function () {
 
             $course = Course::factory()->create();
 
-            deleteJson(route('teacher.course.destroy', $course))
+            deleteJson(route('teacher.courses.destroy', $course))
                 ->assertForbidden();
             $this->assertDatabaseHas('courses', [
                 'id' => $course->id,
@@ -78,7 +78,7 @@ describe('Teacher -> CourseController -> destroy', function () {
             $lessons = Lesson::factory()->for($course, 'course')->count(8)->create();
             Storage::disk('courses')->put($filename, 'fake');
 
-            deleteJson(route('teacher.course.destroy', $course))
+            deleteJson(route('teacher.courses.destroy', $course))
                 ->assertNoContent();
             $this->assertSoftDeleted('courses', [
                 'id' => $course->id,
@@ -124,7 +124,7 @@ describe('Teacher -> CourseController -> destroy', function () {
             Cache::tags($tags)->put($cacheKey, 'test_value', config('cache.ttl.course'));
             expect(Cache::tags($tags)->has($cacheKey))->toBeTrue();
 
-            deleteJson(route('teacher.course.destroy', $course))
+            deleteJson(route('teacher.courses.destroy', $course))
                 ->assertNoContent();
 
             expect(Cache::tags($tags)->has($cacheKey))->toBeFalse();

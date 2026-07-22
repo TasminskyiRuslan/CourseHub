@@ -7,7 +7,7 @@ use App\Enums\UserRole;
 use App\Models\User;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class UpdateUserAction
+readonly class UpdateUserAction
 {
     /**
      * Update the specified user.

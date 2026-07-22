@@ -4,7 +4,7 @@ namespace App\Queries;
 
 use Illuminate\Http\Request;
 
-abstract class CachedListQuery
+readonly abstract class CachedListQuery
 {
     /**
      * Check if the request qualifies for caching.

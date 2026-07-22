@@ -28,7 +28,7 @@ describe('Admin -> LessonController -> show', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            getJson(route('admin.course.lesson.show', ['non-existing-slug', 'lesson-slug']))
+            getJson(route('admin.courses.lessons.show', ['non-existing-slug', 'lesson-slug']))
                 ->assertNotFound();
         });
 
@@ -38,7 +38,7 @@ describe('Admin -> LessonController -> show', function () {
 
             $course = Course::factory()->create();
 
-            getJson(route('admin.course.lesson.show', [$course->slug, 'non-existing-slug']))
+            getJson(route('admin.courses.lessons.show', [$course->slug, 'non-existing-slug']))
                 ->assertNotFound();
         });
 
@@ -49,7 +49,7 @@ describe('Admin -> LessonController -> show', function () {
             $course = Course::factory()->create();
             $lesson = Lesson::factory()->create();
 
-            getJson(route('admin.course.lesson.show', [$course, $lesson]))
+            getJson(route('admin.courses.lessons.show', [$course, $lesson]))
                 ->assertNotFound();
         });
     });
@@ -64,7 +64,7 @@ describe('Admin -> LessonController -> show', function () {
             $course = Course::factory()->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            getJson(route('admin.course.lesson.show', [$course, $lesson]))
+            getJson(route('admin.courses.lessons.show', [$course, $lesson]))
                 ->assertUnauthorized();
         });
 
@@ -74,7 +74,7 @@ describe('Admin -> LessonController -> show', function () {
             $course = Course::factory()->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            getJson(route('admin.course.lesson.show', [$course, $lesson]))
+            getJson(route('admin.courses.lessons.show', [$course, $lesson]))
                 ->assertForbidden();
         })->with([
             'user' => fn() => User::factory()->create(),
@@ -90,7 +90,7 @@ describe('Admin -> LessonController -> show', function () {
             $course = $courseInnerClosure($user);
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            getJson(route('admin.course.lesson.show', [$course, $lesson]))
+            getJson(route('admin.courses.lessons.show', [$course, $lesson]))
                 ->assertOk()
                 ->assertJsonStructure(['data' => adminLessonJsonStructure($course->type)]);
         })->with([
@@ -111,7 +111,7 @@ describe('Admin -> LessonController -> show', function () {
             $lesson->delete();
             $course->delete();
 
-            getJson(route('admin.course.lesson.show', [$course, $lesson]))
+            getJson(route('admin.courses.lessons.show', [$course, $lesson]))
                 ->assertOk()
                 ->assertJsonStructure(['data' => adminLessonJsonStructure($course->type)]);
         })->with([

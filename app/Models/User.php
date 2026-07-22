@@ -15,6 +15,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -22,6 +23,7 @@ use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Laravel\Cashier\Billable;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
 use Spatie\Permission\Models\Permission;
@@ -44,20 +46,26 @@ use Spatie\Sluggable\SlugOptions;
  * @property Carbon|null $banned_at
  * @property string|null $avatar_path
  * @property UserRole $role
- * @property-read Collection<int, Course> $courses
+ * @property-read Collection<int, \App\Models\Course> $courses
  * @property-read int|null $courses_count
+ * @property-read Collection<int, \App\Models\Course> $enrolledCourses
+ * @property-read int|null $enrolled_courses_count
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read Collection<int, Permission> $permissions
  * @property-read int|null $permissions_count
  * @property-read Collection<int, Role> $roles
  * @property-read int|null $roles_count
+ * @property-read Collection<int, \Laravel\Cashier\Subscription> $subscriptions
+ * @property-read int|null $subscriptions_count
  * @property-read Collection<int, PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
  * @method static Builder<static>|User active()
- * @method static UserFactory factory($count = null, $state = [])
+ * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
+ * @method static Builder<static>|User hasExpiredGenericTrial()
  * @method static Builder<static>|User newModelQuery()
  * @method static Builder<static>|User newQuery()
+ * @method static Builder<static>|User onGenericTrial()
  * @method static Builder<static>|User onlyTrashed()
  * @method static Builder<static>|User permission($permissions, bool $without = false)
  * @method static Builder<static>|User query()
@@ -83,7 +91,7 @@ use Spatie\Sluggable\SlugOptions;
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasApiTokens, Notifiable, HasSlug, HasRoles, SoftDeletes, PivotEventTrait;
+    use HasFactory, HasApiTokens, Notifiable, HasSlug, HasRoles, SoftDeletes, PivotEventTrait, Billable;
 
     /**
      * The attributes that are mass assignable.
@@ -117,6 +125,21 @@ class User extends Authenticatable implements MustVerifyEmail
     protected string $guard_name = 'api';
 
     /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+            'role' => UserRole::class,
+            'email_verified_at' => 'datetime',
+            'banned_at' => 'datetime',
+        ];
+    }
+
+    /**
      * The "booted" method of the model.
      *
      * @return void
@@ -147,6 +170,14 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    /**
+     * Check if the user is enrolled in a given course.
+     */
+    public function isEnrolledIn(Course $course): bool
+    {
+        return $this->enrolledCourses()->where('course_id', $course->id)->exists();
     }
 
     /**
@@ -198,6 +229,17 @@ class User extends Authenticatable implements MustVerifyEmail
     public function courses(): HasMany
     {
         return $this->hasMany(Course::class, 'author_id');
+    }
+
+    /**
+     * Get the courses enrolled by the user.
+     *
+     * @return BelongsToMany<Course, $this>
+     */
+    public function enrolledCourses(): BelongsToMany
+    {
+        return $this->belongsToMany(Course::class)
+            ->withPivot('enrolled_at');
     }
 
     /**
@@ -263,20 +305,5 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $this->avatar_path = null;
         return $this;
-    }
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'password' => 'hashed',
-            'role' => UserRole::class,
-            'email_verified_at' => 'datetime',
-            'banned_at' => 'datetime',
-        ];
     }
 }

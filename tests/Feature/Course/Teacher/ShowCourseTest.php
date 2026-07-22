@@ -27,7 +27,7 @@ describe('Teacher -> CourseController -> show', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
 
-            getJson(route('teacher.course.show', 'non-existing-slug'))
+            getJson(route('teacher.courses.show', 'non-existing-slug'))
                 ->assertNotFound();
         });
 
@@ -36,7 +36,7 @@ describe('Teacher -> CourseController -> show', function () {
 
             $course = Course::factory()->create();
 
-            getJson(route('teacher.course.show', $course))
+            getJson(route('teacher.courses.show', $course))
                 ->assertNotFound();
         })->with([
             'another teacher' => fn() => User::factory()->teacher()->create(),
@@ -52,7 +52,7 @@ describe('Teacher -> CourseController -> show', function () {
         it('fails if an unauthenticated user tries to retrieve the course', function () {
             $course = Course::factory()->create();
 
-            getJson(route('teacher.course.show', $course))
+            getJson(route('teacher.courses.show', $course))
                 ->assertUnauthorized();
         });
 
@@ -61,7 +61,7 @@ describe('Teacher -> CourseController -> show', function () {
 
             $course = Course::factory()->create();
 
-            getJson(route('teacher.course.show', $course))
+            getJson(route('teacher.courses.show', $course))
                 ->assertForbidden();
         })->with([
             'user' => fn() => User::factory()->create(),
@@ -76,7 +76,7 @@ describe('Teacher -> CourseController -> show', function () {
             $courseInnerClosure = $courseClosure();
             $course = $courseInnerClosure($user);
 
-            getJson(route('teacher.course.show', $course))
+            getJson(route('teacher.courses.show', $course))
                 ->assertOk()
                 ->assertJsonStructure(['data' => teacherCourseJsonStructure()]);
         })->with([

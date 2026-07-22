@@ -22,8 +22,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
- * @property-read Lesson|null $lesson
- * @method static OfflineLessonFactory factory($count = null, $state = [])
+ * @property-read \App\Models\Lesson|null $lesson
+ * @method static \Database\Factories\OfflineLessonFactory factory($count = null, $state = [])
  * @method static Builder<static>|OfflineLesson newModelQuery()
  * @method static Builder<static>|OfflineLesson newQuery()
  * @method static Builder<static>|OfflineLesson onlyTrashed()

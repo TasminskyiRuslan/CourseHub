@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class VerifyEmailAction
+readonly class VerifyEmailAction
 {
     /**
      * Verify the email address of the user identified by the id.

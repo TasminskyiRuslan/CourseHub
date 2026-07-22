@@ -6,7 +6,7 @@ use App\Models\Course;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class BanCourseAction
+readonly class BanCourseAction
 {
     /**
      * Ban the specified course.

@@ -9,16 +9,14 @@ use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Throwable;
 
-class BanUserAction
+readonly class BanUserAction
 {
     /**
      * @param RevokeAllTokensAction $revokeAllTokensAction
      */
     public function __construct(
         protected RevokeAllTokensAction $revokeAllTokensAction
-    )
-    {
-    }
+    ) {}
 
     /**
      * Ban the specified user.

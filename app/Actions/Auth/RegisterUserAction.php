@@ -3,31 +3,29 @@
 namespace App\Actions\Auth;
 
 use App\Data\Auth\Requests\RegisterUserData;
-use App\Data\Auth\Results\AuthData;
+use App\Data\Auth\Results\AuthResultData;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class RegisterUserAction
+readonly class RegisterUserAction
 {
     /**
      * @param IssueAccessTokenAction $issueAccessTokenAction
      */
     public function __construct(
         protected IssueAccessTokenAction $issueAccessTokenAction,
-    )
-    {
-    }
+    ) {}
 
     /**
      * Register a new user, assign roles, and issue an access token.
      *
      * @param RegisterUserData $data
-     * @return AuthData
+     * @return AuthResultData
      * @throws Throwable
      */
-    public function handle(RegisterUserData $data): AuthData
+    public function handle(RegisterUserData $data): AuthResultData
     {
         return DB::transaction(function () use ($data) {
             $user = User::query()->create($data->all());
@@ -39,7 +37,7 @@ class RegisterUserAction
 
             event(new Registered($user));
 
-            return new AuthData(
+            return new AuthResultData(
                 user: $user,
                 accessToken: $accessTokenData->plainTextToken,
                 expiresAt: $accessTokenData->accessToken->expires_at,

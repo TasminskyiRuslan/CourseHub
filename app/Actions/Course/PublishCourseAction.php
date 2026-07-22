@@ -4,7 +4,7 @@ namespace App\Actions\Course;
 
 use App\Models\Course;
 
-class PublishCourseAction
+readonly class PublishCourseAction
 {
     /**
      * Publish the specified course.

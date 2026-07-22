@@ -27,7 +27,7 @@ describe('Admin -> TeacherController -> index', function () {
         it('fails if unauthenticated user tries to retrieve users', function () {
             User::factory()->count(3)->create();
 
-            getJson(route('admin.user.index'))
+            getJson(route('admin.users.index'))
                 ->assertUnauthorized();
         });
 
@@ -36,7 +36,7 @@ describe('Admin -> TeacherController -> index', function () {
 
             User::factory()->count(3)->create();
 
-            getJson(route('admin.user.index'))
+            getJson(route('admin.users.index'))
                 ->assertForbidden();
         })->with([
             'user' => fn() => User::factory()->create(),
@@ -49,7 +49,7 @@ describe('Admin -> TeacherController -> index', function () {
             $activeUsers = User::factory()->count(2)->create();
             $bannedUsers = User::factory()->count(2)->banned()->create();
 
-            $response = getJson(route('admin.user.index'))
+            $response = getJson(route('admin.users.index'))
                 ->assertOk()
                 ->assertJsonStructure([
                     'data' => [
@@ -86,7 +86,7 @@ describe('Admin -> TeacherController -> index', function () {
             $user2 = User::factory()->create(['name' => 'Other Person', 'email' => 'other@test.com']);
             $searchString = substr($user1->name, 7);
 
-            getJson(route('admin.user.index', ['filter[search]' => $searchString]))
+            getJson(route('admin.users.index', ['filter[search]' => $searchString]))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $user1->id])
                 ->assertJsonMissing(['id' => $user2->id]);
@@ -99,7 +99,7 @@ describe('Admin -> TeacherController -> index', function () {
             $teacher = User::factory()->teacher()->create();
             $user = User::factory()->create();
 
-            getJson(route('admin.user.index', ['filter[role]' => 'teacher']))
+            getJson(route('admin.users.index', ['filter[role]' => 'teacher']))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $teacher->id])
                 ->assertJsonMissing(['id' => $user->id]);
@@ -112,12 +112,12 @@ describe('Admin -> TeacherController -> index', function () {
             $verified = User::factory()->create();
             $unverified = User::factory()->unverified()->create();
 
-            getJson(route('admin.user.index', ['filter[verified]' => true]))
+            getJson(route('admin.users.index', ['filter[verified]' => true]))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $verified->id])
                 ->assertJsonMissing(['id' => $unverified->id]);
 
-            getJson(route('admin.user.index', ['filter[verified]' => false]))
+            getJson(route('admin.users.index', ['filter[verified]' => false]))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $unverified->id])
                 ->assertJsonMissing(['id' => $verified->id]);
@@ -131,12 +131,12 @@ describe('Admin -> TeacherController -> index', function () {
             $banned = User::factory()->create(['banned_at' => now()->subDay()]);
             $active = User::factory()->create(['banned_at' => null]);
 
-            getJson(route('admin.user.index', ['filter[banned]' => true]))
+            getJson(route('admin.users.index', ['filter[banned]' => true]))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $banned->id])
                 ->assertJsonMissing(['id' => $active->id]);
 
-            getJson(route('admin.user.index', ['filter[banned]' => false]))
+            getJson(route('admin.users.index', ['filter[banned]' => false]))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $active->id])
                 ->assertJsonMissing(['id' => $banned->id]);
@@ -150,12 +150,12 @@ describe('Admin -> TeacherController -> index', function () {
             $deletedUser = User::factory()->create();
             $deletedUser->delete();
 
-            getJson(route('admin.user.index', ['filter[trashed]' => 'only']))
+            getJson(route('admin.users.index', ['filter[trashed]' => 'only']))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $deletedUser->id])
                 ->assertJsonMissing(['id' => $user->id]);
 
-            getJson(route('admin.user.index', ['filter[trashed]' => 'with']))
+            getJson(route('admin.users.index', ['filter[trashed]' => 'with']))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $user->id])
                 ->assertJsonFragment(['id' => $deletedUser->id]);
@@ -171,7 +171,7 @@ describe('Admin -> TeacherController -> index', function () {
             $newUser = User::factory()->create();
             DB::table('users')->where('id', $newUser->id)->update(['created_at' => now()->subDay()]);
 
-            $response = getJson(route('admin.user.index'))->assertOk();
+            $response = getJson(route('admin.users.index'))->assertOk();
             $ids = collect($response->json('data'))->pluck('id')->all();
 
             expect(array_search($newUser->id, $ids))->toBeLessThan(array_search($oldUser->id, $ids));
@@ -184,11 +184,11 @@ describe('Admin -> TeacherController -> index', function () {
             $firstAlphabeticalUser = User::factory()->create(['name' => 'Aaron']);
             $lastAlphabeticalUser = User::factory()->create(['name' => 'Zachary']);
 
-            $ascResponse = getJson(route('admin.user.index', ['sort' => 'name']))->assertOk();
+            $ascResponse = getJson(route('admin.users.index', ['sort' => 'name']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
             expect(array_search($firstAlphabeticalUser->id, $ascIds))->toBeLessThan(array_search($lastAlphabeticalUser->id, $ascIds));
 
-            $descResponse = getJson(route('admin.user.index', ['sort' => '-name']))->assertOk();
+            $descResponse = getJson(route('admin.users.index', ['sort' => '-name']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($lastAlphabeticalUser->id, $descIds))->toBeLessThan(array_search($firstAlphabeticalUser->id, $descIds));
         });
@@ -203,11 +203,11 @@ describe('Admin -> TeacherController -> index', function () {
             $newUser = User::factory()->create();
             DB::table('users')->where('id', $newUser->id)->update(['created_at' => now()->subDay()]);
 
-            $ascResponse = getJson(route('admin.user.index', ['sort' => 'created_at']))->assertOk();
+            $ascResponse = getJson(route('admin.users.index', ['sort' => 'created_at']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
             expect(array_search($oldUser->id, $ascIds))->toBeLessThan(array_search($newUser->id, $ascIds));
 
-            $descResponse = getJson(route('admin.user.index', ['sort' => '-created_at']))->assertOk();
+            $descResponse = getJson(route('admin.users.index', ['sort' => '-created_at']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($newUser->id, $descIds))->toBeLessThan(array_search($oldUser->id, $descIds));
         });
@@ -222,11 +222,11 @@ describe('Admin -> TeacherController -> index', function () {
             $newVerified = User::factory()->create();
             DB::table('users')->where('id', $newVerified->id)->update(['email_verified_at' => now()->subDay()]);
 
-            $ascResponse = getJson(route('admin.user.index', ['sort' => 'email_verified_at']))->assertOk();
+            $ascResponse = getJson(route('admin.users.index', ['sort' => 'email_verified_at']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
             expect(array_search($oldVerified->id, $ascIds))->toBeLessThan(array_search($newVerified->id, $ascIds));
 
-            $descResponse = getJson(route('admin.user.index', ['sort' => '-email_verified_at']))->assertOk();
+            $descResponse = getJson(route('admin.users.index', ['sort' => '-email_verified_at']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($newVerified->id, $descIds))->toBeLessThan(array_search($oldVerified->id, $descIds));
         });
@@ -241,11 +241,11 @@ describe('Admin -> TeacherController -> index', function () {
             $newBanned = User::factory()->banned()->create();
             DB::table('users')->where('id', $newBanned->id)->update(['banned_at' => now()->subDay()]);
 
-            $ascResponse = getJson(route('admin.user.index', ['sort' => 'banned_at']))->assertOk();
+            $ascResponse = getJson(route('admin.users.index', ['sort' => 'banned_at']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
             expect(array_search($oldBanned->id, $ascIds))->toBeLessThan(array_search($newBanned->id, $ascIds));
 
-            $descResponse = getJson(route('admin.user.index', ['sort' => '-banned_at']))->assertOk();
+            $descResponse = getJson(route('admin.users.index', ['sort' => '-banned_at']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($newBanned->id, $descIds))->toBeLessThan(array_search($oldBanned->id, $descIds));
         });
@@ -260,11 +260,11 @@ describe('Admin -> TeacherController -> index', function () {
             $teacherWithMany = User::factory()->teacher()->create();
             Course::factory()->count(5)->for($teacherWithMany, 'author')->create();
 
-            $ascResponse = getJson(route('admin.user.index', ['sort' => 'courses_count']))->assertOk();
+            $ascResponse = getJson(route('admin.users.index', ['sort' => 'courses_count']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
             expect(array_search($teacherWithFew->id, $ascIds))->toBeLessThan(array_search($teacherWithMany->id, $ascIds));
 
-            $descResponse = getJson(route('admin.user.index', ['sort' => '-courses_count']))->assertOk();
+            $descResponse = getJson(route('admin.users.index', ['sort' => '-courses_count']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($teacherWithMany->id, $descIds))->toBeLessThan(array_search($teacherWithFew->id, $descIds));
         });
@@ -281,11 +281,11 @@ describe('Admin -> TeacherController -> index', function () {
             $newDeleted->delete();
             DB::table('users')->where('id', $newDeleted->id)->update(['deleted_at' => now()->subDay()]);
 
-            $ascResponse = getJson(route('admin.user.index', ['filter[trashed]' => 'only', 'sort' => 'deleted_at']))->assertOk();
+            $ascResponse = getJson(route('admin.users.index', ['filter[trashed]' => 'only', 'sort' => 'deleted_at']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
             expect(array_search($oldDeleted->id, $ascIds))->toBeLessThan(array_search($newDeleted->id, $ascIds));
 
-            $descResponse = getJson(route('admin.user.index', ['filter[trashed]' => 'only', 'sort' => '-deleted_at']))->assertOk();
+            $descResponse = getJson(route('admin.users.index', ['filter[trashed]' => 'only', 'sort' => '-deleted_at']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($newDeleted->id, $descIds))->toBeLessThan(array_search($oldDeleted->id, $descIds));
         });
@@ -294,7 +294,7 @@ describe('Admin -> TeacherController -> index', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            getJson(route('admin.user.index', ['filter[search]' => 'non-existent-user-name']))
+            getJson(route('admin.users.index', ['filter[search]' => 'non-existent-user-name']))
                 ->assertOk()
                 ->assertJsonCount(0, 'data');
         });
@@ -312,7 +312,7 @@ describe('Admin -> TeacherController -> index', function () {
 
             User::factory()->count(15)->create();
 
-            getJson(route('admin.user.index'))
+            getJson(route('admin.users.index'))
                 ->assertOk()
                 ->assertJsonStructure(paginationJsonStructure());
         });

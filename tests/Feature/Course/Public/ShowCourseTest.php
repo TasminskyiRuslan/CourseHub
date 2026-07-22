@@ -24,7 +24,7 @@ describe('Public -> CourseController -> show', function () {
     */
     describe('validation', function () {
         it('fails if the course does not exist', function () {
-            getJson(route('course.show', 'non-existing-slug'))
+            getJson(route('courses.show', 'non-existing-slug'))
                 ->assertNotFound();
         });
 
@@ -36,7 +36,7 @@ describe('Public -> CourseController -> show', function () {
                 Sanctum::actingAs($user);
             }
 
-            getJson(route('course.show', $course))
+            getJson(route('courses.show', $course))
                 ->assertNotFound();
         })->with([
             'guest' => null,
@@ -64,7 +64,7 @@ describe('Public -> CourseController -> show', function () {
 
             $course = Course::factory()->create();
 
-            getJson(route('course.show', $course))
+            getJson(route('courses.show', $course))
                 ->assertOk()
                 ->assertJsonStructure(['data' => publicCourseJsonStructure()]);
         })->with([

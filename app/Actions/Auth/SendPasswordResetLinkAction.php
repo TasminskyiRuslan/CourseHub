@@ -6,7 +6,7 @@ use App\Data\Auth\Requests\SendPasswordResetLinkData;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 
-class SendPasswordResetLinkAction
+readonly class SendPasswordResetLinkAction
 {
     /**
      * Send a password reset link to the user identified by the email.

@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class DeleteUserAction
+readonly class DeleteUserAction
 {
     /**
      * Delete the specified user.

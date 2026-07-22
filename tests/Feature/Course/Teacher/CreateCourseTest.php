@@ -28,7 +28,7 @@ describe('Teacher -> CourseController -> store', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
 
-            postJson(route('teacher.course.store'), [])
+            postJson(route('teacher.courses.store'), [])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['title', 'type', 'price']);
         });
@@ -37,7 +37,7 @@ describe('Teacher -> CourseController -> store', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
 
-            postJson(route('teacher.course.store'), creatingCoursePayload([
+            postJson(route('teacher.courses.store'), creatingCoursePayload([
                 'title' => str_repeat('A', 256),
                 'slug' => str_repeat('B', 256),
                 'description' => str_repeat('C', 5001),
@@ -52,7 +52,7 @@ describe('Teacher -> CourseController -> store', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
 
-            postJson(route('teacher.course.store'), creatingCoursePayload(['price' => '-10']))
+            postJson(route('teacher.courses.store'), creatingCoursePayload(['price' => '-10']))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['price']);
         });
@@ -63,7 +63,7 @@ describe('Teacher -> CourseController -> store', function () {
 
             $course = Course::factory()->create(['slug' => 'existing-slug']);
 
-            postJson(route('teacher.course.store'), creatingCoursePayload(['slug' => $course->slug]))
+            postJson(route('teacher.courses.store'), creatingCoursePayload(['slug' => $course->slug]))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['slug']);
         });
@@ -72,7 +72,7 @@ describe('Teacher -> CourseController -> store', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
 
-            postJson(route('teacher.course.store'), creatingCoursePayload(['slug' => 'Invalid Slug!']))
+            postJson(route('teacher.courses.store'), creatingCoursePayload(['slug' => 'Invalid Slug!']))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['slug']);
         });
@@ -83,7 +83,7 @@ describe('Teacher -> CourseController -> store', function () {
 
             $slug = 'test-slug';
 
-            postJson(route('teacher.course.store'), creatingCoursePayload(['slug' => $slug]))
+            postJson(route('teacher.courses.store'), creatingCoursePayload(['slug' => $slug]))
                 ->assertCreated()
                 ->assertJsonFragment(['slug' => $slug])
                 ->assertJsonStructure(['data' => teacherCourseJsonStructure()]);
@@ -97,14 +97,14 @@ describe('Teacher -> CourseController -> store', function () {
     */
     describe('permissions', function () {
         it('fails if an unauthenticated user tries to create a course', function () {
-            postJson(route('teacher.course.store'), creatingCoursePayload())
+            postJson(route('teacher.courses.store'), creatingCoursePayload())
                 ->assertUnauthorized();
         });
 
         it('fails if a user without permissions tries to create a course', function ($user) {
             Sanctum::actingAs($user);
 
-            postJson(route('teacher.course.store'), creatingCoursePayload())
+            postJson(route('teacher.courses.store'), creatingCoursePayload())
                 ->assertForbidden();
         })->with([
             'user' => fn() => User::factory()->create(),
@@ -117,7 +117,7 @@ describe('Teacher -> CourseController -> store', function () {
 
             $data = creatingCoursePayload();
 
-            postJson(route('teacher.course.store'), $data)
+            postJson(route('teacher.courses.store'), $data)
                 ->assertCreated()
                 ->assertJsonStructure(['data' => teacherCourseJsonStructure()]);
             $this->assertDatabaseHas('courses', [
@@ -144,7 +144,7 @@ describe('Teacher -> CourseController -> store', function () {
             Cache::tags([config('cache.tags.course_list')])->put($cacheKey, 'test_value', config('cache.ttl.course'));
             expect(Cache::tags([config('cache.tags.course_list')])->get($cacheKey))->not->toBeNull();
 
-            postJson(route('teacher.course.store'), creatingCoursePayload())
+            postJson(route('teacher.courses.store'), creatingCoursePayload())
                 ->assertCreated();
             expect(Cache::tags([config('cache.tags.course_list')])->get($cacheKey))->toBeNull();
         });

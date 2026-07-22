@@ -6,7 +6,7 @@ use App\Models\Course;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class UnbanCourseAction
+readonly class UnbanCourseAction
 {
     /**
      * Unban the specified course.

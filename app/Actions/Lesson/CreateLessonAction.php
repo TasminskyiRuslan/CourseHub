@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class CreateLessonAction
+readonly class CreateLessonAction
 {
     /**
      * Create a new lesson for the specified course.

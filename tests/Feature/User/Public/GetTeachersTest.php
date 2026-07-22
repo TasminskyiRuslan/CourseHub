@@ -39,7 +39,7 @@ describe('Public -> TeacherController -> index', function () {
             $bannedTeacher = User::factory()->teacher()->banned()->create();
             Course::factory()->for($bannedTeacher, 'author')->create();
 
-            $response = getJson(route('teacher.index'))
+            $response = getJson(route('teachers.index'))
                 ->assertOk()
                 ->assertJsonStructure([
                     'data' => [
@@ -78,7 +78,7 @@ describe('Public -> TeacherController -> index', function () {
 
             $searchString = substr($teacher1->name, 4);
 
-            getJson(route('teacher.index', ['filter[search]' => $searchString]))
+            getJson(route('teachers.index', ['filter[search]' => $searchString]))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $teacher1->id])
                 ->assertJsonMissing(['id' => $teacher2->id]);
@@ -93,7 +93,7 @@ describe('Public -> TeacherController -> index', function () {
             Course::factory()->for($newTeacher, 'author')->create();
             DB::table('users')->where('id', $newTeacher->id)->update(['created_at' => now()->subDay()]);
 
-            $response = getJson(route('teacher.index'))->assertOk();
+            $response = getJson(route('teachers.index'))->assertOk();
             $ids = collect($response->json('data'))->pluck('id')->all();
 
             expect(array_search($newTeacher->id, $ids))->toBeLessThan(array_search($oldTeacher->id, $ids));
@@ -108,11 +108,11 @@ describe('Public -> TeacherController -> index', function () {
             Course::factory()->for($newTeacher, 'author')->create();
             DB::table('users')->where('id', $newTeacher->id)->update(['created_at' => now()->subDay()]);
 
-            $ascResponse = getJson(route('teacher.index', ['sort' => 'created_at']))->assertOk();
+            $ascResponse = getJson(route('teachers.index', ['sort' => 'created_at']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
             expect(array_search($oldTeacher->id, $ascIds))->toBeLessThan(array_search($newTeacher->id, $ascIds));
 
-            $descResponse = getJson(route('teacher.index', ['sort' => '-created_at']))->assertOk();
+            $descResponse = getJson(route('teachers.index', ['sort' => '-created_at']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($newTeacher->id, $descIds))->toBeLessThan(array_search($oldTeacher->id, $descIds));
         });
@@ -124,11 +124,11 @@ describe('Public -> TeacherController -> index', function () {
             $teacherB = User::factory()->teacher()->create(['name' => 'Beta Teacher']);
             Course::factory()->for($teacherB, 'author')->create();
 
-            $ascResponse = getJson(route('teacher.index', ['sort' => 'name']))->assertOk();
+            $ascResponse = getJson(route('teachers.index', ['sort' => 'name']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
             expect(array_search($teacherA->id, $ascIds))->toBeLessThan(array_search($teacherB->id, $ascIds));
 
-            $descResponse = getJson(route('teacher.index', ['sort' => '-name']))->assertOk();
+            $descResponse = getJson(route('teachers.index', ['sort' => '-name']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($teacherB->id, $descIds))->toBeLessThan(array_search($teacherA->id, $descIds));
         });
@@ -140,11 +140,11 @@ describe('Public -> TeacherController -> index', function () {
             $teacherWithMany = User::factory()->teacher()->create();
             Course::factory()->count(5)->for($teacherWithMany, 'author')->create();
 
-            $ascResponse = getJson(route('teacher.index', ['sort' => 'courses_count']))->assertOk();
+            $ascResponse = getJson(route('teachers.index', ['sort' => 'courses_count']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
             expect(array_search($teacherWithFew->id, $ascIds))->toBeLessThan(array_search($teacherWithMany->id, $ascIds));
 
-            $descResponse = getJson(route('teacher.index', ['sort' => '-courses_count']))->assertOk();
+            $descResponse = getJson(route('teachers.index', ['sort' => '-courses_count']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($teacherWithMany->id, $descIds))->toBeLessThan(array_search($teacherWithFew->id, $descIds));
         });
@@ -153,7 +153,7 @@ describe('Public -> TeacherController -> index', function () {
             $teacher = User::factory()->teacher()->create();
             Course::factory()->for($teacher, 'author')->create();
 
-            getJson(route('teacher.index', ['filter[search]' => 'non-existent-teacher-name']))
+            getJson(route('teachers.index', ['filter[search]' => 'non-existent-teacher-name']))
                 ->assertOk()
                 ->assertJsonCount(0, 'data');
         });
@@ -175,7 +175,7 @@ describe('Public -> TeacherController -> index', function () {
 
             expect(Cache::tags($tags)->has($cacheKey))->toBeFalse();
 
-            getJson(route('teacher.index'))->assertOk();
+            getJson(route('teachers.index'))->assertOk();
 
             expect(Cache::tags($tags)->has($cacheKey))->toBeTrue();
         });
@@ -185,12 +185,12 @@ describe('Public -> TeacherController -> index', function () {
             $teacher = User::factory()->teacher()->create(['name' => $oldName]);
             Course::factory()->for($teacher, 'author')->create();
 
-            getJson(route('teacher.index'))->assertOk();
+            getJson(route('teachers.index'))->assertOk();
 
             $newName = 'Updated User Name';
             DB::table('users')->where('name', $oldName)->update(['name' => $newName]);
 
-            getJson(route('teacher.index'))
+            getJson(route('teachers.index'))
                 ->assertOk()
                 ->assertJsonFragment(['name' => $oldName])
                 ->assertJsonMissing(['name' => $newName]);
@@ -209,7 +209,7 @@ describe('Public -> TeacherController -> index', function () {
                 Course::factory()->for($teacher, 'author')->create();
             }
 
-            getJson(route('teacher.index'))
+            getJson(route('teachers.index'))
                 ->assertOk()
                 ->assertJsonStructure(paginationJsonStructure());
         });

@@ -28,7 +28,7 @@ describe('Admin -> BanUserController', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            patchJson(route('admin.user.ban', 'non-existing-slug'))
+            patchJson(route('admin.users.ban', 'non-existing-slug'))
                 ->assertNotFound();
         });
     });
@@ -42,7 +42,7 @@ describe('Admin -> BanUserController', function () {
         it('fails if an unauthenticated user tries to ban the user', function () {
             $targetUser = User::factory()->create();
 
-            patchJson(route('admin.user.ban', $targetUser))
+            patchJson(route('admin.users.ban', $targetUser))
                 ->assertUnauthorized();
 
             $targetUser->refresh();
@@ -54,7 +54,7 @@ describe('Admin -> BanUserController', function () {
 
             $targetUser = User::factory()->create();
 
-            patchJson(route('admin.user.ban', $targetUser))
+            patchJson(route('admin.users.ban', $targetUser))
                 ->assertForbidden();
 
             $targetUser->refresh();
@@ -68,7 +68,7 @@ describe('Admin -> BanUserController', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            patchJson(route('admin.user.ban', $admin))
+            patchJson(route('admin.users.ban', $admin))
                 ->assertForbidden();
 
             $admin->refresh();
@@ -79,7 +79,7 @@ describe('Admin -> BanUserController', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            patchJson(route('admin.user.ban', $targetUser))
+            patchJson(route('admin.users.ban', $targetUser))
                 ->assertForbidden();
 
             $targetUser->refresh();
@@ -93,7 +93,7 @@ describe('Admin -> BanUserController', function () {
             $superAdmin = User::where('email', config('super-admin.email'))->first();
             Sanctum::actingAs($superAdmin);
 
-            patchJson(route('admin.user.ban', $superAdmin))
+            patchJson(route('admin.users.ban', $superAdmin))
                 ->assertForbidden();
 
             $superAdmin->refresh();
@@ -108,7 +108,7 @@ describe('Admin -> BanUserController', function () {
 
             $targetUser->createToken('access_token');
 
-            patchJson(route('admin.user.ban', $targetUser))
+            patchJson(route('admin.users.ban', $targetUser))
                 ->assertNoContent();
 
             $targetUser->refresh();
@@ -129,7 +129,7 @@ describe('Admin -> BanUserController', function () {
 
             $targetUser->createToken('access_token');
 
-            patchJson(route('admin.user.ban', $targetUser))
+            patchJson(route('admin.users.ban', $targetUser))
                 ->assertNoContent();
 
             $targetUser->refresh();
@@ -151,7 +151,7 @@ describe('Admin -> BanUserController', function () {
 
             $targetUser = User::factory()->banned()->create();
 
-            patchJson(route('admin.user.ban', $targetUser))
+            patchJson(route('admin.users.ban', $targetUser))
                 ->assertNoContent();
 
             Notification::assertNotSentTo($targetUser, UserBannedNotification::class);
@@ -177,7 +177,7 @@ describe('Admin -> BanUserController', function () {
             Cache::tags($tags)->put($cacheKey, 'test_value', config('cache.ttl.teacher'));
             expect(Cache::tags($tags)->has($cacheKey))->toBeTrue();
 
-            patchJson(route('admin.user.ban', $targetUser))
+            patchJson(route('admin.users.ban', $targetUser))
                 ->assertNoContent();
 
             expect(Cache::tags($tags)->has($cacheKey))->toBeFalse();

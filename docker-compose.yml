@@ -85,6 +85,21 @@ services:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
 
+  stripe-cli:
+    image: stripe/stripe-cli:v1.20.0
+    container_name: stripe_cli
+    command: >
+      listen
+      --api-key ${STRIPE_SECRET}
+      --forward-to nginx:80/stripe/webhook
+      --load-from-webhooks-api
+    networks:
+      - course-hub_net
+    depends_on:
+      - nginx
+      - app
+    restart: unless-stopped
+
 networks:
   course-hub_net:
     driver: bridge

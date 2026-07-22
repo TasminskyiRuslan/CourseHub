@@ -8,7 +8,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class GetUsersQuery
+readonly class GetUsersQuery
 {
     /**
      * Retrieve paginated list of users.

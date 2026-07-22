@@ -47,6 +47,11 @@ Route::prefix('auth')->group(function () {
         ->name('auth.verification.send');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Public actions
+|--------------------------------------------------------------------------
+*/
 Route::prefix('account')
     ->middleware(['auth:sanctum'])
     ->group(function () {
@@ -70,31 +75,36 @@ Route::prefix('account')
             ->name('account.avatar.destroy');
     });
 
-/*
-|--------------------------------------------------------------------------
-| Course & Lessons actions
-|--------------------------------------------------------------------------
-*/
 Route::prefix('courses')->group(function () {
     // Get courses list action
     Route::get('/', [\App\Http\Controllers\Api\Course\Public\CourseController::class, 'index'])
-        ->name('course.index');
+        ->name('courses.index');
 
     // Show course action
     Route::get('/{course}', [\App\Http\Controllers\Api\Course\Public\CourseController::class, 'show'])
-        ->name('course.show');
+        ->name('courses.show');
+
+    // Checkout course
+    Route::post('/{course}/checkout', \App\Http\Controllers\Api\Course\Student\CheckoutController::class)
+        ->middleware(['auth:sanctum', 'restrict.banned.user'])
+        ->name('courses.checkout');
 });
 
 Route::prefix('teachers')->group(function () {
     // Get teachers list action
     Route::get('/', [\App\Http\Controllers\Api\User\Public\TeacherController::class, 'index'])
-        ->name('teacher.index');
+        ->name('teachers.index');
 
     // Show teacher action
     Route::get('/{teacher}', [\App\Http\Controllers\Api\User\Public\TeacherController::class, 'show'])
-        ->name('teacher.show');
+        ->name('teachers.show');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Teacher actions
+|--------------------------------------------------------------------------
+*/
 Route::prefix('teacher')
     ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user', 'can:' . UserPermission::TEACHER_PANEL_ACCESS->value])
     ->group(function () {
@@ -103,64 +113,69 @@ Route::prefix('teacher')
             ->group(function () {
                 // Get teacher courses list action
                 Route::get('/', [\App\Http\Controllers\Api\Course\Teacher\CourseController::class, 'index'])
-                    ->name('teacher.course.index');
+                    ->name('teacher.courses.index');
 
                 // Create course action
                 Route::post('/', [\App\Http\Controllers\Api\Course\Teacher\CourseController::class, 'store'])
-                    ->name('teacher.course.store');
+                    ->name('teacher.courses.store');
 
                 // Show course action
                 Route::get('/{course}', [\App\Http\Controllers\Api\Course\Teacher\CourseController::class, 'show'])
-                    ->name('teacher.course.show');
+                    ->name('teacher.courses.show');
 
                 // Update course action
                 Route::patch('/{course}', [\App\Http\Controllers\Api\Course\Teacher\CourseController::class, 'update'])
-                    ->name('teacher.course.update');
+                    ->name('teacher.courses.update');
 
                 // Delete course action
                 Route::delete('/{course}', [\App\Http\Controllers\Api\Course\Teacher\CourseController::class, 'destroy'])
-                    ->name('teacher.course.destroy');
+                    ->name('teacher.courses.destroy');
 
                 // Update course image action
                 Route::put('/{course}/image', [\App\Http\Controllers\Api\Course\Teacher\CourseImageController::class, 'update'])
-                    ->name('teacher.course.image.update');
+                    ->name('teacher.courses.image.update');
 
                 // Delete course image action
                 Route::delete('/{course}/image', [\App\Http\Controllers\Api\Course\Teacher\CourseImageController::class, 'destroy'])
-                    ->name('teacher.course.image.destroy');
+                    ->name('teacher.courses.image.destroy');
 
                 // Publish course actions
                 Route::patch('/{course}/publish', \App\Http\Controllers\Api\Course\Teacher\PublishCourseController::class)
-                    ->name('teacher.course.publish');
+                    ->name('teacher.courses.publish');
 
                 // Unpublish course action
                 Route::patch('/{course}/unpublish', \App\Http\Controllers\Api\Course\Teacher\UnpublishCourseController::class)
-                    ->name('teacher.course.unpublish');
+                    ->name('teacher.courses.unpublish');
 
                 Route::prefix('/{course}/lessons')->group(function () {
                     // Get course lessons list action
                     Route::get('/', [\App\Http\Controllers\Api\Lesson\Teacher\LessonController::class, 'index'])
-                        ->name('teacher.course.lesson.index');
+                        ->name('teacher.courses.lessons.index');
 
                     // Create lesson action
                     Route::post('/', [\App\Http\Controllers\Api\Lesson\Teacher\LessonController::class, 'store'])
-                        ->name('teacher.course.lesson.store');
+                        ->name('teacher.courses.lessons.store');
 
                     // Show lesson action
                     Route::get('/{lesson}', [\App\Http\Controllers\Api\Lesson\Teacher\LessonController::class, 'show'])
-                        ->name('teacher.course.lesson.show');
+                        ->name('teacher.courses.lessons.show');
 
                     // Update lesson action
                     Route::patch('/{lesson}', [\App\Http\Controllers\Api\Lesson\Teacher\LessonController::class, 'update'])
-                        ->name('teacher.course.lesson.update');
+                        ->name('teacher.courses.lessons.update');
 
                     // Delete lesson action
                     Route::delete('/{lesson}', [\App\Http\Controllers\Api\Lesson\Teacher\LessonController::class, 'destroy'])
-                        ->name('teacher.course.lesson.destroy');
+                        ->name('teacher.courses.lessons.destroy');
                 });
             });
     });
 
+/*
+|--------------------------------------------------------------------------
+| Admin actions
+|--------------------------------------------------------------------------
+*/
 Route::prefix('admin')
     ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user', 'can:' . UserPermission::ADMIN_PANEL_ACCESS->value])
     ->group(function () {
@@ -169,36 +184,36 @@ Route::prefix('admin')
             ->group(function () {
                 // Get all courses list action
                 Route::get('/', [\App\Http\Controllers\Api\Course\Admin\CourseController::class, 'index'])
-                    ->name('admin.course.index');
+                    ->name('admin.courses.index');
 
                 // Show course action
                 Route::get('/{course}', [\App\Http\Controllers\Api\Course\Admin\CourseController::class, 'show'])
-                    ->name('admin.course.show');
+                    ->name('admin.courses.show');
 
                 // Delete course action
                 Route::delete('/{course}', [\App\Http\Controllers\Api\Course\Admin\CourseController::class, 'destroy'])
-                    ->name('admin.course.destroy');
+                    ->name('admin.courses.destroy');
 
                 // Ban course action
                 Route::patch('/{course}/ban', \App\Http\Controllers\Api\Course\Admin\BanCourseController::class)
-                    ->name('admin.course.ban');
+                    ->name('admin.courses.ban');
 
                 // Unban course action
                 Route::patch('/{course}/unban', \App\Http\Controllers\Api\Course\Admin\UnbanCourseController::class)
-                    ->name('admin.course.unban');
+                    ->name('admin.courses.unban');
 
                 Route::prefix('/{course}/lessons')->group(function () {
                     // Get course lessons list action
                     Route::get('/', [\App\Http\Controllers\Api\Lesson\Admin\LessonController::class, 'index'])
-                        ->name('admin.course.lesson.index');
+                        ->name('admin.courses.lessons.index');
 
                     // Show lesson action
                     Route::get('/{lesson}', [\App\Http\Controllers\Api\Lesson\Admin\LessonController::class, 'show'])
-                        ->name('admin.course.lesson.show');
+                        ->name('admin.courses.lessons.show');
 
                     // Delete lesson action
                     Route::delete('/{lesson}', [\App\Http\Controllers\Api\Lesson\Admin\LessonController::class, 'destroy'])
-                        ->name('admin.course.lesson.destroy');
+                        ->name('admin.courses.lessons.destroy');
                 });
             });
 
@@ -206,26 +221,26 @@ Route::prefix('admin')
             ->group(function () {
                 // Get users list action
                 Route::get('/', [\App\Http\Controllers\Api\User\Admin\UserController::class, 'index'])
-                    ->name('admin.user.index');
+                    ->name('admin.users.index');
 
                 // Show user action
                 Route::get('/{user}', [\App\Http\Controllers\Api\User\Admin\UserController::class, 'show'])
-                    ->name('admin.user.show');
+                    ->name('admin.users.show');
 
                 // Delete user action
                 Route::delete('/{user}', [\App\Http\Controllers\Api\User\Admin\UserController::class, 'destroy'])
-                    ->name('admin.user.destroy');
+                    ->name('admin.users.destroy');
 
                 // Update user role action
                 Route::put('/{user}/role', [\App\Http\Controllers\Api\User\Admin\UserRoleController::class, 'update'])
-                    ->name('admin.user.role.update');
+                    ->name('admin.users.role.update');
 
                 // Ban user action
                 Route::patch('/{user}/ban', \App\Http\Controllers\Api\User\Admin\BanUserController::class)
-                    ->name('admin.user.ban');
+                    ->name('admin.users.ban');
 
                 // Unban user action
                 Route::patch('/{user}/unban', \App\Http\Controllers\Api\User\Admin\UnbanUserController::class)
-                    ->name('admin.user.unban');
+                    ->name('admin.users.unban');
             });
     });

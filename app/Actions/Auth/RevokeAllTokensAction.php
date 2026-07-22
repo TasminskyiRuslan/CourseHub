@@ -4,7 +4,7 @@ namespace App\Actions\Auth;
 
 use App\Models\User;
 
-class RevokeAllTokensAction
+readonly class RevokeAllTokensAction
 {
     /**
      * Revoke all access tokens for the specified user.

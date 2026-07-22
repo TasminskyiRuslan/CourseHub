@@ -4,7 +4,7 @@ namespace App\Actions\Auth;
 
 use App\Models\User;
 
-class RevokeCurrentTokenAction
+readonly class RevokeCurrentTokenAction
 {
     /**
      * Revoke the current access token for the specified user.

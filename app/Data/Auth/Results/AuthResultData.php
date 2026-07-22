@@ -6,7 +6,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Spatie\LaravelData\Data;
 
-final class AuthData extends Data
+class AuthResultData extends Data
 {
     /**
      * @param User $user

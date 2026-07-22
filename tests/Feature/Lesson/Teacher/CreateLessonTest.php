@@ -32,7 +32,7 @@ describe('Teacher -> LessonController -> store', function () {
 
             $course = Course::factory()->for($teacher, 'author')->create();
 
-            postJson(route('teacher.course.lesson.store', $course), [])
+            postJson(route('teacher.courses.lessons.store', $course), [])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['title']);
         });
@@ -43,7 +43,7 @@ describe('Teacher -> LessonController -> store', function () {
 
             $course = Course::factory()->for($teacher, 'author')->create();
 
-            postJson(route('teacher.course.lesson.store', $course), creatingLessonPayload($course->type, [
+            postJson(route('teacher.courses.lessons.store', $course), creatingLessonPayload($course->type, [
                 'title' => str_repeat('A', 256),
                 'slug' => str_repeat('b', 256),
                 'position' => -1
@@ -59,7 +59,7 @@ describe('Teacher -> LessonController -> store', function () {
             $course = Course::factory()->for($teacher, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create(['slug' => 'existing-slug']);
 
-            postJson(route('teacher.course.lesson.store', $course), creatingLessonPayload($course->type, [
+            postJson(route('teacher.courses.lessons.store', $course), creatingLessonPayload($course->type, [
                 'slug' => $lesson->slug,
             ]))
                 ->assertUnprocessable()
@@ -72,7 +72,7 @@ describe('Teacher -> LessonController -> store', function () {
 
             $course = Course::factory()->for($teacher, 'author')->create();
 
-            postJson(route('teacher.course.lesson.store', $course), creatingLessonPayload($course->type, [
+            postJson(route('teacher.courses.lessons.store', $course), creatingLessonPayload($course->type, [
                 'slug' => 'Invalid Slug!',
             ]))
                 ->assertUnprocessable()
@@ -85,7 +85,7 @@ describe('Teacher -> LessonController -> store', function () {
 
             $course = Course::factory()->type(CourseType::OFFLINE)->for($teacher, 'author')->create();
 
-            postJson(route('teacher.course.lesson.store', $course), creatingLessonPayload($course->type, [
+            postJson(route('teacher.courses.lessons.store', $course), creatingLessonPayload($course->type, [
                 'start_time' => now()->subDay(),
                 'end_time' => now()->subDays(2),
                 'address' => str_repeat('A', 256),
@@ -101,7 +101,7 @@ describe('Teacher -> LessonController -> store', function () {
 
             $course = Course::factory()->type(CourseType::ONLINE)->for($teacher, 'author')->create();
 
-            postJson(route('teacher.course.lesson.store', $course), creatingLessonPayload($course->type, [
+            postJson(route('teacher.courses.lessons.store', $course), creatingLessonPayload($course->type, [
                 'start_time' => now()->subDay(),
                 'end_time' => now()->subDays(2),
                 'meeting_link' => 'invalid-link',
@@ -116,7 +116,7 @@ describe('Teacher -> LessonController -> store', function () {
 
             $course = Course::factory()->type(CourseType::VIDEO)->for($teacher, 'author')->create();
 
-            postJson(route('teacher.course.lesson.store', $course), creatingLessonPayload($course->type, [
+            postJson(route('teacher.courses.lessons.store', $course), creatingLessonPayload($course->type, [
                 'video_url' => 'invalid-url',
                 'provider' => str_repeat('A', 51),
             ]))
@@ -131,7 +131,7 @@ describe('Teacher -> LessonController -> store', function () {
             $course = Course::factory()->for($teacher, 'author')->create();
             $slug = 'test-slug';
 
-            postJson(route('teacher.course.lesson.store', $course), creatingLessonPayload($course->type, [
+            postJson(route('teacher.courses.lessons.store', $course), creatingLessonPayload($course->type, [
                 'slug' => $slug,
             ]))
                 ->assertCreated()
@@ -148,7 +148,7 @@ describe('Teacher -> LessonController -> store', function () {
             $course = Course::factory()->for($teacher, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create(['position' => 1]);
 
-            postJson(route('teacher.course.lesson.store', $course), creatingLessonPayload($course->type))
+            postJson(route('teacher.courses.lessons.store', $course), creatingLessonPayload($course->type))
                 ->assertCreated()
                 ->assertJsonFragment(['position' => $lesson->position + 1])
                 ->assertJsonStructure([
@@ -167,7 +167,7 @@ describe('Teacher -> LessonController -> store', function () {
             $course = Course::factory()->for($teacher, 'author')->create();
             $manualPosition = 99;
 
-            postJson(route('teacher.course.lesson.store', $course), creatingLessonPayload($course->type, [
+            postJson(route('teacher.courses.lessons.store', $course), creatingLessonPayload($course->type, [
                 'position' => $manualPosition
             ]))
                 ->assertCreated()
@@ -187,7 +187,7 @@ describe('Teacher -> LessonController -> store', function () {
 
             $course = Course::factory()->for($teacher, 'author')->create();
 
-            postJson(route('teacher.course.lesson.store', 'non-existing-slug'), creatingLessonPayload($course->type))
+            postJson(route('teacher.courses.lessons.store', 'non-existing-slug'), creatingLessonPayload($course->type))
                 ->assertNotFound();
         });
     });
@@ -201,7 +201,7 @@ describe('Teacher -> LessonController -> store', function () {
         it('fails if an unauthenticated user tries to create a lesson', function () {
             $course = Course::factory()->create();
 
-            postJson(route('teacher.course.lesson.store', $course), creatingLessonPayload($course->type))
+            postJson(route('teacher.courses.lessons.store', $course), creatingLessonPayload($course->type))
                 ->assertUnauthorized();
         });
 
@@ -210,7 +210,7 @@ describe('Teacher -> LessonController -> store', function () {
 
             $course = Course::factory()->create();
 
-            postJson(route('teacher.course.lesson.store', $course), creatingLessonPayload($course->type))
+            postJson(route('teacher.courses.lessons.store', $course), creatingLessonPayload($course->type))
                 ->assertForbidden();
         })->with([
             'user' => fn() => User::factory()->create(),
@@ -227,7 +227,7 @@ describe('Teacher -> LessonController -> store', function () {
 
             $data = creatingLessonPayload($course->type);
 
-            postJson(route('teacher.course.lesson.store', $course), $data)
+            postJson(route('teacher.courses.lessons.store', $course), $data)
                 ->assertCreated()
                 ->assertJsonStructure(['data' => teacherLessonJsonStructure($course->type)]);
 
@@ -264,7 +264,7 @@ describe('Teacher -> LessonController -> store', function () {
             Cache::tags($tags)->put($cacheKey, 'test_value', config('cache.ttl.lesson'));
             expect(Cache::tags($tags)->get($cacheKey))->not->toBeNull();
 
-            postJson(route('teacher.course.lesson.store', $course), creatingLessonPayload($course->type))
+            postJson(route('teacher.courses.lessons.store', $course), creatingLessonPayload($course->type))
                 ->assertCreated();
 
             expect(Cache::tags($tags)->get($cacheKey))->toBeNull();

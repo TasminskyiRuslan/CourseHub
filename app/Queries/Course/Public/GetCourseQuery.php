@@ -4,7 +4,7 @@ namespace App\Queries\Course\Public;
 
 use App\Models\Course;
 
-class GetCourseQuery
+readonly class GetCourseQuery
 {
     /**
      * Retrieve detailed information about the specified active course.
@@ -18,7 +18,7 @@ class GetCourseQuery
             ->active()
             ->where('slug', $courseSlug)
             ->with(['author' => function ($query) {
-                $query->with('roles')->withCount('courses');
+                $query->with(['roles'])->withCount(['courses' => fn ($q) => $q->active()]);
             }])
             ->withCount(['lessons'])
             ->firstOrFail();

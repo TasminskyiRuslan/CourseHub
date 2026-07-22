@@ -5,7 +5,7 @@ namespace App\Actions\Auth;
 use App\Models\User;
 use Laravel\Sanctum\NewAccessToken;
 
-class IssueAccessTokenAction
+readonly class IssueAccessTokenAction
 {
     /**
      * Issue a new personal access token for the specified user.

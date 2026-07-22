@@ -4,7 +4,7 @@ namespace App\Actions\Course;
 
 use App\Models\Course;
 
-class UnpublishCourseAction
+readonly class UnpublishCourseAction
 {
     /**
      * Unpublish the specified course.

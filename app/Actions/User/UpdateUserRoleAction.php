@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Throwable;
 
-class UpdateUserRoleAction
+readonly class UpdateUserRoleAction
 {
     /**
      * Update the role for the specified user.

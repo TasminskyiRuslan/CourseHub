@@ -3,14 +3,16 @@
 namespace App\Queries\Course\Admin;
 
 use App\Models\Course;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class GetCourseQuery
+readonly class GetCourseQuery
 {
     /**
      * Retrieve detailed information about the specified course by administrator.
      *
      * @param string $courseSlug
      * @return Course
+     * @throws ModelNotFoundException
      */
     public function handle(string $courseSlug): Course
     {

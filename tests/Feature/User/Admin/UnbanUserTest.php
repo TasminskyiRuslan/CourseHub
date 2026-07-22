@@ -28,7 +28,7 @@ describe('Admin -> UnbanUserController', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            patchJson(route('admin.user.unban', 'non-existing-slug'))
+            patchJson(route('admin.users.unban', 'non-existing-slug'))
                 ->assertNotFound();
         });
     });
@@ -42,7 +42,7 @@ describe('Admin -> UnbanUserController', function () {
         it('fails if an unauthenticated user tries to unban the user', function () {
             $targetUser = User::factory()->banned()->create();
 
-            patchJson(route('admin.user.unban', $targetUser))
+            patchJson(route('admin.users.unban', $targetUser))
                 ->assertUnauthorized();
 
             $targetUser->refresh();
@@ -54,7 +54,7 @@ describe('Admin -> UnbanUserController', function () {
 
             $targetUser = User::factory()->banned()->create();
 
-            patchJson(route('admin.user.unban', $targetUser))
+            patchJson(route('admin.users.unban', $targetUser))
                 ->assertForbidden();
 
             $targetUser->refresh();
@@ -68,7 +68,7 @@ describe('Admin -> UnbanUserController', function () {
             $admin = User::factory()->admin()->banned()->create();
             Sanctum::actingAs($admin);
 
-            patchJson(route('admin.user.unban', $admin))
+            patchJson(route('admin.users.unban', $admin))
                 ->assertForbidden();
 
             $admin->refresh();
@@ -79,7 +79,7 @@ describe('Admin -> UnbanUserController', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            patchJson(route('admin.user.unban', $targetUser))
+            patchJson(route('admin.users.unban', $targetUser))
                 ->assertForbidden();
         })->with([
             'admin' => fn() => User::factory()->admin()->banned()->create(),
@@ -92,7 +92,7 @@ describe('Admin -> UnbanUserController', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            patchJson(route('admin.user.unban', $targetUser))
+            patchJson(route('admin.users.unban', $targetUser))
                 ->assertNoContent();
 
             $targetUser->refresh();
@@ -110,7 +110,7 @@ describe('Admin -> UnbanUserController', function () {
             $superAdmin = User::where('email', config('super-admin.email'))->first();
             Sanctum::actingAs($superAdmin);
 
-            patchJson(route('admin.user.unban', $targetUser))
+            patchJson(route('admin.users.unban', $targetUser))
                 ->assertNoContent();
 
             $targetUser->refresh();
@@ -131,7 +131,7 @@ describe('Admin -> UnbanUserController', function () {
 
             $targetUser = User::factory()->create();
 
-            patchJson(route('admin.user.unban', $targetUser))
+            patchJson(route('admin.users.unban', $targetUser))
                 ->assertNoContent();
 
             Notification::assertNothingSent();
@@ -157,7 +157,7 @@ describe('Admin -> UnbanUserController', function () {
             Cache::tags($tags)->put($cacheKey, 'test_value', config('cache.ttl.teacher'));
             expect(Cache::tags($tags)->has($cacheKey))->toBeTrue();
 
-            patchJson(route('admin.user.unban', $targetUser))
+            patchJson(route('admin.users.unban', $targetUser))
                 ->assertNoContent();
 
             expect(Cache::tags($tags)->has($cacheKey))->toBeFalse();

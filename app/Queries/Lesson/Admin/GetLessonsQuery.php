@@ -4,12 +4,13 @@ namespace App\Queries\Lesson\Admin;
 
 use App\Models\Course;
 use App\Models\Lesson;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class GetLessonsQuery
+readonly class GetLessonsQuery
 {
     /**
      * Retrieve a paginated list of lessons for the specified course with conditional caching.
@@ -17,6 +18,7 @@ class GetLessonsQuery
      * @param Request $request
      * @param string $courseSlug
      * @return LengthAwarePaginator
+     * @throws ModelNotFoundException
      */
     public function handle(Request $request, string $courseSlug): LengthAwarePaginator
     {

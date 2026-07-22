@@ -7,7 +7,7 @@ use App\Models\Lesson;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class UpdateLessonAction
+readonly class UpdateLessonAction
 {
     /**
      * Update the specified lesson.

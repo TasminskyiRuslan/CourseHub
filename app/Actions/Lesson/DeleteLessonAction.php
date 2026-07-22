@@ -6,7 +6,7 @@ use App\Models\Lesson;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class DeleteLessonAction
+readonly class DeleteLessonAction
 {
     /**
      * Delete the specified lesson.

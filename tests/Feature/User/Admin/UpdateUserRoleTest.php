@@ -27,7 +27,7 @@ describe('Admin -> UserRoleController -> update', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            putJson(route('admin.user.role.update', 'non-existing-slug'), ['roles' => [UserRole::TEACHER->value]])
+            putJson(route('admin.users.role.update', 'non-existing-slug'), ['roles' => [UserRole::TEACHER->value]])
                 ->assertNotFound();
         });
 
@@ -36,7 +36,7 @@ describe('Admin -> UserRoleController -> update', function () {
             Sanctum::actingAs($admin);
             $targetUser = User::factory()->create();
 
-            putJson(route('admin.user.role.update', $targetUser), [])
+            putJson(route('admin.users.role.update', $targetUser), [])
                 ->assertUnprocessable();
         });
 
@@ -45,7 +45,7 @@ describe('Admin -> UserRoleController -> update', function () {
             Sanctum::actingAs($admin);
             $targetUser = User::factory()->create();
 
-            putJson(route('admin.user.role.update', $targetUser), ['roles' => 'string-instead-of-array'])
+            putJson(route('admin.users.role.update', $targetUser), ['roles' => 'string-instead-of-array'])
                 ->assertUnprocessable();
         });
 
@@ -54,7 +54,7 @@ describe('Admin -> UserRoleController -> update', function () {
             Sanctum::actingAs($admin);
             $targetUser = User::factory()->create();
 
-            putJson(route('admin.user.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value, 'invalid-role']])
+            putJson(route('admin.users.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value, 'invalid-role']])
                 ->assertUnprocessable();
         });
 
@@ -63,7 +63,7 @@ describe('Admin -> UserRoleController -> update', function () {
             Sanctum::actingAs($admin);
             $targetUser = User::factory()->create();
 
-            putJson(route('admin.user.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value, UserRole::TEACHER->value]])
+            putJson(route('admin.users.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value, UserRole::TEACHER->value]])
                 ->assertUnprocessable();
         });
 
@@ -72,7 +72,7 @@ describe('Admin -> UserRoleController -> update', function () {
             Sanctum::actingAs($admin);
             $targetUser = User::factory()->create();
 
-            putJson(route('admin.user.role.update', $targetUser), ['roles' => [UserRole::SUPER_ADMIN->value]])
+            putJson(route('admin.users.role.update', $targetUser), ['roles' => [UserRole::SUPER_ADMIN->value]])
                 ->assertUnprocessable();
         });
     });
@@ -86,7 +86,7 @@ describe('Admin -> UserRoleController -> update', function () {
         it('fails if an unauthenticated user tries to update the user\'s role', function () {
             $targetUser = User::factory()->create();
 
-            putJson(route('admin.user.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value]])
+            putJson(route('admin.users.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value]])
                 ->assertUnauthorized();
         });
 
@@ -95,7 +95,7 @@ describe('Admin -> UserRoleController -> update', function () {
 
             $targetUser = User::factory()->create();
 
-            putJson(route('admin.user.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value]])
+            putJson(route('admin.users.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value]])
                 ->assertForbidden();
         })->with([
             'unverified' => fn() => User::factory()->unverified()->create(),
@@ -107,7 +107,7 @@ describe('Admin -> UserRoleController -> update', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            putJson(route('admin.user.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value]])
+            putJson(route('admin.users.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value]])
                 ->assertForbidden();
         })->with([
             'another admin' => fn() => User::factory()->admin()->create(),
@@ -118,7 +118,7 @@ describe('Admin -> UserRoleController -> update', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            putJson(route('admin.user.role.update', $admin), ['roles' => [UserRole::TEACHER->value]])
+            putJson(route('admin.users.role.update', $admin), ['roles' => [UserRole::TEACHER->value]])
                 ->assertForbidden();
         });
 
@@ -126,7 +126,7 @@ describe('Admin -> UserRoleController -> update', function () {
             $superAdmin = User::whereEmail(config('super-admin.email'))->first();
             Sanctum::actingAs($superAdmin);
 
-            putJson(route('admin.user.role.update', $superAdmin), ['roles' => [UserRole::TEACHER->value]])
+            putJson(route('admin.users.role.update', $superAdmin), ['roles' => [UserRole::TEACHER->value]])
                 ->assertForbidden();
 
             $superAdmin->refresh();
@@ -137,7 +137,7 @@ describe('Admin -> UserRoleController -> update', function () {
             Sanctum::actingAs($user);
             $targetUser = User::factory()->create();
 
-            putJson(route('admin.user.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value, UserRole::ADMIN->value]])
+            putJson(route('admin.users.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value, UserRole::ADMIN->value]])
                 ->assertOk()
                 ->assertJsonStructure(['data' => adminUserJsonStructure()]);
 
@@ -162,7 +162,7 @@ describe('Admin -> UserRoleController -> update', function () {
             $targetUser = User::factory()->create();
             $targetUser->assignRole([UserRole::TEACHER->value]);
 
-            putJson(route('admin.user.role.update', $targetUser), ['roles' => []])
+            putJson(route('admin.users.role.update', $targetUser), ['roles' => []])
                 ->assertOk();
 
             expect($targetUser->fresh()->roles)->toBeEmpty();
@@ -188,7 +188,7 @@ describe('Admin -> UserRoleController -> update', function () {
             Cache::tags($tags)->put($cacheKey, 'test_value', config('cache.ttl.teacher'));
             expect(Cache::tags($tags)->has($cacheKey))->toBeTrue();
 
-            putJson(route('admin.user.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value]])
+            putJson(route('admin.users.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value]])
                 ->assertOk();
 
             expect(Cache::tags($tags)->has($cacheKey))->toBeFalse();

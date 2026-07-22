@@ -29,7 +29,7 @@ describe('Admin -> BanCourseController', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            patchJson(route('admin.course.ban', 'non-existing-slug'))
+            patchJson(route('admin.courses.ban', 'non-existing-slug'))
                 ->assertNotFound();
         });
     });
@@ -43,7 +43,7 @@ describe('Admin -> BanCourseController', function () {
         it('fails if an unauthenticated user tries to ban a course', function () {
             $course = Course::factory()->create();
 
-            patchJson(route('admin.course.ban', $course))
+            patchJson(route('admin.courses.ban', $course))
                 ->assertUnauthorized();
 
             $course->refresh();
@@ -55,7 +55,7 @@ describe('Admin -> BanCourseController', function () {
 
             $course = Course::factory()->create();
 
-            patchJson(route('admin.course.ban', $course))
+            patchJson(route('admin.courses.ban', $course))
                 ->assertForbidden();
 
             $course->refresh();
@@ -73,7 +73,7 @@ describe('Admin -> BanCourseController', function () {
             $courseInnerClosure = $courseClosure();
             $course = $courseInnerClosure();
 
-            patchJson(route('admin.course.ban', $course))
+            patchJson(route('admin.courses.ban', $course))
                 ->assertNoContent();
 
             $course->refresh();
@@ -96,7 +96,7 @@ describe('Admin -> BanCourseController', function () {
 
             $course = Course::factory()->banned()->create();
 
-            patchJson(route('admin.course.ban', $course))
+            patchJson(route('admin.courses.ban', $course))
                 ->assertNoContent();
 
             Notification::assertNothingSent();
@@ -122,7 +122,7 @@ describe('Admin -> BanCourseController', function () {
             Cache::tags($tags)->put($cacheKey, 'test_value', config('cache.ttl.course'));
             expect(Cache::tags($tags)->has($cacheKey))->toBeTrue();
 
-            patchJson(route('admin.course.ban', $course))
+            patchJson(route('admin.courses.ban', $course))
                 ->assertNoContent();
 
             expect(Cache::tags($tags)->has($cacheKey))->toBeFalse();

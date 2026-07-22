@@ -13,11 +13,14 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Stripe\Exception\ApiErrorException;
+use Stripe\StripeClient;
 
 /**
  * @property int $id
@@ -33,11 +36,13 @@ use Spatie\Sluggable\SlugOptions;
  * @property Carbon|null $deleted_at
  * @property Carbon|null $published_at
  * @property Carbon|null $banned_at
- * @property-read User|null $author
- * @property-read Collection<int, Lesson> $lessons
+ * @property-read \App\Models\User|null $author
+ * @property-read Collection<int, \App\Models\Lesson> $lessons
  * @property-read int|null $lessons_count
+ * @property-read Collection<int, \App\Models\User> $students
+ * @property-read int|null $students_count
  * @method static Builder<static>|Course active()
- * @method static CourseFactory factory($count = null, $state = [])
+ * @method static \Database\Factories\CourseFactory factory($count = null, $state = [])
  * @method static Builder<static>|Course newModelQuery()
  * @method static Builder<static>|Course newQuery()
  * @method static Builder<static>|Course onlyTrashed()
@@ -74,11 +79,28 @@ class Course extends Model
         'slug',
         'description',
         'price',
+        'stripe_product_id',
+        'stripe_price_id',
         'type',
         'image_path',
         'published_at',
         'banned_at',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'price' => 'decimal:2',
+            'type' => CourseType::class,
+            'published_at' => 'datetime',
+            'banned_at' => 'datetime',
+        ];
+    }
 
     /**
      * The "booted" method of the model.
@@ -134,6 +156,17 @@ class Course extends Model
     }
 
     /**
+     * Get the students enrolled in the course.
+     *
+     * @return BelongsToMany<User, $this>
+     */
+    public function students(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)
+            ->withPivot('enrolled_at');
+    }
+
+    /**
      * Get the lessons for the course.
      *
      * @return HasMany
@@ -151,6 +184,16 @@ class Course extends Model
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id');
+    }
+
+    /**
+     * Check if the course is free or missing a Stripe price.
+     *
+     * @return bool
+     */
+    public function isFree(): bool
+    {
+        return (float) $this->price === 0.00;
     }
 
     /**
@@ -253,17 +296,38 @@ class Course extends Model
     }
 
     /**
-     * Get the attributes that should be cast.
+     * Synchronizes the course with the Stripe service.
      *
-     * @return array<string, string>
+     * @param StripeClient $stripe
+     * @return void
+     * @throws ApiErrorException
      */
-    protected function casts(): array
+    public function syncWithStripe(StripeClient $stripe): void
     {
-        return [
-            'price' => 'decimal:2',
-            'type' => CourseType::class,
-            'published_at' => 'datetime',
-            'banned_at' => 'datetime',
-        ];
+        if ($this->isFree()) {
+            $this->stripe_price_id = null;
+            $this->saveQuietly();
+            return;
+        }
+
+        if (! $this->stripe_product_id) {
+            $product = $stripe->products->create([
+                'name' => $this->title,
+                'metadata' => [
+                    'course_id' => $this->id,
+                ],
+            ]);
+
+            $this->stripe_product_id = $product->id;
+        }
+
+        $price = $stripe->prices->create([
+            'product' => $this->stripe_product_id,
+            'unit_amount' => (int) round($this->price * 100),
+            'currency' => config('cashier.currency', 'usd'),
+        ]);
+
+        $this->stripe_price_id = $price->id;
+        $this->saveQuietly();
     }
 }

@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Throwable;
 
 class CourseController extends Controller
 {
@@ -163,6 +164,7 @@ class CourseController extends Controller
      * @param CreateCourseData $data
      * @param CreateCourseAction $action
      * @return JsonResponse
+     * @throws Throwable
      */
     public function store(Request $request, CreateCourseData $data, CreateCourseAction $action): JsonResponse
     {
@@ -302,6 +304,7 @@ class CourseController extends Controller
      * @param UpdateCourseAction $action
      * @param Course $course
      * @return JsonResponse
+     * @throws Throwable
      */
     public function update(UpdateCourseData $data, UpdateCourseAction $action, Course $course): JsonResponse
     {

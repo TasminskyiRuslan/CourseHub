@@ -10,7 +10,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class GetLessonsQuery
+readonly class GetLessonsQuery
 {
     /**
      * Retrieve a paginated list of lessons for the specified teacher's course.

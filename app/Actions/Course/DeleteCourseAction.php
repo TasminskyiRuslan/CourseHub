@@ -5,7 +5,7 @@ namespace App\Actions\Course;
 use App\Models\Course;
 use Illuminate\Support\Facades\Storage;
 
-class DeleteCourseAction
+readonly class DeleteCourseAction
 {
     /**
      * Delete the specified course.

@@ -19,8 +19,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
-use Stripe\Exception\ApiErrorException;
-use Stripe\StripeClient;
 
 /**
  * @property int $id
@@ -36,13 +34,15 @@ use Stripe\StripeClient;
  * @property Carbon|null $deleted_at
  * @property Carbon|null $published_at
  * @property Carbon|null $banned_at
- * @property-read \App\Models\User|null $author
- * @property-read Collection<int, \App\Models\Lesson> $lessons
+ * @property string|null $stripe_price_id
+ * @property string|null $stripe_product_id
+ * @property-read User|null $author
+ * @property-read Collection<int, Lesson> $lessons
  * @property-read int|null $lessons_count
- * @property-read Collection<int, \App\Models\User> $students
+ * @property-read Collection<int, User> $students
  * @property-read int|null $students_count
  * @method static Builder<static>|Course active()
- * @method static \Database\Factories\CourseFactory factory($count = null, $state = [])
+ * @method static CourseFactory factory($count = null, $state = [])
  * @method static Builder<static>|Course newModelQuery()
  * @method static Builder<static>|Course newQuery()
  * @method static Builder<static>|Course onlyTrashed()
@@ -57,6 +57,8 @@ use Stripe\StripeClient;
  * @method static Builder<static>|Course wherePrice($value)
  * @method static Builder<static>|Course wherePublishedAt($value)
  * @method static Builder<static>|Course whereSlug($value)
+ * @method static Builder<static>|Course whereStripePriceId($value)
+ * @method static Builder<static>|Course whereStripeProductId($value)
  * @method static Builder<static>|Course whereTitle($value)
  * @method static Builder<static>|Course whereType($value)
  * @method static Builder<static>|Course whereUpdatedAt($value)
@@ -86,21 +88,6 @@ class Course extends Model
         'published_at',
         'banned_at',
     ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'price' => 'decimal:2',
-            'type' => CourseType::class,
-            'published_at' => 'datetime',
-            'banned_at' => 'datetime',
-        ];
-    }
 
     /**
      * The "booted" method of the model.
@@ -193,7 +180,7 @@ class Course extends Model
      */
     public function isFree(): bool
     {
-        return (float) $this->price === 0.00;
+        return (float)$this->price === 0.00;
     }
 
     /**
@@ -296,38 +283,17 @@ class Course extends Model
     }
 
     /**
-     * Synchronizes the course with the Stripe service.
+     * Get the attributes that should be cast.
      *
-     * @param StripeClient $stripe
-     * @return void
-     * @throws ApiErrorException
+     * @return array<string, string>
      */
-    public function syncWithStripe(StripeClient $stripe): void
+    protected function casts(): array
     {
-        if ($this->isFree()) {
-            $this->stripe_price_id = null;
-            $this->saveQuietly();
-            return;
-        }
-
-        if (! $this->stripe_product_id) {
-            $product = $stripe->products->create([
-                'name' => $this->title,
-                'metadata' => [
-                    'course_id' => $this->id,
-                ],
-            ]);
-
-            $this->stripe_product_id = $product->id;
-        }
-
-        $price = $stripe->prices->create([
-            'product' => $this->stripe_product_id,
-            'unit_amount' => (int) round($this->price * 100),
-            'currency' => config('cashier.currency', 'usd'),
-        ]);
-
-        $this->stripe_price_id = $price->id;
-        $this->saveQuietly();
+        return [
+            'price' => 'decimal:2',
+            'type' => CourseType::class,
+            'published_at' => 'datetime',
+            'banned_at' => 'datetime',
+        ];
     }
 }

@@ -136,6 +136,17 @@ describe('Admin -> UnbanUserController', function () {
 
             Notification::assertNothingSent();
         });
+
+        it('fails if a banned user tries to unban a user', function () {
+            $bannedUser = User::factory()->admin()->banned()->create();
+
+            $targetUser = User::factory()->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            patchJson(route('admin.users.unban', $targetUser))
+                ->assertForbidden();
+        });
     });
 
     /*

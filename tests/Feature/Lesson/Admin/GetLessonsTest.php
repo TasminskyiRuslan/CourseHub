@@ -88,6 +88,17 @@ describe('Admin -> LessonController -> index', function () {
             'unpublished' => fn() => Course::factory()->unpublished()->create(),
             'banned' => fn() => Course::factory()->banned()->create(),
         ]);
+
+        it('fails if a banned user tries to retrieve lessons of the course', function () {
+            $bannedUser = User::factory()->admin()->banned()->create();
+            $course = Course::factory()->for($bannedUser, 'author')->create();
+            $lessons = Lesson::factory()->count(2)->for($course, 'course')->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            getJson(route('admin.courses.lessons.index', $course))
+                ->assertForbidden();
+        });
     });
 
     /*

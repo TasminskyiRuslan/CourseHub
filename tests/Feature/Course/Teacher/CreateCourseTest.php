@@ -7,6 +7,7 @@ use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\Sanctum;
+use Stripe\StripeClient;
 use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class);
@@ -78,6 +79,13 @@ describe('Teacher -> CourseController -> store', function () {
         });
 
         it('succeeds if a slug is provided manually', function () {
+            $this->mock(StripeClient::class, function ($mock) {
+                $mock->products = Mockery::mock();
+                $mock->products->shouldReceive('create')->andReturn((object) ['id' => 'prod_mock_id']);
+                $mock->prices = Mockery::mock();
+                $mock->prices->shouldReceive('create')->andReturn((object) ['id' => 'price_mock_id']);
+            });
+
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
 
@@ -113,6 +121,13 @@ describe('Teacher -> CourseController -> store', function () {
         ]);
 
         it('allows a user with permission to create a course', function ($user) {
+            $this->mock(StripeClient::class, function ($mock) {
+                $mock->products = Mockery::mock();
+                $mock->products->shouldReceive('create')->andReturn((object) ['id' => 'prod_mock_id']);
+                $mock->prices = Mockery::mock();
+                $mock->prices->shouldReceive('create')->andReturn((object) ['id' => 'price_mock_id']);
+            });
+
             Sanctum::actingAs($user);
 
             $data = creatingCoursePayload();
@@ -128,8 +143,81 @@ describe('Teacher -> CourseController -> store', function () {
             'teacher' => fn() => User::factory()->teacher()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ]);
+
+        it('fails if a banned user tries to create a course', function () {
+            $bannedUser = User::factory()->teacher()->banned()->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            postJson(route('teacher.courses.store'), creatingCoursePayload())
+                ->assertForbidden();
+        });
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | operations
+    |--------------------------------------------------------------------------
+    */
+    describe('operations', function () {
+        it('syncs paid course with stripe by creating product and price', function () {
+            $teacher = User::factory()->teacher()->create();
+            Sanctum::actingAs($teacher);
+
+            $expectedProductId = 'prod_' . Str::random(10);
+            $expectedPriceId = 'price_' . Str::random(10);
+
+            $this->mock(StripeClient::class, function ($mock) use ($expectedProductId, $expectedPriceId) {
+                $mock->products = Mockery::mock();
+                $mock->products->shouldReceive('create')
+                    ->once()
+                    ->andReturn((object) ['id' => $expectedProductId]);
+
+                $mock->prices = Mockery::mock();
+                $mock->prices->shouldReceive('create')
+                    ->once()
+                    ->andReturn((object) ['id' => $expectedPriceId]);
+            });
+
+            $payload = creatingCoursePayload([
+                'title' => 'Laravel Advanced Test',
+                'price' => '49.99',
+            ]);
+
+            postJson(route('teacher.courses.store'), $payload)
+                ->assertCreated();
+
+            $this->assertDatabaseHas('courses', [
+                'title' => $payload['title'],
+                'stripe_product_id' => $expectedProductId,
+                'stripe_price_id' => $expectedPriceId,
+            ]);
+        });
+
+        it('does not create stripe price if course is free', function () {
+            $teacher = User::factory()->teacher()->create();
+            Sanctum::actingAs($teacher);
+
+            $this->mock(StripeClient::class, function ($mock) {
+                $mock->shouldNotReceive('products');
+                $mock->shouldNotReceive('prices');
+            });
+
+            $payload = creatingCoursePayload([
+                'title' => 'Free Laravel Course',
+                'price' => '0.00',
+            ]);
+
+            postJson(route('teacher.courses.store'), $payload)
+                ->assertCreated();
+
+            $this->assertDatabaseHas('courses', [
+                'title' => $payload['title'],
+                'stripe_product_id' => null,
+                'stripe_price_id' => null,
+            ]);
+        });
+    });
     /*
     |--------------------------------------------------------------------------
     | caching

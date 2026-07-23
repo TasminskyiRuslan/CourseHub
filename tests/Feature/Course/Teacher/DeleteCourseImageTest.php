@@ -93,6 +93,21 @@ describe('Teacher -> CourseImageController -> destroy', function () {
             'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->for($author, 'author')->withImage()->create(),
             'banned' => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->withImage()->create(),
         ]);
+
+        it('fails if a banned user tries to delete their own course image', function () {
+            $bannedUser = User::factory()->teacher()->banned()->create();
+            $course = Course::factory()->for($bannedUser, 'author')->withImage()->create();
+            Storage::disk('courses')->put($course->image_path, 'fake');
+
+            Sanctum::actingAs($bannedUser);
+
+            deleteJson(route('teacher.courses.image.destroy', $course), imagePayload())
+                ->assertForbidden();
+
+            $course->refresh();
+            expect($course->image_path)->not->toBeNull();
+            Storage::disk('courses')->assertExists($course->image_path);
+        });
     });
 
     /*

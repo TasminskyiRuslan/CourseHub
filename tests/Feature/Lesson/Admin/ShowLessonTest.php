@@ -102,7 +102,7 @@ describe('Admin -> LessonController -> show', function () {
             'banned' => fn() => fn($author) => Course::factory()->banned()->create(),
         ]);
 
-        it('allows a user with permission to retrieve soft-deleted lessons', function ($user) {
+        it('allows a user with permission to retrieve soft-deleted lesson', function ($user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -118,5 +118,16 @@ describe('Admin -> LessonController -> show', function () {
             'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ]);
+
+        it('fails if a banned user tries to retrieve the lesson', function () {
+            $bannedUser = User::factory()->admin()->banned()->create();
+            $course = Course::factory()->for($bannedUser, 'author')->create();
+            $lesson = Lesson::factory()->for($course, 'course')->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            getJson(route('admin.courses.lessons.show', [$course, $lesson]))
+                ->assertForbidden();
+        });
     });
 })->group('lesson', 'admin');

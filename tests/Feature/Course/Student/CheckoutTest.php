@@ -30,7 +30,7 @@ describe('Student -> CheckoutController', function () {
             $user = User::factory()->create();
             Sanctum::actingAs($user);
 
-            postJson(route('courses.checkout', 'non-existing-slug'))
+            postJson(route('student.courses.checkout', 'non-existing-slug'))
                 ->assertNotFound();
         });
 
@@ -40,7 +40,7 @@ describe('Student -> CheckoutController', function () {
 
             $course = Course::factory()->for($user, 'author')->create();
 
-            postJson(route('courses.checkout', $course))
+            postJson(route('student.courses.checkout', $course))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['course']);
         });
@@ -55,7 +55,7 @@ describe('Student -> CheckoutController', function () {
         it('fails if an unauthenticated user tries to checkout', function () {
             $course = Course::factory()->create();
 
-            postJson(route('courses.checkout', $course))
+            postJson(route('student.courses.checkout', $course))
                 ->assertUnauthorized();
         });
 
@@ -65,7 +65,7 @@ describe('Student -> CheckoutController', function () {
 
             Sanctum::actingAs($bannedUser);
 
-            postJson(route('courses.checkout', $course))
+            postJson(route('student.courses.checkout', $course))
                 ->assertForbidden();
 
             $this->assertDatabaseMissing('course_user', [
@@ -88,7 +88,7 @@ describe('Student -> CheckoutController', function () {
             $course = Course::factory()->create();
             $user->enrolledCourses()->attach($course->id);
 
-            postJson(route('courses.checkout', $course))
+            postJson(route('student.courses.checkout', $course))
                 ->assertOk()
                 ->assertJson([
                     'data' => [
@@ -111,7 +111,7 @@ describe('Student -> CheckoutController', function () {
 
             $freeCourse = Course::factory()->free()->create();
 
-            postJson(route('courses.checkout', $freeCourse->slug))
+            postJson(route('student.courses.checkout', $freeCourse->slug))
                 ->assertOk()
                 ->assertJson([
                     'data' => [
@@ -146,7 +146,7 @@ describe('Student -> CheckoutController', function () {
                 ->once()
                 ->andReturn($mockCheckout);
 
-            postJson(route('courses.checkout', $course))
+            postJson(route('student.courses.checkout', $course))
                 ->assertOk()
                 ->assertJson([
                     'data' => [

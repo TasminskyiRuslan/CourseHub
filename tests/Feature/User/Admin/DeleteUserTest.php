@@ -116,6 +116,17 @@ describe('Admin -> TeacherController -> destroy', function () {
             'active user' => fn() => User::factory()->create(),
             'banned user' => fn() => User::factory()->banned()->create(),
         ]);
+
+        it('fails if a banned user tries to delete a user', function () {
+            $bannedUser = User::factory()->admin()->banned()->create();
+
+            $targetUser = User::factory()->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            deleteJson(route('admin.users.destroy', $targetUser))
+                ->assertForbidden();
+        });
     });
 
     /*

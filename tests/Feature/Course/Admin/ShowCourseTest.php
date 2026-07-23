@@ -80,5 +80,15 @@ describe('Admin -> CourseController -> show', function () {
                 return $course;
             }
         ]);
+
+        it('fails if a banned user tries to retrieve a course', function () {
+            $bannedUser = User::factory()->admin()->banned()->create();
+            $course = Course::factory()->for($bannedUser, 'author')->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            getJson(route('admin.courses.show', $course))
+                ->assertForbidden();
+        });
     });
 })->group('course', 'admin');

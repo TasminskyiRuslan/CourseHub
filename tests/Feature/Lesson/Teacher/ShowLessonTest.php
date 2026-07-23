@@ -117,5 +117,16 @@ describe('Teacher -> LessonController -> show', function () {
             'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->for($author, 'author')->create(),
             'banned' => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
         ]);
+
+        it('fails if a banned user tries to retrieve their own lesson', function () {
+            $bannedUser = User::factory()->teacher()->banned()->create();
+            $course = Course::factory()->for($bannedUser, 'author')->create();
+            $lesson = Lesson::factory()->for($course, 'course')->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            getJson(route('teacher.courses.lessons.show', [$course, $lesson]))
+                ->assertForbidden();
+        });
     });
 })->group('lesson', 'teacher');

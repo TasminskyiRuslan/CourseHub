@@ -156,6 +156,17 @@ describe('Admin -> BanUserController', function () {
 
             Notification::assertNotSentTo($targetUser, UserBannedNotification::class);
         });
+
+        it('fails if a banned user tries to ban a user', function () {
+            $bannedUser = User::factory()->admin()->banned()->create();
+
+            $targetUser = User::factory()->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            patchJson(route('admin.users.ban', $targetUser))
+                ->assertForbidden();
+        });
     });
 
     /*

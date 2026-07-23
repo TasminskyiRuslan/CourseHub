@@ -66,6 +66,16 @@ describe('Teacher -> CourseController -> index', function () {
             'teacher' => fn() => User::factory()->teacher()->create(),
             'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
         ]);
+
+        it('fails if a banned user tries to retrieve their own courses', function () {
+            $bannedUser = User::factory()->teacher()->banned()->create();
+            $ownCourses = Course::factory()->count(3)->for($bannedUser, 'author')->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            getJson(route('teacher.courses.index'))
+                ->assertForbidden();
+        });
     });
 
     /*

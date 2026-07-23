@@ -83,11 +83,6 @@ Route::prefix('courses')->group(function () {
     // Show course action
     Route::get('/{course}', [\App\Http\Controllers\Api\Course\Public\CourseController::class, 'show'])
         ->name('courses.show');
-
-    // Checkout course
-    Route::post('/{course}/checkout', \App\Http\Controllers\Api\Course\Student\CheckoutController::class)
-        ->middleware(['auth:sanctum', 'restrict.banned.user'])
-        ->name('courses.checkout');
 });
 
 Route::prefix('teachers')->group(function () {
@@ -99,6 +94,23 @@ Route::prefix('teachers')->group(function () {
     Route::get('/{teacher}', [\App\Http\Controllers\Api\User\Public\TeacherController::class, 'show'])
         ->name('teachers.show');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Student actions
+|--------------------------------------------------------------------------
+*/
+Route::prefix('student')
+    ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user'])
+    ->group(function () {
+        Route::prefix('courses')
+            ->scopeBindings()
+            ->group(function () {
+                // Checkout course
+                Route::post('/{course}/checkout', \App\Http\Controllers\Api\Course\Student\CheckoutController::class)
+                    ->name('student.courses.checkout');
+            });
+    });
 
 /*
 |--------------------------------------------------------------------------

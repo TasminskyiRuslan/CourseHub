@@ -13,7 +13,7 @@ use OpenApi\Attributes as OA;
 class CheckoutController extends Controller
 {
     #[OA\Post(
-        path: '/courses/{course}/checkout',
+        path: '/student/courses/{course}/checkout',
         description: 'Check out the specified course for the authenticated user.',
         summary: '[Student] Check out course',
         security: [['sanctum' => []]],

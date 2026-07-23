@@ -87,5 +87,15 @@ describe('Teacher -> CourseController -> show', function () {
             'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->for($author, 'author')->create(),
             'banned' => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
         ]);
+
+        it('fails if a banned user tries to retrieve their own course', function () {
+            $bannedUser = User::factory()->teacher()->banned()->create();
+            $course = Course::factory()->for($bannedUser, 'author')->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            getJson(route('teacher.courses.show', $course))
+                ->assertForbidden();
+        });
     });
 })->group('course', 'teacher');

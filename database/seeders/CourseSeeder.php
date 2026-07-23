@@ -13,23 +13,27 @@ class CourseSeeder extends Seeder
     public function run(): void
     {
         Course::factory()
+            ->withStripe()
             ->count(10)
             ->withImage()
             ->create();
 
         Course::factory()
+            ->withStripe()
             ->count(5)
             ->free()
             ->withImage()
             ->create();
 
         Course::factory()
+            ->withStripe()
             ->count(2)
             ->unpublished()
             ->withImage()
             ->create();
 
         Course::factory()
+            ->withStripe()
             ->count(2)
             ->banned()
             ->withImage()

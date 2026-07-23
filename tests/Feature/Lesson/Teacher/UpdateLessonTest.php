@@ -254,6 +254,17 @@ describe('Teacher -> LessonController -> update', function () {
             'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->for($author, 'author')->create(),
             'banned' => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
         ]);
+
+        it('fails if a banned user tries to update a lesson', function () {
+            $bannedUser = User::factory()->teacher()->banned()->create();
+            $course = Course::factory()->for($bannedUser, 'author')->create();
+            $lesson = Lesson::factory()->for($course, 'course')->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            patchJson(route('teacher.courses.lessons.update', [$course, $lesson]), updatingLessonPayload($course->type))
+                ->assertForbidden();
+        });
     });
 
     /*

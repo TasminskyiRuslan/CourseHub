@@ -98,6 +98,16 @@ describe('Admin -> UnbanCourseController', function () {
 
             Notification::assertNothingSent();
         });
+
+        it('fails if a banned user tries to unban a course', function () {
+            $bannedUser = User::factory()->admin()->banned()->create();
+            $course = Course::factory()->for($bannedUser, 'author')->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            patchJson(route('admin.courses.unban', $course))
+                ->assertForbidden();
+        });
     });
 
     /*

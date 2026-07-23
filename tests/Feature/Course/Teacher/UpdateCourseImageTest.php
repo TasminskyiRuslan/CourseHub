@@ -160,6 +160,20 @@ describe('Teacher -> CourseImageController -> update', function () {
             'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->for($author, 'author')->create(),
             'banned' => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
         ]);
+
+        it('fails if a banned user tries to update their own course image', function () {
+            $bannedUser = User::factory()->teacher()->banned()->create();
+            $course = Course::factory()->for($bannedUser, 'author')->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            postJson(route('teacher.courses.image.update', $course), imagePayload())
+                ->assertForbidden();
+
+            $course->refresh();
+            expect($course->image_path)->toBeNull();
+            Storage::disk('courses')->assertMissing($course->image_path);
+        });
     });
 
     /*

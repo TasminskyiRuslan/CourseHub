@@ -86,13 +86,13 @@ services:
       interval: 5s
 
   stripe-cli:
-    image: stripe/stripe-cli:v1.20.0
+    image: stripe/stripe-cli:latest
     container_name: stripe_cli
+    env_file: .env
     command: >
       listen
       --api-key ${STRIPE_SECRET}
-      --forward-to nginx:80/stripe/webhook
-      --load-from-webhooks-api
+      --forward-to nginx/stripe/webhook
     networks:
       - course-hub_net
     depends_on:

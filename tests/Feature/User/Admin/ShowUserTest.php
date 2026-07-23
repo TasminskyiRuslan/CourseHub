@@ -78,5 +78,16 @@ describe('Admin -> TeacherController -> show', function () {
                 return $user;
             },
         ]);
+
+        it('fails if a banned user tries to retrieve a user', function () {
+            $bannedUser = User::factory()->admin()->banned()->create();
+
+            $targetUser = User::factory()->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            getJson(route('admin.users.show', $targetUser))
+                ->assertForbidden();
+        });
     });
 })->group('user', 'admin');

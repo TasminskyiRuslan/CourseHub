@@ -70,6 +70,15 @@ describe('Admin -> TeacherController -> index', function () {
             'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
         ]);
+
+        it('fails if a banned user tries to retrieve all users', function () {
+            $bannedUser = User::factory()->admin()->banned()->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            getJson(route('admin.users.index'))
+                ->assertForbidden();
+        });
     });
 
     /*

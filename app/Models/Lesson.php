@@ -26,9 +26,9 @@ use Spatie\Sluggable\SlugOptions;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
- * @property-read \App\Models\Course|null $course
- * @property-read Model|\Eloquent $lessonable
- * @method static \Database\Factories\LessonFactory factory($count = null, $state = [])
+ * @property-read Course|null $course
+ * @property-read Model|Eloquent $lessonable
+ * @method static LessonFactory factory($count = null, $state = [])
  * @method static Builder<static>|Lesson newModelQuery()
  * @method static Builder<static>|Lesson newQuery()
  * @method static Builder<static>|Lesson onlyTrashed()

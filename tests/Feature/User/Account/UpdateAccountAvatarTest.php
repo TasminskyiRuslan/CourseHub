@@ -126,6 +126,18 @@ describe('Account -> AccountAvatarController -> update', function () {
             'unverified teacher' => fn() => User::factory()->withAvatar()->teacher()->unverified()->create(),
             'admin' => fn() => User::factory()->withAvatar()->admin()->create(),
         ]);
+
+        it('fails if a banned user tries to update their own avatar', function () {
+            $bannedUser = User::factory()->banned()->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            postJson(route('account.avatar.update'), avatarPayload())
+                ->assertForbidden();
+
+            $bannedUser->refresh();
+            expect($bannedUser->avatar_path)->toBeNull();
+        });
     });
 
     /*

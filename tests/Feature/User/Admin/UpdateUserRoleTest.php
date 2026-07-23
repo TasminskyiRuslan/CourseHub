@@ -147,6 +147,17 @@ describe('Admin -> UserRoleController -> update', function () {
             'admin' => fn() => User::factory()->admin()->create(),
             'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
         ]);
+
+        it('fails if a banned user tries to update the user\'s role', function () {
+            $bannedUser = User::factory()->admin()->banned()->create();
+
+            $targetUser = User::factory()->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            putJson(route('admin.users.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value, UserRole::ADMIN->value]])
+                ->assertForbidden();
+        });
     });
 
     /*

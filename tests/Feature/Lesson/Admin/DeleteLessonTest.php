@@ -112,6 +112,17 @@ describe('Admin -> LessonController -> destroy', function () {
             'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->create(),
             'banned' => fn() => fn($author) => Course::factory()->banned()->create(),
         ]);
+
+        it('fails if a banned user tries to delete a lesson', function () {
+            $bannedUser = User::factory()->admin()->banned()->create();
+            $course = Course::factory()->for($bannedUser, 'author')->create();
+            $lesson = Lesson::factory()->for($course, 'course')->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            deleteJson(route('admin.courses.lessons.destroy', [$course, $lesson]))
+                ->assertForbidden();
+        });
     });
 
     /*

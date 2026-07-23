@@ -114,6 +114,23 @@ describe('Account -> AccountController -> update', function () {
             'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
             'admin' => fn() => User::factory()->admin()->create(),
         ]);
+
+        it('fails if a banned user tries to update their own profile data', function () {
+            $bannedUser = User::factory()->banned()->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            $data = [
+                'name' => 'Updated Name',
+                'slug' => 'updated-slug',
+            ];
+
+            patchJson(route('account.update'), $data)
+                ->assertForbidden();
+
+            expect($bannedUser->refresh()->name)->not->toBe($data['name'])
+                ->and($bannedUser->slug)->not->toBe($data['slug']);
+        });
     });
 
     /*

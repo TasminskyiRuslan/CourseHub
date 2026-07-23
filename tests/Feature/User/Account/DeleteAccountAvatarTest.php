@@ -63,6 +63,18 @@ describe('Account -> AccountAvatarController -> destroy', function () {
             'unverified teacher' => fn() => User::factory()->teacher()->unverified()->withAvatar()->create(),
             'admin' => fn() => User::factory()->admin()->withAvatar()->create(),
         ]);
+
+        it('fails if a banned user tries to delete their own avatar', function () {
+            $bannedUser = User::factory()->banned()->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            deleteJson(route('account.avatar.destroy'))
+                ->assertForbidden();
+
+            $bannedUser->refresh();
+            expect($bannedUser->avatar_path)->toBeNull();
+        });
     });
 
     /*

@@ -85,6 +85,16 @@ describe('Teacher -> PublishCourseController', function () {
             'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->for($author, 'author')->create(),
             'banned' => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
         ]);
+
+        it('fails if a banned user tries to publish their own course', function () {
+            $bannedUser = User::factory()->teacher()->banned()->create();
+            $course = Course::factory()->unpublished()->for($bannedUser, 'author')->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            patchJson(route('teacher.courses.publish', $course))
+                ->assertForbidden();
+        });
     });
 
     /*

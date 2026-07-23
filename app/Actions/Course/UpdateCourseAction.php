@@ -11,10 +11,10 @@ use Throwable;
 readonly class UpdateCourseAction
 {
     /**
-     * @param StripeClient $stripe
+     * @param SyncCourseWithStripeAction $syncCourseWithStripeAction
      */
     public function __construct(
-        private StripeClient $stripe
+        private SyncCourseWithStripeAction $syncCourseWithStripeAction
     ) {}
 
     /**
@@ -27,11 +27,12 @@ readonly class UpdateCourseAction
      */
     public function handle(UpdateCourseData $data, Course $course): Course
     {
-        return DB::transaction(function () use ($course, $data) {
+        DB::transaction(function () use ($course, $data) {
             $course->update($data->all());
-            $course->syncWithStripe($this->stripe);
-
-            return $course;
         });
+
+        $this->syncCourseWithStripeAction->handle($course);
+
+        return $course;
     }
 }

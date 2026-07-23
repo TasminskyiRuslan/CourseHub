@@ -106,6 +106,16 @@ describe('Admin -> CourseController -> destroy', function () {
             'unpublished' => fn() => fn($filename) => Course::factory()->unpublished()->withImage($filename)->create(),
             'banned' => fn() => fn($filename) => Course::factory()->banned()->withImage($filename)->create(),
         ]);
+
+        it('fails if a banned user tries to delete a course', function () {
+            $bannedUser = User::factory()->admin()->banned()->create();
+            $course = Course::factory()->for($bannedUser, 'author')->create();
+
+            Sanctum::actingAs($bannedUser);
+
+            deleteJson(route('admin.courses.destroy', $course))
+                ->assertForbidden();
+        });
     });
 
     /*

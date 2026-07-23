@@ -749,6 +749,62 @@
                 }
             }
         },
+        "/courses/{course}/checkout": {
+            "post": {
+                "tags": [
+                    "Course"
+                ],
+                "summary": "[Student] Check out course",
+                "description": "Check out the specified course for the authenticated user.",
+                "operationId": "040f4cad8490d1c220dcd6ca207fbec0",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Course checked out successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CourseCheckoutResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course not found."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/teacher/courses": {
             "get": {
                 "tags": [
@@ -2895,6 +2951,41 @@
                         "type": "string",
                         "format": "date-time",
                         "example": null,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "CourseCheckoutResponse": {
+                "title": "Course Checkout Response",
+                "description": "Course checkout result data.",
+                "required": [
+                    "status",
+                    "is_enrolled",
+                    "course_id",
+                    "checkout_url"
+                ],
+                "properties": {
+                    "status": {
+                        "description": "Status of the checkout process.",
+                        "type": "string",
+                        "example": "enrolled"
+                    },
+                    "is_enrolled": {
+                        "description": "Indicates if the user was enrolled in the course.",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "course_id": {
+                        "description": "Course identifier.",
+                        "type": "integer",
+                        "example": 42
+                    },
+                    "checkout_url": {
+                        "description": "Redirect URL for payment gateways.",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "https://checkout.stripe.com/c/pay/cs_test_123",
                         "nullable": true
                     }
                 },

@@ -149,7 +149,7 @@ class Course extends Model
      */
     public function students(): BelongsToMany
     {
-        return $this->belongsToMany(User::class)
+        return $this->belongsToMany(User::class, 'course_user')
             ->withPivot('enrolled_at');
     }
 

@@ -18,7 +18,7 @@ Route::prefix('student')
             ->scopeBindings()
             ->group(function () {
 
-                // Checkout course
+                // Checkout course action
                 Route::post('/{course}/checkout', CheckoutController::class)
                     ->name('student.courses.checkout');
 
@@ -26,5 +26,8 @@ Route::prefix('student')
                 Route::get('/', [CourseController::class, 'index'])
                     ->name('student.courses.index');
 
+                // Show student course action
+                Route::get('/{course}', [CourseController::class, 'show'])
+                    ->name('student.courses.show');
             });
     });

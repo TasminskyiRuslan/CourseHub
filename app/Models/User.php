@@ -181,7 +181,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function enrolledCourses(): BelongsToMany
     {
-        return $this->belongsToMany(Course::class)
+        return $this->belongsToMany(Course::class, 'course_user')
             ->withPivot('enrolled_at');
     }
 

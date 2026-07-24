@@ -6,6 +6,7 @@ use App\Enums\CourseType;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Course\Student\CourseResource;
 use App\Queries\Course\Student\GetCoursesQuery;
+use App\Queries\Course\Student\GetCourseQuery;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
@@ -87,7 +88,7 @@ class CourseController extends Controller
         ]
     )]
     /**
-     * Retrieve a paginated list of student's courses.
+     * Retrieve a paginated list of student's enrolled courses.
      *
      * @param Request $request
      * @param GetCoursesQuery $query
@@ -104,35 +105,67 @@ class CourseController extends Controller
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 
+    #[OA\Get(
+        path: '/student/courses/{course}',
+        description: 'Retrieve detailed information about the specified enrolled student\'s course.',
+        summary: '[Student] Retrieve course details',
+        security: [['sanctum' => []]],
+        tags: ['Course'],
+        parameters: [
+            new OA\Parameter(
+                name: 'course',
+                description: 'Course identifier (slug).',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(
+                    type: 'string',
+                    example: 'math-101'
+                )
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: SymfonyResponse::HTTP_OK,
+                description: 'Course details retrieved successfully.',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/CourseStudentResponse'
+                        )
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+                description: 'User is unauthenticated.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_FORBIDDEN,
+                description: 'User does not have permissions.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_NOT_FOUND,
+                description: 'Course not found.'
+            ),
+        ]
+    )]
     /**
-     * Store a newly created resource in storage.
+     * Retrieve detailed information about the specified enrolled student's course.
+     *
+     * @param Request $request
+     * @param GetCourseQuery $query
+     * @param string $course
+     * @return JsonResponse
      */
-    public function store(Request $request)
+    public function show(Request $request, GetCourseQuery $query, string $course)
     {
-        //
-    }
+        $currentUser = $request->user();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        $gottenCourse = $query->handle($course, $currentUser);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return CourseResource::make($gottenCourse)
+            ->response()
+            ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 }

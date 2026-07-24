@@ -30,31 +30,31 @@ Route::prefix('teacher')
                 Route::post('/', [CourseController::class, 'store'])
                     ->name('teacher.courses.store');
 
-                // Show course action
+                // Show teacher course action
                 Route::get('/{course}', [CourseController::class, 'show'])
                     ->name('teacher.courses.show');
 
-                // Update course action
+                // Update teacher course action
                 Route::patch('/{course}', [CourseController::class, 'update'])
                     ->name('teacher.courses.update');
 
-                // Delete course action
+                // Delete teacher course action
                 Route::delete('/{course}', [CourseController::class, 'destroy'])
                     ->name('teacher.courses.destroy');
 
-                // Update course image action
+                // Update teacher course image action
                 Route::put('/{course}/image', [CourseImageController::class, 'update'])
                     ->name('teacher.courses.image.update');
 
-                // Delete course image action
+                // Delete teacher course image action
                 Route::delete('/{course}/image', [CourseImageController::class, 'destroy'])
                     ->name('teacher.courses.image.destroy');
 
-                // Publish course actions
+                // Publish teacher course actions
                 Route::patch('/{course}/publish', PublishCourseController::class)
                     ->name('teacher.courses.publish');
 
-                // Unpublish course action
+                // Unpublish teacher course action
                 Route::patch('/{course}/unpublish', UnpublishCourseController::class)
                     ->name('teacher.courses.unpublish');
 
@@ -69,15 +69,15 @@ Route::prefix('teacher')
                     Route::post('/', [LessonController::class, 'store'])
                         ->name('teacher.courses.lessons.store');
 
-                    // Show lesson action
+                    // Show course lesson action
                     Route::get('/{lesson}', [LessonController::class, 'show'])
                         ->name('teacher.courses.lessons.show');
 
-                    // Update lesson action
+                    // Update course lesson action
                     Route::patch('/{lesson}', [LessonController::class, 'update'])
                         ->name('teacher.courses.lessons.update');
 
-                    // Delete lesson action
+                    // Delete course lesson action
                     Route::delete('/{lesson}', [LessonController::class, 'destroy'])
                         ->name('teacher.courses.lessons.destroy');
                 });

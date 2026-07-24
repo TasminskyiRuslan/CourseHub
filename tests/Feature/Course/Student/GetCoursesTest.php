@@ -37,7 +37,7 @@ describe('Student -> CourseController -> index', function () {
             $enrolledCourses = Course::factory()->count(3)->for($author, 'author')->create();
             $otherCourses = Course::factory()->count(2)->for($author, 'author')->create();
 
-            $user->enrolledCourses()->attach($enrolledCourses);
+            $user->enrolledCourses()->attach($enrolledCourses, [], 'enrolledCourses');
 
             $response = getJson(route('student.courses.index'))
                 ->assertOk()
@@ -67,7 +67,7 @@ describe('Student -> CourseController -> index', function () {
             $author = User::factory()->teacher()->create();
             $courses = Course::factory()->count(3)->for($author, 'author')->create();
 
-            $bannedUser->enrolledCourses()->attach($courses);
+            $bannedUser->enrolledCourses()->attach($courses, [], 'enrolledCourses');
 
             Sanctum::actingAs($bannedUser);
 
@@ -90,7 +90,7 @@ describe('Student -> CourseController -> index', function () {
             $course1 = Course::factory()->for($author, 'author')->create(['title' => 'Laravel Deep Dive']);
             $course2 = Course::factory()->for($author, 'author')->create(['title' => 'React Basics']);
 
-            $user->enrolledCourses()->attach([$course1->id, $course2->id]);
+            $user->enrolledCourses()->attach([$course1->id, $course2->id], [], 'enrolledCourses');
             $searchString = substr($course1->title, 8);
 
             getJson(route('student.courses.index', ['filter[search]' => $searchString]))
@@ -112,7 +112,7 @@ describe('Student -> CourseController -> index', function () {
             $onlineCourse = Course::factory()->type(CourseType::ONLINE)->for($author, 'author')->create();
             $videoCourse = Course::factory()->type(CourseType::VIDEO)->for($author, 'author')->create();
 
-            $user->enrolledCourses()->attach([$onlineCourse->id, $videoCourse->id]);
+            $user->enrolledCourses()->attach([$onlineCourse->id, $videoCourse->id], [], 'enrolledCourses');
 
             getJson(route('student.courses.index', ['filter[type]' => CourseType::ONLINE->value]))
                 ->assertOk()
@@ -130,7 +130,7 @@ describe('Student -> CourseController -> index', function () {
             $courseA = Course::factory()->for($authorA, 'author')->create();
             $courseB = Course::factory()->for($authorB, 'author')->create();
 
-            $user->enrolledCourses()->attach([$courseA->id, $courseB->id]);
+            $user->enrolledCourses()->attach([$courseA->id, $courseB->id], [], 'enrolledCourses');
 
             getJson(route('student.courses.index', ['filter[author]' => $authorA->slug]))
                 ->assertOk()
@@ -146,8 +146,8 @@ describe('Student -> CourseController -> index', function () {
             $oldCourse = Course::factory()->for($author, 'author')->create();
             $newCourse = Course::factory()->for($author, 'author')->create();
 
-            $user->enrolledCourses()->attach($oldCourse, ['enrolled_at' => now()->subDays(2)]);
-            $user->enrolledCourses()->attach($newCourse, ['enrolled_at' => now()->subDay()]);
+            $user->enrolledCourses()->attach($oldCourse, ['enrolled_at' => now()->subDays(2)], 'enrolledCourses');
+            $user->enrolledCourses()->attach($newCourse, ['enrolled_at' => now()->subDay()], 'enrolledCourses');
 
             $response = getJson(route('student.courses.index'))->assertOk();
             $ids = collect($response->json('data'))->pluck('id')->all();
@@ -163,8 +163,8 @@ describe('Student -> CourseController -> index', function () {
             $oldCourse = Course::factory()->for($author, 'author')->create();
             $newCourse = Course::factory()->for($author, 'author')->create();
 
-            $user->enrolledCourses()->attach($oldCourse, ['enrolled_at' => now()->subDays(2)]);
-            $user->enrolledCourses()->attach($newCourse, ['enrolled_at' => now()->subDay()]);
+            $user->enrolledCourses()->attach($oldCourse, ['enrolled_at' => now()->subDays(2)], 'enrolledCourses');
+            $user->enrolledCourses()->attach($newCourse, ['enrolled_at' => now()->subDay()], 'enrolledCourses');
 
             $ascResponse = getJson(route('student.courses.index', ['sort' => 'enrolled_at']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
@@ -183,7 +183,7 @@ describe('Student -> CourseController -> index', function () {
             $oldCourse = Course::factory()->for($author, 'author')->create(['published_at' => now()->subDays(3)]);
             $newCourse = Course::factory()->for($author, 'author')->create(['published_at' => now()->subDay()]);
 
-            $user->enrolledCourses()->attach([$oldCourse->id, $newCourse->id]);
+            $user->enrolledCourses()->attach([$oldCourse->id, $newCourse->id], [], 'enrolledCourses');
 
             $ascResponse = getJson(route('student.courses.index', ['sort' => 'published_at']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
@@ -202,7 +202,7 @@ describe('Student -> CourseController -> index', function () {
             $courseA = Course::factory()->for($author, 'author')->create(['title' => 'Alpha Course']);
             $courseB = Course::factory()->for($author, 'author')->create(['title' => 'Beta Course']);
 
-            $user->enrolledCourses()->attach([$courseA->id, $courseB->id]);
+            $user->enrolledCourses()->attach([$courseA->id, $courseB->id], [], 'enrolledCourses');
 
             $ascResponse = getJson(route('student.courses.index', ['sort' => 'title']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
@@ -221,7 +221,7 @@ describe('Student -> CourseController -> index', function () {
             $cheap = Course::factory()->for($author, 'author')->create(['price' => 150]);
             $expensive = Course::factory()->for($author, 'author')->create(['price' => 450]);
 
-            $user->enrolledCourses()->attach([$cheap->id, $expensive->id]);
+            $user->enrolledCourses()->attach([$cheap->id, $expensive->id], [], 'enrolledCourses');
 
             $ascResponse = getJson(route('student.courses.index', ['sort' => 'price']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
@@ -238,7 +238,7 @@ describe('Student -> CourseController -> index', function () {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->for($author, 'author')->create();
-            $user->enrolledCourses()->attach($course);
+            $user->enrolledCourses()->attach($course, [], 'enrolledCourses');
 
             getJson(route('student.courses.index', ['filter[search]' => 'non-existent-course-title']))
                 ->assertOk()
@@ -258,7 +258,7 @@ describe('Student -> CourseController -> index', function () {
             Sanctum::actingAs($user);
 
             $courses = Course::factory()->count(3)->for($author, 'author')->create();
-            $user->enrolledCourses()->attach($courses);
+            $user->enrolledCourses()->attach($courses, [], 'enrolledCourses');
 
             getJson(route('student.courses.index'))
                 ->assertOk()

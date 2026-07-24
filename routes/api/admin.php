@@ -52,11 +52,11 @@ Route::prefix('admin')
                     Route::get('/', [LessonController::class, 'index'])
                         ->name('admin.courses.lessons.index');
 
-                    // Show lesson action
+                    // Show course lesson action
                     Route::get('/{lesson}', [LessonController::class, 'show'])
                         ->name('admin.courses.lessons.show');
 
-                    // Delete lesson action
+                    // Delete course lesson action
                     Route::delete('/{lesson}', [LessonController::class, 'destroy'])
                         ->name('admin.courses.lessons.destroy');
                 });

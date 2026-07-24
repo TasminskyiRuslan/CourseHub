@@ -1,56 +1,41 @@
 <?php
 
-namespace App\Queries\Course\Public;
+namespace App\Queries\Course\Student;
 
 use App\Models\Course;
-use App\Queries\CachedListQuery;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Cache;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 
-readonly class GetCoursesQuery extends CachedListQuery
+readonly class GetCoursesQuery
 {
     /**
-     * Retrieve a paginated list of active courses with conditional caching.
+     * Retrieve a paginated list of student's courses.
      *
      * @param Request $request
+     * @param User $student
      * @return LengthAwarePaginator
      */
-    public function handle(Request $request): LengthAwarePaginator
+    public function handle(Request $request, User $student): LengthAwarePaginator
     {
-        if (!$this->shouldUseCache($request)) {
-            return $this->query($request)
-                ->paginate(config('pagination.courses_per_page'))
-                ->withQueryString();
-        }
-
-        $page = (int)$request->query('page', 1);
-        $cacheKey = "courses:page:{$page}";
-        $tags = [
-            config('cache.tags.course_list')
-        ];
-
-        return Cache::tags($tags)
-            ->remember(
-                $cacheKey,
-                config('cache.ttl.course'),
-                fn() => $this->query($request)
-                    ->paginate(config('pagination.courses_per_page'))
-                    ->withQueryString()
-            );
+        return $this->query($request, $student)
+            ->paginate(config('pagination.courses_per_page'))
+            ->withQueryString();
     }
 
     /**
      * Build query builder with allowed filters and sorting.
      *
      * @param Request $request
+     * @param User $student
      * @return QueryBuilder
      */
-    protected function query(Request $request): QueryBuilder
+    protected function query(Request $request, User $student): QueryBuilder
     {
-        return QueryBuilder::for(Course::class, $request)
+        return QueryBuilder::for($student->enrolledCourses(), $request)
             ->active()
             ->with(['author' => function ($query) {
                 $query->with(['roles'])->withCount(['courses' => fn ($q) => $q->active()]);
@@ -73,7 +58,8 @@ readonly class GetCoursesQuery extends CachedListQuery
                 'price',
                 'published_at',
                 'lessons_count',
+                AllowedSort::field('enrolled_at', 'course_user.enrolled_at'),
             ])
-            ->defaultSort('-published_at');
+            ->defaultSort('-course_user.enrolled_at');
     }
 }

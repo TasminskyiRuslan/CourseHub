@@ -749,14 +749,14 @@
                 }
             }
         },
-        "/courses/{course}/checkout": {
+        "/student/courses/{course}/checkout": {
             "post": {
                 "tags": [
                     "Course"
                 ],
                 "summary": "[Student] Check out course",
                 "description": "Check out the specified course for the authenticated user.",
-                "operationId": "040f4cad8490d1c220dcd6ca207fbec0",
+                "operationId": "c80179fa1829b5cd58f78adaff838152",
                 "parameters": [
                     {
                         "name": "course",
@@ -796,6 +796,113 @@
                     },
                     "422": {
                         "description": "Validation error."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/student/courses": {
+            "get": {
+                "tags": [
+                    "Course"
+                ],
+                "summary": "[Student] Retrieve a list of enrolled courses",
+                "description": "Retrieve a paginated list of student's enrolled courses.",
+                "operationId": "c0ce0c3d8640bece69744ae80e7dd8c9",
+                "parameters": [
+                    {
+                        "name": "filter[search]",
+                        "in": "query",
+                        "description": "Search courses by title or description.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[type]",
+                        "in": "query",
+                        "description": "Filter courses by type.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "offline",
+                                "online",
+                                "video"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter[author]",
+                        "in": "query",
+                        "description": "Filter courses by author slug.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort courses by field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "enrolled_at",
+                                "-enrolled_at",
+                                "title",
+                                "-title",
+                                "price",
+                                "-price",
+                                "published_at",
+                                "-published_at",
+                                "lessons_count",
+                                "-lessons_count"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Course list retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CourseStudentResponse"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
                     }
                 },
                 "security": [
@@ -3073,6 +3180,99 @@
                         "format": "date-time",
                         "example": "2026-01-25T12:00:00.000000Z",
                         "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "CourseStudentResponse": {
+                "title": "Course Student Response",
+                "description": "Student panel data of a course.",
+                "required": [
+                    "id",
+                    "author_id",
+                    "title",
+                    "slug",
+                    "type",
+                    "price",
+                    "lessons_count",
+                    "enrolled_at"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "author_id": {
+                        "description": "Author identifier.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "author": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/UserPublicResponse"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Author details."
+                    },
+                    "title": {
+                        "description": "Title.",
+                        "type": "string",
+                        "example": "Math 101"
+                    },
+                    "slug": {
+                        "description": "Course slug.",
+                        "type": "string",
+                        "example": "math-101"
+                    },
+                    "description": {
+                        "description": "Description.",
+                        "type": "string",
+                        "example": "A basic mathematics course",
+                        "nullable": true
+                    },
+                    "type": {
+                        "description": "Type.",
+                        "type": "string",
+                        "enum": [
+                            "online",
+                            "offline",
+                            "video"
+                        ],
+                        "example": "online"
+                    },
+                    "price": {
+                        "description": "Price value.",
+                        "type": "string",
+                        "format": "float",
+                        "example": 99.99
+                    },
+                    "image_url": {
+                        "description": "Public URL to the image.",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "http://loclhost:8080/storage/courses/course1.png",
+                        "nullable": true
+                    },
+                    "lessons_count": {
+                        "description": "Total number of lessons.",
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "published_at": {
+                        "description": "Publishing time.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-01-25T12:00:00.000000Z",
+                        "nullable": true
+                    },
+                    "enrolled_at": {
+                        "description": "Enrolling time.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-03-25T12:00:00.000000Z"
                     }
                 },
                 "type": "object"

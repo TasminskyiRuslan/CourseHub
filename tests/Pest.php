@@ -243,6 +243,27 @@ function teacherCourseJsonStructure(): array
 }
 
 /**
+ * Get the expected JSON structure for course resource (student).
+ *
+ * @return array
+ */
+function studentCourseJsonStructure(): array
+{
+    return [
+        'id',
+        'author_id',
+        'title',
+        'slug',
+        'description',
+        'type',
+        'price',
+        'image_url',
+        'lessons_count',
+        'published_at',
+        'enrolled_at',
+    ];
+}
+/**
  * Get the expected JSON structure for course resource (admin).
  *
  * @return array

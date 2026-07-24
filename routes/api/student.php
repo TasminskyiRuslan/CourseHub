@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Course\Student\CheckoutController;
+use App\Http\Controllers\Api\Course\Student\CourseController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,5 +21,10 @@ Route::prefix('student')
                 // Checkout course
                 Route::post('/{course}/checkout', CheckoutController::class)
                     ->name('student.courses.checkout');
+
+                // Get student courses list action
+                Route::get('/', [CourseController::class, 'index'])
+                    ->name('student.courses.index');
+
             });
     });

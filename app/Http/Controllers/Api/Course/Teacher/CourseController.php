@@ -113,9 +113,9 @@ class CourseController extends Controller
     {
         $currentUser = $request->user();
 
-        $courses = $query->handle($request, $currentUser);
+        $gottenCourses = $query->handle($request, $currentUser);
 
-        return CourseResource::collection($courses)
+        return CourseResource::collection($gottenCourses)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }

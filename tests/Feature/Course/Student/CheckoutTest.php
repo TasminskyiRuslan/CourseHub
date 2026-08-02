@@ -35,10 +35,10 @@ describe('Student -> CheckoutController', function () {
         });
 
         it('fails if the author tries to purchase their own course', function () {
-            $user = User::factory()->teacher()->create();
-            Sanctum::actingAs($user);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($user, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
 
             postJson(route('student.courses.checkout', $course))
                 ->assertUnprocessable()

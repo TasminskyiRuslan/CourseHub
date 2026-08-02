@@ -27,10 +27,10 @@ describe('Teacher -> CourseImageController -> update', function () {
     */
     describe('validation', function () {
         it('fails if the required fields are missing', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
 
             postJson(route('teacher.courses.image.update', $course), ['_method' => 'PUT'])
                 ->assertUnprocessable()
@@ -38,10 +38,10 @@ describe('Teacher -> CourseImageController -> update', function () {
         });
 
         it('fails if the image is not a file', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
 
             postJson(route('teacher.courses.image.update', $course), imagePayload([
                 'image' => 'not-a-file',
@@ -51,10 +51,10 @@ describe('Teacher -> CourseImageController -> update', function () {
         });
 
         it('fails if the file is not an image', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
 
             postJson(route('teacher.courses.image.update', $course), imagePayload([
                 'image' => UploadedFile::fake()->create('document.pdf'),
@@ -64,10 +64,10 @@ describe('Teacher -> CourseImageController -> update', function () {
         });
 
         it('fails if the image exceeds the 2048KB size limit', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
 
             postJson(route('teacher.courses.image.update', $course), imagePayload([
                 'image' => UploadedFile::fake()->create('author.jpg')->size(2049),
@@ -77,10 +77,10 @@ describe('Teacher -> CourseImageController -> update', function () {
         });
 
         it('succeeds if image uploads with all allowed extensions', function (string $ext) {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
 
             postJson(route('teacher.courses.image.update', $course), imagePayload([
                 'image' => UploadedFile::fake()->image("author.$ext"),
@@ -162,10 +162,10 @@ describe('Teacher -> CourseImageController -> update', function () {
         ]);
 
         it('fails if a banned user tries to update their own course image', function () {
-            $bannedUser = User::factory()->teacher()->banned()->create();
-            $course = Course::factory()->for($bannedUser, 'author')->create();
+            $bannedAuthor = User::factory()->teacher()->banned()->create();
+            $course = Course::factory()->for($bannedAuthor, 'author')->create();
 
-            Sanctum::actingAs($bannedUser);
+            Sanctum::actingAs($bannedAuthor);
 
             postJson(route('teacher.courses.image.update', $course), imagePayload())
                 ->assertForbidden();
@@ -183,10 +183,10 @@ describe('Teacher -> CourseImageController -> update', function () {
     */
     describe('caching', function () {
         it('flushes the cache when an course image is updated', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
 
             $page = 1;
             $cacheKey = "courses:page:{$page}";

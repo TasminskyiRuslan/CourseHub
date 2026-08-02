@@ -107,7 +107,7 @@ class LessonController extends Controller
     {
         $currentUser = $request->user();
 
-        $gottenLessons = $query->handle($request, $course, $currentUser);
+        $gottenLessons = $query->handle($request, $currentUser, $course);
 
         return LessonResource::collection($gottenLessons)
             ->response()
@@ -256,7 +256,7 @@ class LessonController extends Controller
     {
         $currentUser = $request->user();
 
-        $gottenLesson = $query->handle($course, $lesson, $currentUser);
+        $gottenLesson = $query->handle($currentUser, $course, $lesson);
 
         return LessonResource::make($gottenLesson)
             ->response()

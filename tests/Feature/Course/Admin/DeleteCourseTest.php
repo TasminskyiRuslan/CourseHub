@@ -108,10 +108,10 @@ describe('Admin -> CourseController -> destroy', function () {
         ]);
 
         it('fails if a banned user tries to delete a course', function () {
-            $bannedUser = User::factory()->admin()->banned()->create();
-            $course = Course::factory()->for($bannedUser, 'author')->create();
+            $bannedAdmin = User::factory()->admin()->banned()->create();
+            $course = Course::factory()->create();
 
-            Sanctum::actingAs($bannedUser);
+            Sanctum::actingAs($bannedAdmin);
 
             deleteJson(route('admin.courses.destroy', $course))
                 ->assertForbidden();
@@ -128,7 +128,7 @@ describe('Admin -> CourseController -> destroy', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            $course = Course::factory()->for($admin, 'author')->create();
+            $course = Course::factory()->create();
 
             $page = 1;
             $cacheKey = "courses:page:{$page}";

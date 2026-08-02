@@ -11,20 +11,20 @@ readonly class GetLessonQuery
     /**
      * Retrieve detailed information about the specified lesson for the specified teacher's course.
      *
+     * @param User $teacher
      * @param string $courseSlug
      * @param string $lessonSlug
-     * @param User $teacher
      * @return Lesson
      * @throws ModelNotFoundException
      */
-    public function handle(string $courseSlug, string $lessonSlug, User $teacher): Lesson
+    public function handle(User $teacher, string $courseSlug, string $lessonSlug): Lesson
     {
-        return Lesson::query()
+        $course = $teacher->courses()
+            ->where('slug', $courseSlug)
+            ->firstOrFail();
+
+        return $course->lessons()
             ->where('slug', $lessonSlug)
-            ->whereHas('course', function ($query) use ($teacher, $courseSlug) {
-                $query->whereBelongsTo($teacher, 'author')
-                    ->where('slug', $courseSlug);
-            })
             ->with(['lessonable'])
             ->firstOrFail();
     }

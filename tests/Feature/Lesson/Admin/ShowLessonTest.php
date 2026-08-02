@@ -120,11 +120,11 @@ describe('Admin -> LessonController -> show', function () {
         ]);
 
         it('fails if a banned user tries to retrieve the lesson', function () {
-            $bannedUser = User::factory()->admin()->banned()->create();
-            $course = Course::factory()->for($bannedUser, 'author')->create();
+            $bannedAuthor = User::factory()->admin()->banned()->create();
+            $course = Course::factory()->for($bannedAuthor, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            Sanctum::actingAs($bannedUser);
+            Sanctum::actingAs($bannedAuthor);
 
             getJson(route('admin.courses.lessons.show', [$course, $lesson]))
                 ->assertForbidden();

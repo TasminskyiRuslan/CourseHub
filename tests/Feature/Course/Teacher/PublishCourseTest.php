@@ -87,10 +87,10 @@ describe('Teacher -> PublishCourseController', function () {
         ]);
 
         it('fails if a banned user tries to publish their own course', function () {
-            $bannedUser = User::factory()->teacher()->banned()->create();
-            $course = Course::factory()->unpublished()->for($bannedUser, 'author')->create();
+            $bannedAuthor = User::factory()->teacher()->banned()->create();
+            $course = Course::factory()->unpublished()->for($bannedAuthor, 'author')->create();
 
-            Sanctum::actingAs($bannedUser);
+            Sanctum::actingAs($bannedAuthor);
 
             patchJson(route('teacher.courses.publish', $course))
                 ->assertForbidden();
@@ -104,10 +104,10 @@ describe('Teacher -> PublishCourseController', function () {
     */
     describe('caching', function () {
         it('flushes the cache when the course is published', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->unpublished()->create();
+            $course = Course::factory()->for($author, 'author')->unpublished()->create();
 
             $page = 1;
             $cacheKey = "courses:page:{$page}";

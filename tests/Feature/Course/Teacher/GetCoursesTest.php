@@ -68,10 +68,10 @@ describe('Teacher -> CourseController -> index', function () {
         ]);
 
         it('fails if a banned user tries to retrieve their own courses', function () {
-            $bannedUser = User::factory()->teacher()->banned()->create();
-            $ownCourses = Course::factory()->count(3)->for($bannedUser, 'author')->create();
+            $bannedAuthor = User::factory()->teacher()->banned()->create();
+            $ownCourses = Course::factory()->count(3)->for($bannedAuthor, 'author')->create();
 
-            Sanctum::actingAs($bannedUser);
+            Sanctum::actingAs($bannedAuthor);
 
             getJson(route('teacher.courses.index'))
                 ->assertForbidden();
@@ -85,11 +85,11 @@ describe('Teacher -> CourseController -> index', function () {
     */
     describe('filters & sorting', function () {
         it('filters courses by a search string', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course1 = Course::factory()->for($teacher, 'author')->create(['title' => 'Laravel Deep Dive']);
-            $course2 = Course::factory()->for($teacher, 'author')->create(['title' => 'React Basics']);
+            $course1 = Course::factory()->for($author, 'author')->create(['title' => 'Laravel Deep Dive']);
+            $course2 = Course::factory()->for($author, 'author')->create(['title' => 'React Basics']);
             $searchString = substr($course1->title, 8);
 
             getJson(route('teacher.courses.index', ['filter[search]' => $searchString]))
@@ -104,11 +104,11 @@ describe('Teacher -> CourseController -> index', function () {
         });
 
         it('filters courses by type', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $onlineCourse = Course::factory()->type(CourseType::ONLINE)->for($teacher, 'author')->create();
-            $videoCourse = Course::factory()->type(CourseType::VIDEO)->for($teacher, 'author')->create();
+            $onlineCourse = Course::factory()->type(CourseType::ONLINE)->for($author, 'author')->create();
+            $videoCourse = Course::factory()->type(CourseType::VIDEO)->for($author, 'author')->create();
 
             getJson(route('teacher.courses.index', ['filter[type]' => CourseType::ONLINE->value]))
                 ->assertOk()
@@ -117,11 +117,11 @@ describe('Teacher -> CourseController -> index', function () {
         });
 
         it('filters courses by banned status', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $bannedCourse = Course::factory()->for($teacher, 'author')->banned()->create();
-            $activeCourse = Course::factory()->for($teacher, 'author')->create();
+            $bannedCourse = Course::factory()->for($author, 'author')->banned()->create();
+            $activeCourse = Course::factory()->for($author, 'author')->create();
 
             getJson(route('teacher.courses.index', ['filter[banned]' => 'true']))
                 ->assertOk()
@@ -135,11 +135,11 @@ describe('Teacher -> CourseController -> index', function () {
         });
 
         it('filters courses by published status', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $publishedCourse = Course::factory()->for($teacher, 'author')->create();
-            $unpublishedCourse = Course::factory()->for($teacher, 'author')->unpublished()->create();
+            $publishedCourse = Course::factory()->for($author, 'author')->create();
+            $unpublishedCourse = Course::factory()->for($author, 'author')->unpublished()->create();
 
             getJson(route('teacher.courses.index', ['filter[published]' => 'true']))
                 ->assertOk()
@@ -153,12 +153,12 @@ describe('Teacher -> CourseController -> index', function () {
         });
 
         it('sorts courses by created_at (desc) by default', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $oldCourse = Course::factory()->for($teacher, 'author')->create();
+            $oldCourse = Course::factory()->for($author, 'author')->create();
             $oldCourse->setCreatedAt(now()->subDays(2))->save();
-            $newCourse = Course::factory()->for($teacher, 'author')->create();
+            $newCourse = Course::factory()->for($author, 'author')->create();
             $newCourse->setCreatedAt(now()->subDay())->save();
 
             $response = getJson(route('teacher.courses.index'))->assertOk();
@@ -168,12 +168,12 @@ describe('Teacher -> CourseController -> index', function () {
         });
 
         it('sorts courses by created_at (asc and desc)', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $oldCourse = Course::factory()->for($teacher, 'author')->create();
+            $oldCourse = Course::factory()->for($author, 'author')->create();
             $oldCourse->setCreatedAt(now()->subDays(2))->save();
-            $newCourse = Course::factory()->for($teacher, 'author')->create();
+            $newCourse = Course::factory()->for($author, 'author')->create();
             $newCourse->setCreatedAt(now()->subDay())->save();
 
             $ascResponse = getJson(route('teacher.courses.index', ['sort' => 'created_at']))->assertOk();
@@ -186,11 +186,11 @@ describe('Teacher -> CourseController -> index', function () {
         });
 
         it('sorts courses by published_at (asc and desc)', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $oldCourse = Course::factory()->for($teacher, 'author')->create(['published_at' => now()->subDays(3)]);
-            $newCourse = Course::factory()->for($teacher, 'author')->create(['published_at' => now()->subDay()]);
+            $oldCourse = Course::factory()->for($author, 'author')->create(['published_at' => now()->subDays(3)]);
+            $newCourse = Course::factory()->for($author, 'author')->create(['published_at' => now()->subDay()]);
 
             $ascResponse = getJson(route('teacher.courses.index', ['sort' => 'published_at']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
@@ -202,11 +202,11 @@ describe('Teacher -> CourseController -> index', function () {
         });
 
         it('sorts courses by title (asc and desc)', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $courseA = Course::factory()->for($teacher, 'author')->create(['title' => 'Alpha Course']);
-            $courseB = Course::factory()->for($teacher, 'author')->create(['title' => 'Beta Course']);
+            $courseA = Course::factory()->for($author, 'author')->create(['title' => 'Alpha Course']);
+            $courseB = Course::factory()->for($author, 'author')->create(['title' => 'Beta Course']);
 
             $ascResponse = getJson(route('teacher.courses.index', ['sort' => 'title']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
@@ -218,11 +218,11 @@ describe('Teacher -> CourseController -> index', function () {
         });
 
         it('sorts courses by price (asc and desc)', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $cheap = Course::factory()->for($teacher, 'author')->create(['price' => 150]);
-            $expensive = Course::factory()->for($teacher, 'author')->create(['price' => 450]);
+            $cheap = Course::factory()->for($author, 'author')->create(['price' => 150]);
+            $expensive = Course::factory()->for($author, 'author')->create(['price' => 450]);
 
             $ascResponse = getJson(route('teacher.courses.index', ['sort' => 'price']))->assertOk();
             $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
@@ -234,10 +234,10 @@ describe('Teacher -> CourseController -> index', function () {
         });
 
         it('returns empty data when no courses match the search', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            Course::factory()->for($teacher, 'author')->create();
+            Course::factory()->for($author, 'author')->create();
 
             getJson(route('teacher.courses.index', ['filter[search]' => 'non-existent-course-title']))
                 ->assertOk()
@@ -252,10 +252,10 @@ describe('Teacher -> CourseController -> index', function () {
     */
     describe('pagination', function () {
         it('returns a paginated list of course', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            Course::factory()->count(3)->for($teacher, 'author')->create();
+            Course::factory()->count(3)->for($author, 'author')->create();
 
             getJson(route('teacher.courses.index'))
                 ->assertOk()

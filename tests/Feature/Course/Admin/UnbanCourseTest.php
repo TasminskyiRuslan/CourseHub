@@ -100,10 +100,10 @@ describe('Admin -> UnbanCourseController', function () {
         });
 
         it('fails if a banned user tries to unban a course', function () {
-            $bannedUser = User::factory()->admin()->banned()->create();
-            $course = Course::factory()->for($bannedUser, 'author')->create();
+            $bannedAdmin = User::factory()->admin()->banned()->create();
+            $course = Course::factory()->create();
 
-            Sanctum::actingAs($bannedUser);
+            Sanctum::actingAs($bannedAdmin);
 
             patchJson(route('admin.courses.unban', $course))
                 ->assertForbidden();

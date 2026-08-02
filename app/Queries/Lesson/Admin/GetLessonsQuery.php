@@ -41,8 +41,7 @@ readonly class GetLessonsQuery
      */
     protected function query(Request $request, Course $course): QueryBuilder
     {
-        return QueryBuilder::for(Lesson::class, $request)
-            ->whereBelongsTo($course, 'course')
+        return QueryBuilder::for($course->lessons(), $request)
             ->with(['lessonable' => fn($morphTo) => $morphTo->withTrashed()])
             ->withTrashed()
             ->allowedFilters([

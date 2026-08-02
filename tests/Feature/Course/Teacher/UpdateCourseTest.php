@@ -26,10 +26,10 @@ describe('Teacher -> CourseController -> update', function () {
     */
     describe('validation', function () {
         it('fails if the present fields are empty', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
 
             patchJson(route('teacher.courses.update', $course), updatingCoursePayload([
                 'title' => '',
@@ -41,10 +41,10 @@ describe('Teacher -> CourseController -> update', function () {
         });
 
         it('fails if the present fields are null', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
 
             patchJson(route('teacher.courses.update', $course), updatingCoursePayload([
                 'title' => null,
@@ -56,10 +56,10 @@ describe('Teacher -> CourseController -> update', function () {
         });
 
         it('fails if the fields are too long', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
 
             patchJson(route('teacher.courses.update', $course), updatingCoursePayload([
                 'title' => str_repeat('A', 256),
@@ -72,11 +72,11 @@ describe('Teacher -> CourseController -> update', function () {
         });
 
         it('fails if the slug is taken by another course', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create(['slug' => 'my-slug']);
-            $anotherCourse = Course::factory()->for($teacher, 'author')->create(['slug' => 'taken-slug']);
+            $course = Course::factory()->for($author, 'author')->create(['slug' => 'my-slug']);
+            $anotherCourse = Course::factory()->for($author, 'author')->create(['slug' => 'taken-slug']);
 
             patchJson(route('teacher.courses.update', $course), updatingCoursePayload([
                 'slug' => $anotherCourse->slug,
@@ -86,10 +86,10 @@ describe('Teacher -> CourseController -> update', function () {
         });
 
         it('fails if the slug format is invalid', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
 
             patchJson(route('teacher.courses.update', $course), updatingCoursePayload([
                 'slug' => 'Invalid Slug!'
@@ -99,10 +99,10 @@ describe('Teacher -> CourseController -> update', function () {
         });
 
         it('succeeds if the slug remains the same (ignore current)', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
 
             $this->mock(StripeClient::class, function ($mock) {
                 $mock->products = Mockery::mock();
@@ -124,10 +124,10 @@ describe('Teacher -> CourseController -> update', function () {
         });
 
         it('fails if price is invalid', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
 
             patchJson(route('teacher.courses.update', $course), ['price' => 'not-a-number'])
                 ->assertUnprocessable()
@@ -209,10 +209,10 @@ describe('Teacher -> CourseController -> update', function () {
         ]);
 
         it('fails if a banned user tries to update their own course', function () {
-            $bannedUser = User::factory()->teacher()->banned()->create();
-            $course = Course::factory()->for($bannedUser, 'author')->create();
+            $bannedAuthor = User::factory()->teacher()->banned()->create();
+            $course = Course::factory()->for($bannedAuthor, 'author')->create();
 
-            Sanctum::actingAs($bannedUser);
+            Sanctum::actingAs($bannedAuthor);
 
             patchJson(route('teacher.courses.update', $course), updatingCoursePayload())
                 ->assertForbidden();
@@ -226,13 +226,13 @@ describe('Teacher -> CourseController -> update', function () {
     */
     describe('operations', function () {
         it('updates stripe product title if course title changed', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
             $existingProductId = 'prod_' . Str::random(10);
             $existingPriceId = 'price_' . Str::random(10);
 
-            $course = Course::factory()->for($teacher, 'author')->create([
+            $course = Course::factory()->for($author, 'author')->create([
                 'title' => 'Old Course Title',
                 'price' => '20.00',
                 'stripe_product_id' => $existingProductId,
@@ -275,14 +275,14 @@ describe('Teacher -> CourseController -> update', function () {
         });
 
         it('creates a new stripe price when course price changes', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
             $existingProductId = 'prod_' . Str::random(10);
             $oldPriceId = 'price_' . Str::random(10);
             $expectedNewPriceId = 'price_' . Str::random(10);
 
-            $course = Course::factory()->for($teacher, 'author')->create([
+            $course = Course::factory()->for($author, 'author')->create([
                 'title' => 'Laravel Course',
                 'price' => '20.00',
                 'stripe_product_id' => $existingProductId,
@@ -331,10 +331,10 @@ describe('Teacher -> CourseController -> update', function () {
     */
     describe('caching', function () {
         it('flushes the course cache when a course is updated', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
 
             $this->mock(StripeClient::class, function ($mock) {
                 $mock->products = Mockery::mock();

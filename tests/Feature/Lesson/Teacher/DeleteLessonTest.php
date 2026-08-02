@@ -46,10 +46,10 @@ describe('Teacher -> LessonController -> destroy', function () {
         });
 
         it('fails if the lesson is from another course', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
             $lesson = Lesson::factory()->create();
 
             deleteJson(route('teacher.courses.lessons.destroy', [$course, $lesson]))
@@ -115,11 +115,11 @@ describe('Teacher -> LessonController -> destroy', function () {
         ]);
 
         it('fails if a banned user tries to delete a lesson', function () {
-            $bannedUser = User::factory()->teacher()->banned()->create();
-            $course = Course::factory()->for($bannedUser, 'author')->create();
+            $bannedAuthor = User::factory()->teacher()->banned()->create();
+            $course = Course::factory()->for($bannedAuthor, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            Sanctum::actingAs($bannedUser);
+            Sanctum::actingAs($bannedAuthor);
 
             deleteJson(route('teacher.courses.lessons.destroy', [$course, $lesson]))
                 ->assertForbidden();
@@ -133,10 +133,10 @@ describe('Teacher -> LessonController -> destroy', function () {
     */
     describe('caching', function () {
         it('flushes the lesson cache when a lesson is deleted', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
             $page = 1;

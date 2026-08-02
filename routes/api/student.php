@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Course\Student\CheckoutController;
 use App\Http\Controllers\Api\Course\Student\CourseController;
+use App\Http\Controllers\Api\Lesson\Student\LessonController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,5 +30,13 @@ Route::prefix('student')
                 // Show student course action
                 Route::get('/{course}', [CourseController::class, 'show'])
                     ->name('student.courses.show');
+
+                // Lesson actions
+                Route::prefix('/{course}/lessons')->group(function () {
+
+                    // Get course lessons list action
+                    Route::get('/', [LessonController::class, 'index'])
+                        ->name('student.courses.lessons.index');
+                });
             });
     });

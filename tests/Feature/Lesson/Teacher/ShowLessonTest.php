@@ -35,20 +35,20 @@ describe('Teacher -> LessonController -> show', function () {
         });
 
         it('fails if the lesson does not exist', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
 
             getJson(route('teacher.courses.lessons.show', [$course, 'non-existing-slug']))
                 ->assertNotFound();
         });
 
         it('fails if the lesson is from another course', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
             $lesson = Lesson::factory()->create();
 
             getJson(route('teacher.courses.lessons.show', [$course, $lesson]))
@@ -119,11 +119,11 @@ describe('Teacher -> LessonController -> show', function () {
         ]);
 
         it('fails if a banned user tries to retrieve their own lesson', function () {
-            $bannedUser = User::factory()->teacher()->banned()->create();
-            $course = Course::factory()->for($bannedUser, 'author')->create();
+            $bannedAuthor = User::factory()->teacher()->banned()->create();
+            $course = Course::factory()->for($bannedAuthor, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            Sanctum::actingAs($bannedUser);
+            Sanctum::actingAs($bannedAuthor);
 
             getJson(route('teacher.courses.lessons.show', [$course, $lesson]))
                 ->assertForbidden();

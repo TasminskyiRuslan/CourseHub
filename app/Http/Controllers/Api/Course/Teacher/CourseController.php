@@ -237,7 +237,7 @@ class CourseController extends Controller
     {
         $currentUser = $request->user();
 
-        $gottenCourse = $query->handle($course, $currentUser);
+        $gottenCourse = $query->handle($currentUser, $course);
 
         return CourseResource::make($gottenCourse)
             ->response()

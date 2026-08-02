@@ -27,10 +27,10 @@ describe('Teacher -> LessonController -> update', function () {
     */
     describe('validation', function () {
         it('fails if the present fields are empty', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
             patchJson(route('teacher.courses.lessons.update', [$course, $lesson]), updatingLessonPayload($course->type, [
@@ -43,10 +43,10 @@ describe('Teacher -> LessonController -> update', function () {
         });
 
         it('fails if the present fields are null', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
             patchJson(route('teacher.courses.lessons.update', [$course, $lesson]), updatingLessonPayload($course->type, [
@@ -59,10 +59,10 @@ describe('Teacher -> LessonController -> update', function () {
         });
 
         it('fails if fields are invalid', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
             patchJson(route('teacher.courses.lessons.update', [$course, $lesson]), updatingLessonPayload($course->type, [
@@ -75,10 +75,10 @@ describe('Teacher -> LessonController -> update', function () {
         });
 
         it('fails if slug is taken by another lesson within the same course', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
             $anotherLesson = Lesson::factory()->for($course, 'course')->create(['slug' => 'taken-slug']);
 
@@ -90,10 +90,10 @@ describe('Teacher -> LessonController -> update', function () {
         });
 
         it('succeeds if the slug remains the same (ignore current)', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
             patchJson(route('teacher.courses.lessons.update', [$course, $lesson]), updatingLessonPayload($course->type, [
@@ -104,10 +104,10 @@ describe('Teacher -> LessonController -> update', function () {
         });
 
         it('fails if slug format is invalid', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
             patchJson(route('teacher.courses.lessons.update', [$course, $lesson]), updatingLessonPayload($course->type, [
@@ -118,10 +118,10 @@ describe('Teacher -> LessonController -> update', function () {
         });
 
         it('fails if OFFLINE fields are invalid', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->type(CourseType::OFFLINE)->for($teacher, 'author')->create();
+            $course = Course::factory()->type(CourseType::OFFLINE)->for($author, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
             patchJson(route('teacher.courses.lessons.update', [$course, $lesson]), updatingLessonPayload($course->type, [
@@ -135,10 +135,10 @@ describe('Teacher -> LessonController -> update', function () {
         });
 
         it('fails if ONLINE fields are invalid', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->type(CourseType::ONLINE)->for($teacher, 'author')->create();
+            $course = Course::factory()->type(CourseType::ONLINE)->for($author, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
             patchJson(route('teacher.courses.lessons.update', [$course, $lesson]), updatingLessonPayload($course->type, [
@@ -151,10 +151,10 @@ describe('Teacher -> LessonController -> update', function () {
         });
 
         it('fails if VIDEO fields are invalid', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->type(CourseType::VIDEO)->for($teacher, 'author')->create();
+            $course = Course::factory()->type(CourseType::VIDEO)->for($author, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
             patchJson(route('teacher.courses.lessons.update', [$course, $lesson]), updatingLessonPayload($course->type, [
@@ -166,10 +166,10 @@ describe('Teacher -> LessonController -> update', function () {
         });
 
         it('fails if the course does not exist', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
             patchJson(route('teacher.courses.lessons.update', ['non-existing-slug', $lesson]), updatingLessonPayload($course->type))
@@ -177,20 +177,20 @@ describe('Teacher -> LessonController -> update', function () {
         });
 
         it('fails if the lesson does not exist', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
 
             patchJson(route('teacher.courses.lessons.update', [$course, 'non-existing-slug']), updatingLessonPayload($course->type))
                 ->assertNotFound();
         });
 
         it('fails if the lesson is from another course', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
             $lesson = Lesson::factory()->create();
 
             patchJson(route('teacher.courses.lessons.update', [$course, $lesson]), updatingLessonPayload($course->type))
@@ -256,11 +256,11 @@ describe('Teacher -> LessonController -> update', function () {
         ]);
 
         it('fails if a banned user tries to update a lesson', function () {
-            $bannedUser = User::factory()->teacher()->banned()->create();
-            $course = Course::factory()->for($bannedUser, 'author')->create();
+            $bannedAuthor = User::factory()->teacher()->banned()->create();
+            $course = Course::factory()->for($bannedAuthor, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            Sanctum::actingAs($bannedUser);
+            Sanctum::actingAs($bannedAuthor);
 
             patchJson(route('teacher.courses.lessons.update', [$course, $lesson]), updatingLessonPayload($course->type))
                 ->assertForbidden();
@@ -274,10 +274,10 @@ describe('Teacher -> LessonController -> update', function () {
     */
     describe('caching', function () {
         it('flushes the cache when a lesson is updated', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
             $page = 1;

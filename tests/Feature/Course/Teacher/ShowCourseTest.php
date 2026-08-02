@@ -89,10 +89,10 @@ describe('Teacher -> CourseController -> show', function () {
         ]);
 
         it('fails if a banned user tries to retrieve their own course', function () {
-            $bannedUser = User::factory()->teacher()->banned()->create();
-            $course = Course::factory()->for($bannedUser, 'author')->create();
+            $bannedAuthor = User::factory()->teacher()->banned()->create();
+            $course = Course::factory()->for($bannedAuthor, 'author')->create();
 
-            Sanctum::actingAs($bannedUser);
+            Sanctum::actingAs($bannedAuthor);
 
             getJson(route('teacher.courses.show', $course))
                 ->assertForbidden();

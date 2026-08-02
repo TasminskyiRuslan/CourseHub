@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Queries\Lesson\Teacher;
+namespace App\Queries\Lesson\Student;
 
 use App\Models\Course;
-use App\Models\Lesson;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -13,16 +12,17 @@ use Spatie\QueryBuilder\QueryBuilder;
 readonly class GetLessonsQuery
 {
     /**
-     * Retrieve a paginated list of lessons for the specified teacher's course.
+     * Retrieve a paginated list of lessons for the specified student's enrolled course.
      *
      * @param Request $request
-     * @param User $teacher
+     * @param User $student
      * @param string $courseSlug
      * @return LengthAwarePaginator
      */
-    public function handle(Request $request, User $teacher, string $courseSlug): LengthAwarePaginator
+    public function handle(Request $request, User $student, string $courseSlug): LengthAwarePaginator
     {
-        $course = $teacher->courses()
+        $course = $student->enrolledCourses()
+            ->active()
             ->where('slug', $courseSlug)
             ->firstOrFail();
 

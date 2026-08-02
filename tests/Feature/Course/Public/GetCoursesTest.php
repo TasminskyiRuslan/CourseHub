@@ -94,11 +94,11 @@ describe('Public -> CourseController -> index', function () {
         });
 
         it('filters courses by author slug', function () {
-            $teacher = User::factory()->teacher()->create();
-            $course1 = Course::factory()->for($teacher, 'author')->create();
+            $author = User::factory()->teacher()->create();
+            $course1 = Course::factory()->for($author, 'author')->create();
             $course2 = Course::factory()->create();
 
-            getJson(route('courses.index', ['filter[author]' => $teacher->slug]))
+            getJson(route('courses.index', ['filter[author]' => $author->slug]))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $course1->id])
                 ->assertJsonMissing(['id' => $course2->id]);

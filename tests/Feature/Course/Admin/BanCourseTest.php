@@ -103,10 +103,10 @@ describe('Admin -> BanCourseController', function () {
         });
 
         it('fails if a banned user tries to ban a course', function () {
-            $bannedUser = User::factory()->admin()->banned()->create();
-            $course = Course::factory()->for($bannedUser, 'author')->create();
+            $bannedAdmin = User::factory()->admin()->banned()->create();
+            $course = Course::factory()->create();
 
-            Sanctum::actingAs($bannedUser);
+            Sanctum::actingAs($bannedAdmin);
 
             patchJson(route('admin.courses.ban', $course))
                 ->assertForbidden();

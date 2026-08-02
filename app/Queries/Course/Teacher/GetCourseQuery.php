@@ -16,10 +16,9 @@ readonly class GetCourseQuery
      * @return Course
      * @throws ModelNotFoundException
      */
-    public function handle(string $courseSlug, User $teacher): Course
+    public function handle(User $teacher, string $courseSlug): Course
     {
-        return Course::query()
-            ->whereBelongsTo($teacher, 'author')
+        return $teacher->courses()
             ->where('slug', $courseSlug)
             ->withCount(['lessons'])
             ->firstOrFail();

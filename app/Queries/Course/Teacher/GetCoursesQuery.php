@@ -34,8 +34,7 @@ readonly class GetCoursesQuery
      */
     protected function query(Request $request, User $teacher): QueryBuilder
     {
-        return QueryBuilder::for(Course::class, $request)
-            ->whereBelongsTo($teacher, 'author')
+        return QueryBuilder::for($teacher->courses(), $request)
             ->withCount(['lessons'])
             ->allowedFilters([
                 'type',

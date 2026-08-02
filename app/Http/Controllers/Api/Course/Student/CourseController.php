@@ -94,7 +94,7 @@ class CourseController extends Controller
      * @param GetCoursesQuery $query
      * @return JsonResponse
      */
-    public function index(Request $request, GetCoursesQuery $query)
+    public function index(Request $request, GetCoursesQuery $query): JsonResponse
     {
         $currentUser = $request->user();
 
@@ -158,11 +158,11 @@ class CourseController extends Controller
      * @param string $course
      * @return JsonResponse
      */
-    public function show(Request $request, GetCourseQuery $query, string $course)
+    public function show(Request $request, GetCourseQuery $query, string $course): JsonResponse
     {
         $currentUser = $request->user();
 
-        $gottenCourse = $query->handle($course, $currentUser);
+        $gottenCourse = $query->handle($currentUser, $course);
 
         return CourseResource::make($gottenCourse)
             ->response()

@@ -119,11 +119,11 @@ describe('Admin -> CourseController -> index', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
-            $teacher = User::factory()->teacher()->create();
-            $course1 = Course::factory()->for($teacher, 'author')->create();
+            $author = User::factory()->teacher()->create();
+            $course1 = Course::factory()->for($author, 'author')->create();
             $course2 = Course::factory()->create();
 
-            getJson(route('admin.courses.index', ['filter[author]' => $teacher->slug]))
+            getJson(route('admin.courses.index', ['filter[author]' => $author->slug]))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $course1->id])
                 ->assertJsonMissing(['data' => [['id' => $course2->id]]])

@@ -16,7 +16,7 @@ readonly class GetCourseQuery
      * @return Course
      * @throws ModelNotFoundException
      */
-    public function handle(string $courseSlug, User $student): Course
+    public function handle(User $student, string $courseSlug): Course
     {
         return $student->enrolledCourses()
             ->active()

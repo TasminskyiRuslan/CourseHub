@@ -105,10 +105,10 @@ describe('Teacher -> CourseController -> destroy', function () {
         ]);
 
         it('fails if a banned user tries to delete their own course', function () {
-            $bannedUser = User::factory()->teacher()->banned()->create();
-            $course = Course::factory()->for($bannedUser, 'author')->create();
+            $bannedAuthor = User::factory()->teacher()->banned()->create();
+            $course = Course::factory()->for($bannedAuthor, 'author')->create();
 
-            Sanctum::actingAs($bannedUser);
+            Sanctum::actingAs($bannedAuthor);
 
             deleteJson(route('teacher.courses.destroy', $course))
                 ->assertForbidden();
@@ -122,10 +122,10 @@ describe('Teacher -> CourseController -> destroy', function () {
     */
     describe('caching', function () {
         it('flushes the course cache when a course is deleted', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
 
             $page = 1;
             $cacheKey = "courses:page:{$page}";

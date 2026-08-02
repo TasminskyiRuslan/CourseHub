@@ -124,6 +124,40 @@ function authJsonStructure(): array
 }
 
 /**
+ * Get the expected JSON structure for a lesson object (student).
+ *
+ * @param CourseType|null $courseType
+ * @return array
+ */
+function studentLessonJsonStructure(?CourseType $courseType): array
+{
+    return [
+        'id',
+        'course_id',
+        'title',
+        'slug',
+        'position',
+        'content' => match ($courseType) {
+            CourseType::OFFLINE => [
+                'start_time',
+                'end_time',
+                'address',
+                'room_number'
+            ],
+            CourseType::ONLINE => [
+                'start_time',
+                'end_time',
+                'meeting_link',
+            ],
+            CourseType::VIDEO => [
+                'video_url',
+                'provider',
+            ],
+        },
+    ];
+}
+
+/**
  * Get the expected JSON structure for a lesson object (teacher).
  *
  * @param CourseType|null $courseType

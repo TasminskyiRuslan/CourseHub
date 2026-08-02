@@ -95,11 +95,11 @@ describe('Teacher -> CourseImageController -> destroy', function () {
         ]);
 
         it('fails if a banned user tries to delete their own course image', function () {
-            $bannedUser = User::factory()->teacher()->banned()->create();
-            $course = Course::factory()->for($bannedUser, 'author')->withImage()->create();
+            $bannedAuthor = User::factory()->teacher()->banned()->create();
+            $course = Course::factory()->for($bannedAuthor, 'author')->withImage()->create();
             Storage::disk('courses')->put($course->image_path, 'fake');
 
-            Sanctum::actingAs($bannedUser);
+            Sanctum::actingAs($bannedAuthor);
 
             deleteJson(route('teacher.courses.image.destroy', $course), imagePayload())
                 ->assertForbidden();
@@ -117,10 +117,10 @@ describe('Teacher -> CourseImageController -> destroy', function () {
     */
     describe('caching', function () {
         it('flushes the cache when the course image is deleted', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->withImage()->create();
+            $course = Course::factory()->for($author, 'author')->withImage()->create();
 
             $page = 1;
             $cacheKey = "courses:page:{$page}";

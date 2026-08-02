@@ -87,10 +87,10 @@ describe('Teacher -> UnpublishCourseController', function () {
         ]);
 
         it('fails if a banned user tries to unpublish their own course', function () {
-            $bannedUser = User::factory()->teacher()->banned()->create();
-            $course = Course::factory()->for($bannedUser, 'author')->create();
+            $bannedAuthor = User::factory()->teacher()->banned()->create();
+            $course = Course::factory()->for($bannedAuthor, 'author')->create();
 
-            Sanctum::actingAs($bannedUser);
+            Sanctum::actingAs($bannedAuthor);
 
             patchJson(route('teacher.courses.unpublish', $course))
                 ->assertForbidden();
@@ -104,10 +104,10 @@ describe('Teacher -> UnpublishCourseController', function () {
     */
     describe('caching', function () {
         it('flushes the cache when the course is unpublished', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
 
-            $course = Course::factory()->for($teacher, 'author')->create();
+            $course = Course::factory()->for($author, 'author')->create();
 
             $page = 1;
             $cacheKey = "courses:page:{$page}";

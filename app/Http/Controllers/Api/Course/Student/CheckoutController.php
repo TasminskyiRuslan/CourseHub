@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\Course\Student;
 use App\Actions\Course\CheckoutCourseAction;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Course\Student\CheckoutResource;
+use App\Models\Course;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -12,6 +14,8 @@ use OpenApi\Attributes as OA;
 
 class CheckoutController extends Controller
 {
+    use AuthorizesRequests;
+
     #[OA\Post(
         path: '/student/courses/{course}/checkout',
         description: 'Check out the specified course for the authenticated user.',
@@ -71,9 +75,16 @@ class CheckoutController extends Controller
      */
     public function __invoke(Request $request, CheckoutCourseAction $action, string $course): JsonResponse
     {
+        $gottenCourse = Course::query()
+            ->active()
+            ->where('slug', $course)
+            ->firstOrFail();
+
+        $this->authorize('checkout', $gottenCourse);
+
         $currentUser = $request->user();
 
-        $result = $action->handle($currentUser, $course);
+        $result = $action->handle($currentUser, $gottenCourse);
 
         return CheckoutResource::make($result)
             ->response()

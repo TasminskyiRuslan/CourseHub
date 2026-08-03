@@ -31,9 +31,11 @@ readonly class GetCoursesQuery
      */
     protected function query(Request $request): QueryBuilder
     {
-        return QueryBuilder::for(Course::class, $request)
+        return QueryBuilder::for(Course::query()->withTrashed(), $request)
             ->with(['author' => function ($query) {
-                $query->with('roles')->withCount(['courses' => fn($q) => $q->withTrashed()])->withTrashed();
+                $query->withTrashed()
+                    ->with('roles')
+                    ->withCount(['courses' => fn($q) => $q->withTrashed()]);
             }])
             ->withCount(['lessons' => fn($query) => $query->withTrashed()])
             ->allowedFilters([
@@ -46,14 +48,19 @@ readonly class GetCoursesQuery
                 }),
                 AllowedFilter::callback('author', function ($query, $value) {
                     $query->whereHas('author', function ($q) use ($value) {
-                        $q->withTrashed()->where('slug', $value);
+                        $q->withTrashed()
+                            ->where('slug', $value);
                     });
                 }),
                 AllowedFilter::callback('banned', function ($query, $value) {
-                    filter_var($value, FILTER_VALIDATE_BOOLEAN) ? $query->whereNotNull('banned_at') : $query->whereNull('banned_at');
+                    filter_var($value, FILTER_VALIDATE_BOOLEAN)
+                        ? $query->whereNotNull('banned_at')
+                        : $query->whereNull('banned_at');
                 }),
                 AllowedFilter::callback('published', function ($query, $value) {
-                    filter_var($value, FILTER_VALIDATE_BOOLEAN) ? $query->whereNotNull('published_at') : $query->whereNull('published_at');
+                    filter_var($value, FILTER_VALIDATE_BOOLEAN)
+                        ? $query->whereNotNull('published_at')
+                        : $query->whereNull('published_at');
                 }),
                 AllowedFilter::trashed()
             ])

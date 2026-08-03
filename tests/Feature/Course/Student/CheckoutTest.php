@@ -41,8 +41,7 @@ describe('Student -> CheckoutController', function () {
             $course = Course::factory()->for($author, 'author')->create();
 
             postJson(route('student.courses.checkout', $course))
-                ->assertUnprocessable()
-                ->assertJsonValidationErrors(['course']);
+                ->assertForbidden();
         });
     });
 

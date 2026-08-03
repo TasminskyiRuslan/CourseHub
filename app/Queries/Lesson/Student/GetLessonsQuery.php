@@ -4,6 +4,7 @@ namespace App\Queries\Lesson\Student;
 
 use App\Models\Course;
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -18,6 +19,7 @@ readonly class GetLessonsQuery
      * @param User $student
      * @param string $courseSlug
      * @return LengthAwarePaginator
+     * @throws ModelNotFoundException
      */
     public function handle(Request $request, User $student, string $courseSlug): LengthAwarePaginator
     {

@@ -37,6 +37,10 @@ Route::prefix('student')
                     // Get course lessons list action
                     Route::get('/', [LessonController::class, 'index'])
                         ->name('student.courses.lessons.index');
+
+                    // Show course lesson action
+                    Route::get('/{lesson}', [LessonController::class, 'show'])
+                        ->name('student.courses.lessons.show');
                 });
             });
     });

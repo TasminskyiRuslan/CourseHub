@@ -22,7 +22,6 @@ readonly class IssueAccessTokenAction
 
         return $user->createToken(
             name: 'access_token',
-            abilities: ['*'],
             expiresAt: now()->addMinutes($ttl)
         );
     }

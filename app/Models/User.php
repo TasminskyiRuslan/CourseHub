@@ -51,9 +51,9 @@ use Spatie\Sluggable\SlugOptions;
  * @property string|null $pm_last_four
  * @property string|null $trial_ends_at
  * @property UserRole $role
- * @property-read Collection<int, Course> $courses
+ * @property-read Collection<int, \App\Models\Course> $courses
  * @property-read int|null $courses_count
- * @property-read Collection<int, Course> $enrolledCourses
+ * @property-read Collection<int, \App\Models\Course> $enrolledCourses
  * @property-read int|null $enrolled_courses_count
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
@@ -66,7 +66,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property-read Collection<int, PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
  * @method static Builder<static>|User active()
- * @method static UserFactory factory($count = null, $state = [])
+ * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static Builder<static>|User hasExpiredGenericTrial()
  * @method static Builder<static>|User newModelQuery()
  * @method static Builder<static>|User newQuery()

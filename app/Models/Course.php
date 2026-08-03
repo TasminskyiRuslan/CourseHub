@@ -36,13 +36,13 @@ use Spatie\Sluggable\SlugOptions;
  * @property Carbon|null $banned_at
  * @property string|null $stripe_price_id
  * @property string|null $stripe_product_id
- * @property-read User|null $author
- * @property-read Collection<int, Lesson> $lessons
+ * @property-read \App\Models\User|null $author
+ * @property-read Collection<int, \App\Models\Lesson> $lessons
  * @property-read int|null $lessons_count
- * @property-read Collection<int, User> $students
+ * @property-read Collection<int, \App\Models\User> $students
  * @property-read int|null $students_count
  * @method static Builder<static>|Course active()
- * @method static CourseFactory factory($count = null, $state = [])
+ * @method static \Database\Factories\CourseFactory factory($count = null, $state = [])
  * @method static Builder<static>|Course newModelQuery()
  * @method static Builder<static>|Course newQuery()
  * @method static Builder<static>|Course onlyTrashed()

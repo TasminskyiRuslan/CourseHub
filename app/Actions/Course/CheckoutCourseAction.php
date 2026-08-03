@@ -6,6 +6,7 @@ use App\Data\Course\Results\CheckoutResultData;
 use App\Enums\CheckoutStatus;
 use App\Models\Course;
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 
 readonly class CheckoutCourseAction
@@ -21,22 +22,11 @@ readonly class CheckoutCourseAction
      * Check out the specified course for the specified user.
      *
      * @param User $user
-     * @param string $courseSlug
+     * @param Course $course
      * @return CheckoutResultData
      */
-    public function handle(User $user, string $courseSlug): CheckoutResultData
+    public function handle(User $user, Course $course): CheckoutResultData
     {
-        $course = Course::query()
-            ->active()
-            ->where('slug', $courseSlug)
-            ->firstOrFail();
-
-        if ($user->is($course->author)) {
-            throw ValidationException::withMessages([
-                'course' => __('You cannot enroll in or purchase your own course.'),
-            ]);
-        }
-
         if ($user->isEnrolledIn($course)) {
             return new CheckoutResultData(
                 status: CheckoutStatus::ENROLLED,
@@ -55,12 +45,14 @@ readonly class CheckoutCourseAction
             );
         }
 
+        $baseUrl = rtrim(config('app.frontend_url'), '/');
+
         $checkout = $user->checkout([$course->stripe_price_id => 1], [
-            'success_url' => config('app.frontend_url') . "/courses/{$course->slug}?status=success",
-            'cancel_url' => config('app.frontend_url') . "/courses/{$course->slug}?status=cancelled",
+            'success_url' => "{$baseUrl}/courses/{$course->slug}?status=success",
+            'cancel_url' => "{$baseUrl}/courses/{$course->slug}?status=cancelled",
             'metadata' => [
-                'user_id' => $user->id,
-                'course_id' => $course->id,
+                'user_id' => (string) $user->id,
+                'course_id' => (string) $course->id,
             ],
         ]);
 

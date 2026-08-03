@@ -3,6 +3,7 @@
 namespace App\Queries\Course\Public;
 
 use App\Models\Course;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 readonly class GetCourseQuery
 {
@@ -11,6 +12,7 @@ readonly class GetCourseQuery
      *
      * @param string $courseSlug
      * @return Course
+     * @throws ModelNotFoundException
      */
     public function handle(string $courseSlug): Course
     {
@@ -18,7 +20,8 @@ readonly class GetCourseQuery
             ->active()
             ->where('slug', $courseSlug)
             ->with(['author' => function ($query) {
-                $query->with(['roles'])->withCount(['courses' => fn ($q) => $q->active()]);
+                $query->with(['roles'])
+                    ->withCount(['courses' => fn ($q) => $q->active()]);
             }])
             ->withCount(['lessons'])
             ->firstOrFail();

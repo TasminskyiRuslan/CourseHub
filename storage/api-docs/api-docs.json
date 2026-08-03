@@ -406,7 +406,8 @@
                             "type": "string",
                             "enum": [
                                 "with",
-                                "only"
+                                "only",
+                                "without"
                             ]
                         }
                     },
@@ -903,6 +904,59 @@
                     },
                     "403": {
                         "description": "User does not have permissions."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/student/courses/{course}": {
+            "get": {
+                "tags": [
+                    "Course"
+                ],
+                "summary": "[Student] Retrieve course details",
+                "description": "Retrieve detailed information about the specified enrolled student's course.",
+                "operationId": "9356981e5316f4e53d1d9bdce9389fed",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Course details retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CourseStudentResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course not found."
                     }
                 },
                 "security": [
@@ -1654,6 +1708,162 @@
                 "responses": {
                     "204": {
                         "description": "Lesson deleted successfully."
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course or lesson not found."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/student/courses/{course}/lessons": {
+            "get": {
+                "tags": [
+                    "Lesson"
+                ],
+                "summary": "[Student] Retrieve a list of course lessons",
+                "description": "Retrieve a paginated list of lessons for the specified student's enrolled course.",
+                "operationId": "14bb6446d24e1a80ad12ea8caebfd2b1",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    },
+                    {
+                        "name": "filter[search]",
+                        "in": "query",
+                        "description": "Search lessons by title.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort lessons by field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "title",
+                                "-title",
+                                "position",
+                                "-position",
+                                "created_at",
+                                "-created_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lesson list retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/LessonStudentResponse"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is unauthenticated."
+                    },
+                    "403": {
+                        "description": "User does not have permissions."
+                    },
+                    "404": {
+                        "description": "Course not found."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/student/courses/{course}/lessons/{lesson}": {
+            "get": {
+                "tags": [
+                    "Lesson"
+                ],
+                "summary": "[Student] Retrieve lesson details",
+                "description": "Retrieve detailed information about the specified lesson for the specified student's enrolled course.",
+                "operationId": "7b0d2c1282634cfc2c5fa9585047e8d1",
+                "parameters": [
+                    {
+                        "name": "course",
+                        "in": "path",
+                        "description": "Course identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "math-101"
+                        }
+                    },
+                    {
+                        "name": "lesson",
+                        "in": "path",
+                        "description": "Lesson identifier (slug).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "introduction-to-algebra"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lesson details retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/LessonStudentResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "User is unauthenticated."
@@ -3697,6 +3907,59 @@
                         "format": "date-time",
                         "example": null,
                         "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "LessonStudentResponse": {
+                "title": "Lesson Student Response",
+                "description": "Student panel data of a lesson.",
+                "required": [
+                    "id",
+                    "course_id",
+                    "title",
+                    "slug",
+                    "position"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "course_id": {
+                        "description": "Course identifier.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "description": "Title.",
+                        "type": "string",
+                        "example": "Introduction to Algebra"
+                    },
+                    "slug": {
+                        "description": "Lesson slug.",
+                        "type": "string",
+                        "example": "introduction-to-algebra"
+                    },
+                    "position": {
+                        "description": "Position.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "content": {
+                        "description": "Polymorphic content of the lesson.",
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/OfflineLessonResponse"
+                            },
+                            {
+                                "$ref": "#/components/schemas/OnlineLessonResponse"
+                            },
+                            {
+                                "$ref": "#/components/schemas/VideoLessonResponse"
+                            }
+                        ]
                     }
                 },
                 "type": "object"

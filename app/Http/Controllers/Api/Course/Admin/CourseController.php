@@ -67,7 +67,7 @@ class CourseController extends Controller
                 description: 'Filter by trashed state.',
                 in: 'query',
                 required: false,
-                schema: new OA\Schema(type: 'string', enum: ['with', 'only']),
+                schema: new OA\Schema(type: 'string', enum: ['with', 'only', 'without']),
             ),
             new OA\Parameter(
                 name: 'sort',

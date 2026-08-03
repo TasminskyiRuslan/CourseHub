@@ -50,10 +50,10 @@ readonly class GetCoursesQuery extends CachedListQuery
      */
     protected function query(Request $request): QueryBuilder
     {
-        return QueryBuilder::for(Course::class, $request)
-            ->active()
+        return QueryBuilder::for(Course::query()->active(), $request)
             ->with(['author' => function ($query) {
-                $query->with(['roles'])->withCount(['courses' => fn ($q) => $q->active()]);
+                $query->with(['roles'])
+                    ->withCount(['courses' => fn ($q) => $q->active()]);
             }])
             ->withCount(['lessons'])
             ->allowedFilters([

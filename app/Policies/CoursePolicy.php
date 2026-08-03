@@ -73,17 +73,14 @@ class CoursePolicy
      */
     public function delete(User $user, Course $course): Response
     {
-        // 1. Адмін з правом видалення всіх курсів має беззаперечний дозвіл
         if ($user->can(UserPermission::COURSES_DELETE_ALL->value)) {
             return Response::allow();
         }
 
-        // 2. Перевіряємо право видалення власних курсів
         if (!$user->can(UserPermission::COURSES_DELETE_OWN->value)) {
             return Response::deny(__('You do not have permission to delete courses.'));
         }
 
-        // 3. Перевіряємо авторство
         if (!$user->is($course->author)) {
             return Response::deny(__('You can only delete your own courses.'));
         }
@@ -107,7 +104,7 @@ class CoursePolicy
     }
 
     /**
-     * Determine whether the user can checkout or enroll in the course.
+     * Determine whether the user can check out or enroll in the course.
      *
      * @param User $user
      * @param Course $course

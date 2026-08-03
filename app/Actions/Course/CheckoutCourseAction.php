@@ -6,8 +6,6 @@ use App\Data\Course\Results\CheckoutResultData;
 use App\Enums\CheckoutStatus;
 use App\Models\Course;
 use App\Models\User;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Validation\ValidationException;
 
 readonly class CheckoutCourseAction
 {

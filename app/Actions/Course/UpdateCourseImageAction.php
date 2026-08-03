@@ -4,18 +4,19 @@ namespace App\Actions\Course;
 
 use App\Data\Course\Requests\UpdateCourseImageData;
 use App\Models\Course;
-use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 readonly class UpdateCourseImageAction
 {
     /**
-     * Update the specified course image.
+     * Update the specified course image and clean up the old file.
      *
      * @param UpdateCourseImageData $data
      * @param Course $course
      * @return Course
-     * @throws Exception
+     * @throws Throwable
      */
     public function handle(UpdateCourseImageData $data, Course $course): Course
     {
@@ -23,13 +24,15 @@ readonly class UpdateCourseImageAction
         $newPath = $data->image->store('/', 'courses');
 
         try {
-            $course->setImage($newPath)->save();
-        } catch (Exception $e) {
+            DB::transaction(function () use ($course, $newPath) {
+                $course->setImage($newPath)->save();
+            });
+        } catch (Throwable $e) {
             Storage::disk('courses')->delete($newPath);
             throw $e;
         }
 
-        if ($oldPath && Storage::disk('courses')->exists($oldPath)) {
+        if ($oldPath) {
             Storage::disk('courses')->delete($oldPath);
         }
 

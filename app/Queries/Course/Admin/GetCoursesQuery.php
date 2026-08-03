@@ -3,6 +3,7 @@
 namespace App\Queries\Course\Admin;
 
 use App\Models\Course;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -32,32 +33,32 @@ readonly class GetCoursesQuery
     protected function query(Request $request): QueryBuilder
     {
         return QueryBuilder::for(Course::query()->withTrashed(), $request)
-            ->with(['author' => function ($query) {
+            ->with(['author' => function (Builder $query) {
                 $query->withTrashed()
-                    ->with('roles')
-                    ->withCount(['courses' => fn($q) => $q->withTrashed()]);
+                    ->with(['roles'])
+                    ->withCount(['courses' => fn(Builder $q) => $q->withTrashed()]);
             }])
-            ->withCount(['lessons' => fn($query) => $query->withTrashed()])
+            ->withCount(['lessons' => fn(Builder $query) => $query->withTrashed()])
             ->allowedFilters([
                 'type',
-                AllowedFilter::callback('search', function ($query, $value) {
-                    $query->where(function ($q) use ($value) {
+                AllowedFilter::callback('search', function (Builder $query, mixed $value) {
+                    $query->where(function (Builder $q) use ($value) {
                         $q->where('title', 'like', "%{$value}%")
                             ->orWhere('description', 'like', "%{$value}%");
                     });
                 }),
-                AllowedFilter::callback('author', function ($query, $value) {
-                    $query->whereHas('author', function ($q) use ($value) {
+                AllowedFilter::callback('author', function (Builder $query, mixed $value) {
+                    $query->whereHas('author', function (Builder $q) use ($value) {
                         $q->withTrashed()
                             ->where('slug', $value);
                     });
                 }),
-                AllowedFilter::callback('banned', function ($query, $value) {
+                AllowedFilter::callback('banned', function (Builder $query, mixed $value) {
                     filter_var($value, FILTER_VALIDATE_BOOLEAN)
                         ? $query->whereNotNull('banned_at')
                         : $query->whereNull('banned_at');
                 }),
-                AllowedFilter::callback('published', function ($query, $value) {
+                AllowedFilter::callback('published', function (Builder $query, mixed $value) {
                     filter_var($value, FILTER_VALIDATE_BOOLEAN)
                         ? $query->whereNotNull('published_at')
                         : $query->whereNull('published_at');

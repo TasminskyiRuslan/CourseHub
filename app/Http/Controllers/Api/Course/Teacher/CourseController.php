@@ -8,10 +8,11 @@ use App\Actions\Course\UpdateCourseAction;
 use App\Data\Course\Requests\CreateCourseData;
 use App\Data\Course\Requests\UpdateCourseData;
 use App\Enums\CourseType;
+use App\Finders\Course\Teacher\FindCourseBySlug;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Course\Teacher\CourseResource;
+use App\Loaders\Course\Teacher\LoadCourse;
 use App\Models\Course;
-use App\Queries\Course\Teacher\GetCourseQuery;
 use App\Queries\Course\Teacher\GetCoursesQuery;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -163,19 +164,21 @@ class CourseController extends Controller
      * @param Request $request
      * @param CreateCourseData $data
      * @param CreateCourseAction $action
+     * @param LoadCourse $loader
      * @return JsonResponse
      * @throws Throwable
      */
-    public function store(Request $request, CreateCourseData $data, CreateCourseAction $action): JsonResponse
+    public function store(Request $request, CreateCourseData $data, CreateCourseAction $action, LoadCourse $loader): JsonResponse
     {
         $this->authorize('create', Course::class);
 
         $currentUser = $request->user();
 
         $createdCourse = $action->handle($data, $currentUser);
-        $createdCourse->loadCount(['lessons']);
 
-        return CourseResource::make($createdCourse)
+        $loadedCourse = $loader->handle($createdCourse);
+
+        return CourseResource::make($loadedCourse)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_CREATED);
     }
@@ -229,17 +232,20 @@ class CourseController extends Controller
      * Retrieve detailed information about the specified teacher's course.
      *
      * @param Request $request
-     * @param GetCourseQuery $query
+     * @param FindCourseBySlug $finder
+     * @param LoadCourse $loader
      * @param string $course
      * @return JsonResponse
      */
-    public function show(Request $request, GetCourseQuery $query, string $course): JsonResponse
+    public function show(Request $request, FindCourseBySlug $finder, LoadCourse $loader, string $course): JsonResponse
     {
         $currentUser = $request->user();
 
-        $gottenCourse = $query->handle($currentUser, $course);
+        $gottenCourse = $finder->handle($currentUser, $course);
 
-        return CourseResource::make($gottenCourse)
+        $loadedCourse = $loader->handle($gottenCourse);
+
+        return CourseResource::make($loadedCourse)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
@@ -302,18 +308,20 @@ class CourseController extends Controller
      *
      * @param UpdateCourseData $data
      * @param UpdateCourseAction $action
+     * @param LoadCourse $loader
      * @param Course $course
      * @return JsonResponse
      * @throws Throwable
      */
-    public function update(UpdateCourseData $data, UpdateCourseAction $action, Course $course): JsonResponse
+    public function update(UpdateCourseData $data, UpdateCourseAction $action, LoadCourse $loader, Course $course): JsonResponse
     {
         $this->authorize('update', $course);
 
         $updatedCourse = $action->handle($data, $course);
-        $updatedCourse->loadCount(['lessons']);
 
-        return CourseResource::make($updatedCourse)
+        $loadedCourse = $loader->handle($updatedCourse);
+
+        return CourseResource::make($loadedCourse)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
@@ -361,6 +369,7 @@ class CourseController extends Controller
      * @param DeleteCourseAction $action
      * @param Course $course
      * @return Response
+     * @throws Throwable
      */
     public function destroy(DeleteCourseAction $action, Course $course): Response
     {

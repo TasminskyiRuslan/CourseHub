@@ -3,15 +3,18 @@
 namespace App\Actions\Course;
 
 use App\Models\Course;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 readonly class DeleteCourseImageAction
 {
     /**
-     * Delete the specified course image.
+     * Delete the image file and remove its reference from the specified course.
      *
      * @param Course $course
      * @return void
+     * @throws Throwable
      */
     public function handle(Course $course): void
     {
@@ -19,10 +22,12 @@ readonly class DeleteCourseImageAction
             return;
         }
 
-        if (Storage::disk('courses')->exists($course->image_path)) {
-            Storage::disk('courses')->delete($course->image_path);
-        }
+        $imagePath = $course->image_path;
 
-        $course->removeImage()->save();
+        DB::transaction(function () use ($course) {
+            $course->removeImage()->save();
+        });
+
+        Storage::disk('courses')->delete($imagePath);
     }
 }

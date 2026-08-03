@@ -7,13 +7,14 @@ use App\Actions\Course\UpdateCourseImageAction;
 use App\Data\Course\Requests\UpdateCourseImageData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Course\Teacher\CourseResource;
+use App\Loaders\Course\Teacher\LoadCourse;
 use App\Models\Course;
-use Exception;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Throwable;
 
 class CourseImageController extends Controller
 {
@@ -80,18 +81,20 @@ class CourseImageController extends Controller
      *
      * @param UpdateCourseImageData $data
      * @param UpdateCourseImageAction $action
+     * @param LoadCourse $loader
      * @param Course $course
      * @return JsonResponse
-     * @throws Exception
+     * @throws Throwable
      */
-    public function update(UpdateCourseImageData $data, UpdateCourseImageAction $action, Course $course): JsonResponse
+    public function update(UpdateCourseImageData $data, UpdateCourseImageAction $action, LoadCourse $loader, Course $course): JsonResponse
     {
         $this->authorize('update', $course);
 
         $updatedCourse = $action->handle($data, $course);
-        $updatedCourse->loadCount(['lessons']);
 
-        return CourseResource::make($updatedCourse)
+        $loadedCourse = $loader->handle($updatedCourse);
+
+        return CourseResource::make($loadedCourse)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
@@ -139,6 +142,7 @@ class CourseImageController extends Controller
      * @param DeleteCourseImageAction $action
      * @param Course $course
      * @return Response
+     * @throws Throwable
      */
     public function destroy(DeleteCourseImageAction $action, Course $course): Response
     {

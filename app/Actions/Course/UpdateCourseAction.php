@@ -5,7 +5,6 @@ namespace App\Actions\Course;
 use App\Data\Course\Requests\UpdateCourseData;
 use App\Models\Course;
 use Illuminate\Support\Facades\DB;
-use Stripe\StripeClient;
 use Throwable;
 
 readonly class UpdateCourseAction
@@ -27,12 +26,12 @@ readonly class UpdateCourseAction
      */
     public function handle(UpdateCourseData $data, Course $course): Course
     {
-        DB::transaction(function () use ($course, $data) {
-            $course->update($data->all());
+        return DB::transaction(function () use ($course, $data) {
+            $course->update($data->toArray());
+
+            $this->syncCourseWithStripeAction->handle($course);
+
+            return $course;
         });
-
-        $this->syncCourseWithStripeAction->handle($course);
-
-        return $course;
     }
 }

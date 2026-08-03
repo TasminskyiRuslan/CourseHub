@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Api\Course\Student;
 
 use App\Enums\CourseType;
+use App\Finders\Course\Student\FindCourseBySlug;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Course\Student\CourseResource;
+use App\Loaders\Course\Student\LoadCourse;
 use App\Queries\Course\Student\GetCoursesQuery;
-use App\Queries\Course\Student\GetCourseQuery;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
@@ -154,17 +155,20 @@ class CourseController extends Controller
      * Retrieve detailed information about the specified enrolled student's course.
      *
      * @param Request $request
-     * @param GetCourseQuery $query
+     * @param FindCourseBySlug $finder
+     * @param LoadCourse $loader
      * @param string $course
      * @return JsonResponse
      */
-    public function show(Request $request, GetCourseQuery $query, string $course): JsonResponse
+    public function show(Request $request, FindCourseBySlug $finder, LoadCourse $loader, string $course): JsonResponse
     {
         $currentUser = $request->user();
 
-        $gottenCourse = $query->handle($currentUser, $course);
+        $gottenCourse = $finder->handle($currentUser, $course);
 
-        return CourseResource::make($gottenCourse)
+        $loadedCourse = $loader->handle($gottenCourse);
+
+        return CourseResource::make($loadedCourse)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }

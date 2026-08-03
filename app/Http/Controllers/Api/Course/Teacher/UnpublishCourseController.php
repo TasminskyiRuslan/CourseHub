@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Api\Course\Teacher;
 use App\Actions\Course\UnpublishCourseAction;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Course\Teacher\CourseResource;
+use App\Loaders\Course\Teacher\LoadCourse;
 use App\Models\Course;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Throwable;
 
 class UnpublishCourseController extends Controller
 {
@@ -64,17 +66,20 @@ class UnpublishCourseController extends Controller
      * Unpublish the specified teacher's course.
      *
      * @param UnpublishCourseAction $action
+     * @param LoadCourse $loader
      * @param Course $course
      * @return JsonResponse
+     * @throws Throwable
      */
-    public function __invoke(UnpublishCourseAction $action, Course $course): JsonResponse
+    public function __invoke(UnpublishCourseAction $action, LoadCourse $loader, Course $course): JsonResponse
     {
         $this->authorize('publish', $course);
 
         $unpublishedCourse = $action->handle($course);
-        $unpublishedCourse->loadCount(['lessons']);
 
-        return CourseResource::make($unpublishedCourse)
+        $loadedCourse = $loader->handle($unpublishedCourse);
+
+        return CourseResource::make($loadedCourse)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }

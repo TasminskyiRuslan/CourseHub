@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Api\Course\Admin;
 
 use App\Actions\Course\DeleteCourseAction;
 use App\Enums\CourseType;
+use App\Finders\Course\Admin\FindCourseBySlug;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Course\Admin\CourseResource;
+use App\Loaders\Course\Admin\LoadCourse;
 use App\Models\Course;
-use App\Queries\Course\Admin\GetCourseQuery;
 use App\Queries\Course\Admin\GetCoursesQuery;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -15,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Throwable;
 
 class CourseController extends Controller
 {
@@ -175,15 +177,18 @@ class CourseController extends Controller
     /**
      * Retrieve detailed information about the specified course by administrator.
      *
-     * @param GetCourseQuery $query
+     * @param FindCourseBySlug $finder
+     * @param LoadCourse $loader
      * @param string $course
      * @return JsonResponse
      */
-    public function show(GetCourseQuery $query, string $course): JsonResponse
+    public function show(FindCourseBySlug $finder, LoadCourse $loader, string $course): JsonResponse
     {
-        $gottenCourse = $query->handle($course);
+        $gottenCourse = $finder->handle($course);
 
-        return CourseResource::make($gottenCourse)
+        $loadedCourse = $loader->handle($gottenCourse);
+
+        return CourseResource::make($loadedCourse)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
@@ -231,6 +236,7 @@ class CourseController extends Controller
      * @param DeleteCourseAction $action
      * @param Course $course
      * @return Response
+     * @throws Throwable
      */
     public function destroy(DeleteCourseAction $action, Course $course): Response
     {

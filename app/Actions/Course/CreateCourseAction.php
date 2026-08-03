@@ -19,7 +19,7 @@ readonly class CreateCourseAction
     ) {}
 
     /**
-     * Create a new course for the specified teacher.
+     * Create a new course for the specified teacher and sync with Stripe.
      *
      * @param CreateCourseData $data
      * @param User $teacher
@@ -28,12 +28,12 @@ readonly class CreateCourseAction
      */
     public function handle(CreateCourseData $data, User $teacher): Course
     {
-        $course = DB::transaction(function () use ($data, $teacher) {
-            return $teacher->courses()->create($data->all());
+        return DB::transaction(function () use ($data, $teacher) {
+            $course = $teacher->courses()->create($data->toArray());
+
+            $this->syncCourseWithStripeAction->handle($course);
+
+            return $course;
         });
-
-        $this->syncCourseWithStripeAction->handle($course);
-
-        return $course;
     }
 }

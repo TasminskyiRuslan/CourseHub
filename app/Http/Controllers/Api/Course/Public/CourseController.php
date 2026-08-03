@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api\Course\Public;
 
 use App\Enums\CourseType;
+use App\Finders\Course\Public\FindCourseBySlug;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Course\Public\CourseResource;
-use App\Queries\Course\Public\GetCourseQuery;
+use App\Loaders\Course\Public\LoadCourse;
 use App\Queries\Course\Public\GetCoursesQuery;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -130,15 +131,18 @@ class CourseController extends Controller
     /**
      * Retrieve detailed information about the specified active course.
      *
-     * @param GetCourseQuery $query
+     * @param FindCourseBySlug $finder
+     * @param LoadCourse $loader
      * @param string $course
      * @return JsonResponse
      */
-    public function show(GetCourseQuery $query, string $course): JsonResponse
+    public function show(FindCourseBySlug $finder, LoadCourse $loader, string $course): JsonResponse
     {
-        $gottenCourse = $query->handle($course);
+        $gottenCourse = $finder->handle($course);
 
-        return CourseResource::make($gottenCourse)
+        $loadedCourse = $loader->handle($gottenCourse);
+
+        return CourseResource::make($loadedCourse)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }

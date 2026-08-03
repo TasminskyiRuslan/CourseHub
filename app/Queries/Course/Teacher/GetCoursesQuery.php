@@ -4,6 +4,7 @@ namespace App\Queries\Course\Teacher;
 
 use App\Models\Course;
 use App\Models\User;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -38,17 +39,21 @@ readonly class GetCoursesQuery
             ->withCount(['lessons'])
             ->allowedFilters([
                 'type',
-                AllowedFilter::callback('search', function ($query, $value) {
-                    $query->where(function ($q) use ($value) {
+                AllowedFilter::callback('search', function (Builder $query, mixed $value) {
+                    $query->where(function (Builder $q) use ($value) {
                         $q->where('title', 'like', "%{$value}%")
                             ->orWhere('description', 'like', "%{$value}%");
                     });
                 }),
-                AllowedFilter::callback('banned', function ($query, $value) {
-                    filter_var($value, FILTER_VALIDATE_BOOLEAN) ? $query->whereNotNull('banned_at') : $query->whereNull('banned_at');
+                AllowedFilter::callback('banned', function (Builder $query, mixed $value) {
+                    filter_var($value, FILTER_VALIDATE_BOOLEAN)
+                        ? $query->whereNotNull('banned_at')
+                        : $query->whereNull('banned_at');
                 }),
-                AllowedFilter::callback('published', function ($query, $value) {
-                    filter_var($value, FILTER_VALIDATE_BOOLEAN) ? $query->whereNotNull('published_at') : $query->whereNull('published_at');
+                AllowedFilter::callback('published', function (Builder $query, mixed $value) {
+                    filter_var($value, FILTER_VALIDATE_BOOLEAN)
+                        ? $query->whereNotNull('published_at')
+                        : $query->whereNull('published_at');
                 })
             ])
             ->allowedSorts([

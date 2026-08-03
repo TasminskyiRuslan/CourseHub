@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api\Course\Student;
 
 use App\Actions\Course\CheckoutCourseAction;
+use App\Finders\Course\Public\FindCourseBySlug;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Course\Student\CheckoutResource;
-use App\Models\Course;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -69,24 +69,22 @@ class CheckoutController extends Controller
      * Check out the specified course for the authenticated user.
      *
      * @param Request $request
+     * @param FindCourseBySlug $finder
      * @param CheckoutCourseAction $action
      * @param string $course
      * @return JsonResponse
      */
-    public function __invoke(Request $request, CheckoutCourseAction $action, string $course): JsonResponse
+    public function __invoke(Request $request, FindCourseBySlug $finder, CheckoutCourseAction $action, string $course): JsonResponse
     {
-        $gottenCourse = Course::query()
-            ->active()
-            ->where('slug', $course)
-            ->firstOrFail();
+        $gottenCourse = $finder->handle($course);
 
         $this->authorize('checkout', $gottenCourse);
 
         $currentUser = $request->user();
 
-        $result = $action->handle($currentUser, $gottenCourse);
+        $checkoutResultData = $action->handle($currentUser, $gottenCourse);
 
-        return CheckoutResource::make($result)
+        return CheckoutResource::make($checkoutResultData)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }

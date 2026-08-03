@@ -3,6 +3,8 @@
 namespace App\Actions\Course;
 
 use App\Models\Course;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 readonly class UnpublishCourseAction
 {
@@ -11,11 +13,14 @@ readonly class UnpublishCourseAction
      *
      * @param Course $course
      * @return Course
+     * @throws Throwable
      */
     public function handle(Course $course): Course
     {
-        $course->unpublish()->save();
+        return DB::transaction(function () use ($course) {
+            $course->unpublish()->save();
 
-        return $course;
+            return $course;
+        });
     }
 }

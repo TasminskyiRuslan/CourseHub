@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Api\Course\Teacher;
 use App\Actions\Course\PublishCourseAction;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Course\Teacher\CourseResource;
+use App\Loaders\Course\Teacher\LoadCourse;
 use App\Models\Course;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Throwable;
 
 class PublishCourseController extends Controller
 {
@@ -64,17 +66,20 @@ class PublishCourseController extends Controller
      * Publish the specified teacher's course.
      *
      * @param PublishCourseAction $action
+     * @param LoadCourse $loader
      * @param Course $course
      * @return JsonResponse
+     * @throws Throwable
      */
-    public function __invoke(PublishCourseAction $action, Course $course): JsonResponse
+    public function __invoke(PublishCourseAction $action, LoadCourse $loader, Course $course): JsonResponse
     {
         $this->authorize('publish', $course);
 
         $publishedCourse = $action->handle($course);
-        $publishedCourse->loadCount(['lessons']);
 
-        return CourseResource::make($publishedCourse)
+        $loadedCourse = $loader->handle($publishedCourse);
+
+        return CourseResource::make($loadedCourse)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }

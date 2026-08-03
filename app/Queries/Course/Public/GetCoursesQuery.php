@@ -4,6 +4,7 @@ namespace App\Queries\Course\Public;
 
 use App\Models\Course;
 use App\Queries\CachedListQuery;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
@@ -51,20 +52,20 @@ readonly class GetCoursesQuery extends CachedListQuery
     protected function query(Request $request): QueryBuilder
     {
         return QueryBuilder::for(Course::query()->active(), $request)
-            ->with(['author' => function ($query) {
+            ->with(['author' => function (Builder $query) {
                 $query->with(['roles'])
-                    ->withCount(['courses' => fn ($q) => $q->active()]);
+                    ->withCount(['courses' => fn (Builder $q) => $q->active()]);
             }])
             ->withCount(['lessons'])
             ->allowedFilters([
                 'type',
-                AllowedFilter::callback('search', function ($query, $value) {
-                    $query->where(function ($q) use ($value) {
+                AllowedFilter::callback('search', function (Builder $query, mixed $value) {
+                    $query->where(function (Builder $q) use ($value) {
                         $q->where('title', 'like', "%{$value}%")
                             ->orWhere('description', 'like', "%{$value}%");
                     });
                 }),
-                AllowedFilter::callback('author', function ($query, $value) {
+                AllowedFilter::callback('author', function (Builder $query, mixed $value) {
                     $query->whereRelation('author', 'slug', $value);
                 }),
             ])

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Data\Casts;
 
 use Illuminate\Support\Str;
@@ -11,12 +13,6 @@ class LowercaseCast implements Cast
 {
     /**
      * Cast the given value to lowercase.
-     *
-     * @param DataProperty $property
-     * @param mixed $value
-     * @param array $properties
-     * @param CreationContext $context
-     * @return string
      */
     public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): string
     {

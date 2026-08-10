@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\User\Public;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\User\Public\UserResource;
-use App\Queries\User\Public\GetTeacherQuery;
+use App\Http\Resources\Api\User\Public\TeacherResource;
+use App\Loaders\User\Public\TeacherLoader;
+use App\Models\User;
 use App\Queries\User\Public\GetTeachersQuery;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -42,7 +45,7 @@ class TeacherController extends Controller
                 in: 'query',
                 required: false,
                 schema: new OA\Schema(type: 'integer', default: 1, minimum: 1),
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -53,37 +56,33 @@ class TeacherController extends Controller
                         new OA\Property(
                             property: 'data',
                             type: 'array',
-                            items: new OA\Items(ref: '#/components/schemas/UserPublicResponse')
-                        )
+                            items: new OA\Items(ref: '#/components/schemas/TeacherPublicResponse')
+                        ),
                     ]
                 )
-            )
+            ),
         ]
     )]
     /**
      * Retrieve a paginated list of teachers.
-     *
-     * @param Request $request
-     * @param GetTeachersQuery $query
-     * @return JsonResponse
      */
     public function index(Request $request, GetTeachersQuery $query): JsonResponse
     {
-        $gottenUsers = $query->handle($request);
+        $gottenTeachers = $query->handle($request);
 
-        return UserResource::collection($gottenUsers)
+        return TeacherResource::collection($gottenTeachers)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 
     #[OA\Get(
-        path: '/teachers/{teacher}',
+        path: '/teachers/{publicTeacher}',
         description: 'Retrieve detailed information about the specified teacher.',
         summary: '[Public] Retrieve teacher details',
         tags: ['User'],
         parameters: [
             new OA\Parameter(
-                name: 'teacher',
+                name: 'publicTeacher',
                 description: 'Teacher identifier (slug).',
                 in: 'path',
                 required: true,
@@ -91,7 +90,7 @@ class TeacherController extends Controller
                     type: 'string',
                     example: 'john-doe'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -101,29 +100,25 @@ class TeacherController extends Controller
                     properties: [
                         new OA\Property(
                             property: 'data',
-                            ref: '#/components/schemas/UserPublicResponse'
-                        )
+                            ref: '#/components/schemas/TeacherPublicResponse'
+                        ),
                     ]
                 )
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
                 description: 'Teacher not found.'
-            )
+            ),
         ]
     )]
     /**
      * Retrieve detailed information about the specified teacher.
-     *
-     * @param GetTeacherQuery $query
-     * @param string $teacher
-     * @return JsonResponse
      */
-    public function show(GetTeacherQuery $query, string $teacher): JsonResponse
+    public function show(TeacherLoader $teacherLoader, User $publicTeacher): JsonResponse
     {
-        $gottenUser = $query->handle($teacher);
+        $loadedTeacher = $teacherLoader->handle($publicTeacher);
 
-        return UserResource::make($gottenUser)
+        return TeacherResource::make($loadedTeacher)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }

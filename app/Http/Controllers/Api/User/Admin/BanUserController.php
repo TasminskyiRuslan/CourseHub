@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\User\Admin;
 
 use App\Actions\User\BanUserAction;
@@ -17,14 +19,14 @@ class BanUserController extends Controller
     use AuthorizesRequests;
 
     #[OA\Patch(
-        path: '/admin/users/{user}/ban',
+        path: '/admin/users/{adminUser}/ban',
         description: 'Ban the specified user by administrator.',
         summary: '[Admin] Ban a user',
         security: [['sanctum' => []]],
         tags: ['User'],
         parameters: [
             new OA\Parameter(
-                name: 'user',
+                name: 'adminUser',
                 description: 'User identifier (slug).',
                 in: 'path',
                 required: true,
@@ -32,7 +34,7 @@ class BanUserController extends Controller
                     type: 'string',
                     example: 'john-doe'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -50,23 +52,20 @@ class BanUserController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
                 description: 'User not found.'
-            )
+            ),
         ]
     )]
     /**
      * Ban the specified user by administrator.
      *
-     * @param BanUserAction $banUserAction
-     * @param User $user
-     * @return Response
      * @throws AccessDeniedHttpException
      * @throws Throwable
      */
-    public function __invoke(BanUserAction $banUserAction, User $user): Response
+    public function __invoke(BanUserAction $banUserAction, User $adminUser): Response
     {
-        $this->authorize('ban', $user);
+        $this->authorize('ban', $adminUser);
 
-        $banUserAction->handle($user);
+        $banUserAction->handle($adminUser);
 
         return response()->noContent();
     }

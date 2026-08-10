@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\UserRole;
 use App\Models\User;
 use Carbon\Carbon;
@@ -7,6 +9,8 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Hash;
+
 use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class);
@@ -28,12 +32,26 @@ describe('Auth -> RegisterController', function () {
                 ->assertJsonValidationErrors(['name', 'email', 'password']);
         });
 
+        it('fails if the name is too short', function () {
+            postJson(route('auth.register'), registrationPayload(['name' => 'A']))
+                ->assertUnprocessable()
+                ->assertJsonValidationErrors(['name']);
+        });
+
         it('fails if the email is already taken', function () {
             $data = registrationPayload();
 
             User::factory()->create(['email' => $data['email']]);
 
             postJson(route('auth.register'), $data)
+                ->assertUnprocessable()
+                ->assertJsonValidationErrors(['email']);
+        });
+
+        it('fails if the email exists regardless of case sensitivity', function () {
+            User::factory()->create(['email' => 'user@example.com']);
+
+            postJson(route('auth.register'), registrationPayload(['email' => 'USER@EXAMPLE.COM']))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
         });
@@ -79,7 +97,7 @@ describe('Auth -> RegisterController', function () {
                 ->assertJsonValidationErrors(['roles.1']);
         });
 
-        it('fails if trying to register with forbidden role', function ($invalidRole) {
+        it('fails if trying to register with a forbidden role', function (UserRole $invalidRole) {
             $data = registrationPayload(['roles' => [$invalidRole->value]]);
 
             postJson(route('auth.register'), $data)
@@ -99,7 +117,7 @@ describe('Auth -> RegisterController', function () {
     |--------------------------------------------------------------------------
     */
     describe('operations', function () {
-        it('registers a user successfully and returns an access token', function ($rolePayload, $expectedRoleInJson) {
+        it('registers a user successfully and returns an access token', function (array $rolePayload, ?string $expectedRoleInJson) {
             Event::fake();
 
             $data = registrationPayload($rolePayload);
@@ -120,16 +138,20 @@ describe('Auth -> RegisterController', function () {
             expect($user)->not->toBeNull()
                 ->and(Hash::check($data['password'], $user->password))->toBeTrue();
 
-            Event::assertDispatched(Registered::class, fn($event) => $event->user->email === $user->email);
+            if ($expectedRoleInJson) {
+                expect($user->hasRole($expectedRoleInJson))->toBeTrue();
+            }
+
+            Event::assertDispatched(Registered::class, fn ($event) => $event->user->email === $user->email);
         })
             ->with([
-                'with allowed teacher role' => [
+                'teacher role' => [
                     ['roles' => [UserRole::TEACHER->value]],
-                    UserRole::TEACHER->value
+                    UserRole::TEACHER->value,
                 ],
-                'without role (default registration)' => [
+                'default registration without explicit role' => [
                     [],
-                    null
+                    null,
                 ],
             ]);
 

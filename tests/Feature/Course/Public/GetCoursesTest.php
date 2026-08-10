@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\CourseType;
 use App\Models\Course;
 use App\Models\User;
@@ -8,6 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class);
@@ -24,7 +27,7 @@ describe('Public -> CourseController -> index', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('allows users to retrieve only published, non-banned courses from active authors', function ($user) {
+        it('allows users to retrieve only published, non-banned courses from active authors', function (?User $user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }
@@ -39,8 +42,8 @@ describe('Public -> CourseController -> index', function () {
                 ->assertOk()
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => publicCourseJsonStructure()
-                    ]
+                        '*' => publicCourseJsonStructure(),
+                    ],
                 ]);
 
             $responseDataIds = collect($response->json('data'))->pluck('id');
@@ -54,10 +57,10 @@ describe('Public -> CourseController -> index', function () {
             }
         })->with([
             'guest' => null,
-            'user' => fn() => User::factory()->create(),
-            'teacher' => fn() => User::factory()->teacher()->create(),
-            'admin' => fn() => User::factory()->admin()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'user' => fn () => User::factory()->create(),
+            'teacher' => fn () => User::factory()->teacher()->create(),
+            'admin' => fn () => User::factory()->admin()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
         ]);
     });
 
@@ -67,7 +70,7 @@ describe('Public -> CourseController -> index', function () {
     |--------------------------------------------------------------------------
     */
     describe('filters & sorting', function () {
-        it('filters courses by a search string', function () {
+        it('filters courses by a search string in title', function () {
             $course1 = Course::factory()->create(['title' => 'Laravel Deep Dive']);
             $course2 = Course::factory()->create(['title' => 'React Basics']);
             $searchString = substr($course1->title, 8);
@@ -78,9 +81,19 @@ describe('Public -> CourseController -> index', function () {
                 ->assertJsonMissing(['id' => $course2->id])
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => publicCourseJsonStructure()
-                    ]
+                        '*' => publicCourseJsonStructure(),
+                    ],
                 ]);
+        });
+
+        it('filters courses by description in search query', function () {
+            $course1 = Course::factory()->create(['description' => 'Unique description text']);
+            $course2 = Course::factory()->create(['description' => 'Standard content']);
+
+            getJson(route('courses.index', ['filter[search]' => 'Unique description']))
+                ->assertOk()
+                ->assertJsonFragment(['id' => $course1->id])
+                ->assertJsonMissing(['id' => $course2->id]);
         });
 
         it('filters courses by type', function () {
@@ -151,6 +164,24 @@ describe('Public -> CourseController -> index', function () {
             $descResponse = getJson(route('courses.index', ['sort' => '-price']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($expensive->id, $descIds))->toBeLessThan(array_search($cheap->id, $descIds));
+        });
+
+        it('sorts courses by lessons_count (asc and desc)', function () {
+            $courseWithManyLessons = Course::factory()->hasLessons(5)->create();
+            $courseWithFewLessons = Course::factory()->hasLessons(1)->create();
+
+            $ascResponse = getJson(route('courses.index', ['sort' => 'lessons_count']))->assertOk();
+            $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
+            expect(array_search($courseWithFewLessons->id, $ascIds))->toBeLessThan(array_search($courseWithManyLessons->id, $ascIds));
+
+            $descResponse = getJson(route('courses.index', ['sort' => '-lessons_count']))->assertOk();
+            $descIds = collect($descResponse->json('data'))->pluck('id')->all();
+            expect(array_search($courseWithManyLessons->id, $descIds))->toBeLessThan(array_search($courseWithFewLessons->id, $descIds));
+        });
+
+        it('fails if an invalid sort parameter is provided', function () {
+            getJson(route('courses.index', ['sort' => 'unsupported_field']))
+                ->assertBadRequest();
         });
 
         it('returns empty data when no courses match the search', function () {

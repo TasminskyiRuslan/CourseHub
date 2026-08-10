@@ -1,13 +1,18 @@
 <?php
 
-use App\Enums\CourseType;
+declare(strict_types=1);
+
+use App\Jobs\Course\ArchiveCourseInStripeJob;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\deleteJson;
 
 uses(RefreshDatabase::class);
@@ -15,7 +20,6 @@ uses(RefreshDatabase::class);
 describe('Admin -> CourseController -> destroy', function () {
     beforeEach(function () {
         Cache::flush();
-        Storage::fake('courses');
         $this->seed(RolesAndPermissionsSeeder::class);
         $this->seed(SuperAdminUserSeeder::class);
     });
@@ -46,65 +50,23 @@ describe('Admin -> CourseController -> destroy', function () {
 
             deleteJson(route('admin.courses.destroy', $course))
                 ->assertUnauthorized();
-            $this->assertDatabaseHas('courses', [
-                'id' => $course->id,
-            ]);
+
+            $this->assertNotSoftDeleted($course);
         });
 
-        it('fails if a user without permissions tries to delete a course', function ($user) {
+        it('fails if a user without permissions tries to delete a course', function (?User $user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
 
             deleteJson(route('admin.courses.destroy', $course))
                 ->assertForbidden();
-            $this->assertDatabaseHas('courses', [
-                'id' => $course->id,
-            ]);
+
+            $this->assertNotSoftDeleted($course);
         })->with([
-            'user' => fn() => User::factory()->create(),
-            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'another teacher' => fn() => User::factory()->teacher()->create(),
-        ]);
-
-        it('allows a user with permissions to delete a course', function ($userClosure, $courseClosure) {
-            $user = $userClosure();
-
-            Sanctum::actingAs($user);
-
-            $filename = 'test-image.jpg';
-            $courseInnerClosure = $courseClosure();
-            $course = $courseInnerClosure($filename);
-            $lessons = Lesson::factory()->for($course)->count(2)->create();
-            Storage::disk('courses')->put($filename, 'fake');
-
-            deleteJson(route('admin.courses.destroy', $course))
-                ->assertNoContent();
-
-            $this->assertSoftDeleted('courses', [
-                'id' => $course->id,
-            ]);
-
-            foreach ($lessons as $lesson) {
-                $this->assertSoftDeleted('lessons', ['id' => $lesson->id]);
-                $lessonableTable = match ($course->type) {
-                    CourseType::OFFLINE => 'offline_lessons',
-                    CourseType::ONLINE => 'online_lessons',
-                    CourseType::VIDEO => 'video_lessons',
-                };
-                $this->assertSoftDeleted($lessonableTable, [
-                    'id' => $lesson->lessonable->id,
-                ]);
-            }
-
-            Storage::disk('courses')->assertMissing($filename);
-        })->with([
-            'admin' => fn() => User::factory()->admin()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
-        ])->with([
-            'published' => fn() => fn($filename) => Course::factory()->withImage($filename)->create(),
-            'unpublished' => fn() => fn($filename) => Course::factory()->unpublished()->withImage($filename)->create(),
-            'banned' => fn() => fn($filename) => Course::factory()->banned()->withImage($filename)->create(),
+            'user' => fn () => User::factory()->create(),
+            'unverified teacher' => fn () => User::factory()->teacher()->unverified()->create(),
+            'another teacher' => fn () => User::factory()->teacher()->create(),
         ]);
 
         it('fails if a banned user tries to delete a course', function () {
@@ -115,6 +77,70 @@ describe('Admin -> CourseController -> destroy', function () {
 
             deleteJson(route('admin.courses.destroy', $course))
                 ->assertForbidden();
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | operations
+    |--------------------------------------------------------------------------
+    */
+    describe('operations', function () {
+        it('allows a user with permissions to delete a course and soft-deletes related lessons', function (User $user, Course $course) {
+            Queue::fake();
+
+            Sanctum::actingAs($user);
+
+            $lessons = Lesson::factory()->for($course)->count(2)->create();
+
+            deleteJson(route('admin.courses.destroy', $course))
+                ->assertNoContent();
+
+            $this->assertSoftDeleted($course);
+
+            $lessons->each(function (Lesson $lesson) {
+                $this->assertSoftDeleted($lesson);
+                $this->assertSoftDeleted($lesson->lessonable);
+            });
+        })->with([
+            'admin' => fn () => User::factory()->admin()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
+        ])->with([
+            'published course' => fn () => Course::factory()->withImage('test-image.jpg')->create(),
+            'unpublished course' => fn () => Course::factory()->unpublished()->withImage('test-image.jpg')->create(),
+            'banned course' => fn () => Course::factory()->banned()->withImage('test-image.jpg')->create(),
+        ]);
+
+        it('dispatches ArchiveCourseInStripeJob when stripe_product_id is present', function () {
+            Queue::fake();
+
+            $admin = User::factory()->admin()->create();
+            Sanctum::actingAs($admin);
+
+            $stripeProductId = 'prod_123456789';
+            $course = Course::factory()->create(['stripe_product_id' => $stripeProductId]);
+
+            deleteJson(route('admin.courses.destroy', $course))
+                ->assertNoContent();
+
+            Queue::assertPushed(
+                ArchiveCourseInStripeJob::class,
+                fn (ArchiveCourseInStripeJob $job) => $job->stripeProductId === $stripeProductId
+            );
+        });
+
+        it('does not dispatch ArchiveCourseInStripeJob when stripe_product_id is missing', function () {
+            Queue::fake();
+
+            $admin = User::factory()->admin()->create();
+            Sanctum::actingAs($admin);
+
+            $course = Course::factory()->create(['stripe_product_id' => null]);
+
+            deleteJson(route('admin.courses.destroy', $course))
+                ->assertNoContent();
+
+            Queue::assertNotPushed(ArchiveCourseInStripeJob::class);
         });
     });
 

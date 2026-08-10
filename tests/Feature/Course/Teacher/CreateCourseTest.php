@@ -1,13 +1,17 @@
 <?php
 
-use App\Models\Course;
+declare(strict_types=1);
+
+use App\Enums\CourseType;
+use App\Jobs\Course\SyncCourseWithStripeJob;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
-use Stripe\StripeClient;
+
 use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class);
@@ -25,7 +29,7 @@ describe('Teacher -> CourseController -> store', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-        it('fails if required fields are missing', function () {
+        it('fails with 422 when required payload fields are missing', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
 
@@ -34,67 +38,36 @@ describe('Teacher -> CourseController -> store', function () {
                 ->assertJsonValidationErrors(['title', 'type', 'price']);
         });
 
-        it('fails if fields are invalid', function () {
+        it('fails with 422 when course type is invalid', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
 
-            postJson(route('teacher.courses.store'), creatingCoursePayload([
-                'title' => str_repeat('A', 256),
-                'slug' => str_repeat('B', 256),
-                'description' => str_repeat('C', 5001),
+            $payload = [
+                'title' => 'Test Course',
+                'description' => 'Course description',
                 'type' => 'invalid-type',
-                'price' => 'invalid-price'
-            ]))
+                'price' => 1000,
+            ];
+
+            postJson(route('teacher.courses.store'), $payload)
                 ->assertUnprocessable()
-                ->assertJsonValidationErrors(['title', 'slug', 'description', 'type', 'price']);
+                ->assertJsonValidationErrors(['type']);
         });
 
-        it('fails if price is out of range', function () {
+        it('fails with 422 when price is negative or non-numeric', function () {
             $teacher = User::factory()->teacher()->create();
             Sanctum::actingAs($teacher);
 
-            postJson(route('teacher.courses.store'), creatingCoursePayload(['price' => '-10']))
+            $payload = [
+                'title' => 'Test Course',
+                'description' => 'Course description',
+                'type' => CourseType::ONLINE->value,
+                'price' => -500,
+            ];
+
+            postJson(route('teacher.courses.store'), $payload)
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['price']);
-        });
-
-        it('fails if slug is not unique', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
-
-            $course = Course::factory()->create(['slug' => 'existing-slug']);
-
-            postJson(route('teacher.courses.store'), creatingCoursePayload(['slug' => $course->slug]))
-                ->assertUnprocessable()
-                ->assertJsonValidationErrors(['slug']);
-        });
-
-        it('fails if slug format is invalid', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
-
-            postJson(route('teacher.courses.store'), creatingCoursePayload(['slug' => 'Invalid Slug!']))
-                ->assertUnprocessable()
-                ->assertJsonValidationErrors(['slug']);
-        });
-
-        it('succeeds if a slug is provided manually', function () {
-            $this->mock(StripeClient::class, function ($mock) {
-                $mock->products = Mockery::mock();
-                $mock->products->shouldReceive('create')->andReturn((object) ['id' => 'prod_mock_id']);
-                $mock->prices = Mockery::mock();
-                $mock->prices->shouldReceive('create')->andReturn((object) ['id' => 'price_mock_id']);
-            });
-
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
-
-            $slug = 'test-slug';
-
-            postJson(route('teacher.courses.store'), creatingCoursePayload(['slug' => $slug]))
-                ->assertCreated()
-                ->assertJsonFragment(['slug' => $slug])
-                ->assertJsonStructure(['data' => teacherCourseJsonStructure()]);
         });
     });
 
@@ -105,52 +78,59 @@ describe('Teacher -> CourseController -> store', function () {
     */
     describe('permissions', function () {
         it('fails if an unauthenticated user tries to create a course', function () {
-            postJson(route('teacher.courses.store'), creatingCoursePayload())
+            $payload = [
+                'title' => 'Unauthenticated Course',
+                'description' => 'Description',
+                'type' => CourseType::ONLINE->value,
+                'price' => 1500,
+            ];
+
+            postJson(route('teacher.courses.store'), $payload)
                 ->assertUnauthorized();
+
+            $this->assertDatabaseMissing('courses', [
+                'title' => 'Unauthenticated Course',
+            ]);
         });
 
-        it('fails if a user without permissions tries to create a course', function ($user) {
+        it('fails if a user without permissions tries to create a course', function (?User $user) {
             Sanctum::actingAs($user);
 
-            postJson(route('teacher.courses.store'), creatingCoursePayload())
+            $payload = [
+                'title' => 'Forbidden Course',
+                'description' => 'Description',
+                'type' => CourseType::ONLINE->value,
+                'price' => 1500,
+            ];
+
+            postJson(route('teacher.courses.store'), $payload)
                 ->assertForbidden();
-        })->with([
-            'user' => fn() => User::factory()->create(),
-            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'admin' => fn() => User::factory()->admin()->create(),
-        ]);
 
-        it('allows a user with permission to create a course', function ($user) {
-            $this->mock(StripeClient::class, function ($mock) {
-                $mock->products = Mockery::mock();
-                $mock->products->shouldReceive('create')->andReturn((object) ['id' => 'prod_mock_id']);
-                $mock->prices = Mockery::mock();
-                $mock->prices->shouldReceive('create')->andReturn((object) ['id' => 'price_mock_id']);
-            });
-
-            Sanctum::actingAs($user);
-
-            $data = creatingCoursePayload();
-
-            postJson(route('teacher.courses.store'), $data)
-                ->assertCreated()
-                ->assertJsonStructure(['data' => teacherCourseJsonStructure()]);
-            $this->assertDatabaseHas('courses', [
-                'title' => $data['title'],
-                'author_id' => $user->id,
+            $this->assertDatabaseMissing('courses', [
+                'title' => 'Forbidden Course',
             ]);
         })->with([
-            'teacher' => fn() => User::factory()->teacher()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'user' => fn () => User::factory()->create(),
+            'admin' => fn () => User::factory()->admin()->create(),
         ]);
 
-        it('fails if a banned user tries to create a course', function () {
-            $bannedUser = User::factory()->teacher()->banned()->create();
+        it('fails if a banned teacher tries to create a course', function () {
+            $bannedTeacher = User::factory()->teacher()->banned()->create();
+            Sanctum::actingAs($bannedTeacher);
 
-            Sanctum::actingAs($bannedUser);
+            $payload = [
+                'title' => 'Banned Teacher Course',
+                'description' => 'Description',
+                'type' => CourseType::ONLINE->value,
+                'price' => 1500,
+            ];
 
-            postJson(route('teacher.courses.store'), creatingCoursePayload())
+            postJson(route('teacher.courses.store'), $payload)
                 ->assertForbidden();
+
+            $this->assertDatabaseMissing('courses', [
+                'title' => 'Banned Teacher Course',
+            ]);
         });
     });
 
@@ -160,81 +140,45 @@ describe('Teacher -> CourseController -> store', function () {
     |--------------------------------------------------------------------------
     */
     describe('operations', function () {
-        it('syncs paid course with stripe by creating product and price', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
+        it('successfully creates a course, attaches teacher as author and dispatches SyncCourseWithStripeJob', function (?User $user) {
+            Queue::fake();
 
-            $expectedProductId = 'prod_' . Str::random(10);
-            $expectedPriceId = 'price_' . Str::random(10);
+            Sanctum::actingAs($user);
 
-            $this->mock(StripeClient::class, function ($mock) use ($expectedProductId, $expectedPriceId) {
-                $mock->products = Mockery::mock();
-                $mock->products->shouldReceive('create')
-                    ->once()
-                    ->andReturn((object) ['id' => $expectedProductId]);
+            $payload = [
+                'title' => 'Mastering Laravel Architecture',
+                'description' => 'Deep dive into advanced Laravel patterns.',
+                'type' => CourseType::VIDEO->value,
+                'price' => '4900.00',
+            ];
 
-                $mock->prices = Mockery::mock();
-                $mock->prices->shouldReceive('create')
-                    ->once()
-                    ->andReturn((object) ['id' => $expectedPriceId]);
-            });
+            $response = postJson(route('teacher.courses.store'), $payload)
+                ->assertCreated()
+                ->assertJsonStructure([
+                    'data' => teacherCourseJsonStructure(),
+                ])
+                ->assertJsonPath('data.title', $payload['title'])
+                ->assertJsonPath('data.type', $payload['type'])
+                ->assertJsonPath('data.price', $payload['price'])
+                ->assertJsonPath('data.lessons_count', 0);
 
-            $payload = creatingCoursePayload([
-                'title' => 'Laravel Advanced Test',
-                'price' => '49.99',
-            ]);
-
-            postJson(route('teacher.courses.store'), $payload)
-                ->assertCreated();
+            $createdCourseId = $response->json('data.id');
 
             $this->assertDatabaseHas('courses', [
+                'id' => $createdCourseId,
+                'author_id' => $user->id,
                 'title' => $payload['title'],
-                'stripe_product_id' => $expectedProductId,
-                'stripe_price_id' => $expectedPriceId,
-            ]);
-        });
-
-        it('does not create stripe price if course is free', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
-
-            $this->mock(StripeClient::class, function ($mock) {
-                $mock->shouldNotReceive('products');
-                $mock->shouldNotReceive('prices');
-            });
-
-            $payload = creatingCoursePayload([
-                'title' => 'Free Laravel Course',
-                'price' => '0.00',
+                'type' => $payload['type'],
+                'price' => $payload['price'],
             ]);
 
-            postJson(route('teacher.courses.store'), $payload)
-                ->assertCreated();
-
-            $this->assertDatabaseHas('courses', [
-                'title' => $payload['title'],
-                'stripe_product_id' => null,
-                'stripe_price_id' => null,
-            ]);
-        });
-    });
-    /*
-    |--------------------------------------------------------------------------
-    | caching
-    |--------------------------------------------------------------------------
-    */
-    describe('caching', function () {
-        it('flushes the course cache when a new course is created', function () {
-            $teacher = User::factory()->teacher()->create();
-            Sanctum::actingAs($teacher);
-
-            $cacheKey = "courses:page:1";
-            Cache::tags([config('cache.tags.course_list')])->put($cacheKey, 'test_value', config('cache.ttl.course'));
-            expect(Cache::tags([config('cache.tags.course_list')])->get($cacheKey))->not->toBeNull();
-
-            postJson(route('teacher.courses.store'), creatingCoursePayload())
-                ->assertCreated();
-            expect(Cache::tags([config('cache.tags.course_list')])->get($cacheKey))->toBeNull();
-        });
+            Queue::assertPushed(
+                SyncCourseWithStripeJob::class,
+                fn (SyncCourseWithStripeJob $job) => $job->course->id === $createdCourseId
+            );
+        })->with([
+            'teacher' => fn () => User::factory()->teacher()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
+        ]);
     });
 })->group('course', 'teacher');

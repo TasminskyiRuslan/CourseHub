@@ -1,29 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Course;
 
+use App\Jobs\Course\ArchiveCourseInStripeJob;
 use App\Models\Course;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Throwable;
 
 readonly class DeleteCourseAction
 {
     /**
-     * Delete the specified course.
-     *
-     * @param Course $course
-     * @return void
-     * @throws Throwable
+     * Delete the specified course and archive Stripe product.
      */
     public function handle(Course $course): void
     {
-        DB::transaction(function () use ($course) {
-            if ($course->image_path) {
-                Storage::disk('courses')->delete($course->image_path);
-            }
+        if ($course->stripe_product_id) {
+            ArchiveCourseInStripeJob::dispatch($course->stripe_product_id);
+        }
 
-            $course->delete();
-        });
+        $course->delete();
     }
 }

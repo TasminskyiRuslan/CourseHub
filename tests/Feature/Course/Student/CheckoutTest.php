@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\CheckoutStatus;
 use App\Models\Course;
 use App\Models\User;
@@ -9,6 +11,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Cashier\Checkout;
 use Laravel\Sanctum\Sanctum;
+use Mockery\MockInterface;
+
 use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class);
@@ -129,7 +133,8 @@ describe('Student -> CheckoutController', function () {
             ]);
         });
 
-        it('generates a stripe checkout url for paid courses', function () {
+        it('generates a stripe checkout url with correct metadata for paid courses', function () {
+            /** @var User|MockInterface $user */
             $user = Mockery::mock(User::factory()->create())->makePartial();
             Sanctum::actingAs($user);
 
@@ -138,11 +143,25 @@ describe('Student -> CheckoutController', function () {
                 'stripe_price_id' => 'price_123456789',
             ]);
 
+            /** @var Checkout|MockInterface $mockCheckout */
             $mockCheckout = Mockery::mock(Checkout::class);
             $mockCheckout->url = 'https://checkout.stripe.com/c/pay/cs_test_123';
 
+            $baseUrl = rtrim(config('app.frontend_url'), '/');
+
             $user->shouldReceive('checkout')
                 ->once()
+                ->with(
+                    [$course->stripe_price_id => 1],
+                    [
+                        'success_url' => "{$baseUrl}/courses/{$course->slug}?status=success",
+                        'cancel_url' => "{$baseUrl}/courses/{$course->slug}?status=cancelled",
+                        'metadata' => [
+                            'user_id' => (string) $user->id,
+                            'course_id' => (string) $course->id,
+                        ],
+                    ]
+                )
                 ->andReturn($mockCheckout);
 
             postJson(route('student.courses.checkout', $course))

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\Lesson\Requests;
 
 use OpenApi\Attributes as OA;
@@ -33,7 +35,7 @@ use OpenApi\Attributes as OA;
             minimum: 0,
             example: 1,
             nullable: true
-        )
+        ),
     ],
     type: 'object',
     oneOf: [
@@ -42,6 +44,4 @@ use OpenApi\Attributes as OA;
         new OA\Schema(ref: '#/components/schemas/CreateVideoLessonRequest'),
     ]
 )]
-class CreateLessonRequestSchema
-{
-}
+class CreateLessonRequestSchema {}

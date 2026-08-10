@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\User;
@@ -7,7 +9,9 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class);
@@ -47,7 +51,7 @@ describe('Admin -> LessonController -> index', function () {
                 ->assertUnauthorized();
         });
 
-        it('fails if a user without permissions tries to retrieve the lessons', function ($user) {
+        it('fails if a user without permissions tries to retrieve the lessons', function (?User $user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -55,44 +59,40 @@ describe('Admin -> LessonController -> index', function () {
             getJson(route('admin.courses.lessons.index', $course))
                 ->assertForbidden();
         })->with([
-            'user' => fn() => User::factory()->create(),
-            'teacher' => fn() => User::factory()->teacher()->create(),
-            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
+            'user' => fn () => User::factory()->create(),
+            'teacher' => fn () => User::factory()->teacher()->create(),
+            'unverified teacher' => fn () => User::factory()->teacher()->unverified()->create(),
         ]);
 
-        it('allows a user with permission to retrieve lessons of the course', function ($userClosure, $courseClosure) {
-            $user = $userClosure();
+        it('allows a user with permission to retrieve lessons of the course', function (?User $user, Course $course) {
             Sanctum::actingAs($user);
-
-            $course = $courseClosure();
 
             $lessons = Lesson::factory()->count(2)->for($course, 'course')->create();
 
             $response = getJson(route('admin.courses.lessons.index', $course))
                 ->assertOk()
+                ->assertJsonCount(2, 'data')
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => adminLessonJsonStructure($course->type)
-                    ]
+                        '*' => adminLessonJsonStructure($course->type),
+                    ],
                 ]);
 
-            $responseDataIds = collect($response->json('data'))->pluck('id');
-            foreach ($lessons as $lesson) {
-                expect($responseDataIds)->toContain($lesson->id);
-            }
+            expect($response->json('data.*.id'))
+                ->toContain(...$lessons->pluck('id')->all());
         })->with([
-            'admin' => fn() => User::factory()->admin()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'admin' => fn () => User::factory()->admin()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
         ])->with([
-            'published' => fn() => Course::factory()->create(),
-            'unpublished' => fn() => Course::factory()->unpublished()->create(),
-            'banned' => fn() => Course::factory()->banned()->create(),
+            'published course' => fn () => Course::factory()->create(),
+            'unpublished course' => fn () => Course::factory()->unpublished()->create(),
+            'banned course' => fn () => Course::factory()->banned()->create(),
         ]);
 
         it('fails if a banned user tries to retrieve lessons of the course', function () {
             $bannedAuthor = User::factory()->admin()->banned()->create();
             $course = Course::factory()->for($bannedAuthor, 'author')->create();
-            $lessons = Lesson::factory()->count(2)->for($course, 'course')->create();
+            Lesson::factory()->count(2)->for($course, 'course')->create();
 
             Sanctum::actingAs($bannedAuthor);
 
@@ -242,6 +242,16 @@ describe('Admin -> LessonController -> index', function () {
             $descResponse = getJson(route('admin.courses.lessons.index', [$course, 'filter[trashed]' => 'only', 'sort' => '-deleted_at']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($newDeleted->id, $descIds))->toBeLessThan(array_search($oldDeleted->id, $descIds));
+        });
+
+        it('fails if an invalid sort parameter is provided', function () {
+            $admin = User::factory()->admin()->create();
+            Sanctum::actingAs($admin);
+
+            $course = Course::factory()->create();
+
+            getJson(route('admin.courses.lessons.index', [$course, 'sort' => 'invalid_field']))
+                ->assertBadRequest();
         });
 
         it('returns empty data when no lessons match the search', function () {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\ResetPasswordAction;
@@ -35,9 +37,6 @@ class ResetPasswordController extends Controller
     /**
      * Reset the password for the user identified by the email.
      *
-     * @param ResetPasswordData $data
-     * @param ResetPasswordAction $action
-     * @return Response
      * @throws ValidationException
      */
     public function __invoke(ResetPasswordData $data, ResetPasswordAction $action): Response

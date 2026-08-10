@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\UserPermission;
 use App\Http\Controllers\Api\Course\Admin\BanCourseController;
 use App\Http\Controllers\Api\Course\Admin\CourseController;
@@ -13,81 +15,61 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Admin actions
+| Admin Routes
 |--------------------------------------------------------------------------
 */
 Route::prefix('admin')
-    ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user', 'can:' . UserPermission::ADMIN_PANEL_ACCESS->value])
-    ->group(function () {
-
-        // Course actions
+    ->middleware(['auth:sanctum', 'verified', 'restrict.banned.user', 'can:'.UserPermission::ADMIN_PANEL_ACCESS->value])
+    ->group(function (): void {
         Route::prefix('courses')
             ->scopeBindings()
-            ->group(function () {
-
-                // Get all courses list action
+            ->group(function (): void {
                 Route::get('/', [CourseController::class, 'index'])
                     ->name('admin.courses.index');
 
-                // Show course action
-                Route::get('/{course}', [CourseController::class, 'show'])
+                Route::get('/{adminCourse}', [CourseController::class, 'show'])
                     ->name('admin.courses.show');
 
-                // Delete course action
-                Route::delete('/{course}', [CourseController::class, 'destroy'])
+                Route::delete('/{adminCourse}', [CourseController::class, 'destroy'])
                     ->name('admin.courses.destroy');
 
-                // Ban course action
-                Route::patch('/{course}/ban', BanCourseController::class)
+                Route::patch('/{adminCourse}/ban', BanCourseController::class)
                     ->name('admin.courses.ban');
 
-                // Unban course action
-                Route::patch('/{course}/unban', UnbanCourseController::class)
+                Route::patch('/{adminCourse}/unban', UnbanCourseController::class)
                     ->name('admin.courses.unban');
 
-                // Lesson actions
-                Route::prefix('/{course}/lessons')->group(function () {
+                Route::prefix('/{adminCourse}/lessons')
+                    ->group(function (): void {
+                        Route::get('/', [LessonController::class, 'index'])
+                            ->name('admin.courses.lessons.index');
 
-                    // Get course lessons list action
-                    Route::get('/', [LessonController::class, 'index'])
-                        ->name('admin.courses.lessons.index');
+                        Route::get('/{adminLesson}', [LessonController::class, 'show'])
+                            ->name('admin.courses.lessons.show');
 
-                    // Show course lesson action
-                    Route::get('/{lesson}', [LessonController::class, 'show'])
-                        ->name('admin.courses.lessons.show');
-
-                    // Delete course lesson action
-                    Route::delete('/{lesson}', [LessonController::class, 'destroy'])
-                        ->name('admin.courses.lessons.destroy');
-                });
+                        Route::delete('/{adminLesson}', [LessonController::class, 'destroy'])
+                            ->name('admin.courses.lessons.destroy');
+                    });
             });
 
-        // Users actions
         Route::prefix('users')
-            ->group(function () {
-
-                // Get users list action
+            ->group(function (): void {
                 Route::get('/', [UserController::class, 'index'])
                     ->name('admin.users.index');
 
-                // Show user action
-                Route::get('/{user}', [UserController::class, 'show'])
+                Route::get('/{adminUser}', [UserController::class, 'show'])
                     ->name('admin.users.show');
 
-                // Delete user action
-                Route::delete('/{user}', [UserController::class, 'destroy'])
+                Route::delete('/{adminUser}', [UserController::class, 'destroy'])
                     ->name('admin.users.destroy');
 
-                // Update user role action
-                Route::put('/{user}/role', [UserRoleController::class, 'update'])
+                Route::put('/{adminUser}/role', [UserRoleController::class, 'update'])
                     ->name('admin.users.role.update');
 
-                // Ban user action
-                Route::patch('/{user}/ban', BanUserController::class)
+                Route::patch('/{adminUser}/ban', BanUserController::class)
                     ->name('admin.users.ban');
 
-                // Unban user action
-                Route::patch('/{user}/unban', UnbanUserController::class)
+                Route::patch('/{adminUser}/unban', UnbanUserController::class)
                     ->name('admin.users.unban');
             });
     });

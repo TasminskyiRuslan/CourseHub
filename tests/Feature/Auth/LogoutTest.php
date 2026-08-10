@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\deleteJson;
 
 uses(RefreshDatabase::class);
@@ -31,17 +33,22 @@ describe('Auth -> LogoutController', function () {
     |--------------------------------------------------------------------------
     */
     describe('operations', function () {
-        it('revokes the current access token only', function () {
-            $user = User::factory()->create();
+        describe('operations', function () {
+            it('revokes the current access token only', function () {
+                $user = User::factory()->create();
 
-            collect(range(1, 4))->each(fn() => $user->createToken('access_token'));
+                collect(range(1, 3))->each(fn () => $user->createToken('other_token'));
 
-            Sanctum::actingAs($user);
+                $token = $user->createToken('current_token');
 
-            deleteJson(route('auth.token.destroy'))
-                ->assertNoContent();
+                deleteJson(
+                    route('auth.token.destroy'),
+                    headers: ['Authorization' => 'Bearer '.$token->plainTextToken]
+                )->assertNoContent();
 
-            expect($user->fresh()->tokens()->count())->toBe(4);
+                expect($user->fresh()->tokens()->count())->toBe(3)
+                    ->and($user->fresh()->tokens()->where('id', $token->accessToken->id)->exists())->toBeFalse();
+            });
         });
     });
 })->group('auth');

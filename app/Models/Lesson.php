@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Observers\Lesson\LessonObserver;
@@ -28,6 +30,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property Carbon|null $deleted_at
  * @property-read \App\Models\Course|null $course
  * @property-read Model|\Eloquent $lessonable
+ *
  * @method static \Database\Factories\LessonFactory factory($count = null, $state = [])
  * @method static Builder<static>|Lesson newModelQuery()
  * @method static Builder<static>|Lesson newQuery()
@@ -45,12 +48,13 @@ use Spatie\Sluggable\SlugOptions;
  * @method static Builder<static>|Lesson whereUpdatedAt($value)
  * @method static Builder<static>|Lesson withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|Lesson withoutTrashed()
+ *
  * @mixin Eloquent
  */
 class Lesson extends Model
 {
     /** @use HasFactory<LessonFactory> */
-    use HasSlug, HasFactory, SoftDeletes;
+    use HasFactory, HasSlug, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -60,13 +64,11 @@ class Lesson extends Model
     protected $fillable = [
         'title',
         'slug',
-        'position'
+        'position',
     ];
 
     /**
      * The "booted" method of the model.
-     *
-     * @return void
      */
     protected static function booted(): void
     {
@@ -74,19 +76,7 @@ class Lesson extends Model
     }
 
     /**
-     * Get the route key name for the model.
-     *
-     * @return string
-     */
-    public function getRouteKeyName(): string
-    {
-        return 'slug';
-    }
-
-    /**
      * Get the options for generating the slug.
-     *
-     * @return SlugOptions
      */
     public function getSlugOptions(): SlugOptions
     {
@@ -94,13 +84,19 @@ class Lesson extends Model
             ->generateSlugsFrom('title')
             ->saveSlugsTo('slug')
             ->doNotGenerateSlugsOnUpdate()
-            ->extraScope(fn($builder) => $builder->where('course_id', $this->course_id));
+            ->extraScope(fn ($builder) => $builder->where('course_id', $this->course_id));
+    }
+
+    /**
+     * Get the route key name for the model.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
     }
 
     /**
      * Get the owning lessonable model.
-     *
-     * @return MorphTo
      */
     public function lessonable(): MorphTo
     {
@@ -109,8 +105,6 @@ class Lesson extends Model
 
     /**
      * Get the course that owns the lesson.
-     *
-     * @return BelongsTo
      */
     public function course(): BelongsTo
     {

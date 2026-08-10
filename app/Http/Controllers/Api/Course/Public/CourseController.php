@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\Course\Public;
 
 use App\Enums\CourseType;
-use App\Finders\Course\Public\FindCourseBySlug;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Course\Public\CourseResource;
-use App\Loaders\Course\Public\LoadCourse;
+use App\Loaders\Course\Public\CourseLoader;
+use App\Models\Course;
 use App\Queries\Course\Public\GetCoursesQuery;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -58,7 +60,7 @@ class CourseController extends Controller
                 in: 'query',
                 required: false,
                 schema: new OA\Schema(type: 'integer', default: 1, minimum: 1),
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -70,18 +72,14 @@ class CourseController extends Controller
                             property: 'data',
                             type: 'array',
                             items: new OA\Items(ref: '#/components/schemas/CoursePublicResponse')
-                        )
+                        ),
                     ]
                 )
-            )
+            ),
         ]
     )]
     /**
      * Retrieve a paginated list of active courses.
-     *
-     * @param Request $request
-     * @param GetCoursesQuery $query
-     * @return JsonResponse
      */
     public function index(Request $request, GetCoursesQuery $query): JsonResponse
     {
@@ -93,13 +91,13 @@ class CourseController extends Controller
     }
 
     #[OA\Get(
-        path: '/courses/{course}',
+        path: '/courses/{publicCourse}',
         description: 'Retrieve detailed information about the specified active course.',
         summary: '[Public] Retrieve course details',
         tags: ['Course'],
         parameters: [
             new OA\Parameter(
-                name: 'course',
+                name: 'publicCourse',
                 description: 'Course identifier (slug).',
                 in: 'path',
                 required: true,
@@ -107,7 +105,7 @@ class CourseController extends Controller
                     type: 'string',
                     example: 'math-101'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -118,29 +116,22 @@ class CourseController extends Controller
                         new OA\Property(
                             property: 'data',
                             ref: '#/components/schemas/CoursePublicResponse'
-                        )
+                        ),
                     ]
                 )
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
                 description: 'Course not found.'
-            )
+            ),
         ]
     )]
     /**
      * Retrieve detailed information about the specified active course.
-     *
-     * @param FindCourseBySlug $finder
-     * @param LoadCourse $loader
-     * @param string $course
-     * @return JsonResponse
      */
-    public function show(FindCourseBySlug $finder, LoadCourse $loader, string $course): JsonResponse
+    public function show(CourseLoader $courseLoader, Course $publicCourse): JsonResponse
     {
-        $gottenCourse = $finder->handle($course);
-
-        $loadedCourse = $loader->handle($gottenCourse);
+        $loadedCourse = $courseLoader->handle($publicCourse);
 
         return CourseResource::make($loadedCourse)
             ->response()

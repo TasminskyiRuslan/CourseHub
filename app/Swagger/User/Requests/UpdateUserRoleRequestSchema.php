@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\User\Requests;
 
 use App\Enums\UserRole;
@@ -19,15 +21,11 @@ use OpenApi\Attributes as OA;
                 type: 'string',
                 enum: [
                     UserRole::TEACHER->value,
-                    UserRole::ADMIN->value,
                 ]
             ),
             example: [UserRole::TEACHER->value]
-        )
+        ),
     ],
     type: 'object'
 )]
-class UpdateUserRoleRequestSchema
-{
-
-}
+class UpdateUserRoleRequestSchema {}

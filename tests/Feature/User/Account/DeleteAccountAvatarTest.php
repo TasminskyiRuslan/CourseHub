@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+use App\Jobs\DeleteFileFromStorageJob;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\deleteJson;
 
 uses(RefreshDatabase::class);
@@ -45,7 +50,9 @@ describe('Account -> AccountAvatarController -> destroy', function () {
                 ->assertForbidden();
         });
 
-        it('allows an authenticated user to delete their own avatar', function ($user) {
+        it('allows an authenticated user to delete their own avatar', function (?User $user) {
+            Queue::fake();
+
             $avatarPath = $user->avatar_path;
 
             Storage::disk('users')->put($avatarPath, 'fake');
@@ -56,12 +63,15 @@ describe('Account -> AccountAvatarController -> destroy', function () {
 
             $user->refresh();
             expect($user->avatar_path)->toBeNull();
-            Storage::disk('users')->assertMissing($avatarPath);
+
+            Queue::assertPushed(DeleteFileFromStorageJob::class, function ($job) use ($avatarPath) {
+                return $job->disk === 'users' && $job->filePath === $avatarPath;
+            });
         })->with([
-            'student' => fn() => User::factory()->withAvatar()->create(),
-            'teacher' => fn() => User::factory()->teacher()->withAvatar()->create(),
-            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->withAvatar()->create(),
-            'admin' => fn() => User::factory()->admin()->withAvatar()->create(),
+            'student' => fn () => User::factory()->withAvatar()->create(),
+            'teacher' => fn () => User::factory()->teacher()->withAvatar()->create(),
+            'unverified teacher' => fn () => User::factory()->teacher()->unverified()->withAvatar()->create(),
+            'admin' => fn () => User::factory()->admin()->withAvatar()->create(),
         ]);
 
         it('fails if a banned user tries to delete their own avatar', function () {

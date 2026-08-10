@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\Lesson\Admin;
 
 use App\Actions\Lesson\DeleteLessonAction;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Lesson\Admin\LessonResource;
+use App\Loaders\Lesson\Admin\LessonLoader;
 use App\Models\Course;
 use App\Models\Lesson;
-use App\Queries\Lesson\Admin\GetLessonQuery;
 use App\Queries\Lesson\Admin\GetLessonsQuery;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -22,14 +24,14 @@ class LessonController extends Controller
     use AuthorizesRequests;
 
     #[OA\Get(
-        path: '/admin/courses/{course}/lessons',
+        path: '/admin/courses/{adminCourse}/lessons',
         description: 'Retrieve a paginated list of lessons for the specified course by administrator.',
         summary: '[Admin] Retrieve a list of course lessons',
         security: [['sanctum' => []]],
         tags: ['Lesson'],
         parameters: [
             new OA\Parameter(
-                name: 'course',
+                name: 'adminCourse',
                 description: 'Course identifier (slug).',
                 in: 'path',
                 required: true,
@@ -50,7 +52,7 @@ class LessonController extends Controller
                 description: 'Filter by trashed state.',
                 in: 'query',
                 required: false,
-                schema: new OA\Schema(type: 'string', enum: ['only', 'with'])
+                schema: new OA\Schema(type: 'string', enum: ['only', 'with', 'without'])
             ),
             new OA\Parameter(
                 name: 'sort',
@@ -80,7 +82,7 @@ class LessonController extends Controller
                             property: 'data',
                             type: 'array',
                             items: new OA\Items(ref: '#/components/schemas/LessonAdminResponse')
-                        )
+                        ),
                     ]
                 )
             ),
@@ -95,35 +97,30 @@ class LessonController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
                 description: 'Course not found.'
-            )
+            ),
         ]
     )]
     /**
      * Retrieve a paginated list of lessons for the specified course by administrator.
-     *
-     * @param Request $request
-     * @param GetLessonsQuery $query
-     * @param string $course
-     * @return JsonResponse
      */
-    public function index(Request $request, GetLessonsQuery $query, string $course): JsonResponse
+    public function index(Request $request, GetLessonsQuery $query, Course $adminCourse): JsonResponse
     {
-        $lessons = $query->handle($request, $course);
+        $gottenLessons = $query->handle($request, $adminCourse);
 
-        return LessonResource::collection($lessons)
+        return LessonResource::collection($gottenLessons)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 
     #[OA\Get(
-        path: '/admin/courses/{course}/lessons/{lesson}',
+        path: '/admin/courses/{adminCourse}/lessons/{adminLesson}',
         description: 'Retrieve detailed information about the specified lesson by administrator.',
         summary: '[Admin] Retrieve lesson details',
         security: [['sanctum' => []]],
         tags: ['Lesson'],
         parameters: [
             new OA\Parameter(
-                name: 'course',
+                name: 'adminCourse',
                 description: 'Course identifier (slug).',
                 in: 'path',
                 required: true,
@@ -133,7 +130,7 @@ class LessonController extends Controller
                 )
             ),
             new OA\Parameter(
-                name: 'lesson',
+                name: 'adminLesson',
                 description: 'Lesson identifier (slug).',
                 in: 'path',
                 required: true,
@@ -141,7 +138,7 @@ class LessonController extends Controller
                     type: 'string',
                     example: 'introduction-to-algebra'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -152,7 +149,7 @@ class LessonController extends Controller
                         new OA\Property(
                             property: 'data',
                             ref: '#/components/schemas/LessonAdminResponse'
-                        )
+                        ),
                     ]
                 )
             ),
@@ -167,35 +164,30 @@ class LessonController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
                 description: 'Course or lesson not found.'
-            )
+            ),
         ]
     )]
     /**
      * Retrieve detailed information about the specified lesson by administrator.
-     *
-     * @param GetLessonQuery $query
-     * @param string $course
-     * @param string $lesson
-     * @return JsonResponse
      */
-    public function show(GetLessonQuery $query, string $course, string $lesson): JsonResponse
+    public function show(LessonLoader $lessonLoader, Course $adminCourse, Lesson $adminLesson): JsonResponse
     {
-        $gottenLesson = $query->handle($course, $lesson);
+        $loadedLesson = $lessonLoader->handle($adminLesson);
 
-        return LessonResource::make($gottenLesson)
+        return LessonResource::make($loadedLesson)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 
     #[OA\Delete(
-        path: '/admin/courses/{course}/lessons/{lesson}',
+        path: '/admin/courses/{adminCourse}/lessons/{adminLesson}',
         description: 'Delete the specified lesson by administrator.',
         summary: '[Admin] Delete a lesson',
         security: [['sanctum' => []]],
         tags: ['Lesson'],
         parameters: [
             new OA\Parameter(
-                name: 'course',
+                name: 'adminCourse',
                 description: 'Course identifier (slug).',
                 in: 'path',
                 required: true,
@@ -205,7 +197,7 @@ class LessonController extends Controller
                 )
             ),
             new OA\Parameter(
-                name: 'lesson',
+                name: 'adminLesson',
                 description: 'Lesson identifier (slug).',
                 in: 'path',
                 required: true,
@@ -213,7 +205,7 @@ class LessonController extends Controller
                     type: 'string',
                     example: 'introduction-to-algebra'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -237,17 +229,13 @@ class LessonController extends Controller
     /**
      * Delete the specified lesson by administrator.
      *
-     * @param DeleteLessonAction $action
-     * @param Course $course
-     * @param Lesson $lesson
-     * @return Response
      * @throws Throwable
      */
-    public function destroy(DeleteLessonAction $action, Course $course, Lesson $lesson): Response
+    public function destroy(DeleteLessonAction $action, Course $adminCourse, Lesson $adminLesson): Response
     {
-        $this->authorize('delete', $lesson);
+        $this->authorize('delete', $adminLesson);
 
-        $action->handle($lesson);
+        $action->handle($adminLesson);
 
         return response()->noContent();
     }

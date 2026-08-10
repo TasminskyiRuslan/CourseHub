@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\Auth\Requests;
 
 use OpenApi\Attributes as OA;
@@ -39,10 +41,8 @@ use OpenApi\Attributes as OA;
             description: 'Password reset token received via email.',
             type: 'string',
             example: '66006454322443...'
-        )
+        ),
     ],
     type: 'object'
 )]
-class ResetPasswordRequestSchema
-{
-}
+class ResetPasswordRequestSchema {}

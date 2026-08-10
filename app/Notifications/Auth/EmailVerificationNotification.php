@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications\Auth;
 
 use Illuminate\Auth\Notifications\VerifyEmail;
@@ -25,7 +27,6 @@ class EmailVerificationNotification extends VerifyEmail implements ShouldQueue
     /**
      * Get the notification's delivery channels.
      *
-     * @param mixed $notifiable
      * @return array<int, string>
      */
     public function via(mixed $notifiable): array
@@ -35,27 +36,21 @@ class EmailVerificationNotification extends VerifyEmail implements ShouldQueue
 
     /**
      * Get the mail representation of the notification.
-     *
-     * @param mixed $notifiable
-     * @return MailMessage
      */
     public function toMail(mixed $notifiable): MailMessage
     {
-        $url = $this->verificationUrl($notifiable);
+        $verificationUrl = $this->verificationUrl($notifiable);
 
         return (new MailMessage)
             ->subject('Verify Your Email Address')
             ->markdown('emails.auth.verify', [
-                'url' => $url,
+                'url' => $verificationUrl,
                 'user' => $notifiable,
             ]);
     }
 
     /**
      * Get the verification URL for the given notifiable.
-     *
-     * @param mixed $notifiable
-     * @return string
      */
     protected function verificationUrl(mixed $notifiable): string
     {
@@ -65,7 +60,7 @@ class EmailVerificationNotification extends VerifyEmail implements ShouldQueue
 
         return URL::temporarySignedRoute(
             'auth.verification.verify',
-            Carbon::now()->addMinutes(Config::get('auth.verification.expire')),
+            Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
             [
                 'id' => $notifiable->getKey(),
                 'hash' => sha1($notifiable->getEmailForVerification()),

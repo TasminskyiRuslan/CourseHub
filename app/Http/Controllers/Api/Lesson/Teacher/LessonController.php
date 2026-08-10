@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\Lesson\Teacher;
 
 use App\Actions\Lesson\CreateLessonAction;
@@ -9,9 +11,9 @@ use App\Data\Lesson\Requests\CreateLessonData;
 use App\Data\Lesson\Requests\UpdateLessonData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Lesson\Teacher\LessonResource;
+use App\Loaders\Lesson\Teacher\LessonLoader;
 use App\Models\Course;
 use App\Models\Lesson;
-use App\Queries\Lesson\Teacher\GetLessonQuery;
 use App\Queries\Lesson\Teacher\GetLessonsQuery;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -26,14 +28,14 @@ class LessonController extends Controller
     use AuthorizesRequests;
 
     #[OA\Get(
-        path: '/teacher/courses/{course}/lessons',
+        path: '/teacher/courses/{teacherCourse}/lessons',
         description: 'Retrieve a paginated list of lessons for the specified teacher\'s course.',
         summary: '[Teacher] Retrieve a list of course lessons',
         security: [['sanctum' => []]],
         tags: ['Lesson'],
         parameters: [
             new OA\Parameter(
-                name: 'course',
+                name: 'teacherCourse',
                 description: 'Course identifier (slug).',
                 in: 'path',
                 required: true,
@@ -77,7 +79,7 @@ class LessonController extends Controller
                             property: 'data',
                             type: 'array',
                             items: new OA\Items(ref: '#/components/schemas/LessonTeacherResponse')
-                        )
+                        ),
                     ]
                 )
             ),
@@ -92,22 +94,15 @@ class LessonController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
                 description: 'Course not found.'
-            )
+            ),
         ]
     )]
     /**
      * Retrieve a paginated list of lessons for the specified teacher's course.
-     *
-     * @param Request $request
-     * @param GetLessonsQuery $query
-     * @param string $course
-     * @return JsonResponse
      */
-    public function index(Request $request, GetLessonsQuery $query, string $course): JsonResponse
+    public function index(Request $request, GetLessonsQuery $query, Course $teacherCourse): JsonResponse
     {
-        $currentUser = $request->user();
-
-        $gottenLessons = $query->handle($request, $currentUser, $course);
+        $gottenLessons = $query->handle($request, $teacherCourse);
 
         return LessonResource::collection($gottenLessons)
             ->response()
@@ -115,7 +110,7 @@ class LessonController extends Controller
     }
 
     #[OA\Post(
-        path: '/teacher/courses/{course}/lessons',
+        path: '/teacher/courses/{teacherCourse}/lessons',
         description: 'Create a new lesson for the specified teacher\'s course.',
         summary: '[Teacher] Create a lesson',
         security: [['sanctum' => []]],
@@ -126,7 +121,7 @@ class LessonController extends Controller
         tags: ['Lesson'],
         parameters: [
             new OA\Parameter(
-                name: 'course',
+                name: 'teacherCourse',
                 description: 'Course identifier (slug).',
                 in: 'path',
                 required: true,
@@ -134,7 +129,7 @@ class LessonController extends Controller
                     type: 'string',
                     example: 'math-101'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -145,7 +140,7 @@ class LessonController extends Controller
                         new OA\Property(
                             property: 'data',
                             ref: '#/components/schemas/LessonTeacherResponse'
-                        )
+                        ),
                     ]
                 )
             ),
@@ -164,39 +159,35 @@ class LessonController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
                 description: 'Validation error.'
-            )
+            ),
         ]
     )]
     /**
      * Create a new lesson for the specified teacher's course.
      *
-     * @param CreateLessonData $data
-     * @param CreateLessonAction $action
-     * @param Course $course
-     * @return JsonResponse
      * @throws Throwable
      */
-    public function store(CreateLessonData $data, CreateLessonAction $action, Course $course): JsonResponse
+    public function store(CreateLessonData $data, CreateLessonAction $action, LessonLoader $lessonLoader, Course $teacherCourse): JsonResponse
     {
-        $this->authorize('create', [Lesson::class, $course]);
+        $this->authorize('create', [Lesson::class, $teacherCourse]);
 
-        $createdLesson = $action->handle($data, $course);
-        $createdLesson->loadMissing(['lessonable']);
+        $createdLesson = $action->handle($data, $teacherCourse);
+        $loadedLesson = $lessonLoader->handle($createdLesson);
 
-        return LessonResource::make($createdLesson)
+        return LessonResource::make($loadedLesson)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_CREATED);
     }
 
     #[OA\Get(
-        path: '/teacher/courses/{course}/lessons/{lesson}',
+        path: '/teacher/courses/{teacherCourse}/lessons/{teacherLesson}',
         description: 'Retrieve detailed information about the specified lesson for the specified teacher\'s course.',
         summary: '[Teacher] Retrieve lesson details',
         security: [['sanctum' => []]],
         tags: ['Lesson'],
         parameters: [
             new OA\Parameter(
-                name: 'course',
+                name: 'teacherCourse',
                 description: 'Course identifier (slug).',
                 in: 'path',
                 required: true,
@@ -206,7 +197,7 @@ class LessonController extends Controller
                 )
             ),
             new OA\Parameter(
-                name: 'lesson',
+                name: 'teacherLesson',
                 description: 'Lesson identifier (slug).',
                 in: 'path',
                 required: true,
@@ -214,7 +205,7 @@ class LessonController extends Controller
                     type: 'string',
                     example: 'introduction-to-algebra'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -225,7 +216,7 @@ class LessonController extends Controller
                         new OA\Property(
                             property: 'data',
                             ref: '#/components/schemas/LessonTeacherResponse'
-                        )
+                        ),
                     ]
                 )
             ),
@@ -240,31 +231,23 @@ class LessonController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
                 description: 'Course or lesson not found.'
-            )
+            ),
         ]
     )]
     /**
      * Retrieve detailed information about the specified lesson for the specified teacher's course.
-     *
-     * @param Request $request
-     * @param GetLessonQuery $query
-     * @param string $course
-     * @param string $lesson
-     * @return JsonResponse
      */
-    public function show(Request $request, GetLessonQuery $query, string $course, string $lesson): JsonResponse
+    public function show(LessonLoader $lessonLoader, Course $teacherCourse, Lesson $teacherLesson): JsonResponse
     {
-        $currentUser = $request->user();
+        $loadedLesson = $lessonLoader->handle($teacherLesson);
 
-        $gottenLesson = $query->handle($currentUser, $course, $lesson);
-
-        return LessonResource::make($gottenLesson)
+        return LessonResource::make($loadedLesson)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 
     #[OA\Patch(
-        path: '/teacher/courses/{course}/lessons/{lesson}',
+        path: '/teacher/courses/{teacherCourse}/lessons/{teacherLesson}',
         description: 'Update the specified lesson for the specified teacher\'s course.',
         summary: '[Teacher] Update a lesson',
         security: [['sanctum' => []]],
@@ -275,7 +258,7 @@ class LessonController extends Controller
         tags: ['Lesson'],
         parameters: [
             new OA\Parameter(
-                name: 'course',
+                name: 'teacherCourse',
                 description: 'Course identifier (slug).',
                 in: 'path',
                 required: true,
@@ -285,7 +268,7 @@ class LessonController extends Controller
                 )
             ),
             new OA\Parameter(
-                name: 'lesson',
+                name: 'teacherLesson',
                 description: 'Lesson identifier (slug).',
                 in: 'path',
                 required: true,
@@ -293,7 +276,7 @@ class LessonController extends Controller
                     type: 'string',
                     example: 'introduction-to-algebra'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -304,7 +287,7 @@ class LessonController extends Controller
                         new OA\Property(
                             property: 'data',
                             ref: '#/components/schemas/LessonTeacherResponse'
-                        )
+                        ),
                     ]
                 )
             ),
@@ -323,38 +306,35 @@ class LessonController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
                 description: 'Validation error.'
-            )
+            ),
         ]
     )]
     /**
      * Update the specified lesson for the specified teacher's course.
      *
-     * @param UpdateLessonData $data
-     * @param UpdateLessonAction $action
-     * @param Course $course
-     * @param Lesson $lesson
-     * @return JsonResponse
      * @throws Throwable
      */
-    public function update(UpdateLessonData $data, UpdateLessonAction $action, Course $course, Lesson $lesson): JsonResponse
+    public function update(UpdateLessonData $data, UpdateLessonAction $action, LessonLoader $lessonLoader, Course $teacherCourse, Lesson $teacherLesson): JsonResponse
     {
-        $this->authorize('update', $lesson);
-        $updatedLesson = $action->handle($data, $lesson);
-        $updatedLesson->loadMissing(['lessonable']);
-        return LessonResource::make($updatedLesson)
+        $this->authorize('update', $teacherLesson);
+
+        $updatedLesson = $action->handle($data, $teacherLesson);
+        $loadedLesson = $lessonLoader->handle($updatedLesson);
+
+        return LessonResource::make($loadedLesson)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 
     #[OA\Delete(
-        path: '/teacher/courses/{course}/lessons/{lesson}',
+        path: '/teacher/courses/{teacherCourse}/lessons/{teacherLesson}',
         description: 'Delete the specified lesson for the specified teacher\'s course.',
         summary: '[Teacher] Delete a lesson',
         security: [['sanctum' => []]],
         tags: ['Lesson'],
         parameters: [
             new OA\Parameter(
-                name: 'course',
+                name: 'teacherCourse',
                 description: 'Course identifier (slug).',
                 in: 'path',
                 required: true,
@@ -364,7 +344,7 @@ class LessonController extends Controller
                 )
             ),
             new OA\Parameter(
-                name: 'lesson',
+                name: 'teacherLesson',
                 description: 'Lesson identifier (slug).',
                 in: 'path',
                 required: true,
@@ -372,7 +352,7 @@ class LessonController extends Controller
                     type: 'string',
                     example: 'introduction-to-algebra'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -396,17 +376,13 @@ class LessonController extends Controller
     /**
      * Delete the specified lesson for the specified teacher's course.
      *
-     * @param DeleteLessonAction $action
-     * @param Course $course
-     * @param Lesson $lesson
-     * @return Response
      * @throws Throwable
      */
-    public function destroy(DeleteLessonAction $action, Course $course, Lesson $lesson): Response
+    public function destroy(DeleteLessonAction $action, Course $teacherCourse, Lesson $teacherLesson): Response
     {
-        $this->authorize('delete', $lesson);
+        $this->authorize('delete', $teacherLesson);
 
-        $action->handle($lesson);
+        $action->handle($teacherLesson);
 
         return response()->noContent();
     }

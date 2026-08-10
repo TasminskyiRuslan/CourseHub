@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\Course\Teacher;
 
 use App\Actions\Course\UnpublishCourseAction;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Course\Teacher\CourseResource;
-use App\Loaders\Course\Teacher\LoadCourse;
+use App\Loaders\Course\Teacher\CourseLoader;
 use App\Models\Course;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -18,14 +20,14 @@ class UnpublishCourseController extends Controller
     use AuthorizesRequests;
 
     #[OA\Patch(
-        path: '/teacher/courses/{course}/unpublish',
+        path: '/teacher/courses/{teacherCourse}/unpublish',
         description: 'Unpublish the specified teacher\'s course.',
         summary: '[Teacher] Unpublish a course',
         security: [['sanctum' => []]],
         tags: ['Course'],
         parameters: [
             new OA\Parameter(
-                name: 'course',
+                name: 'teacherCourse',
                 description: 'Course identifier (slug)',
                 in: 'path',
                 required: true,
@@ -33,7 +35,7 @@ class UnpublishCourseController extends Controller
                     type: 'string',
                     example: 'math-101'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -44,7 +46,7 @@ class UnpublishCourseController extends Controller
                         new OA\Property(
                             property: 'data',
                             ref: '#/components/schemas/CourseTeacherResponse'
-                        )
+                        ),
                     ]
                 )
             ),
@@ -59,25 +61,20 @@ class UnpublishCourseController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
                 description: 'Course not found.'
-            )
+            ),
         ]
     )]
     /**
      * Unpublish the specified teacher's course.
      *
-     * @param UnpublishCourseAction $action
-     * @param LoadCourse $loader
-     * @param Course $course
-     * @return JsonResponse
      * @throws Throwable
      */
-    public function __invoke(UnpublishCourseAction $action, LoadCourse $loader, Course $course): JsonResponse
+    public function __invoke(UnpublishCourseAction $action, CourseLoader $courseLoader, Course $teacherCourse): JsonResponse
     {
-        $this->authorize('publish', $course);
+        $this->authorize('publish', $teacherCourse);
 
-        $unpublishedCourse = $action->handle($course);
-
-        $loadedCourse = $loader->handle($unpublishedCourse);
+        $unpublishedCourse = $action->handle($teacherCourse);
+        $loadedCourse = $courseLoader->handle($unpublishedCourse);
 
         return CourseResource::make($loadedCourse)
             ->response()

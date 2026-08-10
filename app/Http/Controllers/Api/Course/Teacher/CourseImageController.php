@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\Course\Teacher;
 
 use App\Actions\Course\DeleteCourseImageAction;
@@ -7,7 +9,7 @@ use App\Actions\Course\UpdateCourseImageAction;
 use App\Data\Course\Requests\UpdateCourseImageData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Course\Teacher\CourseResource;
-use App\Loaders\Course\Teacher\LoadCourse;
+use App\Loaders\Course\Teacher\CourseLoader;
 use App\Models\Course;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -21,7 +23,7 @@ class CourseImageController extends Controller
     use AuthorizesRequests;
 
     #[OA\Post(
-        path: '/teacher/courses/{course}/image',
+        path: '/teacher/courses/{teacherCourse}/image',
         description: 'Update the image of the specified teacher\'s course.',
         summary: '[Teacher] Update course image',
         security: [['sanctum' => []]],
@@ -35,7 +37,7 @@ class CourseImageController extends Controller
         tags: ['Course'],
         parameters: [
             new OA\Parameter(
-                name: 'course',
+                name: 'teacherCourse',
                 description: 'Course identifier (slug)',
                 in: 'path',
                 required: true,
@@ -43,7 +45,7 @@ class CourseImageController extends Controller
                     type: 'string',
                     example: 'math-101'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -54,7 +56,7 @@ class CourseImageController extends Controller
                         new OA\Property(
                             property: 'data',
                             ref: '#/components/schemas/CourseTeacherResponse'
-                        )
+                        ),
                     ]
                 )
             ),
@@ -73,26 +75,20 @@ class CourseImageController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
                 description: 'Validation error.'
-            )
+            ),
         ]
     )]
     /**
      * Update the image of the specified teacher's course.
      *
-     * @param UpdateCourseImageData $data
-     * @param UpdateCourseImageAction $action
-     * @param LoadCourse $loader
-     * @param Course $course
-     * @return JsonResponse
      * @throws Throwable
      */
-    public function update(UpdateCourseImageData $data, UpdateCourseImageAction $action, LoadCourse $loader, Course $course): JsonResponse
+    public function update(UpdateCourseImageData $data, UpdateCourseImageAction $action, CourseLoader $courseLoader, Course $teacherCourse): JsonResponse
     {
-        $this->authorize('update', $course);
+        $this->authorize('update', $teacherCourse);
 
-        $updatedCourse = $action->handle($data, $course);
-
-        $loadedCourse = $loader->handle($updatedCourse);
+        $updatedCourse = $action->handle($data, $teacherCourse);
+        $loadedCourse = $courseLoader->handle($updatedCourse);
 
         return CourseResource::make($loadedCourse)
             ->response()
@@ -100,14 +96,14 @@ class CourseImageController extends Controller
     }
 
     #[OA\Delete(
-        path: '/teacher/courses/{course}/image',
+        path: '/teacher/courses/{teacherCourse}/image',
         description: 'Delete the image of the specified teacher\'s course.',
         summary: '[Teacher] Delete course image',
         security: [['sanctum' => []]],
         tags: ['Course'],
         parameters: [
             new OA\Parameter(
-                name: 'course',
+                name: 'teacherCourse',
                 description: 'Course identifier (slug)',
                 in: 'path',
                 required: true,
@@ -115,7 +111,7 @@ class CourseImageController extends Controller
                     type: 'string',
                     example: 'math-101'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -133,22 +129,19 @@ class CourseImageController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
                 description: 'Course not found.'
-            )
+            ),
         ]
     )]
     /**
      * Delete the image of the specified teacher's course.
      *
-     * @param DeleteCourseImageAction $action
-     * @param Course $course
-     * @return Response
      * @throws Throwable
      */
-    public function destroy(DeleteCourseImageAction $action, Course $course): Response
+    public function destroy(DeleteCourseImageAction $action, Course $teacherCourse): Response
     {
-        $this->authorize('update', $course);
+        $this->authorize('update', $teacherCourse);
 
-        $action->handle($course);
+        $action->handle($teacherCourse);
 
         return response()->noContent();
     }

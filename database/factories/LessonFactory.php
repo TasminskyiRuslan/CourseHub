@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Enums\CourseType;
@@ -29,6 +31,7 @@ class LessonFactory extends Factory
     public function definition(): array
     {
         $title = fake()->sentence(3);
+
         return [
             'course_id' => Course::factory()->lazy(),
             'title' => $title,
@@ -45,7 +48,7 @@ class LessonFactory extends Factory
     public function configure(): static
     {
         return $this->afterMaking(function (Lesson $lesson) {
-            if (!$lesson->lessonable_id) {
+            if (! $lesson->lessonable_id) {
                 $lessonable = match ($lesson->course->type) {
                     CourseType::OFFLINE => OfflineLesson::factory()->create(),
                     CourseType::ONLINE => OnlineLesson::factory()->create(),

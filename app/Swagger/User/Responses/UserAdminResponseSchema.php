@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\User\Responses;
 
 use App\Enums\UserRole;
@@ -101,10 +103,8 @@ use OpenApi\Attributes as OA;
             format: 'date-time',
             example: null,
             nullable: true
-        )
+        ),
     ],
     type: 'object'
 )]
-class UserAdminResponseSchema
-{
-}
+class UserAdminResponseSchema {}

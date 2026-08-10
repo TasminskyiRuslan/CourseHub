@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Auth;
 
 use App\Data\Auth\Requests\SendPasswordResetLinkData;
@@ -11,21 +13,19 @@ readonly class SendPasswordResetLinkAction
     /**
      * Send a password reset link to the user identified by the email.
      *
-     * @param SendPasswordResetLinkData $data
-     * @return void
      * @throws ValidationException
      */
     public function handle(SendPasswordResetLinkData $data): void
     {
-        $status = Password::sendResetLink(['email' => $data->email]);
+        $resetStatus = Password::sendResetLink(['email' => $data->email]);
 
-        if ($status === Password::INVALID_USER) {
+        if ($resetStatus === Password::INVALID_USER) {
             return;
         }
 
-        if ($status !== Password::RESET_LINK_SENT) {
+        if ($resetStatus !== Password::RESET_LINK_SENT) {
             throw ValidationException::withMessages([
-                'email' => [__($status)],
+                'email' => [__($resetStatus)],
             ]);
         }
     }

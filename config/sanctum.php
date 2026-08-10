@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Laravel\Sanctum\Sanctum;
 
 return [
@@ -19,7 +21,7 @@ return [
         '%s%s',
         'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
         Sanctum::currentApplicationUrlWithPort(),
-    // Sanctum::currentRequestHost(),
+        // Sanctum::currentRequestHost(),
     ))),
 
     /*
@@ -48,8 +50,8 @@ return [
     */
 
     'token_ttl' => [
-        'default' => (int)env('SANCTUM_TOKEN_TTL_DEFAULT', 2880),
-        'remember' => (int)env('SANCTUM_TOKEN_TTL_REMEMBER', 20160),
+        'default' => (int) env('SANCTUM_TOKEN_TTL_DEFAULT', 2880),
+        'remember' => (int) env('SANCTUM_TOKEN_TTL_REMEMBER', 20160),
     ],
 
     /*

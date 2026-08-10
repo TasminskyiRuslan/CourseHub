@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Course;
 
 use App\Models\Course;
@@ -9,15 +11,11 @@ readonly class EnrollUserAction
 {
     /**
      * Enroll the specified user in the specified course.
-     *
-     * @param User $user
-     * @param Course $course
-     * @return Course
      */
     public function handle(User $user, Course $course): Course
     {
         $user->enrolledCourses()->syncWithoutDetaching([
-            $course->id
+            $course->id,
         ]);
 
         return $course;

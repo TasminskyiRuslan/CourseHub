@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources\Api\Lesson\Admin;
 
 use Carbon\Carbon;
@@ -24,7 +26,6 @@ class LessonResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param Request $request
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
@@ -35,10 +36,10 @@ class LessonResource extends JsonResource
             'title' => $this->title,
             'slug' => $this->slug,
             'position' => $this->position,
-            'content' => $this->whenLoaded('lessonable', fn() => $this->lessonable?->toResource()),
+            'content' => $this->whenLoaded('lessonable', fn () => $this->lessonable?->toResource()),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at
+            'deleted_at' => $this->deleted_at,
         ];
     }
 }

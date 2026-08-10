@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources\Api\User\Public;
 
 use Illuminate\Http\Request;
@@ -14,12 +16,11 @@ use Illuminate\Support\Facades\Storage;
  * @property-read string|null $avatar_path
  * @property-read int|MissingValue $courses_count
  */
-class UserResource extends JsonResource
+class TeacherResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
-     * @param Request $request
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
@@ -29,7 +30,7 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'avatar_url' => $this->avatar_path ? Storage::disk('users')->url($this->avatar_path) : null,
-            'courses_count' => $this->whenCounted('courses', fn() => $this->courses_count, 0),
+            'courses_count' => $this->whenCounted('courses'),
         ];
     }
 }

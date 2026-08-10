@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\Lesson\Requests;
 
 use OpenApi\Attributes as OA;
@@ -25,10 +27,8 @@ use OpenApi\Attributes as OA;
             maxLength: 50,
             example: 'vimeo',
             nullable: true
-        )
+        ),
     ],
     type: 'object'
 )]
-class UpdateVideoLessonRequestSchema
-{
-}
+class UpdateVideoLessonRequestSchema {}

@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\Course;
 use App\Models\User;
 use App\Notifications\Course\CourseBannedNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\patchJson;
 
 uses(RefreshDatabase::class);
@@ -50,7 +54,7 @@ describe('Admin -> BanCourseController', function () {
             expect($course->isBanned())->toBeFalse();
         });
 
-        it('fails if a user without permissions tries to ban a course', function ($user) {
+        it('fails if a user without permissions tries to ban a course', function (?User $user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -61,31 +65,44 @@ describe('Admin -> BanCourseController', function () {
             $course->refresh();
             expect($course->isBanned())->toBeFalse();
         })->with([
-            'user' => fn() => User::factory()->create(),
-            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'another teacher' => fn() => User::factory()->teacher()->create(),
+            'user' => fn () => User::factory()->create(),
+            'unverified teacher' => fn () => User::factory()->teacher()->unverified()->create(),
+            'another teacher' => fn () => User::factory()->teacher()->create(),
         ]);
 
-        it('allows a user with permissions to ban a course', function ($userClosure, $courseClosure) {
-            Notification::fake();
-            Sanctum::actingAs($userClosure());
+        it('fails if a banned user tries to ban a course', function () {
+            $bannedAdmin = User::factory()->admin()->banned()->create();
+            $course = Course::factory()->create();
 
-            $courseInnerClosure = $courseClosure();
-            $course = $courseInnerClosure();
+            Sanctum::actingAs($bannedAdmin);
+
+            patchJson(route('admin.courses.ban', $course))
+                ->assertForbidden();
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | operations
+    |--------------------------------------------------------------------------
+    */
+    describe('operations', function () {
+        it('bans a course successfully and sends a notification to the author', function (?User $user, Course $course) {
+            Notification::fake();
+            Sanctum::actingAs($user);
 
             patchJson(route('admin.courses.ban', $course))
                 ->assertNoContent();
 
-            $course->refresh();
-            expect($course->isBanned())->toBeTrue();
+            expect($course->refresh()->isBanned())->toBeTrue();
 
             Notification::assertSentTo($course->author, CourseBannedNotification::class);
         })->with([
-            'admin' => fn() => User::factory()->admin()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'admin' => fn () => User::factory()->admin()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
         ])->with([
-            'published' => fn() => fn() => Course::factory()->create(),
-            'unpublished' => fn() => fn() => Course::factory()->unpublished()->create(),
+            'published course' => fn () => Course::factory()->create(),
+            'unpublished course' => fn () => Course::factory()->unpublished()->create(),
         ]);
 
         it('does not send a notification if the course is already banned', function () {
@@ -100,16 +117,6 @@ describe('Admin -> BanCourseController', function () {
                 ->assertNoContent();
 
             Notification::assertNothingSent();
-        });
-
-        it('fails if a banned user tries to ban a course', function () {
-            $bannedAdmin = User::factory()->admin()->banned()->create();
-            $course = Course::factory()->create();
-
-            Sanctum::actingAs($bannedAdmin);
-
-            patchJson(route('admin.courses.ban', $course))
-                ->assertForbidden();
         });
     });
 

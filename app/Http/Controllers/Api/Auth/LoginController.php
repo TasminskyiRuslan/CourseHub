@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\LoginUserAction;
@@ -30,7 +32,7 @@ class LoginController extends Controller
                         new OA\Property(
                             property: 'data',
                             ref: '#/components/schemas/AuthResponse'
-                        )
+                        ),
                     ]
                 )
             ),
@@ -42,16 +44,12 @@ class LoginController extends Controller
     )]
     /**
      * Authenticate the user and issue an access token.
-     *
-     * @param LoginUserData $data
-     * @param LoginUserAction $action
-     * @return JsonResponse
      */
     public function __invoke(LoginUserData $data, LoginUserAction $action): JsonResponse
     {
-        $authData = $action->handle($data);
+        $authenticatedAuthData = $action->handle($data);
 
-        return AuthResource::make($authData)
+        return AuthResource::make($authenticatedAuthData)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }

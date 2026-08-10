@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Auth;
 
 use App\Models\User;
@@ -9,10 +11,6 @@ readonly class IssueAccessTokenAction
 {
     /**
      * Issue a new personal access token for the specified user.
-     *
-     * @param User $user
-     * @param bool $remember
-     * @return NewAccessToken
      */
     public function handle(User $user, bool $remember = false): NewAccessToken
     {

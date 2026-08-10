@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\User\Admin;
 
 use App\Actions\User\UpdateUserRoleAction;
 use App\Data\User\Requests\UpdateUserRoleData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\User\Admin\UserResource;
+use App\Loaders\User\Admin\UserLoader;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Throwable;
 
 class UserRoleController extends Controller
@@ -19,7 +21,7 @@ class UserRoleController extends Controller
     use AuthorizesRequests;
 
     #[OA\Put(
-        path: '/admin/users/{user}/role',
+        path: '/admin/users/{adminUser}/role',
         description: 'Update the role of the specified user by administrator.',
         summary: '[Admin] Update user role',
         security: [['sanctum' => []]],
@@ -30,7 +32,7 @@ class UserRoleController extends Controller
         tags: ['User'],
         parameters: [
             new OA\Parameter(
-                name: 'user',
+                name: 'adminUser',
                 description: 'User identifier (slug).',
                 in: 'path',
                 required: true,
@@ -38,7 +40,7 @@ class UserRoleController extends Controller
                     type: 'string',
                     example: 'john-doe'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -49,7 +51,7 @@ class UserRoleController extends Controller
                         new OA\Property(
                             property: 'data',
                             ref: '#/components/schemas/UserAdminResponse'
-                        )
+                        ),
                     ]
                 )
             ),
@@ -68,27 +70,22 @@ class UserRoleController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
                 description: 'Validation error.'
-            )
+            ),
         ]
     )]
     /**
      * Update the role of the specified user by administrator.
      *
-     * @param UpdateUserRoleData $data
-     * @param UpdateUserRoleAction $action
-     * @param User $user
-     * @return JsonResponse
-     * @throws AccessDeniedHttpException
      * @throws Throwable
      */
-    public function update(UpdateUserRoleData $data, UpdateUserRoleAction $action, User $user): JsonResponse
+    public function update(UpdateUserRoleData $data, UpdateUserRoleAction $action, UserLoader $userLoader, User $adminUser): JsonResponse
     {
-        $this->authorize('update-roles', $user);
+        $this->authorize('update-roles', $adminUser);
 
-        $updatedUser = $action->handle($data, $user);
-        $updatedUser->load(['roles']);
+        $updatedUser = $action->handle($data, $adminUser);
+        $loadedUser = $userLoader->handle($updatedUser);
 
-        return UserResource::make($updatedUser)
+        return UserResource::make($loadedUser)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }

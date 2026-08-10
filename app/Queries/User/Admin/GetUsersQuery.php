@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Queries\User\Admin;
 
 use App\Models\User;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -12,9 +15,6 @@ readonly class GetUsersQuery
 {
     /**
      * Retrieve paginated list of users.
-     *
-     * @param Request $request
-     * @return LengthAwarePaginator
      */
     public function handle(Request $request): LengthAwarePaginator
     {
@@ -25,34 +25,35 @@ readonly class GetUsersQuery
 
     /**
      * Build query builder with allowed filters and sorting.
-     *
-     * @param Request $request
-     * @return QueryBuilder
      */
     protected function query(Request $request): QueryBuilder
     {
-        return QueryBuilder::for(User::class, $request)
+        return QueryBuilder::for(User::withTrashed(), $request)
             ->with(['roles'])
-            ->withCount(['courses' => fn($q) => $q->withTrashed()])
+            ->withCount(['courses' => fn (Builder $q): Builder => $q->withTrashed()])
             ->allowedFilters([
-                AllowedFilter::callback('search', function ($query, $value) {
-                    $query->where(function ($q) use ($value) {
-                        $q->where('name', 'like', "%$value%")
-                            ->orWhere('email', 'like', "%$value%");
+                AllowedFilter::callback('search', function (Builder $query, mixed $value): void {
+                    $query->where(function (Builder $q) use ($value): void {
+                        $q->where('name', 'like', "%{$value}%")
+                            ->orWhere('email', 'like', "%{$value}%");
                     });
                 }),
-                AllowedFilter::callback('role', function ($query, $value) {
-                    $query->whereHas('roles', function ($q) use ($value) {
-                        $q->where('name', $value);
-                    });
+                AllowedFilter::callback('role', function (Builder $query, mixed $value): void {
+                    $query->when(
+                        $value === 'without_role',
+                        fn (Builder $q) => $q->doesntHave('roles'),
+                        fn (Builder $q) => $q->whereRelation('roles', 'name', $value)
+                    );
                 }),
-                AllowedFilter::callback('verified', function ($query, $value) {
-                    $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
-                    $value ? $query->whereNotNull('email_verified_at') : $query->whereNull('email_verified_at');
+                AllowedFilter::callback('verified', function (Builder $query, mixed $value): void {
+                    filter_var($value, FILTER_VALIDATE_BOOLEAN)
+                        ? $query->whereNotNull('email_verified_at')
+                        : $query->whereNull('email_verified_at');
                 }),
-                AllowedFilter::callback('banned', function ($query, $value) {
-                    $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
-                    $value ? $query->whereNotNull('banned_at') : $query->whereNull('banned_at');
+                AllowedFilter::callback('banned', function (Builder $query, mixed $value): void {
+                    filter_var($value, FILTER_VALIDATE_BOOLEAN)
+                        ? $query->whereNotNull('banned_at')
+                        : $query->whereNull('banned_at');
                 }),
                 AllowedFilter::trashed(),
             ])

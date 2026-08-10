@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Enums\CourseType;
@@ -19,6 +21,7 @@ class CourseFactory extends Factory
      * Define the model's default state.
      *
      * @return array<string, mixed>
+     *
      * @throws ApiErrorException
      */
     public function definition(): array
@@ -31,8 +34,8 @@ class CourseFactory extends Factory
             'slug' => Str::slug($title),
             'description' => fake()->sentence(10),
             'price' => (string) fake()->randomFloat(2, 10, 500),
-            'stripe_product_id' => 'prod_fake_' . Str::random(14),
-            'stripe_price_id' => 'price_fake_' . Str::random(14),
+            'stripe_product_id' => 'prod_fake_'.Str::random(14),
+            'stripe_price_id' => 'price_fake_'.Str::random(14),
             'type' => fake()->randomElement(CourseType::cases()),
             'image_path' => null,
             'published_at' => now(),
@@ -74,7 +77,7 @@ class CourseFactory extends Factory
      */
     public function unpublished(): static
     {
-        return $this->state(fn() => ['published_at' => null]);
+        return $this->state(fn () => ['published_at' => null]);
     }
 
     /**
@@ -84,7 +87,7 @@ class CourseFactory extends Factory
      */
     public function banned(): static
     {
-        return $this->state(fn() => ['banned_at' => now()]);
+        return $this->state(fn () => ['banned_at' => now()]);
     }
 
     /**
@@ -94,19 +97,16 @@ class CourseFactory extends Factory
      */
     public function free(): static
     {
-        return $this->state(fn() => ['price' => 0]);
+        return $this->state(fn () => ['price' => 0]);
     }
 
     /**
      * Add an image to the course.
-     *
-     * @param string|null $path
-     * @return static
      */
     public function withImage(?string $path = null): static
     {
         return $this->state(function (array $attributes) use ($path) {
-            return ['image_path' => $path ?? 'courses/' . fake()->uuid() . '.jpg'];
+            return ['image_path' => $path ?? 'courses/'.fake()->uuid().'.jpg'];
         });
     }
 
@@ -117,6 +117,6 @@ class CourseFactory extends Factory
      */
     public function type(CourseType $courseType): static
     {
-        return $this->state(fn() => ['type' => $courseType]);
+        return $this->state(fn () => ['type' => $courseType]);
     }
 }

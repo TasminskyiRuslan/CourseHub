@@ -44,6 +44,7 @@
     40 => 'Spatie\\StructureDiscoverer\\StructureDiscovererServiceProvider',
     41 => 'App\\Providers\\AppServiceProvider',
     42 => 'App\\Providers\\EloquentServiceProvider',
+    43 => 'App\\Providers\\RouteBindingServiceProvider',
   ),
   'eager' => 
   array (
@@ -74,6 +75,7 @@
     24 => 'Spatie\\StructureDiscoverer\\StructureDiscovererServiceProvider',
     25 => 'App\\Providers\\AppServiceProvider',
     26 => 'App\\Providers\\EloquentServiceProvider',
+    27 => 'App\\Providers\\RouteBindingServiceProvider',
   ),
   'deferred' => 
   array (

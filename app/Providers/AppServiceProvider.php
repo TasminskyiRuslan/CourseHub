@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
 use App\Enums\UserRole;
@@ -17,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(StripeClient::class, function () {
+        $this->app->singleton(StripeClient::class, function (): StripeClient {
             return new StripeClient(config('cashier.secret'));
         });
     }
@@ -27,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::before(function ($user, $ability) {
+        Gate::before(function ($user, $ability): ?bool {
             return $user->hasRole(UserRole::SUPER_ADMIN->value) ? true : null;
         });
 

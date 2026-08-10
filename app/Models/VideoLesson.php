@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Http\Resources\Api\Lesson\VideoLessonResource;
@@ -21,6 +23,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  * @property-read \App\Models\Lesson|null $lesson
+ *
  * @method static \Database\Factories\VideoLessonFactory factory($count = null, $state = [])
  * @method static Builder<static>|VideoLesson newModelQuery()
  * @method static Builder<static>|VideoLesson newQuery()
@@ -34,6 +37,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|VideoLesson whereVideoUrl($value)
  * @method static Builder<static>|VideoLesson withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|VideoLesson withoutTrashed()
+ *
  * @mixin Eloquent
  */
 class VideoLesson extends Model
@@ -48,13 +52,11 @@ class VideoLesson extends Model
      */
     protected $fillable = [
         'video_url',
-        'provider'
+        'provider',
     ];
 
     /**
      * Get the lesson associated with the video lesson.
-     *
-     * @return MorphOne
      */
     public function lesson(): MorphOne
     {
@@ -63,9 +65,6 @@ class VideoLesson extends Model
 
     /**
      * Transform the model into a JSON resource.
-     *
-     * @param string|null $resourceClass
-     * @return JsonResource
      */
     public function toResource(?string $resourceClass = null): JsonResource
     {

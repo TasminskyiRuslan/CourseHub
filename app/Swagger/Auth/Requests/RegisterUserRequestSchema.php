@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\Auth\Requests;
 
 use App\Enums\UserRole;
@@ -50,17 +52,15 @@ use OpenApi\Attributes as OA;
             items: new OA\Items(
                 type: 'string',
                 enum: [
-                    UserRole::TEACHER->value
+                    UserRole::TEACHER->value,
                 ]
             ),
             default: [],
             example: [
-                UserRole::TEACHER->value
+                UserRole::TEACHER->value,
             ]
-        )
+        ),
     ],
     type: 'object'
 )]
-class RegisterUserRequestSchema
-{
-}
+class RegisterUserRequestSchema {}

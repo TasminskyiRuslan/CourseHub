@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 use App\Notifications\Auth\PasswordResetNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
-use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Notification;
+
 use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class);
@@ -15,7 +17,6 @@ describe('Auth -> SendPasswordResetLinkController', function () {
     beforeEach(function () {
         $this->withoutMiddleware(ThrottleRequests::class);
         $this->seed(RolesAndPermissionsSeeder::class);
-        $this->seed(SuperAdminUserSeeder::class);
     });
 
     /*
@@ -40,7 +41,7 @@ describe('Auth -> SendPasswordResetLinkController', function () {
 
         it('fails if the email is too long', function () {
             postJson(route('auth.password.forgot'), [
-                'email' => str_repeat('a', 256) . '@example.com',
+                'email' => str_repeat('a', 256).'@example.com',
             ])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
@@ -53,7 +54,7 @@ describe('Auth -> SendPasswordResetLinkController', function () {
     |--------------------------------------------------------------------------
     */
     describe('operations', function () {
-        it('sends a password reset link to a valid user', function ($user) {
+        it('sends a password reset link to a valid user', function (?User $user) {
             Notification::fake();
 
             postJson(route('auth.password.forgot'), [
@@ -63,7 +64,7 @@ describe('Auth -> SendPasswordResetLinkController', function () {
             Notification::assertSentTo(
                 $user,
                 PasswordResetNotification::class,
-                fn($notification) => !empty($notification->token)
+                fn ($notification) => ! empty($notification->token)
             );
 
             $this->assertDatabaseHas('password_reset_tokens', [
@@ -71,17 +72,39 @@ describe('Auth -> SendPasswordResetLinkController', function () {
             ]);
         })
             ->with([
-                'verified user' => fn() => User::factory()->create(),
-                'unverified user' => fn() => User::factory()->unverified()->create(),
+                'verified user' => fn () => User::factory()->create(),
+                'unverified user' => fn () => User::factory()->unverified()->create(),
             ]);
+
+        it('sends a password reset link when email is provided in uppercase', function () {
+            Notification::fake();
+
+            $user = User::factory()->create(['email' => 'user@example.com']);
+
+            postJson(route('auth.password.forgot'), [
+                'email' => 'USER@EXAMPLE.COM',
+            ])->assertNoContent();
+
+            Notification::assertSentTo(
+                $user,
+                PasswordResetNotification::class,
+                fn ($notification) => ! empty($notification->token)
+            );
+
+            $this->assertDatabaseHas('password_reset_tokens', [
+                'email' => 'user@example.com',
+            ]);
+        });
 
         it('does not send a notification if the email does not exist', function () {
             Notification::fake();
+
             postJson(route('auth.password.forgot'), [
                 'email' => 'nonexistent@example.com',
             ])->assertNoContent();
 
             Notification::assertNothingSent();
+
             $this->assertDatabaseCount('password_reset_tokens', 0);
         });
     });

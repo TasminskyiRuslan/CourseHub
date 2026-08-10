@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources\Api\Course\Teacher;
 
 use App\Http\Resources\Api\User\Admin\UserResource;
@@ -30,7 +32,6 @@ class CourseResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param Request $request
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
@@ -44,7 +45,7 @@ class CourseResource extends JsonResource
             'type' => $this->type,
             'price' => $this->price,
             'image_url' => $this->image_path ? Storage::disk('courses')->url($this->image_path) : null,
-            'lessons_count' => $this->whenCounted('lessons', fn() => $this->lessons_count, 0),
+            'lessons_count' => $this->whenCounted('lessons'),
             'published_at' => $this->published_at,
             'banned_at' => $this->banned_at,
             'created_at' => $this->created_at,

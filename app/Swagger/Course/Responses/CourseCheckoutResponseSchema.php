@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\Course\Responses;
 
 use OpenApi\Attributes as OA;
@@ -35,11 +37,8 @@ use OpenApi\Attributes as OA;
             format: 'uri',
             example: 'https://checkout.stripe.com/c/pay/cs_test_123',
             nullable: true
-        )
+        ),
     ],
     type: 'object'
 )]
-class CourseCheckoutResponseSchema
-{
-
-}
+class CourseCheckoutResponseSchema {}

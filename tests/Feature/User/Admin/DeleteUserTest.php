@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\deleteJson;
 
 uses(RefreshDatabase::class);
 
-describe('Admin -> TeacherController -> destroy', function () {
+describe('Admin -> UserController -> destroy', function () {
     beforeEach(function () {
         Cache::flush();
         $this->seed(RolesAndPermissionsSeeder::class);
@@ -31,22 +34,19 @@ describe('Admin -> TeacherController -> destroy', function () {
                 ->assertNotFound();
         });
 
-        it('fails if a user tries to delete themselves', function ($user) {
+        it('fails if a user tries to delete themselves', function (User $user) {
             Sanctum::actingAs($user);
 
             deleteJson(route('admin.users.destroy', $user))
                 ->assertForbidden();
 
-            $this->assertDatabaseHas('users', [
-                'id' => $user->id,
-                'deleted_at' => null,
-            ]);
+            $this->assertNotSoftDeleted($user);
         })->with([
-            'admin' => fn() => User::factory()->admin()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'admin' => fn () => User::factory()->admin()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
         ]);
 
-        it('fails if an admin tries to delete another admin or super-admin', function ($targetUser) {
+        it('fails if an admin tries to delete another admin or super-admin', function (User $targetUser) {
             $admin = User::factory()->admin()->create();
 
             Sanctum::actingAs($admin);
@@ -54,13 +54,10 @@ describe('Admin -> TeacherController -> destroy', function () {
             deleteJson(route('admin.users.destroy', $targetUser))
                 ->assertForbidden();
 
-            $this->assertDatabaseHas('users', [
-                'id' => $targetUser->id,
-                'deleted_at' => null,
-            ]);
+            $this->assertNotSoftDeleted($targetUser);
         })->with([
-            'admin' => fn() => User::factory()->admin()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'admin' => fn () => User::factory()->admin()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
         ]);
     });
 
@@ -76,12 +73,10 @@ describe('Admin -> TeacherController -> destroy', function () {
             deleteJson(route('admin.users.destroy', $targetUser))
                 ->assertUnauthorized();
 
-            $this->assertDatabaseHas('users', [
-                'id' => $targetUser->id,
-            ]);
+            $this->assertNotSoftDeleted($targetUser);
         });
 
-        it('fails if a user without permissions tries to delete a user', function ($user) {
+        it('fails if a user without permissions tries to delete a user', function (?User $user) {
             Sanctum::actingAs($user);
 
             $targetUser = User::factory()->create();
@@ -89,32 +84,26 @@ describe('Admin -> TeacherController -> destroy', function () {
             deleteJson(route('admin.users.destroy', $targetUser))
                 ->assertForbidden();
 
-            $this->assertDatabaseHas('users', [
-                'id' => $targetUser->id,
-            ]);
+            $this->assertNotSoftDeleted($targetUser);
         })->with([
-            'user' => fn() => User::factory()->create(),
-            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'teacher' => fn() => User::factory()->teacher()->create(),
+            'user' => fn () => User::factory()->create(),
+            'unverified teacher' => fn () => User::factory()->teacher()->unverified()->create(),
+            'teacher' => fn () => User::factory()->teacher()->create(),
         ]);
 
-        it('allows a user with permission to delete a user', function ($userClosure, $targetUserClosure) {
-            Sanctum::actingAs($userClosure());
-
-            $targetUser = $targetUserClosure();
+        it('allows a user with permission to delete a user', function (?User $user, ?User $targetUser) {
+            Sanctum::actingAs($user);
 
             deleteJson(route('admin.users.destroy', $targetUser))
                 ->assertNoContent();
 
-            $this->assertSoftDeleted('users', [
-                'id' => $targetUser->id,
-            ]);
+            $this->assertSoftDeleted($targetUser);
         })->with([
-            'admin' => fn() => User::factory()->admin()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'admin' => fn () => User::factory()->admin()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
         ])->with([
-            'active user' => fn() => User::factory()->create(),
-            'banned user' => fn() => User::factory()->banned()->create(),
+            'active user' => fn () => User::factory()->create(),
+            'banned user' => fn () => User::factory()->banned()->create(),
         ]);
 
         it('fails if a banned user tries to delete a user', function () {

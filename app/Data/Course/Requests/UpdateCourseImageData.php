@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Data\Course\Requests;
 
 use Illuminate\Http\UploadedFile;
@@ -12,9 +14,6 @@ use Spatie\LaravelData\Data;
 
 class UpdateCourseImageData extends Data
 {
-    /**
-     * @param UploadedFile $image
-     */
     public function __construct(
         #[Required]
         #[File]
@@ -22,7 +21,5 @@ class UpdateCourseImageData extends Data
         #[Mimes(['jpg', 'jpeg', 'png', 'webp'])]
         #[Max(2048)]
         public UploadedFile $image,
-    )
-    {
-    }
+    ) {}
 }

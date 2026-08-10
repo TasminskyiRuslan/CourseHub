@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\CourseType;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\patchJson;
 
 uses(RefreshDatabase::class);
@@ -36,7 +40,7 @@ describe('Teacher -> LessonController -> update', function () {
             patchJson(route('teacher.courses.lessons.update', [$course, $lesson]), updatingLessonPayload($course->type, [
                 'title' => '',
                 'slug' => '',
-                'position' => ''
+                'position' => '',
             ]))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['title', 'slug', 'position']);
@@ -52,7 +56,7 @@ describe('Teacher -> LessonController -> update', function () {
             patchJson(route('teacher.courses.lessons.update', [$course, $lesson]), updatingLessonPayload($course->type, [
                 'title' => null,
                 'slug' => null,
-                'position' => null
+                'position' => null,
             ]))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['title', 'slug', 'position']);
@@ -68,7 +72,7 @@ describe('Teacher -> LessonController -> update', function () {
             patchJson(route('teacher.courses.lessons.update', [$course, $lesson]), updatingLessonPayload($course->type, [
                 'title' => str_repeat('A', 256),
                 'slug' => str_repeat('b', 256),
-                'position' => -1
+                'position' => -1,
             ]))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['title', 'slug', 'position']);
@@ -196,6 +200,21 @@ describe('Teacher -> LessonController -> update', function () {
             patchJson(route('teacher.courses.lessons.update', [$course, $lesson]), updatingLessonPayload($course->type))
                 ->assertNotFound();
         });
+
+        it('fails if a non-author user tries to update a lesson', function (?User $user) {
+            Sanctum::actingAs($user);
+
+            $course = Course::factory()->create();
+            $lesson = Lesson::factory()->for($course, 'course')->create();
+
+            patchJson(route('teacher.courses.lessons.update', [$course, $lesson]), updatingLessonPayload($course->type, ['title' => 'Updated Title']))
+                ->assertNotFound();
+        })->with([
+            'user' => fn () => User::factory()->create(),
+            'unverified teacher' => fn () => User::factory()->teacher()->unverified()->create(),
+            'another teacher' => fn () => User::factory()->teacher()->create(),
+            'admin' => fn () => User::factory()->admin()->create(),
+        ]);
     });
 
     /*
@@ -212,27 +231,10 @@ describe('Teacher -> LessonController -> update', function () {
                 ->assertUnauthorized();
         });
 
-        it('fails if a user without permissions tries to update a lesson', function ($user) {
+        it('allows a user with permission to update a lesson', function (?User $user, Factory $courseFactory) {
             Sanctum::actingAs($user);
 
-            $course = Course::factory()->create();
-            $lesson = Lesson::factory()->for($course, 'course')->create();
-
-            patchJson(route('teacher.courses.lessons.update', [$course, $lesson]), updatingLessonPayload($course->type, ['title' => 'Updated Title']))
-                ->assertForbidden();
-        })->with([
-            'user' => fn() => User::factory()->create(),
-            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'another teacher' => fn() => User::factory()->teacher()->create(),
-            'admin' => fn() => User::factory()->admin()->create(),
-        ]);
-
-        it('allows a user with permission to update a lesson', function ($userClosure, $courseClosure) {
-            $user = $userClosure();
-            Sanctum::actingAs($user);
-
-            $courseInnerClosure = $courseClosure();
-            $course = $courseInnerClosure($user);
+            $course = $courseFactory->for($user, 'author')->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
             $data = updatingLessonPayload($course->type, ['title' => 'Updated Title']);
@@ -247,12 +249,12 @@ describe('Teacher -> LessonController -> update', function () {
                 'title' => $data['title'],
             ]);
         })->with([
-            'teacher' => fn() => User::factory()->teacher()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'teacher' => fn () => User::factory()->teacher()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
         ])->with([
-            'published' => fn() => fn($author) => Course::factory()->for($author, 'author')->create(),
-            'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->for($author, 'author')->create(),
-            'banned' => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
+            'published course' => fn () => Course::factory(),
+            'unpublished course' => fn () => Course::factory()->unpublished(),
+            'banned course' => fn () => Course::factory()->banned(),
         ]);
 
         it('fails if a banned user tries to update a lesson', function () {

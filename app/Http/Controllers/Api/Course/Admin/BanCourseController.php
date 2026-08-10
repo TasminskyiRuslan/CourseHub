@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\Course\Admin;
 
 use App\Actions\Course\BanCourseAction;
@@ -16,14 +18,14 @@ class BanCourseController extends Controller
     use AuthorizesRequests;
 
     #[OA\Patch(
-        path: '/admin/courses/{course}/ban',
+        path: '/admin/courses/{adminCourse}/ban',
         description: 'Ban the specified course by administrator.',
         summary: '[Admin] Ban a course',
         security: [['sanctum' => []]],
         tags: ['Course'],
         parameters: [
             new OA\Parameter(
-                name: 'course',
+                name: 'adminCourse',
                 description: 'Course identifier (slug).',
                 in: 'path',
                 required: true,
@@ -31,7 +33,7 @@ class BanCourseController extends Controller
                     type: 'string',
                     example: 'math-101'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -49,22 +51,19 @@ class BanCourseController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
                 description: 'Course not found.'
-            )
+            ),
         ]
     )]
     /**
      * Ban the specified course by administrator.
      *
-     * @param BanCourseAction $action
-     * @param Course $course
-     * @return Response
      * @throws Throwable
      */
-    public function __invoke(BanCourseAction $action, Course $course): Response
+    public function __invoke(BanCourseAction $action, Course $adminCourse): Response
     {
-        $this->authorize('ban', $course);
+        $this->authorize('ban', $adminCourse);
 
-        $action->handle($course);
+        $action->handle($adminCourse);
 
         return response()->noContent();
     }

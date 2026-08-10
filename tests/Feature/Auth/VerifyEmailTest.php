@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Auth\Events\Verified;
@@ -7,12 +9,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
+
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class);
 
 describe('Auth -> VerifyEmailController', function () {
-
     beforeEach(function () {
         $this->seed(RolesAndPermissionsSeeder::class);
         $this->withoutMiddleware(ThrottleRequests::class);
@@ -62,6 +64,21 @@ describe('Auth -> VerifyEmailController', function () {
                 'hash' => sha1($user->getEmailForVerification()),
             ]))->assertForbidden();
         });
+
+        it('fails if the signed link has expired', function () {
+            $user = User::factory()->unverified()->create();
+
+            $url = URL::temporarySignedRoute(
+                'auth.verification.verify',
+                now()->subMinutes(1),
+                [
+                    'id' => $user->id,
+                    'hash' => sha1($user->getEmailForVerification()),
+                ]
+            );
+
+            getJson($url)->assertForbidden();
+        });
     });
 
     /*
@@ -70,7 +87,7 @@ describe('Auth -> VerifyEmailController', function () {
     |--------------------------------------------------------------------------
     */
     describe('operations', function () {
-        it('verifies the email address for a user', function ($user) {
+        it('verifies the email address for a user', function (?User $user) {
             Event::fake();
 
             $url = URL::temporarySignedRoute(
@@ -85,12 +102,12 @@ describe('Auth -> VerifyEmailController', function () {
             getJson($url)->assertNoContent();
 
             expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
-            Event::assertDispatched(Verified::class, fn($event) => $event->user->id === $user->id);
+            Event::assertDispatched(Verified::class, fn ($event) => $event->user->id === $user->id);
         })
             ->with([
-                'user' => fn() => User::factory()->unverified()->create(),
-                'teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-                'admin' => fn() => User::factory()->admin()->unverified()->create(),
+                'user' => fn () => User::factory()->unverified()->create(),
+                'teacher' => fn () => User::factory()->teacher()->unverified()->create(),
+                'admin' => fn () => User::factory()->admin()->unverified()->create(),
             ]);
 
         it('does nothing if the email is already verified', function () {

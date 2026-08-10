@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Data\Auth\Requests;
 
 use App\Data\Casts\LowercaseCast;
@@ -15,11 +17,6 @@ use Spatie\LaravelData\Data;
 
 class ResetPasswordData extends Data
 {
-    /**
-     * @param string $email
-     * @param string $password
-     * @param string $token
-     */
     public function __construct(
         #[Required]
         #[Email]
@@ -37,7 +34,5 @@ class ResetPasswordData extends Data
         #[Required]
         #[StringType]
         public string $token,
-    )
-    {
-    }
+    ) {}
 }

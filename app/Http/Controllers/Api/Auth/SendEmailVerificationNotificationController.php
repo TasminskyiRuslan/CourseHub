@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\SendEmailVerificationNotificationAction;
@@ -34,21 +36,20 @@ class SendEmailVerificationNotificationController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_TOO_MANY_REQUESTS,
                 description: 'Too many requests.'
-            )
+            ),
         ]
     )]
     /**
      * Send the email verification notification to the authenticated user.
      *
-     * @param Request $request
-     * @param SendEmailVerificationNotificationAction $action
-     * @return Response
      * @throws ValidationException
      */
     public function __invoke(Request $request, SendEmailVerificationNotificationAction $action): Response
     {
         $currentUser = $request->user();
+
         $action->handle($currentUser);
+
         return response()->noContent();
     }
 }

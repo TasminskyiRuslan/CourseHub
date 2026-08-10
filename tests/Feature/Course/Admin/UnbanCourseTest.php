@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\Course;
 use App\Models\User;
 use App\Notifications\Course\CourseUnbannedNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\patchJson;
 
 uses(RefreshDatabase::class);
@@ -50,7 +54,7 @@ describe('Admin -> UnbanCourseController', function () {
             expect($course->isBanned())->toBeTrue();
         });
 
-        it('fails if a user without permissions tries to unban a course', function ($user) {
+        it('fails if a user without permissions tries to unban a course', function (?User $user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->banned()->create();
@@ -61,12 +65,29 @@ describe('Admin -> UnbanCourseController', function () {
             $course->refresh();
             expect($course->isBanned())->toBeTrue();
         })->with([
-            'user' => fn() => User::factory()->create(),
-            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'another teacher' => fn() => User::factory()->teacher()->create(),
+            'user' => fn () => User::factory()->create(),
+            'unverified teacher' => fn () => User::factory()->teacher()->unverified()->create(),
+            'another teacher' => fn () => User::factory()->teacher()->create(),
         ]);
 
-        it('allows a user with permissions to unban a course', function ($user) {
+        it('fails if a banned user tries to unban a course', function () {
+            $bannedAdmin = User::factory()->admin()->banned()->create();
+            $course = Course::factory()->banned()->create();
+
+            Sanctum::actingAs($bannedAdmin);
+
+            patchJson(route('admin.courses.unban', $course))
+                ->assertForbidden();
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | operations
+    |--------------------------------------------------------------------------
+    */
+    describe('operations', function () {
+        it('unbans a course successfully and sends a notification to the author', function (?User $user) {
             Notification::fake();
 
             Sanctum::actingAs($user);
@@ -81,8 +102,8 @@ describe('Admin -> UnbanCourseController', function () {
 
             Notification::assertSentTo($course->author, CourseUnbannedNotification::class);
         })->with([
-            'admin' => fn() => User::factory()->admin()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'admin' => fn () => User::factory()->admin()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
         ]);
 
         it('does not send a notification if the course is already unbanned', function () {
@@ -97,16 +118,6 @@ describe('Admin -> UnbanCourseController', function () {
                 ->assertNoContent();
 
             Notification::assertNothingSent();
-        });
-
-        it('fails if a banned user tries to unban a course', function () {
-            $bannedAdmin = User::factory()->admin()->banned()->create();
-            $course = Course::factory()->create();
-
-            Sanctum::actingAs($bannedAdmin);
-
-            patchJson(route('admin.courses.unban', $course))
-                ->assertForbidden();
         });
     });
 

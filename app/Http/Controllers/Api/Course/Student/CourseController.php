@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\Course\Student;
 
 use App\Enums\CourseType;
-use App\Finders\Course\Student\FindCourseBySlug;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Course\Student\CourseResource;
-use App\Loaders\Course\Student\LoadCourse;
+use App\Loaders\Course\Student\CourseLoader;
+use App\Models\Course;
 use App\Queries\Course\Student\GetCoursesQuery;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -62,7 +64,7 @@ class CourseController extends Controller
                 in: 'query',
                 required: false,
                 schema: new OA\Schema(type: 'integer', default: 1, minimum: 1),
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -74,7 +76,7 @@ class CourseController extends Controller
                             property: 'data',
                             type: 'array',
                             items: new OA\Items(ref: '#/components/schemas/CourseStudentResponse')
-                        )
+                        ),
                     ]
                 )
             ),
@@ -85,15 +87,11 @@ class CourseController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_FORBIDDEN,
                 description: 'User does not have permissions.'
-            )
+            ),
         ]
     )]
     /**
      * Retrieve a paginated list of student's enrolled courses.
-     *
-     * @param Request $request
-     * @param GetCoursesQuery $query
-     * @return JsonResponse
      */
     public function index(Request $request, GetCoursesQuery $query): JsonResponse
     {
@@ -107,14 +105,14 @@ class CourseController extends Controller
     }
 
     #[OA\Get(
-        path: '/student/courses/{course}',
+        path: '/student/courses/{studentCourse}',
         description: 'Retrieve detailed information about the specified enrolled student\'s course.',
         summary: '[Student] Retrieve course details',
         security: [['sanctum' => []]],
         tags: ['Course'],
         parameters: [
             new OA\Parameter(
-                name: 'course',
+                name: 'studentCourse',
                 description: 'Course identifier (slug).',
                 in: 'path',
                 required: true,
@@ -122,7 +120,7 @@ class CourseController extends Controller
                     type: 'string',
                     example: 'math-101'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -133,7 +131,7 @@ class CourseController extends Controller
                         new OA\Property(
                             property: 'data',
                             ref: '#/components/schemas/CourseStudentResponse'
-                        )
+                        ),
                     ]
                 )
             ),
@@ -153,20 +151,10 @@ class CourseController extends Controller
     )]
     /**
      * Retrieve detailed information about the specified enrolled student's course.
-     *
-     * @param Request $request
-     * @param FindCourseBySlug $finder
-     * @param LoadCourse $loader
-     * @param string $course
-     * @return JsonResponse
      */
-    public function show(Request $request, FindCourseBySlug $finder, LoadCourse $loader, string $course): JsonResponse
+    public function show(CourseLoader $courseLoader, Course $studentCourse): JsonResponse
     {
-        $currentUser = $request->user();
-
-        $gottenCourse = $finder->handle($currentUser, $course);
-
-        $loadedCourse = $loader->handle($gottenCourse);
+        $loadedCourse = $courseLoader->handle($studentCourse);
 
         return CourseResource::make($loadedCourse)
             ->response()

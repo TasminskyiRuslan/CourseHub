@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middleware\Api\User;
 
 use Closure;
@@ -11,9 +13,7 @@ class RestrictBannedUsers
     /**
      * Handle an incoming request to ensure the user is not banned.
      *
-     * @param Request $request
-     * @param Closure(Request): (SymfonyResponse) $next
-     * @return SymfonyResponse
+     * @param  Closure(Request): (SymfonyResponse)  $next
      */
     public function handle(Request $request, Closure $next): SymfonyResponse
     {

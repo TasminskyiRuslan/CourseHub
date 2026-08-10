@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Data\Auth\Results;
 
 use App\Models\User;
@@ -8,18 +10,10 @@ use Spatie\LaravelData\Data;
 
 class AuthResultData extends Data
 {
-    /**
-     * @param User $user
-     * @param string $accessToken
-     * @param Carbon $expiresAt
-     * @param string|null $tokenType
-     */
     public function __construct(
-        public User    $user,
-        public string  $accessToken,
-        public Carbon  $expiresAt,
+        public User $user,
+        public string $accessToken,
+        public ?Carbon $expiresAt = null,
         public ?string $tokenType = 'Bearer',
-    )
-    {
-    }
+    ) {}
 }

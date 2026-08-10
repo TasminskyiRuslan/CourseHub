@@ -1,14 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
+use App\Jobs\DeleteFileFromStorageJob;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
-use function Pest\Laravel\postJson;
+
+use function Pest\Laravel\putJson;
 
 uses(RefreshDatabase::class);
 
@@ -31,7 +36,7 @@ describe('Account -> AccountAvatarController -> update', function () {
             $user = User::factory()->create();
             Sanctum::actingAs($user);
 
-            postJson(route('account.avatar.update'), ['_method' => 'PUT'])
+            putJson(route('account.avatar.update'), [])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['avatar']);
         });
@@ -40,7 +45,7 @@ describe('Account -> AccountAvatarController -> update', function () {
             $user = User::factory()->create();
             Sanctum::actingAs($user);
 
-            postJson(route('account.avatar.update'), avatarPayload([
+            putJson(route('account.avatar.update'), avatarPayload([
                 'avatar' => 'not-a-file',
             ]))
                 ->assertUnprocessable()
@@ -51,7 +56,7 @@ describe('Account -> AccountAvatarController -> update', function () {
             $user = User::factory()->create();
             Sanctum::actingAs($user);
 
-            postJson(route('account.avatar.update'), avatarPayload([
+            putJson(route('account.avatar.update'), avatarPayload([
                 'avatar' => UploadedFile::fake()->create('document.pdf'),
             ]))
                 ->assertUnprocessable()
@@ -62,18 +67,18 @@ describe('Account -> AccountAvatarController -> update', function () {
             $user = User::factory()->create();
             Sanctum::actingAs($user);
 
-            postJson(route('account.avatar.update'), avatarPayload([
+            putJson(route('account.avatar.update'), avatarPayload([
                 'avatar' => UploadedFile::fake()->create('avatar.jpg')->size(2049),
             ]))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['avatar']);
         });
 
-        it('succeeds if avatar uploads with all allowed extensions', function ($ext) {
+        it('succeeds if avatar uploads with all allowed extensions', function (string $ext) {
             $user = User::factory()->create();
             Sanctum::actingAs($user);
 
-            postJson(route('account.avatar.update'), avatarPayload([
+            putJson(route('account.avatar.update'), avatarPayload([
                 'avatar' => UploadedFile::fake()->image("avatar.$ext"),
             ]))
                 ->assertOk()
@@ -92,7 +97,7 @@ describe('Account -> AccountAvatarController -> update', function () {
     */
     describe('permissions', function () {
         it('fails if an unauthenticated user tries to update the auth image', function () {
-            postJson(route('account.avatar.update'), avatarPayload())
+            putJson(route('account.avatar.update'), avatarPayload())
                 ->assertUnauthorized();
         });
 
@@ -100,31 +105,37 @@ describe('Account -> AccountAvatarController -> update', function () {
             $superAdmin = User::where('email', config('super-admin.email'))->first();
             Sanctum::actingAs($superAdmin);
 
-            postJson(route('account.avatar.update'), avatarPayload())
+            putJson(route('account.avatar.update'), avatarPayload())
                 ->assertForbidden();
 
             $superAdmin->refresh();
             expect($superAdmin->avatar_path)->toBeNull();
         });
 
-        it('allows an authenticated user with any role to update their own avatar', function ($user) {
+        it('allows an authenticated user with any role to update their own avatar', function (?User $user) {
+            Queue::fake();
             Sanctum::actingAs($user);
 
             $oldAvatarPath = $user->avatar_path;
 
-            postJson(route('account.avatar.update'), avatarPayload())
+            putJson(route('account.avatar.update'), avatarPayload())
                 ->assertOk()
                 ->assertJsonStructure(['data' => accountUserJsonStructure()]);
 
             $user->refresh();
             expect($user->avatar_path)->not->toBeNull();
             Storage::disk('users')->assertExists($user->avatar_path);
-            Storage::disk('users')->assertMissing($oldAvatarPath);
+
+            if ($oldAvatarPath) {
+                Queue::assertPushed(DeleteFileFromStorageJob::class, function ($job) use ($oldAvatarPath) {
+                    return $job->disk === 'users' && $job->filePath === $oldAvatarPath;
+                });
+            }
         })->with([
-            'user' => fn() => User::factory()->withAvatar()->create(),
-            'teacher' => fn() => User::factory()->withAvatar()->teacher()->create(),
-            'unverified teacher' => fn() => User::factory()->withAvatar()->teacher()->unverified()->create(),
-            'admin' => fn() => User::factory()->withAvatar()->admin()->create(),
+            'user' => fn () => User::factory()->withAvatar()->create(),
+            'teacher' => fn () => User::factory()->withAvatar()->teacher()->create(),
+            'unverified teacher' => fn () => User::factory()->withAvatar()->teacher()->unverified()->create(),
+            'admin' => fn () => User::factory()->withAvatar()->admin()->create(),
         ]);
 
         it('fails if a banned user tries to update their own avatar', function () {
@@ -132,7 +143,7 @@ describe('Account -> AccountAvatarController -> update', function () {
 
             Sanctum::actingAs($bannedUser);
 
-            postJson(route('account.avatar.update'), avatarPayload())
+            putJson(route('account.avatar.update'), avatarPayload())
                 ->assertForbidden();
 
             $bannedUser->refresh();
@@ -157,7 +168,7 @@ describe('Account -> AccountAvatarController -> update', function () {
             Cache::tags($tags)->put($cacheKey, 'test_value', config('cache.ttl.teacher'));
             expect(Cache::tags($tags)->has($cacheKey))->toBeTrue();
 
-            postJson(route('account.avatar.update'), avatarPayload())
+            putJson(route('account.avatar.update'), avatarPayload())
                 ->assertOk();
 
             expect(Cache::tags($tags)->has($cacheKey))->toBeFalse();

@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\User\Admin;
 
 use App\Actions\User\DeleteUserAction;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\User\Admin\UserResource;
+use App\Loaders\User\Admin\UserLoader;
 use App\Models\User;
-use App\Queries\User\Admin\GetUserQuery;
 use App\Queries\User\Admin\GetUsersQuery;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -15,7 +17,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class UserController extends Controller
 {
@@ -40,7 +41,7 @@ class UserController extends Controller
                 description: 'Filter by role.',
                 in: 'query',
                 required: false,
-                schema: new OA\Schema(type: 'string', enum: [UserRole::TEACHER->value, UserRole::ADMIN->value, UserRole::SUPER_ADMIN->value]),
+                schema: new OA\Schema(type: 'string', enum: ['without_role', UserRole::TEACHER->value, UserRole::ADMIN->value, UserRole::SUPER_ADMIN->value]),
             ),
             new OA\Parameter(
                 name: 'filter[verified]',
@@ -69,7 +70,7 @@ class UserController extends Controller
                 required: false,
                 schema: new OA\Schema(
                     type: 'string',
-                    enum: ['only', 'with']
+                    enum: ['only', 'with', 'without']
                 ),
             ),
             new OA\Parameter(
@@ -88,7 +89,7 @@ class UserController extends Controller
                 in: 'query',
                 required: false,
                 schema: new OA\Schema(type: 'integer', default: 1, minimum: 1),
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -108,18 +109,14 @@ class UserController extends Controller
                             property: 'data',
                             type: 'array',
                             items: new OA\Items(ref: '#/components/schemas/UserAdminResponse')
-                        )
+                        ),
                     ]
                 )
-            )
+            ),
         ]
     )]
     /**
      * Retrieve a paginated list of users by administrator.
-     *
-     * @param Request $request
-     * @param GetUsersQuery $query
-     * @return JsonResponse
      */
     public function index(Request $request, GetUsersQuery $query): JsonResponse
     {
@@ -131,14 +128,14 @@ class UserController extends Controller
     }
 
     #[OA\Get(
-        path: '/admin/users/{user}',
+        path: '/admin/users/{adminUser}',
         description: 'Retrieve detailed information about the specified user by administrator.',
         summary: '[Admin] Retrieve user details',
         security: [['sanctum' => []]],
         tags: ['User'],
         parameters: [
             new OA\Parameter(
-                name: 'user',
+                name: 'adminUser',
                 description: 'User identifier (slug).',
                 in: 'path',
                 required: true,
@@ -146,7 +143,7 @@ class UserController extends Controller
                     type: 'string',
                     example: 'john-doe'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -157,7 +154,7 @@ class UserController extends Controller
                         new OA\Property(
                             property: 'data',
                             ref: '#/components/schemas/UserAdminResponse'
-                        )
+                        ),
                     ]
                 )
             ),
@@ -172,19 +169,15 @@ class UserController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
                 description: 'User not found.'
-            )
+            ),
         ]
     )]
     /**
      * Retrieve detailed information about the specified user by administrator.
-     *
-     * @param GetUserQuery $query
-     * @param string $user
-     * @return JsonResponse
      */
-    public function show(GetUserQuery $query, string $user): JsonResponse
+    public function show(UserLoader $userLoader, User $adminUser): JsonResponse
     {
-        $gottenUser = $query->handle($user);
+        $gottenUser = $userLoader->handle($adminUser);
 
         return UserResource::make($gottenUser)
             ->response()
@@ -192,14 +185,14 @@ class UserController extends Controller
     }
 
     #[OA\Delete(
-        path: '/admin/users/{user}',
+        path: '/admin/users/{adminUser}',
         description: 'Delete the specified user by administrator.',
         summary: '[Admin] Delete a user',
         security: [['sanctum' => []]],
         tags: ['User'],
         parameters: [
             new OA\Parameter(
-                name: 'user',
+                name: 'adminUser',
                 description: 'User identifier (slug).',
                 in: 'path',
                 required: true,
@@ -207,7 +200,7 @@ class UserController extends Controller
                     type: 'string',
                     example: 'john-doe'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -230,17 +223,12 @@ class UserController extends Controller
     )]
     /**
      * Delete the specified user by administrator.
-     *
-     * @param DeleteUserAction $action
-     * @param User $user
-     * @return Response
-     * @throws AccessDeniedHttpException
      */
-    public function destroy(DeleteUserAction $action, User $user): Response
+    public function destroy(DeleteUserAction $action, User $adminUser): Response
     {
-        $this->authorize('delete', $user);
+        $this->authorize('delete', $adminUser);
 
-        $action->handle($user);
+        $action->handle($adminUser);
 
         return response()->noContent();
     }

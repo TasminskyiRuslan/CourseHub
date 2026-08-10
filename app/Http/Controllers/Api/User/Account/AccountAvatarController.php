@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\User\Account;
 
 use App\Actions\User\DeleteUserAvatarAction;
@@ -7,13 +9,14 @@ use App\Actions\User\UpdateUserAvatarAction;
 use App\Data\User\Requests\UpdateUserAvatarData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\User\Account\UserResource;
-use Exception;
+use App\Loaders\User\Account\UserLoader;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Throwable;
 
 class AccountAvatarController extends Controller
 {
@@ -39,7 +42,7 @@ class AccountAvatarController extends Controller
                         new OA\Property(
                             property: 'data',
                             ref: '#/components/schemas/UserAccountResponse'
-                        )
+                        ),
                     ]
                 )
             ),
@@ -54,26 +57,23 @@ class AccountAvatarController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
                 description: 'Validation error.'
-            )
+            ),
         ]
     )]
     /**
-     * Update the authenticated user\'s account avatar.
+     * Update the authenticated user's account avatar.
      *
-     * @param Request $request
-     * @param UpdateUserAvatarData $data
-     * @param UpdateUserAvatarAction $action
-     * @return JsonResponse
-     * @throws Exception
+     * @throws AccessDeniedHttpException
+     * @throws Throwable
      */
-    public function update(Request $request, UpdateUserAvatarData $data, UpdateUserAvatarAction $action): JsonResponse
+    public function update(Request $request, UpdateUserAvatarData $data, UpdateUserAvatarAction $action, UserLoader $userLoader): JsonResponse
     {
         $currentUser = $request->user();
 
         $updatedUser = $action->handle($data, $currentUser);
-        $updatedUser->loadMissing(['roles']);
+        $loadedUser = $userLoader->handle($updatedUser);
 
-        return UserResource::make($updatedUser)
+        return UserResource::make($loadedUser)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
@@ -96,15 +96,12 @@ class AccountAvatarController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_FORBIDDEN,
                 description: 'User does not have permissions.'
-            )
+            ),
         ]
     )]
     /**
      * Delete the authenticated user's account avatar.
      *
-     * @param Request $request
-     * @param DeleteUserAvatarAction $action
-     * @return Response
      * @throws AccessDeniedHttpException
      */
     public function destroy(Request $request, DeleteUserAvatarAction $action): Response

@@ -1,13 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\Course\Admin;
 
 use App\Actions\Course\DeleteCourseAction;
 use App\Enums\CourseType;
-use App\Finders\Course\Admin\FindCourseBySlug;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Course\Admin\CourseResource;
-use App\Loaders\Course\Admin\LoadCourse;
+use App\Loaders\Course\Admin\CourseLoader;
 use App\Models\Course;
 use App\Queries\Course\Admin\GetCoursesQuery;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -87,7 +88,7 @@ class CourseController extends Controller
                 in: 'query',
                 required: false,
                 schema: new OA\Schema(type: 'integer', default: 1, minimum: 1),
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -99,7 +100,7 @@ class CourseController extends Controller
                             property: 'data',
                             type: 'array',
                             items: new OA\Items(ref: '#/components/schemas/CourseAdminResponse')
-                        )
+                        ),
                     ]
                 )
             ),
@@ -110,15 +111,11 @@ class CourseController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_FORBIDDEN,
                 description: 'User does not have permissions.'
-            )
+            ),
         ]
     )]
     /**
      * Retrieve a paginated list of all courses by administrator.
-     *
-     * @param Request $request
-     * @param GetCoursesQuery $query
-     * @return JsonResponse
      */
     public function index(Request $request, GetCoursesQuery $query): JsonResponse
     {
@@ -130,14 +127,14 @@ class CourseController extends Controller
     }
 
     #[OA\Get(
-        path: '/admin/courses/{course}',
+        path: '/admin/courses/{adminCourse}',
         description: 'Retrieve detailed information about the specified course by administrator.',
         summary: '[Admin] Retrieve course details',
         security: [['sanctum' => []]],
         tags: ['Course'],
         parameters: [
             new OA\Parameter(
-                name: 'course',
+                name: 'adminCourse',
                 description: 'Course identifier (slug).',
                 in: 'path',
                 required: true,
@@ -145,7 +142,7 @@ class CourseController extends Controller
                     type: 'string',
                     example: 'math-101'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -156,7 +153,7 @@ class CourseController extends Controller
                         new OA\Property(
                             property: 'data',
                             ref: '#/components/schemas/CourseAdminResponse'
-                        )
+                        ),
                     ]
                 )
             ),
@@ -171,22 +168,15 @@ class CourseController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
                 description: 'Course not found.'
-            )
+            ),
         ]
     )]
     /**
      * Retrieve detailed information about the specified course by administrator.
-     *
-     * @param FindCourseBySlug $finder
-     * @param LoadCourse $loader
-     * @param string $course
-     * @return JsonResponse
      */
-    public function show(FindCourseBySlug $finder, LoadCourse $loader, string $course): JsonResponse
+    public function show(CourseLoader $courseLoader, Course $adminCourse): JsonResponse
     {
-        $gottenCourse = $finder->handle($course);
-
-        $loadedCourse = $loader->handle($gottenCourse);
+        $loadedCourse = $courseLoader->handle($adminCourse);
 
         return CourseResource::make($loadedCourse)
             ->response()
@@ -194,14 +184,14 @@ class CourseController extends Controller
     }
 
     #[OA\Delete(
-        path: '/admin/courses/{course}',
+        path: '/admin/courses/{adminCourse}',
         description: 'Delete the specified course by administrator.',
         summary: '[Admin] Delete a course',
         security: [['sanctum' => []]],
         tags: ['Course'],
         parameters: [
             new OA\Parameter(
-                name: 'course',
+                name: 'adminCourse',
                 description: 'Course identifier (slug).',
                 in: 'path',
                 required: true,
@@ -209,7 +199,7 @@ class CourseController extends Controller
                     type: 'string',
                     example: 'math-101'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -233,16 +223,13 @@ class CourseController extends Controller
     /**
      * Delete the specified course by administrator.
      *
-     * @param DeleteCourseAction $action
-     * @param Course $course
-     * @return Response
      * @throws Throwable
      */
-    public function destroy(DeleteCourseAction $action, Course $course): Response
+    public function destroy(DeleteCourseAction $action, Course $adminCourse): Response
     {
-        $this->authorize('delete', $course);
+        $this->authorize('delete', $adminCourse);
 
-        $action->handle($course);
+        $action->handle($adminCourse);
 
         return response()->noContent();
     }

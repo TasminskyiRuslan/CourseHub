@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\User\Responses;
 
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
-    schema: 'UserPublicResponse',
-    title: 'User Public Response',
-    description: 'Public profile data of a user.',
+    schema: 'TeacherPublicResponse',
+    title: 'Teacher Public Response',
+    description: 'Public profile data of a teacher.',
     required: ['id', 'name', 'slug', 'courses_count'],
     properties: [
         new OA\Property(
@@ -24,7 +26,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'slug',
-            description: 'User slug.',
+            description: 'Teacher slug.',
             type: 'string',
             example: 'john-doe'
         ),
@@ -41,10 +43,8 @@ use OpenApi\Attributes as OA;
             description: 'Total number of published courses.',
             type: 'integer',
             example: 5
-        )
+        ),
     ],
     type: 'object'
 )]
-class UserPublicResponseSchema
-{
-}
+class TeacherPublicResponseSchema {}

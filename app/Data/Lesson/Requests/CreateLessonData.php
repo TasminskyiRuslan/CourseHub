@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Data\Lesson\Requests;
 
 use App\Enums\CourseType;
@@ -11,42 +13,27 @@ use Spatie\LaravelData\Support\Validation\ValidationContext;
 
 class CreateLessonData extends Data
 {
-    /**
-     * @param string $title
-     * @param string|null $slug
-     * @param int|null $position
-     * @param CarbonImmutable|null $start_time
-     * @param CarbonImmutable|null $end_time
-     * @param string|null $address
-     * @param string|null $room_number
-     * @param string|null $meeting_link
-     * @param string|null $video_url
-     * @param string|null $provider
-     */
     public function __construct(
-        public string           $title,
-        public ?string          $slug,
-        public ?int             $position,
+        public string $title,
+        public ?string $slug,
+        public ?int $position,
         public ?CarbonImmutable $start_time,
         public ?CarbonImmutable $end_time,
-        public ?string          $address,
-        public ?string          $room_number,
-        public ?string          $meeting_link,
-        public ?string          $video_url,
-        public ?string          $provider,
-    )
-    {
-    }
+        public ?string $address,
+        public ?string $room_number,
+        public ?string $meeting_link,
+        public ?string $video_url,
+        public ?string $provider,
+    ) {}
 
     /**
      * Return validation rules.
      *
-     * @param ValidationContext $context
      * @return array<string, array<int, mixed>>
      */
     public static function rules(ValidationContext $context): array
     {
-        $course = Route::current()?->parameter('course');
+        $teacherCourse = Route::current()?->parameter('teacherCourse');
 
         $rules = [
             'title' => [
@@ -59,7 +46,7 @@ class CreateLessonData extends Data
                 'string',
                 'max:255',
                 'regex:/^[a-z0-9-]+$/',
-                Rule::unique('lessons', 'slug')->where('course_id', $course?->id),
+                Rule::unique('lessons', 'slug')->where('course_id', $teacherCourse?->id),
             ],
             'position' => [
                 'nullable',
@@ -68,11 +55,11 @@ class CreateLessonData extends Data
             ],
         ];
 
-        if (!$course) {
+        if (! $teacherCourse) {
             return $rules;
         }
 
-        return match ($course->type) {
+        return match ($teacherCourse->type) {
             CourseType::OFFLINE => array_merge($rules, [
                 'start_time' => ['nullable', 'date', 'after_or_equal:today'],
                 'end_time' => ['nullable', 'date', 'after:start_time'],

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\Course\Requests;
 
 use OpenApi\Attributes as OA;
@@ -23,10 +25,8 @@ use OpenApi\Attributes as OA;
             default: 'PUT',
             enum: ['PUT'],
             example: 'PUT'
-        )
+        ),
     ],
     type: 'object'
 )]
-class UpdateCourseImageRequestSchema
-{
-}
+class UpdateCourseImageRequestSchema {}

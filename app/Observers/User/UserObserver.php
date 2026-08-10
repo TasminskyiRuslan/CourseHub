@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Observers\User;
 
 use App\Models\User;
@@ -9,9 +11,6 @@ class UserObserver
 {
     /**
      * Flush the cache when a new user is created.
-     *
-     * @param User $user
-     * @return void
      */
     public function created(User $user): void
     {
@@ -19,23 +18,7 @@ class UserObserver
     }
 
     /**
-     * Flush the user list cache.
-     *
-     * @return void
-     */
-    protected function flushCache(): void
-    {
-        Cache::tags([
-            config('cache.tags.teacher_list'),
-            config('cache.tags.course_list'),
-        ])->flush();
-    }
-
-    /**
      * Flush the cache when a user is updated.
-     *
-     * @param User $user
-     * @return void
      */
     public function updated(User $user): void
     {
@@ -44,9 +27,6 @@ class UserObserver
 
     /**
      * Remove associated courses before the user is removed.
-     *
-     * @param User $user
-     * @return void
      */
     public function deleting(User $user): void
     {
@@ -55,9 +35,6 @@ class UserObserver
 
     /**
      * Flush the cache when a user is deleted.
-     *
-     * @param User $user
-     * @return void
      */
     public function deleted(User $user): void
     {
@@ -66,11 +43,6 @@ class UserObserver
 
     /**
      * Handle the pivot sync event (specifically for Spatie roles).
-     *
-     * @param User $user
-     * @param string $relation
-     * @param array $pivotIds
-     * @return void
      */
     public function pivotSynced(User $user, string $relation, array $pivotIds): void
     {
@@ -81,11 +53,6 @@ class UserObserver
 
     /**
      * Handle the pivot attach event.
-     *
-     * @param User $user
-     * @param string $relation
-     * @param array $pivotIds
-     * @return void
      */
     public function pivotAttached(User $user, string $relation, array $pivotIds): void
     {
@@ -96,16 +63,22 @@ class UserObserver
 
     /**
      * Handle the pivot detach event.
-     *
-     * @param User $user
-     * @param string $relation
-     * @param array $pivotIds
-     * @return void
      */
     public function pivotDetached(User $user, string $relation, array $pivotIds): void
     {
         if ($relation === 'roles') {
             $this->flushCache();
         }
+    }
+
+    /**
+     * Flush the user list cache.
+     */
+    protected function flushCache(): void
+    {
+        Cache::tags([
+            config('cache.tags.teacher_list'),
+            config('cache.tags.course_list'),
+        ])->flush();
     }
 }

@@ -1,24 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\User;
 
 use App\Data\User\Requests\UpdateUserAvatarData;
 use App\Enums\UserRole;
+use App\Jobs\DeleteFileFromStorageJob;
 use App\Models\User;
-use Exception;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Throwable;
 
 readonly class UpdateUserAvatarAction
 {
     /**
      * Update the specified user avatar.
      *
-     * @param UpdateUserAvatarData $data
-     * @param User $user
-     * @return User
      * @throws AccessDeniedHttpException
-     * @throws Exception
+     * @throws Throwable
      */
     public function handle(UpdateUserAvatarData $data, User $user): User
     {
@@ -26,18 +26,19 @@ readonly class UpdateUserAvatarAction
             throw new AccessDeniedHttpException(__('users.protected'));
         }
 
-        $oldPath = $user->avatar_path;
-        $newPath = $data->avatar->store('/', 'users');
+        $oldAvatarPath = $user->avatar_path;
+        $newAvatarPath = $data->avatar->store('/', 'users');
 
         try {
-            $user->setAvatar($newPath)->save();
-        } catch (Exception $e) {
-            Storage::disk('users')->delete($newPath);
-            throw $e;
-        }
+            $user->setAvatar($newAvatarPath)->save();
 
-        if ($oldPath && Storage::disk('users')->exists($oldPath)) {
-            Storage::disk('users')->delete($oldPath);
+            if ($oldAvatarPath) {
+                DeleteFileFromStorageJob::dispatch('users', $oldAvatarPath);
+            }
+        } catch (Throwable $e) {
+            Storage::disk('users')->delete($newAvatarPath);
+
+            throw $e;
         }
 
         return $user;

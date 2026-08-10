@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -51,8 +53,6 @@ function something()
 
 /**
  * Get the expected JSON structure for a user object (public).
- *
- * @return array
  */
 function publicUserJsonStructure(): array
 {
@@ -61,14 +61,12 @@ function publicUserJsonStructure(): array
         'name',
         'slug',
         'avatar_url',
-        'courses_count'
+        'courses_count',
     ];
 }
 
 /**
  * Get the expected JSON structure for a user object (auth).
- *
- * @return array
  */
 function accountUserJsonStructure(): array
 {
@@ -88,8 +86,6 @@ function accountUserJsonStructure(): array
 
 /**
  * Get the expected JSON structure for a user object (admin).
- *
- * @return array
  */
 function adminUserJsonStructure(): array
 {
@@ -110,8 +106,6 @@ function adminUserJsonStructure(): array
 
 /**
  * Get the expected JSON structure for an authentication response.
- *
- * @return array
  */
 function authJsonStructure(): array
 {
@@ -125,9 +119,6 @@ function authJsonStructure(): array
 
 /**
  * Get the expected JSON structure for a lesson object (student).
- *
- * @param CourseType|null $courseType
- * @return array
  */
 function studentLessonJsonStructure(?CourseType $courseType): array
 {
@@ -142,7 +133,7 @@ function studentLessonJsonStructure(?CourseType $courseType): array
                 'start_time',
                 'end_time',
                 'address',
-                'room_number'
+                'room_number',
             ],
             CourseType::ONLINE => [
                 'start_time',
@@ -159,9 +150,6 @@ function studentLessonJsonStructure(?CourseType $courseType): array
 
 /**
  * Get the expected JSON structure for a lesson object (teacher).
- *
- * @param CourseType|null $courseType
- * @return array
  */
 function teacherLessonJsonStructure(?CourseType $courseType): array
 {
@@ -176,7 +164,7 @@ function teacherLessonJsonStructure(?CourseType $courseType): array
                 'start_time',
                 'end_time',
                 'address',
-                'room_number'
+                'room_number',
             ],
             CourseType::ONLINE => [
                 'start_time',
@@ -195,9 +183,6 @@ function teacherLessonJsonStructure(?CourseType $courseType): array
 
 /**
  * Get the expected JSON structure for a lesson object (admin).
- *
- * @param CourseType|null $courseType
- * @return array
  */
 function adminLessonJsonStructure(?CourseType $courseType): array
 {
@@ -212,7 +197,7 @@ function adminLessonJsonStructure(?CourseType $courseType): array
                 'start_time',
                 'end_time',
                 'address',
-                'room_number'
+                'room_number',
             ],
             CourseType::ONLINE => [
                 'start_time',
@@ -232,8 +217,6 @@ function adminLessonJsonStructure(?CourseType $courseType): array
 
 /**
  * Get the expected JSON structure for course resource (public).
- *
- * @return array
  */
 function publicCourseJsonStructure(): array
 {
@@ -254,8 +237,6 @@ function publicCourseJsonStructure(): array
 
 /**
  * Get the expected JSON structure for course resource (teacher).
- *
- * @return array
  */
 function teacherCourseJsonStructure(): array
 {
@@ -278,8 +259,6 @@ function teacherCourseJsonStructure(): array
 
 /**
  * Get the expected JSON structure for course resource (student).
- *
- * @return array
  */
 function studentCourseJsonStructure(): array
 {
@@ -299,8 +278,6 @@ function studentCourseJsonStructure(): array
 }
 /**
  * Get the expected JSON structure for course resource (admin).
- *
- * @return array
  */
 function adminCourseJsonStructure(): array
 {
@@ -325,23 +302,18 @@ function adminCourseJsonStructure(): array
 
 /**
  * Get the expected JSON structure for a pagination data.
- *
- * @return array
  */
 function paginationJsonStructure(): array
 {
     return [
         'data',
         'links',
-        'meta'
+        'meta',
     ];
 }
 
 /**
  * Generate a registration payload with optional overrides.
- *
- * @param array $overrides
- * @return array
  */
 function registrationPayload(array $overrides = []): array
 {
@@ -355,9 +327,6 @@ function registrationPayload(array $overrides = []): array
 
 /**
  * Generate a creation course payload with optional overrides.
- *
- * @param array $overrides
- * @return array
  */
 function creatingCoursePayload(array $overrides = []): array
 {
@@ -365,30 +334,24 @@ function creatingCoursePayload(array $overrides = []): array
         'title' => fake()->sentence(3),
         'description' => fake()->paragraph(),
         'type' => CourseType::OFFLINE,
-        'price' => (string)fake()->randomFloat(2, 0, 99999999.99),
+        'price' => (string) fake()->randomFloat(2, 0, 99999999.99),
     ], $overrides);
 }
 
 /**
  * Generate an updating course payload with optional overrides.
- *
- * @param array $overrides
- * @return array
  */
 function updatingCoursePayload(array $overrides = []): array
 {
     return array_merge([
         'title' => fake()->sentence(3),
         'description' => fake()->paragraph(),
-        'price' => (string)fake()->randomFloat(2, 0, 99999999.99),
+        'price' => (string) fake()->randomFloat(2, 0, 99999999.99),
     ], $overrides);
 }
 
 /**
  * Generate an image payload with optional overrides.
- *
- * @param array $overrides
- * @return array
  */
 function imagePayload(array $overrides = []): array
 {
@@ -400,9 +363,6 @@ function imagePayload(array $overrides = []): array
 
 /**
  * Generate an avatar payload with optional overrides.
- *
- * @param array $overrides
- * @return array
  */
 function avatarPayload(array $overrides = []): array
 {
@@ -414,10 +374,6 @@ function avatarPayload(array $overrides = []): array
 
 /**
  * Generate a creation lesson payload with optional overrides.
- *
- * @param CourseType $courseType
- * @param array $overrides
- * @return array
  */
 function creatingLessonPayload(CourseType $courseType, array $overrides = []): array
 {
@@ -441,16 +397,12 @@ function creatingLessonPayload(CourseType $courseType, array $overrides = []): a
     };
 
     return array_merge([
-        'title' => fake()->sentence(3)
+        'title' => fake()->sentence(3),
     ], $typeSpecific, $overrides);
 }
 
 /**
  * Generate an updating lesson payload with optional overrides.
- *
- * @param CourseType $courseType
- * @param array $overrides
- * @return array
  */
 function updatingLessonPayload(CourseType $courseType, array $overrides = []): array
 {
@@ -482,9 +434,6 @@ function updatingLessonPayload(CourseType $courseType, array $overrides = []): a
 
 /**
  * Generate a stripe checkout webhook payload with optional overrides.
- *
- * @param array $overrides
- * @return array
  */
 function stripeCheckoutWebhookPayload(array $overrides = []): array
 {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Data\User\Requests;
 
 use Illuminate\Support\Facades\Route;
@@ -14,10 +16,6 @@ use Spatie\LaravelData\Support\Validation\ValidationContext;
 
 class UpdateUserData extends Data
 {
-    /**
-     * @param string|Optional $name
-     * @param string|Optional $slug
-     */
     public function __construct(
         #[Sometimes]
         #[StringType]
@@ -26,14 +24,11 @@ class UpdateUserData extends Data
         public string|Optional $name,
 
         public string|Optional $slug,
-    )
-    {
-    }
+    ) {}
 
     /**
      * Return the validation rules.
      *
-     * @param ValidationContext $context
      * @return array<string, array<int, mixed>>
      */
     public static function rules(ValidationContext $context): array

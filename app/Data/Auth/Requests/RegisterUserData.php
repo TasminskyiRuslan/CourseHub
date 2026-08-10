@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Data\Auth\Requests;
 
 use App\Data\Casts\LowercaseCast;
@@ -19,12 +21,6 @@ use Spatie\LaravelData\Support\Validation\ValidationContext;
 
 class RegisterUserData extends Data
 {
-    /**
-     * @param string $name
-     * @param string $email
-     * @param string $password
-     * @param array $roles
-     */
     public function __construct(
         #[Required]
         #[StringType]
@@ -45,16 +41,11 @@ class RegisterUserData extends Data
         #[Password(min: 8)]
         public string $password,
 
-        public array  $roles = [],
-    )
-    {
-    }
+        public array $roles = [],
+    ) {}
 
     /**
      * Return the validation rules.
-     *
-     * @param ValidationContext $context
-     * @return array
      */
     public static function rules(ValidationContext $context): array
     {

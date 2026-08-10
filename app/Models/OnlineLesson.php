@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Http\Resources\Api\Lesson\OnlineLessonResource;
@@ -22,6 +24,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  * @property-read \App\Models\Lesson|null $lesson
+ *
  * @method static \Database\Factories\OnlineLessonFactory factory($count = null, $state = [])
  * @method static Builder<static>|OnlineLesson newModelQuery()
  * @method static Builder<static>|OnlineLesson newQuery()
@@ -36,6 +39,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|OnlineLesson whereUpdatedAt($value)
  * @method static Builder<static>|OnlineLesson withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|OnlineLesson withoutTrashed()
+ *
  * @mixin Eloquent
  */
 class OnlineLesson extends Model
@@ -51,13 +55,11 @@ class OnlineLesson extends Model
     protected $fillable = [
         'start_time',
         'end_time',
-        'meeting_link'
+        'meeting_link',
     ];
 
     /**
      * Get the lesson associated with the online lesson.
-     *
-     * @return MorphOne
      */
     public function lesson(): MorphOne
     {
@@ -66,9 +68,6 @@ class OnlineLesson extends Model
 
     /**
      * Transform the model into a JSON resource.
-     *
-     * @param string|null $resourceClass
-     * @return JsonResource
      */
     public function toResource(?string $resourceClass = null): JsonResource
     {

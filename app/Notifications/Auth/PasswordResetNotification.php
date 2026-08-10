@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications\Auth;
 
 use Illuminate\Bus\Queueable;
@@ -13,8 +15,6 @@ class PasswordResetNotification extends Notification implements ShouldQueue
 
     /**
      * Create a new notification instance.
-     *
-     * @param string $token
      */
     public function __construct(public string $token)
     {
@@ -24,7 +24,6 @@ class PasswordResetNotification extends Notification implements ShouldQueue
     /**
      * Get the notification's delivery channels.
      *
-     * @param mixed $notifiable
      * @return array<int, string>
      */
     public function via(mixed $notifiable): array
@@ -34,13 +33,10 @@ class PasswordResetNotification extends Notification implements ShouldQueue
 
     /**
      * Get the mail representation of the notification.
-     *
-     * @param mixed $notifiable
-     * @return MailMessage
      */
     public function toMail(mixed $notifiable): MailMessage
     {
-        $resetUrl = url('/password/reset?token=' . $this->token);
+        $resetUrl = url('/password/reset?token='.$this->token);
 
         return (new MailMessage)
             ->subject('Reset Password')

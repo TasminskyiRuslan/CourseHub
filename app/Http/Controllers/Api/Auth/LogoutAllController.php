@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\RevokeAllTokensAction;
@@ -30,10 +32,6 @@ class LogoutAllController extends Controller
     )]
     /**
      * Revoke all access tokens for an authenticated user.
-     *
-     * @param Request $request
-     * @param RevokeAllTokensAction $action
-     * @return Response
      */
     public function __invoke(Request $request, RevokeAllTokensAction $action): Response
     {

@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\Course;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\seed;
 
@@ -24,15 +29,13 @@ describe('Public -> TeacherController -> index', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('allows any user to retrieve a list of active teachers', function ($user) {
+        it('allows any user to retrieve a list of active teachers', function (?User $user) {
             if ($user) {
                 Sanctum::actingAs($user);
             }
 
             $teachers = User::factory()->teacher()->count(3)->create();
-            foreach ($teachers as $teacher) {
-                Course::factory()->for($teacher, 'author')->create();
-            }
+            $teachers->each(fn (User $teacher) => Course::factory()->for($teacher, 'author')->create());
 
             User::factory()->teacher()->count(2)->create();
 
@@ -43,23 +46,19 @@ describe('Public -> TeacherController -> index', function () {
                 ->assertOk()
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => publicUserJsonStructure()
-                    ]
+                        '*' => publicUserJsonStructure(),
+                    ],
                 ]);
 
-            $responseDataIds = collect($response->json('data'))->pluck('id');
-
-            foreach ($teachers as $teacher) {
-                expect($responseDataIds)->toContain($teacher->id);
-            }
-
-            expect($responseDataIds)->not->toContain($bannedTeacher->id);
+            expect($response->json('data.*.id'))
+                ->toContain(...$teachers->pluck('id')->all())
+                ->not->toContain($bannedTeacher->id);
         })->with([
             'guest' => null,
-            'user' => fn() => User::factory()->create(),
-            'teacher' => fn() => User::factory()->teacher()->create(),
-            'admin' => fn() => User::factory()->admin()->create(),
-            'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
+            'user' => fn () => User::factory()->create(),
+            'teacher' => fn () => User::factory()->teacher()->create(),
+            'admin' => fn () => User::factory()->admin()->create(),
+            'super-admin' => fn () => User::whereEmail(config('super-admin.email'))->first(),
         ]);
     });
 

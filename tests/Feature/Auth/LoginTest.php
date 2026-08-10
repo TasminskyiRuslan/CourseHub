@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 use Carbon\Carbon;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -7,6 +9,7 @@ use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+
 use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class);
@@ -57,6 +60,23 @@ describe('Auth -> LoginController', function () {
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
         });
+
+        it('logs in successfully when email is provided in uppercase', function () {
+            Event::fake();
+
+            $password = 'password';
+            $user = User::factory()->create([
+                'email' => 'user@example.com',
+                'password' => $password,
+            ]);
+
+            postJson(route('auth.login'), [
+                'email' => 'USER@EXAMPLE.COM',
+                'password' => $password,
+            ])
+                ->assertOk()
+                ->assertJsonFragment(['email' => 'user@example.com']);
+        });
     });
 
     /*
@@ -65,7 +85,7 @@ describe('Auth -> LoginController', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('allows users to log in', function ($user) {
+        it('allows users to log in', function (?User $user) {
             Event::fake();
 
             $data = [
@@ -80,15 +100,15 @@ describe('Auth -> LoginController', function () {
                     'data' => authJsonStructure(),
                 ]);
 
-            Event::assertDispatched(Login::class, fn($event) => $event->user->id === $user->id);
+            Event::assertDispatched(Login::class, fn ($event) => $event->user->id === $user->id);
         })
             ->with([
-                'unverified user' => fn() => User::factory()->unverified()->create(['password' => 'secret']),
-                'verified user' => fn() => User::factory()->create(['password' => 'secret']),
-                'student' => fn() => User::factory()->create(['password' => 'secret']),
-                'teacher' => fn() => User::factory()->teacher()->create(['password' => 'secret']),
-                'admin' => fn() => User::factory()->admin()->create(['password' => 'secret']),
-                'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+                'unverified user' => fn () => User::factory()->unverified()->create(['password' => 'secret']),
+                'verified user' => fn () => User::factory()->create(['password' => 'secret']),
+                'student' => fn () => User::factory()->create(['password' => 'secret']),
+                'teacher' => fn () => User::factory()->teacher()->create(['password' => 'secret']),
+                'admin' => fn () => User::factory()->admin()->create(['password' => 'secret']),
+                'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
             ]);
     });
 
@@ -113,7 +133,7 @@ describe('Auth -> LoginController', function () {
             $expiresAt = Carbon::parse($response->json('data.expires_at'));
             expect($expiresAt->greaterThan(now()->addMinutes(config('sanctum.token_ttl.default'))))->toBeTrue();
 
-            Event::assertDispatched(Login::class, fn($event) => $event->user->id === $user->id);
+            Event::assertDispatched(Login::class, fn ($event) => $event->user->id === $user->id);
         });
 
         it('sets a short token expiration when remember is false', function () {
@@ -131,7 +151,7 @@ describe('Auth -> LoginController', function () {
             $expiresAt = Carbon::parse($response->json('data.expires_at'));
             expect($expiresAt->lessThanOrEqualTo(now()->addMinutes(config('sanctum.token_ttl.default'))))->toBeTrue();
 
-            Event::assertDispatched(Login::class, fn($event) => $event->user->id === $user->id);
+            Event::assertDispatched(Login::class, fn ($event) => $event->user->id === $user->id);
         });
 
         it('sets a short token expiration by default if the remember field is missing', function () {
@@ -148,7 +168,7 @@ describe('Auth -> LoginController', function () {
             $expiresAt = Carbon::parse($response->json('data.expires_at'));
             expect($expiresAt->lessThanOrEqualTo(now()->addMinutes(config('sanctum.token_ttl.default'))))->toBeTrue();
 
-            Event::assertDispatched(Login::class, fn($event) => $event->user->id === $user->id);
+            Event::assertDispatched(Login::class, fn ($event) => $event->user->id === $user->id);
         });
     });
 })->group('auth');

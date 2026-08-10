@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
-use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+
 use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class);
@@ -13,7 +15,6 @@ uses(RefreshDatabase::class);
 describe('Auth -> ResetPasswordController', function () {
     beforeEach(function () {
         $this->seed(RolesAndPermissionsSeeder::class);
-        $this->seed(SuperAdminUserSeeder::class);
     });
 
     /*
@@ -78,7 +79,7 @@ describe('Auth -> ResetPasswordController', function () {
                 'token' => 'invalid-token',
             ])
                 ->assertUnprocessable()
-                ->assertJsonValidationErrors('email');
+                ->assertJsonValidationErrors(['email']);
         });
 
         it('fails if the new password is too short', function () {
@@ -101,7 +102,7 @@ describe('Auth -> ResetPasswordController', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('allows users to reset their password', function ($user) {
+        it('allows users to reset their password', function (?User $user) {
             $newPassword = 'new-password';
 
             postJson(route('auth.password.reset'), [
@@ -111,13 +112,29 @@ describe('Auth -> ResetPasswordController', function () {
                 'token' => Password::createToken($user),
             ])
                 ->assertNoContent();
-            $user->refresh();
-            expect(Hash::check($newPassword, $user->password))->toBeTrue();
+
+            expect(Hash::check($newPassword, $user->fresh()->password))->toBeTrue();
         })
             ->with([
-                'user' => fn() => User::factory()->create(),
-                'teacher' => fn() => User::factory()->teacher()->create(),
-                'admin' => fn() => User::factory()->admin()->create(),
+                'user' => fn () => User::factory()->create(),
+                'teacher' => fn () => User::factory()->teacher()->create(),
+                'admin' => fn () => User::factory()->admin()->create(),
             ]);
+
+        it('allows resetting password when email is provided in uppercase', function () {
+            $user = User::factory()->create(['email' => 'user@example.com']);
+            $token = Password::createToken($user);
+            $newPassword = 'new-password';
+
+            postJson(route('auth.password.reset'), [
+                'email' => 'USER@EXAMPLE.COM',
+                'password' => $newPassword,
+                'password_confirmation' => $newPassword,
+                'token' => $token,
+            ])
+                ->assertNoContent();
+
+            expect(Hash::check($newPassword, $user->fresh()->password))->toBeTrue();
+        });
     });
 })->group('auth');

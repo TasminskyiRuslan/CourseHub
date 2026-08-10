@@ -2786,7 +2786,12 @@ namespace PHPSTORM_META {
 'validation.required_without_all','validation.same','validation.size.array','validation.size.file','validation.size.numeric',
 'validation.size.string','validation.starts_with','validation.string','validation.timezone','validation.unique',
 'validation.uploaded','validation.uppercase','validation.url','validation.ulid','validation.uuid',
-'validation.custom.attribute-name.rule-name','auth.banned','auth.verified','auth.invalid_verification_link','users.protected',);
+'validation.custom.attribute-name.rule-name','auth.banned','auth.verified','auth.invalid_verification_link','courses.forbidden.create',
+'courses.forbidden.update','courses.forbidden.update_own','courses.forbidden.publish','courses.forbidden.publish_own','courses.forbidden.delete',
+'courses.forbidden.delete_own','courses.forbidden.ban','courses.forbidden.checkout_own','lessons.forbidden.create','lessons.forbidden.create_own',
+'lessons.forbidden.update','lessons.forbidden.update_own','lessons.forbidden.delete','lessons.forbidden.delete_own','users.protected',
+'users.forbidden.protected','users.forbidden.update_roles_self','users.forbidden.update_roles','users.forbidden.delete_self','users.forbidden.delete',
+'users.forbidden.ban_self','users.forbidden.ban',);
         registerArgumentsSet('env', 
 'APP_NAME','APP_ENV','APP_KEY','APP_DEBUG','APP_URL',
 'APP_LOCALE','APP_FALLBACK_LOCALE','APP_FAKER_LOCALE','APP_MAINTENANCE_DRIVER','BCRYPT_ROUNDS',

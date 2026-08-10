@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\User;
@@ -8,6 +10,7 @@ use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\deleteJson;
 
 uses(RefreshDatabase::class);
@@ -67,50 +70,47 @@ describe('Admin -> LessonController -> destroy', function () {
             $course = Course::factory()->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            deleteJson(route('teacher.courses.lessons.destroy', [$course, $lesson]))
+            deleteJson(route('admin.courses.lessons.destroy', [$course, $lesson]))
                 ->assertUnauthorized();
 
-            $this->assertDatabaseHas('lessons', ['id' => $lesson->id]);
-            $this->assertDatabaseHas($course->type->value . '_lessons', ['id' => $lesson->lessonable->id]);
+            $this->assertNotSoftDeleted($lesson);
+            $this->assertNotSoftDeleted($lesson->lessonable);
         });
 
-        it('fails if a user without permissions tries to delete a lesson', function ($user) {
+        it('fails if a user without permissions tries to delete a lesson', function (?User $user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
-            deleteJson(route('teacher.courses.lessons.destroy', [$course, $lesson]))
+            deleteJson(route('admin.courses.lessons.destroy', [$course, $lesson]))
                 ->assertForbidden();
 
-            $this->assertDatabaseHas('lessons', ['id' => $lesson->id]);
-            $this->assertDatabaseHas($course->type->value . '_lessons', ['id' => $lesson->lessonable->id]);
+            $this->assertNotSoftDeleted($lesson);
+            $this->assertNotSoftDeleted($lesson->lessonable);
         })->with([
-            'user' => fn() => User::factory()->create(),
-            'teacher' => fn() => User::factory()->teacher()->create(),
-            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
+            'user' => fn () => User::factory()->create(),
+            'teacher' => fn () => User::factory()->teacher()->create(),
+            'unverified teacher' => fn () => User::factory()->teacher()->unverified()->create(),
         ]);
 
-        it('allows a user with permission to delete a lesson', function ($userClosure, $courseClosure) {
-            $user = $userClosure();
+        it('allows a user with permission to delete a lesson', function (?User $user, Course $course) {
             Sanctum::actingAs($user);
 
-            $courseInnerClosure = $courseClosure();
-            $course = $courseInnerClosure($user);
             $lesson = Lesson::factory()->for($course, 'course')->create();
 
             deleteJson(route('admin.courses.lessons.destroy', [$course, $lesson]))
                 ->assertNoContent();
 
-            $this->assertSoftDeleted('lessons', ['id' => $lesson->id]);
-            $this->assertSoftDeleted($course->type->value . '_lessons', ['id' => $lesson->lessonable->id]);
+            $this->assertSoftDeleted($lesson);
+            $this->assertSoftDeleted($lesson->lessonable);
         })->with([
-            'admin' => fn() => User::factory()->admin()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'admin' => fn () => User::factory()->admin()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
         ])->with([
-            'published' => fn() => fn($author) => Course::factory()->create(),
-            'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->create(),
-            'banned' => fn() => fn($author) => Course::factory()->banned()->create(),
+            'published course' => fn () => Course::factory()->create(),
+            'unpublished course' => fn () => Course::factory()->unpublished()->create(),
+            'banned course' => fn () => Course::factory()->banned()->create(),
         ]);
 
         it('fails if a banned user tries to delete a lesson', function () {
@@ -146,10 +146,7 @@ describe('Admin -> LessonController -> destroy', function () {
 
             expect(Cache::tags($tags)->get($cacheKey))->not->toBeNull();
 
-            deleteJson(route('admin.courses.lessons.destroy', [
-                'course' => $course->slug,
-                'lesson' => $lesson->slug
-            ]))->assertNoContent();
+            deleteJson(route('admin.courses.lessons.destroy', [$course, $lesson]))->assertNoContent();
 
             expect(Cache::tags($tags)->get($cacheKey))->toBeNull();
         });

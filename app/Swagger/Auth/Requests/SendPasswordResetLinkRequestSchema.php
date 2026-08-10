@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\Auth\Requests;
 
 use OpenApi\Attributes as OA;
@@ -17,10 +19,8 @@ use OpenApi\Attributes as OA;
             format: 'email',
             maxLength: 255,
             example: 'john@example.com'
-        )
+        ),
     ],
     type: 'object'
 )]
-class SendPasswordResetLinkRequestSchema
-{
-}
+class SendPasswordResetLinkRequestSchema {}

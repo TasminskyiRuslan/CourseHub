@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Course;
 
 use App\Data\Course\Results\CheckoutResultData;
@@ -9,19 +11,12 @@ use App\Models\User;
 
 readonly class CheckoutCourseAction
 {
-    /**
-     * @param EnrollUserAction $enrollUserAction
-     */
     public function __construct(
         private EnrollUserAction $enrollUserAction
     ) {}
 
     /**
      * Check out the specified course for the specified user.
-     *
-     * @param User $user
-     * @param Course $course
-     * @return CheckoutResultData
      */
     public function handle(User $user, Course $course): CheckoutResultData
     {

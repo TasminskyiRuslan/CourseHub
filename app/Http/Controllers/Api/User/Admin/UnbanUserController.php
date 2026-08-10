@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\User\Admin;
 
 use App\Actions\User\UnbanUserAction;
@@ -16,14 +18,14 @@ class UnbanUserController extends Controller
     use AuthorizesRequests;
 
     #[OA\Patch(
-        path: '/admin/users/{user}/unban',
+        path: '/admin/users/{adminUser}/unban',
         description: 'Unban the specified user by administrator.',
         summary: '[Admin] Unban a user',
         security: [['sanctum' => []]],
         tags: ['User'],
         parameters: [
             new OA\Parameter(
-                name: 'user',
+                name: 'adminUser',
                 description: 'User identifier (slug).',
                 in: 'path',
                 required: true,
@@ -31,7 +33,7 @@ class UnbanUserController extends Controller
                     type: 'string',
                     example: 'john-doe'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -49,22 +51,19 @@ class UnbanUserController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
                 description: 'User not found.'
-            )
+            ),
         ]
     )]
     /**
      * Unban the specified user by administrator.
      *
-     * @param UnbanUserAction $action
-     * @param User $user
-     * @return Response
      * @throws Throwable
      */
-    public function __invoke(UnbanUserAction $action, User $user): Response
+    public function __invoke(UnbanUserAction $action, User $adminUser): Response
     {
-        $this->authorize('ban', $user);
+        $this->authorize('ban', $adminUser);
 
-        $action->handle($user);
+        $action->handle($adminUser);
 
         return response()->noContent();
     }

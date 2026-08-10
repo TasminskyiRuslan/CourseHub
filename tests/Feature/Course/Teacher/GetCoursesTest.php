@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\CourseType;
 use App\Models\Course;
 use App\Models\User;
@@ -8,6 +10,7 @@ use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class);
@@ -26,13 +29,11 @@ describe('Teacher -> CourseController -> index', function () {
     */
     describe('permissions', function () {
         it('fails if an unauthenticated user tries to retrieve courses', function () {
-            $course = Course::factory()->create();
-
-            getJson(route('teacher.courses.show', $course))
+            getJson(route('teacher.courses.index'))
                 ->assertUnauthorized();
         });
 
-        it('fails if a user without permissions tries to retrieve courses', function ($user) {
+        it('fails if a user without permissions tries to retrieve courses', function (?User $user) {
             Sanctum::actingAs($user);
 
             Course::factory()->count(5)->create();
@@ -40,11 +41,11 @@ describe('Teacher -> CourseController -> index', function () {
             getJson(route('teacher.courses.index'))
                 ->assertForbidden();
         })->with([
-            'user' => fn() => User::factory()->create(),
-            'admin' => fn() => User::factory()->admin()->create(),
+            'user' => fn () => User::factory()->create(),
+            'admin' => fn () => User::factory()->admin()->create(),
         ]);
 
-        it('allows a user to retrieve their own courses', function ($user) {
+        it('allows a user to retrieve their own courses', function (?User $user) {
             Sanctum::actingAs($user);
 
             $ownCourses = Course::factory()->count(3)->for($user, 'author')->create();
@@ -54,8 +55,8 @@ describe('Teacher -> CourseController -> index', function () {
                 ->assertOk()
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => teacherCourseJsonStructure()
-                    ]
+                        '*' => teacherCourseJsonStructure(),
+                    ],
                 ]);
 
             $responseDataIds = collect($response->json('data'))->pluck('id');
@@ -63,8 +64,8 @@ describe('Teacher -> CourseController -> index', function () {
                 expect($responseDataIds)->toContain($course->id);
             }
         })->with([
-            'teacher' => fn() => User::factory()->teacher()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'teacher' => fn () => User::factory()->teacher()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
         ]);
 
         it('fails if a banned user tries to retrieve their own courses', function () {
@@ -84,7 +85,7 @@ describe('Teacher -> CourseController -> index', function () {
     |--------------------------------------------------------------------------
     */
     describe('filters & sorting', function () {
-        it('filters courses by a search string', function () {
+        it('filters courses by a search string in title', function () {
             $author = User::factory()->teacher()->create();
             Sanctum::actingAs($author);
 
@@ -98,9 +99,22 @@ describe('Teacher -> CourseController -> index', function () {
                 ->assertJsonMissing(['data' => [['id' => $course2->id]]])
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => teacherCourseJsonStructure()
-                    ]
+                        '*' => teacherCourseJsonStructure(),
+                    ],
                 ]);
+        });
+
+        it('filters courses by description in search query', function () {
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
+
+            $course1 = Course::factory()->for($author, 'author')->create(['description' => 'Unique description text']);
+            $course2 = Course::factory()->for($author, 'author')->create(['description' => 'Standard content']);
+
+            getJson(route('teacher.courses.index', ['filter[search]' => 'Unique description']))
+                ->assertOk()
+                ->assertJsonFragment(['id' => $course1->id])
+                ->assertJsonMissing(['data' => [['id' => $course2->id]]]);
         });
 
         it('filters courses by type', function () {
@@ -231,6 +245,30 @@ describe('Teacher -> CourseController -> index', function () {
             $descResponse = getJson(route('teacher.courses.index', ['sort' => '-price']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($expensive->id, $descIds))->toBeLessThan(array_search($cheap->id, $descIds));
+        });
+
+        it('sorts courses by lessons_count (asc and desc)', function () {
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
+
+            $courseWithManyLessons = Course::factory()->for($author, 'author')->hasLessons(5)->create();
+            $courseWithFewLessons = Course::factory()->for($author, 'author')->hasLessons(1)->create();
+
+            $ascResponse = getJson(route('teacher.courses.index', ['sort' => 'lessons_count']))->assertOk();
+            $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
+            expect(array_search($courseWithFewLessons->id, $ascIds))->toBeLessThan(array_search($courseWithManyLessons->id, $ascIds));
+
+            $descResponse = getJson(route('teacher.courses.index', ['sort' => '-lessons_count']))->assertOk();
+            $descIds = collect($descResponse->json('data'))->pluck('id')->all();
+            expect(array_search($courseWithManyLessons->id, $descIds))->toBeLessThan(array_search($courseWithFewLessons->id, $descIds));
+        });
+
+        it('fails if an invalid sort parameter is provided', function () {
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
+
+            getJson(route('teacher.courses.index', ['sort' => 'unsupported_field']))
+                ->assertBadRequest();
         });
 
         it('returns empty data when no courses match the search', function () {

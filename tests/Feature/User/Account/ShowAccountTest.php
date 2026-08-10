@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class);
@@ -34,7 +38,7 @@ describe('Account -> AccountController -> show', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-        it('returns the authenticated user data', function ($user) {
+        it('returns the authenticated user data', function (?User $user) {
             Sanctum::actingAs($user);
 
             getJson(route('account.show'))
@@ -42,11 +46,11 @@ describe('Account -> AccountController -> show', function () {
                 ->assertJsonFragment(['email' => $user->email])
                 ->assertJsonStructure(['data' => accountUserJsonStructure()]);
         })->with([
-            'user' => fn() => User::factory()->create(),
-            'teacher' => fn() => User::factory()->teacher()->create(),
-            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'admin' => fn() => User::factory()->admin()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'user' => fn () => User::factory()->create(),
+            'teacher' => fn () => User::factory()->teacher()->create(),
+            'unverified teacher' => fn () => User::factory()->teacher()->unverified()->create(),
+            'admin' => fn () => User::factory()->admin()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
         ]);
     });
 })->group('user', 'account');

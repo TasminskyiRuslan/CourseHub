@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Lesson;
 
 use App\Models\Lesson;
@@ -9,16 +11,14 @@ use Throwable;
 readonly class DeleteLessonAction
 {
     /**
-     * Delete the specified lesson.
+     * Delete the specified lesson and its content.
      *
-     * @param Lesson $lesson
-     * @return void
      * @throws Throwable
      */
     public function handle(Lesson $lesson): void
     {
-        DB::transaction(function () use ($lesson) {
-            $lesson->lessonable()->delete();
+        DB::transaction(function () use ($lesson): void {
+            $lesson->lessonable?->delete();
             $lesson->delete();
         });
     }

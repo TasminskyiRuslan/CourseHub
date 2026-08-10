@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\Auth\Responses;
 
 use OpenApi\Attributes as OA;
@@ -34,10 +36,8 @@ use OpenApi\Attributes as OA;
             format: 'date-time',
             example: '2026-01-28T12:00:00.000000Z',
             nullable: true
-        )
+        ),
     ],
     type: 'object'
 )]
-class AuthResponseSchema
-{
-}
+class AuthResponseSchema {}

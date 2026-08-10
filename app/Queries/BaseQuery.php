@@ -1,19 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Queries;
 
 use Illuminate\Http\Request;
 
-readonly abstract class CachedListQuery
+abstract readonly class BaseQuery
 {
     /**
      * Check if the request qualifies for caching.
-     *
-     * @param Request $request
-     * @return bool
      */
     protected function shouldUseCache(Request $request): bool
     {
-        return !$request->hasAny(['filter', 'sort', 'include']);
+        return ! $request->hasAny(['filter', 'sort', 'include', 'page']);
     }
 }

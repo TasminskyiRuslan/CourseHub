@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\Lesson\Responses;
 
 use OpenApi\Attributes as OA;
@@ -70,11 +72,8 @@ use OpenApi\Attributes as OA;
             format: 'date-time',
             example: null,
             nullable: true
-        )
+        ),
     ],
     type: 'object'
 )]
-class LessonAdminResponseSchema
-{
-
-}
+class LessonAdminResponseSchema {}

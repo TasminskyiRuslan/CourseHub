@@ -1,37 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Course;
 
 use App\Data\Course\Requests\UpdateCourseData;
+use App\Jobs\Course\SyncCourseWithStripeJob;
 use App\Models\Course;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
 readonly class UpdateCourseAction
 {
     /**
-     * @param SyncCourseWithStripeAction $syncCourseWithStripeAction
-     */
-    public function __construct(
-        private SyncCourseWithStripeAction $syncCourseWithStripeAction
-    ) {}
-
-    /**
-     * Update the specified course.
-     *
-     * @param UpdateCourseData $data
-     * @param Course $course
-     * @return Course
-     * @throws Throwable
+     * Update the specified course and sync with Stripe.
      */
     public function handle(UpdateCourseData $data, Course $course): Course
     {
-        return DB::transaction(function () use ($course, $data) {
-            $course->update($data->toArray());
+        $course->update($data->toArray());
 
-            $this->syncCourseWithStripeAction->handle($course);
+        SyncCourseWithStripeJob::dispatch($course);
 
-            return $course;
-        });
+        return $course;
     }
 }

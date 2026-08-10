@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\User;
@@ -7,7 +9,9 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class);
@@ -33,7 +37,7 @@ describe('Teacher -> LessonController -> index', function () {
                 ->assertNotFound();
         });
 
-        it('fails if a non-author user tries to retrieve the lessons', function ($user) {
+        it('fails if a non-author user tries to retrieve the lessons', function (?User $user) {
             Sanctum::actingAs($user);
 
             $course = Course::factory()->create();
@@ -41,8 +45,11 @@ describe('Teacher -> LessonController -> index', function () {
             getJson(route('teacher.courses.lessons.index', $course))
                 ->assertNotFound();
         })->with([
-            'other teacher' => fn() => User::factory()->teacher()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'user' => fn () => User::factory()->create(),
+            'unverified teacher' => fn () => User::factory()->teacher()->unverified()->create(),
+            'admin' => fn () => User::factory()->admin()->create(),
+            'other teacher' => fn () => User::factory()->teacher()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
         ]);
     });
 
@@ -59,25 +66,11 @@ describe('Teacher -> LessonController -> index', function () {
                 ->assertUnauthorized();
         });
 
-        it('fails if a user without permissions tries to retrieve the lessons', function ($user) {
-            Sanctum::actingAs($user);
-
-            $course = Course::factory()->create();
-
-            getJson(route('teacher.courses.lessons.index', $course))
-                ->assertForbidden();
-        })->with([
-            'user' => fn() => User::factory()->create(),
-            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'admin' => fn() => User::factory()->admin()->create(),
-        ]);
-
         it('allows authors to retrieve lessons of their own course', function ($userClosure, $courseClosure) {
             $user = $userClosure();
             Sanctum::actingAs($user);
 
-            $courseInnerClosure = $courseClosure();
-            $course = $courseInnerClosure($user);
+            $course = $courseClosure($user);
 
             $lessons = Lesson::factory()->count(2)->for($course)->create();
 
@@ -86,8 +79,8 @@ describe('Teacher -> LessonController -> index', function () {
                 ->assertJsonCount(2, 'data')
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => teacherLessonJsonStructure($course->type)
-                    ]
+                        '*' => teacherLessonJsonStructure($course->type),
+                    ],
                 ]);
 
             $responseDataIds = collect($response->json('data'))->pluck('id');
@@ -95,11 +88,11 @@ describe('Teacher -> LessonController -> index', function () {
                 expect($responseDataIds)->toContain($lesson->id);
             }
         })->with([
-            'teacher' => fn() => User::factory()->teacher()->create(),
+            'teacher' => fn () => User::factory()->teacher()->create(),
         ])->with([
-            'published' => fn() => fn($author) => Course::factory()->for($author, 'author')->create(),
-            'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->for($author, 'author')->create(),
-            'banned' => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
+            'published' => fn ($author) => Course::factory()->for($author, 'author')->create(),
+            'unpublished' => fn ($author) => Course::factory()->unpublished()->for($author, 'author')->create(),
+            'banned' => fn ($author) => Course::factory()->banned()->for($author, 'author')->create(),
         ]);
 
         it('fails if a banned user tries to retrieve lessons of their own course', function () {
@@ -205,6 +198,16 @@ describe('Teacher -> LessonController -> index', function () {
             $descResponse = getJson(route('teacher.courses.lessons.index', [$course, 'sort' => '-created_at']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($newLesson->id, $descIds))->toBeLessThan(array_search($oldLesson->id, $descIds));
+        });
+
+        it('fails if an invalid sort parameter is provided', function () {
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($author);
+
+            $course = Course::factory()->for($author, 'author')->create();
+
+            getJson(route('teacher.courses.lessons.index', [$course, 'sort' => 'invalid_field']))
+                ->assertBadRequest();
         });
 
         it('returns empty data when no lessons match the search', function () {

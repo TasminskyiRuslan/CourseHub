@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications\Course;
 
 use App\Models\Course;
@@ -14,8 +16,6 @@ class CourseBannedNotification extends Notification implements ShouldQueue
 
     /**
      * Create a new notification instance.
-     *
-     * @param Course $course
      */
     public function __construct(protected Course $course)
     {
@@ -25,7 +25,6 @@ class CourseBannedNotification extends Notification implements ShouldQueue
     /**
      * Get the notification's delivery channels.
      *
-     * @param mixed $notifiable
      * @return array<int, string>
      */
     public function via(mixed $notifiable): array
@@ -35,9 +34,6 @@ class CourseBannedNotification extends Notification implements ShouldQueue
 
     /**
      * Get the mail representation of the notification.
-     *
-     * @param mixed $notifiable
-     * @return MailMessage
      */
     public function toMail(mixed $notifiable): MailMessage
     {
@@ -46,7 +42,7 @@ class CourseBannedNotification extends Notification implements ShouldQueue
             ->markdown('emails.course.ban', [
                 'user' => $notifiable,
                 'course' => $this->course,
-                'url' => route('teacher.course.show', $this->course->slug),
+                'url' => route('teacher.courses.show', $this->course->slug),
             ]);
     }
 }

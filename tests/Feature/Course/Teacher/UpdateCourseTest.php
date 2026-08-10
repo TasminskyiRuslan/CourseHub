@@ -1,13 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
+use App\Jobs\Course\SyncCourseWithStripeJob;
 use App\Models\Course;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
-use Stripe\StripeClient;
+
 use function Pest\Laravel\patchJson;
 
 uses(RefreshDatabase::class);
@@ -34,7 +40,7 @@ describe('Teacher -> CourseController -> update', function () {
             patchJson(route('teacher.courses.update', $course), updatingCoursePayload([
                 'title' => '',
                 'slug' => '',
-                'price' => ''
+                'price' => '',
             ]))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['title', 'slug', 'price']);
@@ -49,7 +55,7 @@ describe('Teacher -> CourseController -> update', function () {
             patchJson(route('teacher.courses.update', $course), updatingCoursePayload([
                 'title' => null,
                 'slug' => null,
-                'price' => null
+                'price' => null,
             ]))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['title', 'slug', 'price']);
@@ -92,28 +98,19 @@ describe('Teacher -> CourseController -> update', function () {
             $course = Course::factory()->for($author, 'author')->create();
 
             patchJson(route('teacher.courses.update', $course), updatingCoursePayload([
-                'slug' => 'Invalid Slug!'
+                'slug' => 'Invalid Slug!',
             ]))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['slug']);
         });
 
         it('succeeds if the slug remains the same (ignore current)', function () {
+            Queue::fake();
+
             $author = User::factory()->teacher()->create();
             Sanctum::actingAs($author);
 
             $course = Course::factory()->for($author, 'author')->create();
-
-            $this->mock(StripeClient::class, function ($mock) {
-                $mock->products = Mockery::mock();
-                $mock->products->shouldReceive('update')->andReturn((object) ['id' => 'prod_mock_id']);
-                $mock->prices = Mockery::mock();
-                $mock->prices->shouldReceive('retrieve')->andReturn((object) [
-                    'unit_amount' => 1000,
-                    'currency' => config('cashier.currency'),
-                ]);
-                $mock->prices->shouldReceive('create')->andReturn((object) ['id' => 'price_mock_id']);
-            });
 
             patchJson(route('teacher.courses.update', $course), [
                 'slug' => $course->slug,
@@ -141,6 +138,20 @@ describe('Teacher -> CourseController -> update', function () {
             patchJson(route('teacher.courses.update', 'non-existing-slug'))
                 ->assertNotFound();
         });
+
+        it('fails if a non-author user tries to update someone else\'s course', function (?User $user) {
+            Sanctum::actingAs($user);
+
+            $course = Course::factory()->create();
+
+            patchJson(route('teacher.courses.update', $course), updatingCoursePayload())
+                ->assertNotFound();
+        })->with([
+            'user' => fn () => User::factory()->create(),
+            'unverified teacher' => fn () => User::factory()->teacher()->unverified()->create(),
+            'another teacher' => fn () => User::factory()->teacher()->create(),
+            'admin' => fn () => User::factory()->admin()->create(),
+        ]);
     });
 
     /*
@@ -156,37 +167,12 @@ describe('Teacher -> CourseController -> update', function () {
                 ->assertUnauthorized();
         });
 
-        it('fails if a user without permissions tries to update someone else\'s course', function ($user) {
+        it('allows a user to update their own course', function (?User $user, Factory $courseFactory) {
+            Queue::fake();
+
             Sanctum::actingAs($user);
 
-            $course = Course::factory()->create();
-
-            patchJson(route('teacher.courses.update', $course), updatingCoursePayload())
-                ->assertForbidden();
-        })->with([
-            'user' => fn() => User::factory()->create(),
-            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'another teacher' => fn() => User::factory()->teacher()->create(),
-            'admin' => fn() => User::factory()->admin()->create(),
-        ]);
-
-        it('allows a user to update their own course', function ($userClosure, $courseClosure) {
-            $user = $userClosure();
-            Sanctum::actingAs($user);
-
-            $courseInnerClosure = $courseClosure();
-            $course = $courseInnerClosure($user);
-
-            $this->mock(StripeClient::class, function ($mock) {
-                $mock->products = Mockery::mock();
-                $mock->products->shouldReceive('update')->andReturn((object) ['id' => 'prod_mock_id']);
-                $mock->prices = Mockery::mock();
-                $mock->prices->shouldReceive('retrieve')->andReturn((object) [
-                    'unit_amount' => 1000,
-                    'currency' => config('cashier.currency'),
-                ]);
-                $mock->prices->shouldReceive('create')->andReturn((object) ['id' => 'price_mock_id']);
-            });
+            $course = $courseFactory->for($user, 'author')->create();
 
             $data = updatingCoursePayload();
 
@@ -194,18 +180,19 @@ describe('Teacher -> CourseController -> update', function () {
                 ->assertOk()
                 ->assertJsonPath('data.title', $data['title'])
                 ->assertJsonStructure(['data' => teacherCourseJsonStructure()]);
+
             $this->assertDatabaseHas('courses', [
                 'id' => $course->id,
                 'title' => $data['title'],
                 'description' => $data['description'],
             ]);
         })->with([
-            'teacher' => fn() => User::factory()->teacher()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'teacher' => fn () => User::factory()->teacher()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
         ])->with([
-            'published' => fn() => fn($author) => Course::factory()->for($author, 'author')->create(),
-            'unpublished' => fn() => fn($author) => Course::factory()->unpublished()->for($author, 'author')->create(),
-            'banned' => fn() => fn($author) => Course::factory()->banned()->for($author, 'author')->create(),
+            'published course' => fn () => Course::factory(),
+            'unpublished course' => fn () => Course::factory()->unpublished(),
+            'banned course' => fn () => Course::factory()->banned(),
         ]);
 
         it('fails if a banned user tries to update their own course', function () {
@@ -226,11 +213,13 @@ describe('Teacher -> CourseController -> update', function () {
     */
     describe('operations', function () {
         it('updates stripe product title if course title changed', function () {
+            Queue::fake();
+
             $author = User::factory()->teacher()->create();
             Sanctum::actingAs($author);
 
-            $existingProductId = 'prod_' . Str::random(10);
-            $existingPriceId = 'price_' . Str::random(10);
+            $existingProductId = 'prod_'.Str::random(10);
+            $existingPriceId = 'price_'.Str::random(10);
 
             $course = Course::factory()->for($author, 'author')->create([
                 'title' => 'Old Course Title',
@@ -238,25 +227,6 @@ describe('Teacher -> CourseController -> update', function () {
                 'stripe_product_id' => $existingProductId,
                 'stripe_price_id' => $existingPriceId,
             ]);
-
-            $this->mock(StripeClient::class, function ($mock) use ($existingProductId, $existingPriceId) {
-                $mock->products = Mockery::mock();
-                $mock->products->shouldReceive('update')
-                    ->once()
-                    ->with($existingProductId, ['name' => 'Updated Course Title'])
-                    ->andReturn((object) ['id' => $existingProductId]);
-
-                $mock->prices = Mockery::mock();
-                $mock->prices->shouldReceive('retrieve')
-                    ->once()
-                    ->with($existingPriceId)
-                    ->andReturn((object) [
-                        'unit_amount' => 2000,
-                        'currency' => config('cashier.currency'),
-                    ]);
-
-                $mock->prices->shouldNotReceive('create');
-            });
 
             $payload = updatingCoursePayload([
                 'title' => 'Updated Course Title',
@@ -272,15 +242,20 @@ describe('Teacher -> CourseController -> update', function () {
                 'stripe_product_id' => $existingProductId,
                 'stripe_price_id' => $existingPriceId,
             ]);
+
+            Queue::assertPushed(SyncCourseWithStripeJob::class, function ($job) use ($course) {
+                return $job->course->id === $course->id;
+            });
         });
 
         it('creates a new stripe price when course price changes', function () {
+            Queue::fake();
+
             $author = User::factory()->teacher()->create();
             Sanctum::actingAs($author);
 
-            $existingProductId = 'prod_' . Str::random(10);
-            $oldPriceId = 'price_' . Str::random(10);
-            $expectedNewPriceId = 'price_' . Str::random(10);
+            $existingProductId = 'prod_'.Str::random(10);
+            $oldPriceId = 'price_'.Str::random(10);
 
             $course = Course::factory()->for($author, 'author')->create([
                 'title' => 'Laravel Course',
@@ -288,25 +263,6 @@ describe('Teacher -> CourseController -> update', function () {
                 'stripe_product_id' => $existingProductId,
                 'stripe_price_id' => $oldPriceId,
             ]);
-
-            $this->mock(StripeClient::class, function ($mock) use ($existingProductId, $oldPriceId, $expectedNewPriceId) {
-                $mock->products = Mockery::mock();
-                $mock->products->shouldReceive('update')
-                    ->andReturn((object) ['id' => $existingProductId]);
-
-                $mock->prices = Mockery::mock();
-                $mock->prices->shouldReceive('retrieve')
-                    ->once()
-                    ->with($oldPriceId)
-                    ->andReturn((object) [
-                        'unit_amount' => 2000,
-                        'currency' => config('cashier.currency'),
-                    ]);
-
-                $mock->prices->shouldReceive('create')
-                    ->once()
-                    ->andReturn((object) ['id' => $expectedNewPriceId]);
-            });
 
             $payload = updatingCoursePayload([
                 'title' => 'Laravel Course',
@@ -316,11 +272,9 @@ describe('Teacher -> CourseController -> update', function () {
             patchJson(route('teacher.courses.update', $course), $payload)
                 ->assertOk();
 
-            $this->assertDatabaseHas('courses', [
-                'id' => $course->id,
-                'stripe_product_id' => $existingProductId,
-                'stripe_price_id' => $expectedNewPriceId,
-            ]);
+            Queue::assertPushed(SyncCourseWithStripeJob::class, function ($job) use ($course) {
+                return $job->course->id === $course->id;
+            });
         });
     });
 
@@ -331,21 +285,12 @@ describe('Teacher -> CourseController -> update', function () {
     */
     describe('caching', function () {
         it('flushes the course cache when a course is updated', function () {
+            Queue::fake();
+
             $author = User::factory()->teacher()->create();
             Sanctum::actingAs($author);
 
             $course = Course::factory()->for($author, 'author')->create();
-
-            $this->mock(StripeClient::class, function ($mock) {
-                $mock->products = Mockery::mock();
-                $mock->products->shouldReceive('update')->andReturn((object) ['id' => 'prod_mock_id']);
-                $mock->prices = Mockery::mock();
-                $mock->prices->shouldReceive('retrieve')->andReturn((object) [
-                    'unit_amount' => 1000,
-                    'currency' => config('cashier.currency'),
-                ]);
-                $mock->prices->shouldReceive('create')->andReturn((object) ['id' => 'price_mock_id']);
-            });
 
             $page = 1;
             $cacheKey = "courses:page:{$page}";

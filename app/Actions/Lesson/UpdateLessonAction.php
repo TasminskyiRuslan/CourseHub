@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Lesson;
 
 use App\Data\Lesson\Requests\UpdateLessonData;
@@ -10,18 +12,15 @@ use Throwable;
 readonly class UpdateLessonAction
 {
     /**
-     * Update the specified lesson.
+     * Update the specified lesson and its content.
      *
-     * @param UpdateLessonData $data
-     * @param Lesson $lesson
-     * @return Lesson
      * @throws Throwable
      */
     public function handle(UpdateLessonData $data, Lesson $lesson): Lesson
     {
-        return DB::transaction(function () use ($data, $lesson) {
-            $lesson->update($data->all());
-            $lesson->lessonable->update($data->all());
+        return DB::transaction(function () use ($data, $lesson): Lesson {
+            $lesson->update($data->toArray());
+            $lesson->lessonable?->update($data->toArray());
 
             return $lesson;
         });

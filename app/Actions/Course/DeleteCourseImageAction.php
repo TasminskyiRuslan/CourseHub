@@ -1,33 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Course;
 
+use App\Jobs\DeleteFileFromStorageJob;
 use App\Models\Course;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Throwable;
 
 readonly class DeleteCourseImageAction
 {
     /**
-     * Delete the image file and remove its reference from the specified course.
-     *
-     * @param Course $course
-     * @return void
-     * @throws Throwable
+     * Delete the image of the specified course.
      */
     public function handle(Course $course): void
     {
-        if (!$course->image_path) {
+        $imagePath = $course->image_path;
+
+        if (! $imagePath) {
             return;
         }
 
-        $imagePath = $course->image_path;
+        $course->removeImage()->save();
 
-        DB::transaction(function () use ($course) {
-            $course->removeImage()->save();
-        });
+        DeleteFileFromStorageJob::dispatch('courses', $imagePath);
 
-        Storage::disk('courses')->delete($imagePath);
     }
 }

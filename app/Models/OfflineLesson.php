@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Http\Resources\Api\Lesson\OfflineLessonResource;
@@ -23,6 +25,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  * @property-read \App\Models\Lesson|null $lesson
+ *
  * @method static \Database\Factories\OfflineLessonFactory factory($count = null, $state = [])
  * @method static Builder<static>|OfflineLesson newModelQuery()
  * @method static Builder<static>|OfflineLesson newQuery()
@@ -38,6 +41,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|OfflineLesson whereUpdatedAt($value)
  * @method static Builder<static>|OfflineLesson withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|OfflineLesson withoutTrashed()
+ *
  * @mixin Eloquent
  */
 class OfflineLesson extends Model
@@ -54,13 +58,11 @@ class OfflineLesson extends Model
         'start_time',
         'end_time',
         'address',
-        'room_number'
+        'room_number',
     ];
 
     /**
      * Get the lesson associated with the offline lesson.
-     *
-     * @return MorphOne
      */
     public function lesson(): MorphOne
     {
@@ -69,9 +71,6 @@ class OfflineLesson extends Model
 
     /**
      * Transform the model into a JSON resource.
-     *
-     * @param string|null $resourceClass
-     * @return JsonResource
      */
     public function toResource(?string $resourceClass = null): JsonResource
     {

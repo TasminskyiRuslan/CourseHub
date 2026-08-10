@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Str;
 
 return [
@@ -112,7 +114,7 @@ return [
     |
     */
 
-    'prefix' => env('CACHE_PREFIX', Str::slug((string)env('APP_NAME', 'laravel')) . '-cache-'),
+    'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-cache-'),
 
     'ttl' => [
         'course' => env('CACHE_TTL_COURSE', 86400),
@@ -123,5 +125,5 @@ return [
     'tags' => [
         'course_list' => env('CACHE_TAGS_COURSE_LIST', 'course_list'),
         'teacher_list' => env('CACHE_TAGS_TEACHER_LIST', 'teacher_list'),
-    ]
+    ],
 ];

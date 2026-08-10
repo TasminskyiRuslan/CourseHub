@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 use App\Notifications\Auth\EmailVerificationNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -7,6 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class);
@@ -19,12 +22,13 @@ describe('Auth -> SendEmailVerificationNotificationController', function () {
 
     /*
     |--------------------------------------------------------------------------
-    | validations
+    | validation
     |--------------------------------------------------------------------------
     */
-    describe('validations', function () {
-        it('fails if email is already verified', function () {
+    describe('validation', function () {
+        it('fails if the email is already verified', function () {
             Notification::fake();
+
             $user = User::factory()->create();
             Sanctum::actingAs($user);
 
@@ -54,14 +58,19 @@ describe('Auth -> SendEmailVerificationNotificationController', function () {
     |--------------------------------------------------------------------------
     */
     describe('operations', function () {
-        it('sends a verification email if the user\'s email is unverified', function () {
+        it('sends a verification email if the user\'s email is unverified', function (?User $user) {
             Notification::fake();
-            $user = User::factory()->unverified()->create();
+
             Sanctum::actingAs($user);
 
             postJson(route('auth.verification.send'))
                 ->assertNoContent();
+
             Notification::assertSentTo($user, EmailVerificationNotification::class);
-        });
+        })
+            ->with([
+                'unverified user' => fn () => User::factory()->unverified()->create(),
+                'unverified teacher' => fn () => User::factory()->teacher()->unverified()->create(),
+            ]);
     });
 })->group('auth');

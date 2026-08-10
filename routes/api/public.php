@@ -1,35 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\Api\Course\Public\CourseController;
 use App\Http\Controllers\Api\User\Public\TeacherController;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Public actions
+| Public Routes
 |--------------------------------------------------------------------------
 */
 
-// Course actions
-Route::prefix('courses')->group(function () {
-
-    // Get courses list action
+// Courses
+Route::prefix('courses')->group(function (): void {
     Route::get('/', [CourseController::class, 'index'])
         ->name('courses.index');
 
-    // Show course action
-    Route::get('/{course}', [CourseController::class, 'show'])
+    Route::get('/{publicCourse}', [CourseController::class, 'show'])
         ->name('courses.show');
 });
 
-// Teacher actions
+// Teachers
 Route::prefix('teachers')->group(function () {
-
-    // Get teachers list action
     Route::get('/', [TeacherController::class, 'index'])
         ->name('teachers.index');
 
-    // Show teacher action
-    Route::get('/{teacher}', [TeacherController::class, 'show'])
+    Route::get('/{publicTeacher}', [TeacherController::class, 'show'])
         ->name('teachers.show');
 });

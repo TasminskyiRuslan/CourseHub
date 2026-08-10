@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\CourseType;
@@ -41,6 +43,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property-read int|null $lessons_count
  * @property-read Collection<int, \App\Models\User> $students
  * @property-read int|null $students_count
+ *
  * @method static Builder<static>|Course active()
  * @method static \Database\Factories\CourseFactory factory($count = null, $state = [])
  * @method static Builder<static>|Course newModelQuery()
@@ -64,6 +67,7 @@ use Spatie\Sluggable\SlugOptions;
  * @method static Builder<static>|Course whereUpdatedAt($value)
  * @method static Builder<static>|Course withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|Course withoutTrashed()
+ *
  * @mixin Eloquent
  */
 class Course extends Model
@@ -91,8 +95,6 @@ class Course extends Model
 
     /**
      * The "booted" method of the model.
-     *
-     * @return void
      */
     protected static function booted(): void
     {
@@ -101,8 +103,6 @@ class Course extends Model
 
     /**
      * Get the options for generating the slug.
-     *
-     * @return SlugOptions
      */
     public function getSlugOptions(): SlugOptions
     {
@@ -114,32 +114,10 @@ class Course extends Model
 
     /**
      * Get the route key name for the model.
-     *
-     * @return string
      */
     public function getRouteKeyName(): string
     {
         return 'slug';
-    }
-
-    /**
-     * Send course banned notification.
-     *
-     * @return void
-     */
-    public function sendBanNotification(): void
-    {
-        $this->author->notify(new CourseBannedNotification($this));
-    }
-
-    /**
-     * Send course unbanned notification.
-     *
-     * @return void
-     */
-    public function sendUnbanNotification(): void
-    {
-        $this->author->notify(new CourseUnbannedNotification($this));
     }
 
     /**
@@ -155,8 +133,6 @@ class Course extends Model
 
     /**
      * Get the lessons for the course.
-     *
-     * @return HasMany
      */
     public function lessons(): HasMany
     {
@@ -165,8 +141,6 @@ class Course extends Model
 
     /**
      * Get the author that owns the course.
-     *
-     * @return BelongsTo
      */
     public function author(): BelongsTo
     {
@@ -174,19 +148,25 @@ class Course extends Model
     }
 
     /**
+     * Scope a query to only include active courses.
+     */
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->whereNotNull('published_at')
+            ->whereNull('banned_at')
+            ->whereHas('author', fn ($q) => $q->whereNull('banned_at'));
+    }
+
+    /**
      * Check if the course is free or missing a Stripe price.
-     *
-     * @return bool
      */
     public function isFree(): bool
     {
-        return (float)$this->price === 0.00;
+        return (float) $this->price === 0.00;
     }
 
     /**
      * Check if the course is published.
-     *
-     * @return bool
      */
     public function isPublished(): bool
     {
@@ -201,6 +181,7 @@ class Course extends Model
     public function publish(): static
     {
         $this->published_at = $this->freshTimestamp();
+
         return $this;
     }
 
@@ -212,13 +193,12 @@ class Course extends Model
     public function unpublish(): static
     {
         $this->published_at = null;
+
         return $this;
     }
 
     /**
      * Check if the course is banned.
-     *
-     * @return bool
      */
     public function isBanned(): bool
     {
@@ -233,6 +213,7 @@ class Course extends Model
     public function ban(): static
     {
         $this->banned_at = $this->freshTimestamp();
+
         return $this;
     }
 
@@ -244,20 +225,8 @@ class Course extends Model
     public function unban(): static
     {
         $this->banned_at = null;
-        return $this;
-    }
 
-    /**
-     * Scope a query to only include active courses.
-     *
-     * @param Builder $query
-     * @return Builder
-     */
-    public function scopeActive(Builder $query): Builder
-    {
-        return $query->whereNotNull('published_at')
-            ->whereNull('banned_at')
-            ->whereHas('author', fn($q) => $q->whereNull('banned_at'));
+        return $this;
     }
 
     /**
@@ -268,6 +237,7 @@ class Course extends Model
     public function setImage(string $path): static
     {
         $this->image_path = $path;
+
         return $this;
     }
 
@@ -279,7 +249,24 @@ class Course extends Model
     public function removeImage(): static
     {
         $this->image_path = null;
+
         return $this;
+    }
+
+    /**
+     * Send course banned notification.
+     */
+    public function sendBanNotification(): void
+    {
+        $this->author->notify(new CourseBannedNotification($this));
+    }
+
+    /**
+     * Send course unbanned notification.
+     */
+    public function sendUnbanNotification(): void
+    {
+        $this->author->notify(new CourseUnbannedNotification($this));
     }
 
     /**

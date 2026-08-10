@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\User;
 
 use App\Enums\UserRole;
+use App\Jobs\DeleteFileFromStorageJob;
 use App\Models\User;
-use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 readonly class DeleteUserAvatarAction
@@ -12,8 +14,6 @@ readonly class DeleteUserAvatarAction
     /**
      * Delete the specified user avatar.
      *
-     * @param User $user
-     * @return void
      * @throws AccessDeniedHttpException
      */
     public function handle(User $user): void
@@ -22,14 +22,14 @@ readonly class DeleteUserAvatarAction
             throw new AccessDeniedHttpException(__('users.protected'));
         }
 
-        if (!$user->avatar_path) {
+        $avatarPath = $user->avatar_path;
+
+        if (! $avatarPath) {
             return;
         }
 
-        if (Storage::disk('users')->exists($user->avatar_path)) {
-            Storage::disk('users')->delete($user->avatar_path);
-        }
-
         $user->removeAvatar()->save();
+
+        DeleteFileFromStorageJob::dispatch('users', $avatarPath);
     }
 }

@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\UserRole;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\putJson;
 
 uses(RefreshDatabase::class);
@@ -67,9 +71,21 @@ describe('Admin -> UserRoleController -> update', function () {
                 ->assertUnprocessable();
         });
 
-        it('fails if the user role is being updated to a super-admin', function () {
+        it('fails if a regular admin tries to assign restricted roles', function (string $role) {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
+            $targetUser = User::factory()->create();
+
+            putJson(route('admin.users.role.update', $targetUser), ['roles' => [$role]])
+                ->assertUnprocessable();
+        })->with([
+            'admin role' => fn () => UserRole::ADMIN->value,
+            'super-admin role' => fn () => UserRole::SUPER_ADMIN->value,
+        ]);
+
+        it('fails if a super-admin tries to assign a super-admin role', function () {
+            $superAdmin = User::whereEmail(config('super-admin.email'))->first();
+            Sanctum::actingAs($superAdmin);
             $targetUser = User::factory()->create();
 
             putJson(route('admin.users.role.update', $targetUser), ['roles' => [UserRole::SUPER_ADMIN->value]])
@@ -90,7 +106,7 @@ describe('Admin -> UserRoleController -> update', function () {
                 ->assertUnauthorized();
         });
 
-        it('fails if a user without permission tries to update a user\'s role', function ($user) {
+        it('fails if a user without permission tries to update a user\'s role', function (User $user) {
             Sanctum::actingAs($user);
 
             $targetUser = User::factory()->create();
@@ -98,20 +114,20 @@ describe('Admin -> UserRoleController -> update', function () {
             putJson(route('admin.users.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value]])
                 ->assertForbidden();
         })->with([
-            'unverified' => fn() => User::factory()->unverified()->create(),
-            'user' => fn() => User::factory()->create(),
-            'teacher' => fn() => User::factory()->teacher()->create(),
+            'unverified' => fn () => User::factory()->unverified()->create(),
+            'user' => fn () => User::factory()->create(),
+            'teacher' => fn () => User::factory()->teacher()->create(),
         ]);
 
-        it('fails if an admin tries to update an admin or super-admin role', function ($targetUser) {
+        it('fails if an admin tries to update an admin or super-admin role', function (User $targetUser) {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
             putJson(route('admin.users.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value]])
                 ->assertForbidden();
         })->with([
-            'another admin' => fn() => User::factory()->admin()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'another admin' => fn () => User::factory()->admin()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
         ]);
 
         it('fails if an admin tries to update their own role', function () {
@@ -133,8 +149,22 @@ describe('Admin -> UserRoleController -> update', function () {
             expect($superAdmin->hasRole(UserRole::SUPER_ADMIN->value))->toBeTrue();
         });
 
-        it('allows an admin to update a user\'s role', function ($user) {
-            Sanctum::actingAs($user);
+        it('allows a regular admin to update allowed roles for a user', function () {
+            $admin = User::factory()->admin()->create();
+            Sanctum::actingAs($admin);
+            $targetUser = User::factory()->create();
+
+            putJson(route('admin.users.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value]])
+                ->assertOk()
+                ->assertJsonStructure(['data' => adminUserJsonStructure()]);
+
+            $targetUser->refresh();
+            expect($targetUser->hasRole(UserRole::TEACHER->value))->toBeTrue();
+        });
+
+        it('allows a super-admin to assign an admin role to a user', function () {
+            $superAdmin = User::whereEmail(config('super-admin.email'))->first();
+            Sanctum::actingAs($superAdmin);
             $targetUser = User::factory()->create();
 
             putJson(route('admin.users.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value, UserRole::ADMIN->value]])
@@ -143,19 +173,15 @@ describe('Admin -> UserRoleController -> update', function () {
 
             $targetUser->refresh();
             expect($targetUser->hasAllRoles([UserRole::TEACHER->value, UserRole::ADMIN->value]))->toBeTrue();
-        })->with([
-            'admin' => fn() => User::factory()->admin()->create(),
-            'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
-        ]);
+        });
 
         it('fails if a banned user tries to update the user\'s role', function () {
             $bannedUser = User::factory()->admin()->banned()->create();
-
             $targetUser = User::factory()->create();
 
             Sanctum::actingAs($bannedUser);
 
-            putJson(route('admin.users.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value, UserRole::ADMIN->value]])
+            putJson(route('admin.users.role.update', $targetUser), ['roles' => [UserRole::TEACHER->value]])
                 ->assertForbidden();
         });
     });

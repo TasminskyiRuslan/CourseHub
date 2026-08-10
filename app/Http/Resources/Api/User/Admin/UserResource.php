@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources\Api\User\Admin;
 
+use App\Enums\UserRole;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
@@ -28,7 +31,6 @@ class UserResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param Request $request
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
@@ -39,9 +41,12 @@ class UserResource extends JsonResource
             'slug' => $this->slug,
             'email' => $this->email,
             'email_verified_at' => $this->email_verified_at,
-            'roles' => $this->whenLoaded('roles', fn() => $this->roles->pluck('name')),
+            'roles' => $this->whenLoaded('roles', fn () => $this->roles->pluck('name')),
             'avatar_url' => $this->avatar_path ? Storage::disk('users')->url($this->avatar_path) : null,
-            'courses_count' => $this->whenCounted('courses', fn() => $this->courses_count),
+            'courses_count' => $this->when(
+                $this->hasRole(UserRole::TEACHER->value),
+                fn () => $this->whenCounted('courses'),
+            ),
             'banned_at' => $this->banned_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

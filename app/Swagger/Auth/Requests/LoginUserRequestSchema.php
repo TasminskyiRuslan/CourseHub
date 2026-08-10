@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\Auth\Requests;
 
 use OpenApi\Attributes as OA;
@@ -30,11 +32,9 @@ use OpenApi\Attributes as OA;
             description: 'Remember me session flag.',
             type: 'boolean',
             default: false,
-            example: true,
-        )
+            example: false,
+        ),
     ],
     type: 'object'
 )]
-class LoginUserRequestSchema
-{
-}
+class LoginUserRequestSchema {}

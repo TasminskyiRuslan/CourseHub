@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\Course\Responses;
 
 use App\Enums\CourseType;
@@ -56,7 +58,7 @@ use OpenApi\Attributes as OA;
             enum: [
                 CourseType::ONLINE->value,
                 CourseType::OFFLINE->value,
-                CourseType::VIDEO->value
+                CourseType::VIDEO->value,
             ],
             example: CourseType::ONLINE->value
         ),
@@ -76,7 +78,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'lessons_count',
-            description: 'Total number of lessons.',
+            description: 'Total number of lessons.php.',
             type: 'integer',
             example: 10
         ),
@@ -117,10 +119,8 @@ use OpenApi\Attributes as OA;
             format: 'date-time',
             example: null,
             nullable: true
-        )
+        ),
     ],
     type: 'object'
 )]
-class CourseAdminResponseSchema
-{
-}
+class CourseAdminResponseSchema {}

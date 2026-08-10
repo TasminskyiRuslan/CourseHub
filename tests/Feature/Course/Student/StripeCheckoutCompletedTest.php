@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature\Listeners;
 
 use App\Models\Course;
@@ -71,6 +73,26 @@ describe('StripeCheckoutCompletedListener', function () {
 
     it('handles missing metadata gracefully without throwing errors', function () {
         $payload = stripeCheckoutWebhookPayload();
+
+        WebhookReceived::dispatch($payload);
+
+        $this->assertDatabaseCount('course_user', 0);
+    });
+
+    it('does not crash if user or course from metadata is not found in database', function () {
+        $course = Course::factory()->create();
+
+        $payload = stripeCheckoutWebhookPayload([
+            'data' => [
+                'object' => [
+                    'id' => 'cs_test_fake_999',
+                    'metadata' => [
+                        'user_id' => '999999',
+                        'course_id' => (string) $course->id,
+                    ],
+                ],
+            ],
+        ]);
 
         WebhookReceived::dispatch($payload);
 

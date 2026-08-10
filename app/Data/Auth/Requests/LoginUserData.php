@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Data\Auth\Requests;
 
 use App\Data\Casts\LowercaseCast;
@@ -14,11 +16,6 @@ use Spatie\LaravelData\Data;
 
 class LoginUserData extends Data
 {
-    /**
-     * @param string $email
-     * @param string $password
-     * @param bool $remember
-     */
     public function __construct(
         #[Required]
         #[Email]
@@ -32,8 +29,6 @@ class LoginUserData extends Data
 
         #[Sometimes]
         #[BooleanType]
-        public bool   $remember = false,
-    )
-    {
-    }
+        public bool $remember = false,
+    ) {}
 }

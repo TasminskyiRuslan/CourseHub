@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\Course\Requests;
 
 use App\Enums\CourseType;
@@ -57,6 +59,4 @@ use OpenApi\Attributes as OA;
     ],
     type: 'object'
 )]
-class CreateCourseRequestSchema
-{
-}
+class CreateCourseRequestSchema {}

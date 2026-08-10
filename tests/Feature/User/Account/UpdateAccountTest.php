@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\patchJson;
 
 uses(RefreshDatabase::class);
@@ -92,7 +95,7 @@ describe('Account -> AccountController -> update', function () {
             ])->assertForbidden();
         });
 
-        it('allows an authenticated user to update their own profile data', function ($user) {
+        it('allows an authenticated user to update their own profile data', function (?User $user) {
             Sanctum::actingAs($user);
 
             $data = [
@@ -109,10 +112,10 @@ describe('Account -> AccountController -> update', function () {
             expect($user->refresh()->name)->toBe($data['name'])
                 ->and($user->slug)->toBe($data['slug']);
         })->with([
-            'user' => fn() => User::factory()->create(),
-            'teacher' => fn() => User::factory()->teacher()->create(),
-            'unverified teacher' => fn() => User::factory()->teacher()->unverified()->create(),
-            'admin' => fn() => User::factory()->admin()->create(),
+            'user' => fn () => User::factory()->create(),
+            'teacher' => fn () => User::factory()->teacher()->create(),
+            'unverified teacher' => fn () => User::factory()->teacher()->unverified()->create(),
+            'admin' => fn () => User::factory()->admin()->create(),
         ]);
 
         it('fails if a banned user tries to update their own profile data', function () {

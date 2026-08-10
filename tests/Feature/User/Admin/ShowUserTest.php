@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class);
 
-describe('Admin -> TeacherController -> show', function () {
+describe('Admin -> UserController -> show', function () {
     beforeEach(function () {
         Cache::flush();
         $this->seed(RolesAndPermissionsSeeder::class);
@@ -45,7 +48,7 @@ describe('Admin -> TeacherController -> show', function () {
                 ->assertUnauthorized();
         });
 
-        it('fails if a user without permissions tries to retrieve a user', function ($user) {
+        it('fails if a user without permissions tries to retrieve a user', function (?User $user) {
             Sanctum::actingAs($user);
 
             $targetUser = User::factory()->create();
@@ -53,30 +56,24 @@ describe('Admin -> TeacherController -> show', function () {
             getJson(route('admin.users.show', $targetUser))
                 ->assertForbidden();
         })->with([
-            'user' => fn() => User::factory()->create(),
-            'teacher' => fn() => User::factory()->teacher()->create(),
+            'user' => fn () => User::factory()->create(),
+            'teacher' => fn () => User::factory()->teacher()->create(),
         ]);
 
-        it('allows a user with permission to retrieve any user, including banned and soft-deleted', function ($userClosure, $targetUserClosure) {
-            $user = $userClosure();
+        it('allows a user with permission to retrieve any user, including banned and soft-deleted', function (?User $user, User $targetUser) {
             Sanctum::actingAs($user);
-            $targetUser = $targetUserClosure();
 
             getJson(route('admin.users.show', $targetUser))
                 ->assertOk()
                 ->assertJsonStructure(['data' => adminUserJsonStructure()]);
         })->with([
-            'admin' => fn() => User::factory()->admin()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'admin' => fn () => User::factory()->admin()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
         ])->with([
-            'user' => fn() => User::factory()->create(),
-            'teacher' => fn() => User::factory()->teacher()->create(),
-            'banned user' => fn() => User::factory()->banned()->create(),
-            'soft-deleted user' => function () {
-                $user = User::factory()->create();
-                $user->delete();
-                return $user;
-            },
+            'user' => fn () => User::factory()->create(),
+            'teacher' => fn () => User::factory()->teacher()->create(),
+            'banned user' => fn () => User::factory()->banned()->create(),
+            'soft-deleted user' => fn () => tap(User::factory()->create())->delete(),
         ]);
 
         it('fails if a banned user tries to retrieve a user', function () {

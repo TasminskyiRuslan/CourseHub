@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\Course\Requests;
 
 use OpenApi\Attributes as OA;
@@ -39,10 +41,8 @@ use OpenApi\Attributes as OA;
             maximum: 99999999.99,
             minimum: 0,
             example: '299.99'
-        )
+        ),
     ],
     type: 'object'
 )]
-class UpdateCourseRequestSchema
-{
-}
+class UpdateCourseRequestSchema {}

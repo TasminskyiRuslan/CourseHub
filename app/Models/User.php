@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\UserRole;
@@ -65,6 +67,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property-read int|null $subscriptions_count
  * @property-read Collection<int, PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
+ *
  * @method static Builder<static>|User active()
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static Builder<static>|User hasExpiredGenericTrial()
@@ -95,12 +98,13 @@ use Spatie\Sluggable\SlugOptions;
  * @method static Builder<static>|User withoutPermission($permissions)
  * @method static Builder<static>|User withoutRole($roles, ?string $guard = null)
  * @method static Builder<static>|User withoutTrashed()
+ *
  * @mixin Eloquent
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasApiTokens, Notifiable, HasSlug, HasRoles, SoftDeletes, PivotEventTrait, Billable;
+    use Billable, HasApiTokens, HasFactory, HasRoles, HasSlug, Notifiable, PivotEventTrait, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -128,15 +132,11 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * The guard name used for Spatie permissions.
-     *
-     * @var string
      */
     protected string $guard_name = 'api';
 
     /**
      * The "booted" method of the model.
-     *
-     * @return void
      */
     protected static function booted(): void
     {
@@ -145,8 +145,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Get the options for generating the slug.
-     *
-     * @return SlugOptions
      */
     public function getSlugOptions(): SlugOptions
     {
@@ -158,8 +156,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Get the route key name for the model.
-     *
-     * @return string
      */
     public function getRouteKeyName(): string
     {
@@ -167,11 +163,11 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Check if the user is enrolled in a given course.
+     * Get the courses authored by the user.
      */
-    public function isEnrolledIn(Course $course): bool
+    public function courses(): HasMany
     {
-        return $this->enrolledCourses()->where('course_id', $course->id)->exists();
+        return $this->hasMany(Course::class, 'author_id');
     }
 
     /**
@@ -186,60 +182,23 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Send verify email notification.
-     *
-     * @return void
+     * Scope a query to only include active users.
      */
-    public function sendEmailVerificationNotification(): void
+    public function scopeActive(Builder $query): Builder
     {
-        $this->notify(new EmailVerificationNotification());
+        return $query->whereNull('banned_at');
     }
 
     /**
-     * Send the password reset notification.
-     *
-     * @param string $token
-     * @return void
+     * Check if the user is enrolled in a given course.
      */
-    public function sendPasswordResetNotification($token): void
+    public function isEnrolledIn(Course $course): bool
     {
-        $this->notify(new PasswordResetNotification($token));
-    }
-
-    /**
-     * Send user banned notification.
-     *
-     * @return void
-     */
-    public function sendBanNotification(): void
-    {
-        $this->notify(new UserBannedNotification());
-    }
-
-    /**
-     * Send user unbanned notification.
-     *
-     * @return void
-     */
-    public function sendUnbanNotification(): void
-    {
-        $this->notify(new UserUnbannedNotification());
-    }
-
-    /**
-     * Get the courses authored by the user.
-     *
-     * @return HasMany
-     */
-    public function courses(): HasMany
-    {
-        return $this->hasMany(Course::class, 'author_id');
+        return $this->enrolledCourses()->where('course_id', $course->id)->exists();
     }
 
     /**
      * Check if the user is banned.
-     *
-     * @return bool
      */
     public function isBanned(): bool
     {
@@ -254,6 +213,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function ban(): static
     {
         $this->banned_at = $this->freshTimestamp();
+
         return $this;
     }
 
@@ -265,18 +225,8 @@ class User extends Authenticatable implements MustVerifyEmail
     public function unban(): static
     {
         $this->banned_at = null;
-        return $this;
-    }
 
-    /**
-     * Scope a query to only include active users.
-     *
-     * @param Builder $query
-     * @return Builder
-     */
-    public function scopeActive(Builder $query): Builder
-    {
-        return $query->whereNull('banned_at');
+        return $this;
     }
 
     /**
@@ -287,6 +237,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function setAvatar(string $path): static
     {
         $this->avatar_path = $path;
+
         return $this;
     }
 
@@ -298,7 +249,42 @@ class User extends Authenticatable implements MustVerifyEmail
     public function removeAvatar(): static
     {
         $this->avatar_path = null;
+
         return $this;
+    }
+
+    /**
+     * Send verify email notification.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new EmailVerificationNotification);
+    }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new PasswordResetNotification((string) $token));
+    }
+
+    /**
+     * Send user banned notification.
+     */
+    public function sendBanNotification(): void
+    {
+        $this->notify(new UserBannedNotification);
+    }
+
+    /**
+     * Send user unbanned notification.
+     */
+    public function sendUnbanNotification(): void
+    {
+        $this->notify(new UserUnbannedNotification);
     }
 
     /**

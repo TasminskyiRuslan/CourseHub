@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\Lesson\Responses;
 
 use OpenApi\Attributes as OA;
@@ -38,11 +40,8 @@ use OpenApi\Attributes as OA;
             type: 'string',
             example: 'Room 101',
             nullable: true
-        )
+        ),
     ],
     type: 'object'
 )]
-class OfflineLessonResponseSchema
-{
-
-}
+class OfflineLessonResponseSchema {}

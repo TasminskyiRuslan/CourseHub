@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\CourseType;
 use App\Models\Course;
 use App\Models\User;
@@ -8,6 +10,7 @@ use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class);
@@ -30,7 +33,7 @@ describe('Student -> CourseController -> index', function () {
                 ->assertUnauthorized();
         });
 
-        it('allows a student to retrieve their enrolled courses', function ($user) {
+        it('allows a student to retrieve their enrolled courses', function (?User $user) {
             Sanctum::actingAs($user);
 
             $author = User::factory()->teacher()->create();
@@ -43,8 +46,8 @@ describe('Student -> CourseController -> index', function () {
                 ->assertOk()
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => studentCourseJsonStructure()
-                    ]
+                        '*' => studentCourseJsonStructure(),
+                    ],
                 ]);
 
             $responseDataIds = collect($response->json('data'))->pluck('id');
@@ -56,10 +59,10 @@ describe('Student -> CourseController -> index', function () {
                 expect($responseDataIds)->not->toContain($course->id);
             }
         })->with([
-            'user' => fn() => User::factory()->create(),
-            'teacher' => fn() => User::factory()->teacher()->create(),
-            'admin' => fn() => User::factory()->admin()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'user' => fn () => User::factory()->create(),
+            'teacher' => fn () => User::factory()->teacher()->create(),
+            'admin' => fn () => User::factory()->admin()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
         ]);
 
         it('fails if a banned user tries to retrieve their enrolled courses', function () {
@@ -82,7 +85,7 @@ describe('Student -> CourseController -> index', function () {
     |--------------------------------------------------------------------------
     */
     describe('filters & sorting', function () {
-        it('filters enrolled courses by a search string', function () {
+        it('filters enrolled courses by a search string in title', function () {
             $user = User::factory()->create();
             $author = User::factory()->teacher()->create();
             Sanctum::actingAs($user);
@@ -99,9 +102,25 @@ describe('Student -> CourseController -> index', function () {
                 ->assertJsonMissing(['data' => [['id' => $course2->id]]])
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => studentCourseJsonStructure()
-                    ]
+                        '*' => studentCourseJsonStructure(),
+                    ],
                 ]);
+        });
+
+        it('filters enrolled courses by description in search query', function () {
+            $user = User::factory()->create();
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($user);
+
+            $course1 = Course::factory()->for($author, 'author')->create(['description' => 'Unique description text']);
+            $course2 = Course::factory()->for($author, 'author')->create(['description' => 'Standard content']);
+
+            $user->enrolledCourses()->attach([$course1->id, $course2->id], [], 'enrolledCourses');
+
+            getJson(route('student.courses.index', ['filter[search]' => 'Unique description']))
+                ->assertOk()
+                ->assertJsonFragment(['id' => $course1->id])
+                ->assertJsonMissing(['data' => [['id' => $course2->id]]]);
         });
 
         it('filters enrolled courses by type', function () {
@@ -230,6 +249,33 @@ describe('Student -> CourseController -> index', function () {
             $descResponse = getJson(route('student.courses.index', ['sort' => '-price']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($expensive->id, $descIds))->toBeLessThan(array_search($cheap->id, $descIds));
+        });
+
+        it('sorts enrolled courses by lessons_count (asc and desc)', function () {
+            $user = User::factory()->create();
+            $author = User::factory()->teacher()->create();
+            Sanctum::actingAs($user);
+
+            $courseWithManyLessons = Course::factory()->for($author, 'author')->hasLessons(5)->create();
+            $courseWithFewLessons = Course::factory()->for($author, 'author')->hasLessons(1)->create();
+
+            $user->enrolledCourses()->attach([$courseWithManyLessons->id, $courseWithFewLessons->id], [], 'enrolledCourses');
+
+            $ascResponse = getJson(route('student.courses.index', ['sort' => 'lessons_count']))->assertOk();
+            $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
+            expect(array_search($courseWithFewLessons->id, $ascIds))->toBeLessThan(array_search($courseWithManyLessons->id, $ascIds));
+
+            $descResponse = getJson(route('student.courses.index', ['sort' => '-lessons_count']))->assertOk();
+            $descIds = collect($descResponse->json('data'))->pluck('id')->all();
+            expect(array_search($courseWithManyLessons->id, $descIds))->toBeLessThan(array_search($courseWithFewLessons->id, $descIds));
+        });
+
+        it('fails if an invalid sort parameter is provided', function () {
+            $user = User::factory()->create();
+            Sanctum::actingAs($user);
+
+            getJson(route('student.courses.index', ['sort' => 'unsupported_field']))
+                ->assertBadRequest();
         });
 
         it('returns empty data when no enrolled courses match the search', function () {

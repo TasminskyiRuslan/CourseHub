@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\Lesson\Requests;
 
 use OpenApi\Attributes as OA;
@@ -30,7 +32,7 @@ use OpenApi\Attributes as OA;
             type: 'integer',
             minimum: 0,
             example: 1
-        )
+        ),
     ],
     type: 'object',
     oneOf: [
@@ -39,6 +41,4 @@ use OpenApi\Attributes as OA;
         new OA\Schema(ref: '#/components/schemas/UpdateVideoLessonRequest'),
     ]
 )]
-class  UpdateLessonRequestSchema
-{
-}
+class UpdateLessonRequestSchema {}

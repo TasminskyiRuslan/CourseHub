@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\SendPasswordResetLinkAction;
@@ -33,15 +35,12 @@ class SendPasswordResetLinkController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_TOO_MANY_REQUESTS,
                 description: 'Too many requests.'
-            )
+            ),
         ]
     )]
     /**
      * Send a password reset link to the user identified by the email.
      *
-     * @param SendPasswordResetLinkData $data
-     * @param SendPasswordResetLinkAction $action
-     * @return Response
      * @throws ValidationException
      */
     public function __invoke(SendPasswordResetLinkData $data, SendPasswordResetLinkAction $action): Response

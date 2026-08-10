@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\User\Account;
 
 use App\Actions\User\UpdateUserAction;
 use App\Data\User\Requests\UpdateUserData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\User\Account\UserResource;
+use App\Loaders\User\Account\UserLoader;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
@@ -29,29 +32,26 @@ class AccountController extends Controller
                         new OA\Property(
                             property: 'data',
                             ref: '#/components/schemas/UserAccountResponse'
-                        )
+                        ),
                     ]
                 )
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNAUTHORIZED,
                 description: 'User is unauthenticated.'
-            )
+            ),
         ]
     )]
     /**
      * Retrieve the authenticated user's account.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
-    public function show(Request $request): JsonResponse
+    public function show(Request $request, UserLoader $userLoader): JsonResponse
     {
         $currentUser = $request->user();
 
-        $currentUser->loadMissing(['roles']);
+        $loadedUser = $userLoader->handle($currentUser);
 
-        return UserResource::make($currentUser)
+        return UserResource::make($loadedUser)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
@@ -75,7 +75,7 @@ class AccountController extends Controller
                         new OA\Property(
                             property: 'data',
                             ref: '#/components/schemas/UserAccountResponse'
-                        )
+                        ),
                     ]
                 )
             ),
@@ -96,20 +96,16 @@ class AccountController extends Controller
     /**
      * Update the authenticated user's account.
      *
-     * @param Request $request
-     * @param UpdateUserData $data
-     * @param UpdateUserAction $action
-     * @return JsonResponse
      * @throws AccessDeniedHttpException
      */
-    public function update(Request $request, UpdateUserData $data, UpdateUserAction $action): JsonResponse
+    public function update(Request $request, UpdateUserData $data, UpdateUserAction $action, UserLoader $userLoader): JsonResponse
     {
         $currentUser = $request->user();
 
         $updatedUser = $action->handle($data, $currentUser);
-        $updatedUser->loadMissing(['roles']);
+        $loadedUser = $userLoader->handle($updatedUser);
 
-        return UserResource::make($updatedUser)
+        return UserResource::make($loadedUser)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }

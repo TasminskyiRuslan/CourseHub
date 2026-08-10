@@ -1,19 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Course;
 
 use App\Models\Course;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
 readonly class BanCourseAction
 {
     /**
      * Ban the specified course.
-     *
-     * @param Course $course
-     * @return void
-     * @throws Throwable
      */
     public function handle(Course $course): void
     {
@@ -21,12 +17,7 @@ readonly class BanCourseAction
             return;
         }
 
-        DB::transaction(function () use ($course) {
-            $course->ban()->save();
-
-            DB::afterCommit(function () use ($course) {
-                $course->sendBanNotification();
-            });
-        });
+        $course->ban()->save();
+        $course->sendBanNotification();
     }
 }

@@ -1,12 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 use App\Notifications\User\UserUnbannedNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\patchJson;
 
 uses(RefreshDatabase::class);
@@ -49,7 +53,7 @@ describe('Admin -> UnbanUserController', function () {
             expect($targetUser->isBanned())->toBeTrue();
         });
 
-        it('fails if a user without permissions tries to unban a user', function ($user) {
+        it('fails if a user without permissions tries to unban a user', function (?User $user) {
             Sanctum::actingAs($user);
 
             $targetUser = User::factory()->banned()->create();
@@ -60,8 +64,8 @@ describe('Admin -> UnbanUserController', function () {
             $targetUser->refresh();
             expect($targetUser->isBanned())->toBeTrue();
         })->with([
-            'user' => fn() => User::factory()->create(),
-            'teacher' => fn() => User::factory()->teacher()->create(),
+            'user' => fn () => User::factory()->create(),
+            'teacher' => fn () => User::factory()->teacher()->create(),
         ]);
 
         it('fails if an authenticated user tries to unban themselves', function () {
@@ -75,18 +79,18 @@ describe('Admin -> UnbanUserController', function () {
             expect($admin->isBanned())->toBeTrue();
         });
 
-        it('fails if an admin tries to unban another admin or super-admin', function ($targetUser) {
+        it('fails if an admin tries to unban another admin or super-admin', function (?User $targetUser) {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
             patchJson(route('admin.users.unban', $targetUser))
                 ->assertForbidden();
         })->with([
-            'admin' => fn() => User::factory()->admin()->banned()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'admin' => fn () => User::factory()->admin()->banned()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
         ]);
 
-        it('allows an admin to unban non-admin users', function ($targetUser) {
+        it('allows an admin to unban non-admin users', function (?User $targetUser) {
             Notification::fake();
 
             $admin = User::factory()->admin()->create();
@@ -100,11 +104,11 @@ describe('Admin -> UnbanUserController', function () {
 
             Notification::assertSentTo($targetUser, UserUnbannedNotification::class);
         })->with([
-            'user' => fn() => User::factory()->banned()->create(),
-            'teacher' => fn() => User::factory()->teacher()->banned()->create(),
+            'user' => fn () => User::factory()->banned()->create(),
+            'teacher' => fn () => User::factory()->teacher()->banned()->create(),
         ]);
 
-        it('allows a super-admin to unban any user', function ($targetUser) {
+        it('allows a super-admin to unban any user', function (?User $targetUser) {
             Notification::fake();
 
             $superAdmin = User::where('email', config('super-admin.email'))->first();
@@ -118,9 +122,9 @@ describe('Admin -> UnbanUserController', function () {
 
             Notification::assertSentTo($targetUser, UserUnbannedNotification::class);
         })->with([
-            'user' => fn() => User::factory()->banned()->create(),
-            'teacher' => fn() => User::factory()->teacher()->banned()->create(),
-            'admin' => fn() => User::factory()->admin()->banned()->create(),
+            'user' => fn () => User::factory()->banned()->create(),
+            'teacher' => fn () => User::factory()->teacher()->banned()->create(),
+            'admin' => fn () => User::factory()->admin()->banned()->create(),
         ]);
 
         it('does not send a notification if the user is already unbanned', function () {

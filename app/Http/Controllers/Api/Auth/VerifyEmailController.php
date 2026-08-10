@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\VerifyEmailAction;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -45,7 +46,7 @@ class VerifyEmailController extends Controller
                 in: 'query',
                 required: true,
                 schema: new OA\Schema(type: 'string')
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -65,14 +66,9 @@ class VerifyEmailController extends Controller
     /**
      * Verify the email address of the user identified by the id.
      *
-     * @param Request $request
-     * @param VerifyEmailAction $action
-     * @param string $id
-     * @param string $hash
-     * @return Response
      * @throws AccessDeniedHttpException
      */
-    public function __invoke(Request $request, VerifyEmailAction $action, string $id, string $hash): Response
+    public function __invoke(VerifyEmailAction $action, string $id, string $hash): Response
     {
         $action->handle($id, $hash);
 

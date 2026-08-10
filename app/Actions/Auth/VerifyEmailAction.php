@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Auth;
 
 use App\Models\User;
@@ -11,25 +13,22 @@ readonly class VerifyEmailAction
     /**
      * Verify the email address of the user identified by the id.
      *
-     * @param string $id
-     * @param string $hash
-     * @return void
      * @throws AccessDeniedHttpException
      */
     public function handle(string $id, string $hash): void
     {
-        $user = User::query()->find($id);
+        $foundUser = User::query()->find($id);
 
-        if (!$user || !hash_equals($hash, sha1($user->getEmailForVerification()))) {
+        if (! $foundUser || ! hash_equals($hash, sha1($foundUser->getEmailForVerification()))) {
             throw new AccessDeniedHttpException(__('auth.invalid_verification_link'));
         }
 
-        if ($user->hasVerifiedEmail()) {
+        if ($foundUser->hasVerifiedEmail()) {
             return;
         }
 
-        $user->markEmailAsVerified();
+        $foundUser->markEmailAsVerified();
 
-        event(new Verified($user));
+        event(new Verified($foundUser));
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\Course;
@@ -9,7 +11,7 @@ use Illuminate\Database\Seeder;
 class LessonSeeder extends Seeder
 {
     /**
-     * Seed the lessons table.
+     * Seed the lessons.php table.
      */
     public function run(): void
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\CourseType;
 use App\Models\Course;
 use App\Models\User;
@@ -7,7 +9,9 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class);
@@ -30,17 +34,17 @@ describe('Admin -> CourseController -> index', function () {
                 ->assertUnauthorized();
         });
 
-        it('fails if a user without permissions tries to retrieve all courses', function ($user) {
+        it('fails if a user without permissions tries to retrieve all courses', function (?User $user) {
             Sanctum::actingAs($user);
 
             getJson(route('admin.courses.index'))
                 ->assertForbidden();
         })->with([
-            'user' => fn() => User::factory()->create(),
-            'teacher' => fn() => User::factory()->teacher()->create(),
+            'user' => fn () => User::factory()->create(),
+            'teacher' => fn () => User::factory()->teacher()->create(),
         ]);
 
-        it('allows a user with permissions to retrieve all courses', function ($user) {
+        it('allows a user with permissions to retrieve all courses', function (?User $user) {
             Sanctum::actingAs($user);
 
             $courses = Course::factory()->count(3)->create();
@@ -49,8 +53,8 @@ describe('Admin -> CourseController -> index', function () {
                 ->assertOk()
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => adminCourseJsonStructure()
-                    ]
+                        '*' => adminCourseJsonStructure(),
+                    ],
                 ]);
 
             $responseDataIds = collect($response->json('data'))->pluck('id');
@@ -58,8 +62,8 @@ describe('Admin -> CourseController -> index', function () {
                 expect($responseDataIds)->toContain($course->id);
             }
         })->with([
-            'admin' => fn() => User::factory()->admin()->create(),
-            'super-admin' => fn() => User::where('email', config('super-admin.email'))->first(),
+            'admin' => fn () => User::factory()->admin()->create(),
+            'super-admin' => fn () => User::where('email', config('super-admin.email'))->first(),
         ]);
 
         it('fails if a banned user tries to retrieve all courses', function () {
@@ -78,7 +82,7 @@ describe('Admin -> CourseController -> index', function () {
     |--------------------------------------------------------------------------
     */
     describe('filters & sorting', function () {
-        it('filters courses by a search string', function () {
+        it('filters courses by a search string in title', function () {
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 
@@ -92,9 +96,22 @@ describe('Admin -> CourseController -> index', function () {
                 ->assertJsonMissing(['data' => [['id' => $course2->id]]])
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => adminCourseJsonStructure()
-                    ]
+                        '*' => adminCourseJsonStructure(),
+                    ],
                 ]);
+        });
+
+        it('filters courses by description in search query', function () {
+            $admin = User::factory()->admin()->create();
+            Sanctum::actingAs($admin);
+
+            $course1 = Course::factory()->create(['description' => 'Unique description text']);
+            $course2 = Course::factory()->create(['description' => 'Standard content']);
+
+            getJson(route('admin.courses.index', ['filter[search]' => 'Unique description']))
+                ->assertOk()
+                ->assertJsonFragment(['id' => $course1->id])
+                ->assertJsonMissing(['data' => [['id' => $course2->id]]]);
         });
 
         it('filters courses by type', function () {
@@ -110,8 +127,8 @@ describe('Admin -> CourseController -> index', function () {
                 ->assertJsonMissing(['data' => [['id' => $videoCourse->id]]])
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => adminCourseJsonStructure()
-                    ]
+                        '*' => adminCourseJsonStructure(),
+                    ],
                 ]);
         });
 
@@ -129,8 +146,8 @@ describe('Admin -> CourseController -> index', function () {
                 ->assertJsonMissing(['data' => [['id' => $course2->id]]])
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => adminCourseJsonStructure()
-                    ]
+                        '*' => adminCourseJsonStructure(),
+                    ],
                 ]);
         });
 
@@ -310,6 +327,30 @@ describe('Admin -> CourseController -> index', function () {
             $descResponse = getJson(route('admin.courses.index', ['filter[trashed]' => 'only', 'sort' => '-deleted_at']))->assertOk();
             $descIds = collect($descResponse->json('data'))->pluck('id')->all();
             expect(array_search($newDeleted->id, $descIds))->toBeLessThan(array_search($oldDeleted->id, $descIds));
+        });
+
+        it('sorts courses by lessons_count (asc and desc)', function () {
+            $admin = User::factory()->admin()->create();
+            Sanctum::actingAs($admin);
+
+            $courseWithManyLessons = Course::factory()->hasLessons(5)->create();
+            $courseWithFewLessons = Course::factory()->hasLessons(1)->create();
+
+            $ascResponse = getJson(route('admin.courses.index', ['sort' => 'lessons_count']))->assertOk();
+            $ascIds = collect($ascResponse->json('data'))->pluck('id')->all();
+            expect(array_search($courseWithFewLessons->id, $ascIds))->toBeLessThan(array_search($courseWithManyLessons->id, $ascIds));
+
+            $descResponse = getJson(route('admin.courses.index', ['sort' => '-lessons_count']))->assertOk();
+            $descIds = collect($descResponse->json('data'))->pluck('id')->all();
+            expect(array_search($courseWithManyLessons->id, $descIds))->toBeLessThan(array_search($courseWithFewLessons->id, $descIds));
+        });
+
+        it('fails if an invalid sort parameter is provided', function () {
+            $admin = User::factory()->admin()->create();
+            Sanctum::actingAs($admin);
+
+            getJson(route('admin.courses.index', ['sort' => 'unsupported_field']))
+                ->assertBadRequest();
         });
 
         it('returns empty data when no courses match the search', function () {

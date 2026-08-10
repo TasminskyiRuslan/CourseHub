@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Enums\UserRole;
@@ -45,7 +47,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn() => [
+        return $this->state(fn () => [
             'email_verified_at' => null,
         ]);
     }
@@ -57,7 +59,7 @@ class UserFactory extends Factory
      */
     public function banned(): static
     {
-        return $this->state(fn() => [
+        return $this->state(fn () => [
             'banned_at' => now(),
         ]);
     }
@@ -88,14 +90,11 @@ class UserFactory extends Factory
 
     /**
      * Add an avatar to the user.
-     *
-     * @param string|null $path
-     * @return static
      */
     public function withAvatar(?string $path = null): static
     {
         return $this->state(function (array $attributes) use ($path) {
-            return ['avatar_path' => $path ?? 'users/' . fake()->uuid() . '.jpg'];
+            return ['avatar_path' => $path ?? 'users/'.fake()->uuid().'.jpg'];
         });
     }
 }

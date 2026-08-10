@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\User;
 
 use App\Actions\Auth\RevokeAllTokensAction;
@@ -11,9 +13,6 @@ use Throwable;
 
 readonly class BanUserAction
 {
-    /**
-     * @param RevokeAllTokensAction $revokeAllTokensAction
-     */
     public function __construct(
         protected RevokeAllTokensAction $revokeAllTokensAction
     ) {}
@@ -21,8 +20,6 @@ readonly class BanUserAction
     /**
      * Ban the specified user.
      *
-     * @param User $user
-     * @return void
      * @throws AccessDeniedHttpException
      * @throws Throwable
      */
@@ -36,12 +33,12 @@ readonly class BanUserAction
             return;
         }
 
-        DB::transaction(function () use ($user) {
+        DB::transaction(function () use ($user): void {
             $user->ban()->save();
 
             $this->revokeAllTokensAction->handle($user);
 
-            DB::afterCommit(function () use ($user) {
+            DB::afterCommit(function () use ($user): void {
                 $user->sendBanNotification();
             });
         });

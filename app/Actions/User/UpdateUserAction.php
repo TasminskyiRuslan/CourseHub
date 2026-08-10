@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\User;
 
 use App\Data\User\Requests\UpdateUserData;
@@ -12,19 +14,15 @@ readonly class UpdateUserAction
     /**
      * Update the specified user.
      *
-     * @param UpdateUserData $data
-     * @param User $user
-     * @return User
      * @throws AccessDeniedHttpException
      */
     public function handle(UpdateUserData $data, User $user): User
     {
         if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
             throw new AccessDeniedHttpException(__('users.protected'));
-
         }
 
-        $user->update($data->all());
+        $user->update($data->toArray());
 
         return $user;
     }

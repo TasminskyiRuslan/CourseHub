@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\Lesson\Responses;
 
 use OpenApi\Attributes as OA;
@@ -62,11 +64,8 @@ use OpenApi\Attributes as OA;
             type: 'string',
             format: 'date-time',
             example: '2026-01-10T12:00:00.000000Z'
-        )
+        ),
     ],
     type: 'object'
 )]
-class LessonTeacherResponseSchema
-{
-
-}
+class LessonTeacherResponseSchema {}

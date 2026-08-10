@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources\Api\User\Account;
 
 use Carbon\Carbon;
@@ -26,7 +28,6 @@ class UserResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param Request $request
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
@@ -37,7 +38,7 @@ class UserResource extends JsonResource
             'slug' => $this->slug,
             'email' => $this->email,
             'email_verified_at' => $this->email_verified_at,
-            'roles' => $this->whenLoaded('roles', fn() => $this->roles->pluck('name')),
+            'roles' => $this->whenLoaded('roles', fn () => $this->roles->pluck('name')),
             'avatar_url' => $this->avatar_path ? Storage::disk('users')->url($this->avatar_path) : null,
             'banned_at' => $this->banned_at,
             'created_at' => $this->created_at,

@@ -289,17 +289,17 @@
                 }
             }
         },
-        "/admin/courses/{course}/ban": {
+        "/admin/courses/{adminCourse}/ban": {
             "patch": {
                 "tags": [
                     "Course"
                 ],
                 "summary": "[Admin] Ban a course",
                 "description": "Ban the specified course by administrator.",
-                "operationId": "f5cf7186f095547373145c0788e736b6",
+                "operationId": "7bcb08b395b01601d7f6ab6489d2faab",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "adminCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -481,17 +481,17 @@
                 ]
             }
         },
-        "/admin/courses/{course}": {
+        "/admin/courses/{adminCourse}": {
             "get": {
                 "tags": [
                     "Course"
                 ],
                 "summary": "[Admin] Retrieve course details",
                 "description": "Retrieve detailed information about the specified course by administrator.",
-                "operationId": "0a9395ecb4737a0f7e44cb92c3e72957",
+                "operationId": "b5839e72bde30bf435958629e677a291",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "adminCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -539,10 +539,10 @@
                 ],
                 "summary": "[Admin] Delete a course",
                 "description": "Delete the specified course by administrator.",
-                "operationId": "27f11fb2dbf0765c21e19c8198ddb6cb",
+                "operationId": "58ff388e43e6c0e940e8dde4fd673463",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "adminCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -573,17 +573,17 @@
                 ]
             }
         },
-        "/admin/courses/{course}/unban": {
+        "/admin/courses/{adminCourse}/unban": {
             "patch": {
                 "tags": [
                     "Course"
                 ],
                 "summary": "[Admin] Unban a course",
                 "description": "Unban the specified course by administrator.",
-                "operationId": "b73b10b823d7b29faafc7a2b982cb723",
+                "operationId": "b641fdfa8d1d5b6d2bc9c8143d141333",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "adminCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -708,17 +708,17 @@
                 }
             }
         },
-        "/courses/{course}": {
+        "/courses/{publicCourse}": {
             "get": {
                 "tags": [
                     "Course"
                 ],
                 "summary": "[Public] Retrieve course details",
                 "description": "Retrieve detailed information about the specified active course.",
-                "operationId": "ee7a552cafc079327918be522d4124b9",
+                "operationId": "d10d53639343deb246c085d4ddacf431",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "publicCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -750,17 +750,17 @@
                 }
             }
         },
-        "/student/courses/{course}/checkout": {
+        "/student/courses/{publicCourse}/checkout": {
             "post": {
                 "tags": [
                     "Course"
                 ],
                 "summary": "[Student] Check out course",
                 "description": "Check out the specified course for the authenticated user.",
-                "operationId": "c80179fa1829b5cd58f78adaff838152",
+                "operationId": "0711f212649980bb5e4883501d3dd6ef",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "publicCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -913,17 +913,17 @@
                 ]
             }
         },
-        "/student/courses/{course}": {
+        "/student/courses/{studentCourse}": {
             "get": {
                 "tags": [
                     "Course"
                 ],
                 "summary": "[Student] Retrieve course details",
                 "description": "Retrieve detailed information about the specified enrolled student's course.",
-                "operationId": "9356981e5316f4e53d1d9bdce9389fed",
+                "operationId": "1ce002eb7b6d5c79673715d992ded81c",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "studentCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -1139,17 +1139,17 @@
                 ]
             }
         },
-        "/teacher/courses/{course}": {
+        "/teacher/courses/{teacherCourse}": {
             "get": {
                 "tags": [
                     "Course"
                 ],
                 "summary": "[Teacher] Retrieve course details",
                 "description": "Retrieve detailed information about the specified teacher's course.",
-                "operationId": "28a1245b8f05932d1d02d6f8797779a6",
+                "operationId": "32d3eb40714f8f5404f4ce19ff57307e",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "teacherCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -1197,10 +1197,10 @@
                 ],
                 "summary": "[Teacher] Delete a course",
                 "description": "Delete the specified teacher's course.",
-                "operationId": "37fa5feb0fe850cb8f480677bda5c1f1",
+                "operationId": "e1a68d67439c9d3347a08e7324f2fede",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "teacherCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -1236,10 +1236,10 @@
                 ],
                 "summary": "[Teacher] Update a course",
                 "description": "Update the specified teacher's course.",
-                "operationId": "b12b9e8212c1ad90ba32789fc76678e7",
+                "operationId": "333f64e6b5c89a20b78136392f1e7b8d",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "teacherCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -1295,17 +1295,17 @@
                 ]
             }
         },
-        "/teacher/courses/{course}/image": {
+        "/teacher/courses/{teacherCourse}/image": {
             "post": {
                 "tags": [
                     "Course"
                 ],
                 "summary": "[Teacher] Update course image",
                 "description": "Update the image of the specified teacher's course.",
-                "operationId": "6ad2f41b3ea458ac6bba0169b4c29c74",
+                "operationId": "245953a424267e929d810ffdb0a94ffc",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "teacherCourse",
                         "in": "path",
                         "description": "Course identifier (slug)",
                         "required": true,
@@ -1366,10 +1366,10 @@
                 ],
                 "summary": "[Teacher] Delete course image",
                 "description": "Delete the image of the specified teacher's course.",
-                "operationId": "40e55989db0d8d79bc225f7d8013c7f6",
+                "operationId": "1bd207ccfaafb3a14ea6441cf2893b82",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "teacherCourse",
                         "in": "path",
                         "description": "Course identifier (slug)",
                         "required": true,
@@ -1400,17 +1400,17 @@
                 ]
             }
         },
-        "/teacher/courses/{course}/publish": {
+        "/teacher/courses/{teacherCourse}/publish": {
             "patch": {
                 "tags": [
                     "Course"
                 ],
                 "summary": "[Teacher] Publish a course",
                 "description": "Publish the specified teacher's course.",
-                "operationId": "18d188b966ed987fdb15809bc285fb57",
+                "operationId": "5793d784a0b9824fd83835918ce9ab2d",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "teacherCourse",
                         "in": "path",
                         "description": "Course identifier (slug)",
                         "required": true,
@@ -1453,17 +1453,17 @@
                 ]
             }
         },
-        "/teacher/courses/{course}/unpublish": {
+        "/teacher/courses/{teacherCourse}/unpublish": {
             "patch": {
                 "tags": [
                     "Course"
                 ],
                 "summary": "[Teacher] Unpublish a course",
                 "description": "Unpublish the specified teacher's course.",
-                "operationId": "66017d151ac935e2be3512ba5b169f68",
+                "operationId": "b8cf569a1b4ae1aa7fc95de8d3c69d3f",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "teacherCourse",
                         "in": "path",
                         "description": "Course identifier (slug)",
                         "required": true,
@@ -1506,17 +1506,17 @@
                 ]
             }
         },
-        "/admin/courses/{course}/lessons": {
+        "/admin/courses/{adminCourse}/lessons": {
             "get": {
                 "tags": [
                     "Lesson"
                 ],
                 "summary": "[Admin] Retrieve a list of course lessons",
                 "description": "Retrieve a paginated list of lessons for the specified course by administrator.",
-                "operationId": "eb23cde8b61e9c8dc251adb09fa8a478",
+                "operationId": "c4b3fd38e7ead8837ba486a0f1373076",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "adminCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -1543,7 +1543,8 @@
                             "type": "string",
                             "enum": [
                                 "only",
-                                "with"
+                                "with",
+                                "without"
                             ]
                         }
                     },
@@ -1614,17 +1615,17 @@
                 ]
             }
         },
-        "/admin/courses/{course}/lessons/{lesson}": {
+        "/admin/courses/{adminCourse}/lessons/{adminLesson}": {
             "get": {
                 "tags": [
                     "Lesson"
                 ],
                 "summary": "[Admin] Retrieve lesson details",
                 "description": "Retrieve detailed information about the specified lesson by administrator.",
-                "operationId": "a6fd7d27df6c32b3a540d4a335a83b21",
+                "operationId": "1235ded6f4ab3d180c998231177e9aba",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "adminCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -1634,7 +1635,7 @@
                         }
                     },
                     {
-                        "name": "lesson",
+                        "name": "adminLesson",
                         "in": "path",
                         "description": "Lesson identifier (slug).",
                         "required": true,
@@ -1682,10 +1683,10 @@
                 ],
                 "summary": "[Admin] Delete a lesson",
                 "description": "Delete the specified lesson by administrator.",
-                "operationId": "b08822b2fe25fb31fb945cb25d8efd64",
+                "operationId": "6411e2e7ea346f3284618986faf8ce74",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "adminCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -1695,7 +1696,7 @@
                         }
                     },
                     {
-                        "name": "lesson",
+                        "name": "adminLesson",
                         "in": "path",
                         "description": "Lesson identifier (slug).",
                         "required": true,
@@ -1726,17 +1727,17 @@
                 ]
             }
         },
-        "/student/courses/{course}/lessons": {
+        "/student/courses/{studentCourse}/lessons": {
             "get": {
                 "tags": [
                     "Lesson"
                 ],
                 "summary": "[Student] Retrieve a list of course lessons",
                 "description": "Retrieve a paginated list of lessons for the specified student's enrolled course.",
-                "operationId": "14bb6446d24e1a80ad12ea8caebfd2b1",
+                "operationId": "d4da180e226f5f41d5fb79917150d377",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "studentCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -1819,17 +1820,17 @@
                 ]
             }
         },
-        "/student/courses/{course}/lessons/{lesson}": {
+        "/student/courses/{studentCourse}/lessons/{studentLesson}": {
             "get": {
                 "tags": [
                     "Lesson"
                 ],
                 "summary": "[Student] Retrieve lesson details",
                 "description": "Retrieve detailed information about the specified lesson for the specified student's enrolled course.",
-                "operationId": "7b0d2c1282634cfc2c5fa9585047e8d1",
+                "operationId": "da674b26224806d4182c4283d141e709",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "studentCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -1839,7 +1840,7 @@
                         }
                     },
                     {
-                        "name": "lesson",
+                        "name": "studentLesson",
                         "in": "path",
                         "description": "Lesson identifier (slug).",
                         "required": true,
@@ -1882,17 +1883,17 @@
                 ]
             }
         },
-        "/teacher/courses/{course}/lessons": {
+        "/teacher/courses/{teacherCourse}/lessons": {
             "get": {
                 "tags": [
                     "Lesson"
                 ],
                 "summary": "[Teacher] Retrieve a list of course lessons",
                 "description": "Retrieve a paginated list of lessons for the specified teacher's course.",
-                "operationId": "5ccf479f9d045f73269647361833f9dc",
+                "operationId": "8c11b0324aabf5039456704ed857df10",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "teacherCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -1980,10 +1981,10 @@
                 ],
                 "summary": "[Teacher] Create a lesson",
                 "description": "Create a new lesson for the specified teacher's course.",
-                "operationId": "bf062aec0dd11af73ae735d24c6a9cfd",
+                "operationId": "925b6c6c4fa59174e4082e17c02eead7",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "teacherCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -2039,17 +2040,17 @@
                 ]
             }
         },
-        "/teacher/courses/{course}/lessons/{lesson}": {
+        "/teacher/courses/{teacherCourse}/lessons/{teacherLesson}": {
             "get": {
                 "tags": [
                     "Lesson"
                 ],
                 "summary": "[Teacher] Retrieve lesson details",
                 "description": "Retrieve detailed information about the specified lesson for the specified teacher's course.",
-                "operationId": "860d20315084fa69a93093821f2bdf75",
+                "operationId": "d0ebc9f8fe0fe1e4dce9bfe95c19e045",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "teacherCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -2059,7 +2060,7 @@
                         }
                     },
                     {
-                        "name": "lesson",
+                        "name": "teacherLesson",
                         "in": "path",
                         "description": "Lesson identifier (slug).",
                         "required": true,
@@ -2107,10 +2108,10 @@
                 ],
                 "summary": "[Teacher] Delete a lesson",
                 "description": "Delete the specified lesson for the specified teacher's course.",
-                "operationId": "bf3736be9d2c8e81252dbc38224f54c6",
+                "operationId": "dcc0e1b442a2730228f62845e125127b",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "teacherCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -2120,7 +2121,7 @@
                         }
                     },
                     {
-                        "name": "lesson",
+                        "name": "teacherLesson",
                         "in": "path",
                         "description": "Lesson identifier (slug).",
                         "required": true,
@@ -2156,10 +2157,10 @@
                 ],
                 "summary": "[Teacher] Update a lesson",
                 "description": "Update the specified lesson for the specified teacher's course.",
-                "operationId": "85827704efa02685116f1a85306e3268",
+                "operationId": "557404debc36c787940ffc53efacdd85",
                 "parameters": [
                     {
-                        "name": "course",
+                        "name": "teacherCourse",
                         "in": "path",
                         "description": "Course identifier (slug).",
                         "required": true,
@@ -2169,7 +2170,7 @@
                         }
                     },
                     {
-                        "name": "lesson",
+                        "name": "teacherLesson",
                         "in": "path",
                         "description": "Lesson identifier (slug).",
                         "required": true,
@@ -2384,17 +2385,17 @@
                 ]
             }
         },
-        "/admin/users/{user}/ban": {
+        "/admin/users/{adminUser}/ban": {
             "patch": {
                 "tags": [
                     "User"
                 ],
                 "summary": "[Admin] Ban a user",
                 "description": "Ban the specified user by administrator.",
-                "operationId": "f0f07d28454b91784bd878bc71f05af5",
+                "operationId": "8cc988273effccc467702c4296d50e9f",
                 "parameters": [
                     {
-                        "name": "user",
+                        "name": "adminUser",
                         "in": "path",
                         "description": "User identifier (slug).",
                         "required": true,
@@ -2425,17 +2426,17 @@
                 ]
             }
         },
-        "/admin/users/{user}/unban": {
+        "/admin/users/{adminUser}/unban": {
             "patch": {
                 "tags": [
                     "User"
                 ],
                 "summary": "[Admin] Unban a user",
                 "description": "Unban the specified user by administrator.",
-                "operationId": "01ec66809a5458ac6e8b81532f3ac835",
+                "operationId": "46c4905e2e083d2cc3238489d79ca37b",
                 "parameters": [
                     {
-                        "name": "user",
+                        "name": "adminUser",
                         "in": "path",
                         "description": "User identifier (slug).",
                         "required": true,
@@ -2492,6 +2493,7 @@
                         "schema": {
                             "type": "string",
                             "enum": [
+                                "without_role",
                                 "teacher",
                                 "admin",
                                 "super-admin"
@@ -2533,7 +2535,8 @@
                             "type": "string",
                             "enum": [
                                 "only",
-                                "with"
+                                "with",
+                                "without"
                             ]
                         }
                     },
@@ -2605,17 +2608,17 @@
                 ]
             }
         },
-        "/admin/users/{user}": {
+        "/admin/users/{adminUser}": {
             "get": {
                 "tags": [
                     "User"
                 ],
                 "summary": "[Admin] Retrieve user details",
                 "description": "Retrieve detailed information about the specified user by administrator.",
-                "operationId": "3c0ce74acb4a53c748179e4351c03aa9",
+                "operationId": "7426514ced9d9393aa3253b1870e8e33",
                 "parameters": [
                     {
-                        "name": "user",
+                        "name": "adminUser",
                         "in": "path",
                         "description": "User identifier (slug).",
                         "required": true,
@@ -2663,10 +2666,10 @@
                 ],
                 "summary": "[Admin] Delete a user",
                 "description": "Delete the specified user by administrator.",
-                "operationId": "865a00c26de0bf148ff61d6cad9c6d87",
+                "operationId": "93c4f58699f493948c1e49512fa7011e",
                 "parameters": [
                     {
-                        "name": "user",
+                        "name": "adminUser",
                         "in": "path",
                         "description": "User identifier (slug).",
                         "required": true,
@@ -2697,17 +2700,17 @@
                 ]
             }
         },
-        "/admin/users/{user}/role": {
+        "/admin/users/{adminUser}/role": {
             "put": {
                 "tags": [
                     "User"
                 ],
                 "summary": "[Admin] Update user role",
                 "description": "Update the role of the specified user by administrator.",
-                "operationId": "d3f83b949f1de9bcfea2923d37bb1978",
+                "operationId": "b319b45d10c8f53b5b44d733eaca216d",
                 "parameters": [
                     {
-                        "name": "user",
+                        "name": "adminUser",
                         "in": "path",
                         "description": "User identifier (slug).",
                         "required": true,
@@ -2820,7 +2823,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/components/schemas/UserPublicResponse"
+                                                "$ref": "#/components/schemas/TeacherPublicResponse"
                                             }
                                         }
                                     },
@@ -2832,17 +2835,17 @@
                 }
             }
         },
-        "/teachers/{teacher}": {
+        "/teachers/{publicTeacher}": {
             "get": {
                 "tags": [
                     "User"
                 ],
                 "summary": "[Public] Retrieve teacher details",
                 "description": "Retrieve detailed information about the specified teacher.",
-                "operationId": "b91ee72e427911966e80469b442c8fea",
+                "operationId": "2f514705a7de8db7dcdbd7ba2077d47c",
                 "parameters": [
                     {
-                        "name": "teacher",
+                        "name": "publicTeacher",
                         "in": "path",
                         "description": "Teacher identifier (slug).",
                         "required": true,
@@ -2860,7 +2863,7 @@
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/UserPublicResponse"
+                                            "$ref": "#/components/schemas/TeacherPublicResponse"
                                         }
                                     },
                                     "type": "object"
@@ -2902,7 +2905,7 @@
                         "description": "Remember me session flag.",
                         "type": "boolean",
                         "default": false,
-                        "example": true
+                        "example": false
                     }
                 },
                 "type": "object"
@@ -3233,7 +3236,7 @@
                         "nullable": true
                     },
                     "lessons_count": {
-                        "description": "Total number of lessons.",
+                        "description": "Total number of lessons.php.",
                         "type": "integer",
                         "example": 10
                     },
@@ -3334,7 +3337,7 @@
                     "author": {
                         "oneOf": [
                             {
-                                "$ref": "#/components/schemas/UserPublicResponse"
+                                "$ref": "#/components/schemas/TeacherPublicResponse"
                             }
                         ],
                         "nullable": true,
@@ -3380,7 +3383,7 @@
                         "nullable": true
                     },
                     "lessons_count": {
-                        "description": "Total number of lessons.",
+                        "description": "Total number of lessons.php.",
                         "type": "integer",
                         "example": 10
                     },
@@ -3421,7 +3424,7 @@
                     "author": {
                         "oneOf": [
                             {
-                                "$ref": "#/components/schemas/UserPublicResponse"
+                                "$ref": "#/components/schemas/TeacherPublicResponse"
                             }
                         ],
                         "nullable": true,
@@ -3467,7 +3470,7 @@
                         "nullable": true
                     },
                     "lessons_count": {
-                        "description": "Total number of lessons.",
+                        "description": "Total number of lessons.php.",
                         "type": "integer",
                         "example": 10
                     },
@@ -3552,7 +3555,7 @@
                         "nullable": true
                     },
                     "lessons_count": {
-                        "description": "Total number of lessons.",
+                        "description": "Total number of lessons.php.",
                         "type": "integer",
                         "example": 10
                     },
@@ -4112,6 +4115,27 @@
                 },
                 "type": "object"
             },
+            "UpdateUserAccountRequest": {
+                "title": "Update User Account Request",
+                "description": "Payload for updating user account profile details.",
+                "properties": {
+                    "name": {
+                        "description": "Full name.",
+                        "type": "string",
+                        "maxLength": 100,
+                        "minLength": 2,
+                        "example": "John Doe"
+                    },
+                    "slug": {
+                        "description": "Unique auth slug.",
+                        "type": "string",
+                        "maxLength": 100,
+                        "pattern": "^[a-z0-9-]+$",
+                        "example": "john-doe"
+                    }
+                },
+                "type": "object"
+            },
             "UpdateUserAvatarRequest": {
                 "title": "Update User Avatar Request",
                 "description": "Multipart form data payload for uploading a new avatar via PUT spoofing.",
@@ -4137,27 +4161,6 @@
                 },
                 "type": "object"
             },
-            "UpdateUserAccountRequest": {
-                "title": "Update User Account Request",
-                "description": "Payload for updating user account profile details.",
-                "properties": {
-                    "name": {
-                        "description": "Full name.",
-                        "type": "string",
-                        "maxLength": 100,
-                        "minLength": 2,
-                        "example": "John Doe"
-                    },
-                    "slug": {
-                        "description": "Unique auth slug.",
-                        "type": "string",
-                        "maxLength": 100,
-                        "pattern": "^[a-z0-9-]+$",
-                        "example": "john-doe"
-                    }
-                },
-                "type": "object"
-            },
             "UpdateUserRoleRequest": {
                 "title": "Update User Role Request",
                 "description": "Payload for updating a user role.",
@@ -4171,13 +4174,52 @@
                         "items": {
                             "type": "string",
                             "enum": [
-                                "teacher",
-                                "admin"
+                                "teacher"
                             ]
                         },
                         "example": [
                             "teacher"
                         ]
+                    }
+                },
+                "type": "object"
+            },
+            "TeacherPublicResponse": {
+                "title": "Teacher Public Response",
+                "description": "Public profile data of a teacher.",
+                "required": [
+                    "id",
+                    "name",
+                    "slug",
+                    "courses_count"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Full name.",
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "slug": {
+                        "description": "Teacher slug.",
+                        "type": "string",
+                        "example": "john-doe"
+                    },
+                    "avatar_url": {
+                        "description": "Public URL to the avatar image.",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "http://localhost:8080/storage/users/avatar.png",
+                        "nullable": true
+                    },
+                    "courses_count": {
+                        "description": "Total number of published courses.",
+                        "type": "integer",
+                        "example": 5
                     }
                 },
                 "type": "object"
@@ -4358,46 +4400,6 @@
                         "format": "date-time",
                         "example": null,
                         "nullable": true
-                    }
-                },
-                "type": "object"
-            },
-            "UserPublicResponse": {
-                "title": "User Public Response",
-                "description": "Public profile data of a user.",
-                "required": [
-                    "id",
-                    "name",
-                    "slug",
-                    "courses_count"
-                ],
-                "properties": {
-                    "id": {
-                        "description": "Unique identifier.",
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "name": {
-                        "description": "Full name.",
-                        "type": "string",
-                        "example": "John Doe"
-                    },
-                    "slug": {
-                        "description": "User slug.",
-                        "type": "string",
-                        "example": "john-doe"
-                    },
-                    "avatar_url": {
-                        "description": "Public URL to the avatar image.",
-                        "type": "string",
-                        "format": "uri",
-                        "example": "http://localhost:8080/storage/users/avatar.png",
-                        "nullable": true
-                    },
-                    "courses_count": {
-                        "description": "Total number of published courses.",
-                        "type": "integer",
-                        "example": 5
                     }
                 },
                 "type": "object"

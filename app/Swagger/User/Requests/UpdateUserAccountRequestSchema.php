@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\User\Requests;
 
 use OpenApi\Attributes as OA;
@@ -28,6 +30,4 @@ use OpenApi\Attributes as OA;
     ],
     type: 'object'
 )]
-class UpdateUserRequestSchema
-{
-}
+class UpdateUserAccountRequestSchema {}

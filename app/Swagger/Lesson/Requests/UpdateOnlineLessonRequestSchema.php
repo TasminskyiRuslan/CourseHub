@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger\Lesson\Requests;
 
 use OpenApi\Attributes as OA;
@@ -33,10 +35,8 @@ use OpenApi\Attributes as OA;
             maxLength: 2048,
             example: 'https://meet.example.com/lesson123',
             nullable: true
-        )
+        ),
     ],
     type: 'object'
 )]
-class UpdateOnlineLessonRequestSchema
-{
-}
+class UpdateOnlineLessonRequestSchema {}

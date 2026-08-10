@@ -1,17 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
+use App\Enums\UserRole;
 use App\Models\Course;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\seed;
 
 uses(RefreshDatabase::class);
 
-describe('Admin -> TeacherController -> index', function () {
+describe('Admin -> UserController -> index', function () {
     beforeEach(function () {
         Cache::flush();
         seed(RolesAndPermissionsSeeder::class);
@@ -31,7 +37,7 @@ describe('Admin -> TeacherController -> index', function () {
                 ->assertUnauthorized();
         });
 
-        it('fails if users without permissions tries to retrieve users', function ($user) {
+        it('fails if users without permissions tries to retrieve users', function (?User $user) {
             Sanctum::actingAs($user);
 
             User::factory()->count(3)->create();
@@ -39,11 +45,11 @@ describe('Admin -> TeacherController -> index', function () {
             getJson(route('admin.users.index'))
                 ->assertForbidden();
         })->with([
-            'user' => fn() => User::factory()->create(),
-            'teacher' => fn() => User::factory()->teacher()->create(),
+            'user' => fn () => User::factory()->create(),
+            'teacher' => fn () => User::factory()->teacher()->create(),
         ]);
 
-        it('allows users with permissions to retrieve all users', function ($user) {
+        it('allows users with permissions to retrieve all users', function (?User $user) {
             Sanctum::actingAs($user);
 
             $activeUsers = User::factory()->count(2)->create();
@@ -53,22 +59,17 @@ describe('Admin -> TeacherController -> index', function () {
                 ->assertOk()
                 ->assertJsonStructure([
                     'data' => [
-                        '*' => adminUserJsonStructure()
-                    ]
+                        '*' => adminUserJsonStructure(),
+                    ],
                 ]);
 
-            $responseDataIds = collect($response->json('data'))->pluck('id');
+            $createdUserIds = $activeUsers->merge($bannedUsers)->pluck('id')->all();
 
-            foreach ($activeUsers as $activeUser) {
-                expect($responseDataIds)->toContain($activeUser->id);
-            }
-
-            foreach ($bannedUsers as $bannedUser) {
-                expect($responseDataIds)->toContain($bannedUser->id);
-            }
+            expect($response->json('data.*.id'))
+                ->toContain(...$createdUserIds);
         })->with([
-            'admin' => fn() => User::factory()->admin()->create(),
-            'super-admin' => fn() => User::whereEmail(config('super-admin.email'))->first(),
+            'admin' => fn () => User::factory()->admin()->create(),
+            'super-admin' => fn () => User::whereEmail(config('super-admin.email'))->first(),
         ]);
 
         it('fails if a banned user tries to retrieve all users', function () {
@@ -108,7 +109,7 @@ describe('Admin -> TeacherController -> index', function () {
             $teacher = User::factory()->teacher()->create();
             $user = User::factory()->create();
 
-            getJson(route('admin.users.index', ['filter[role]' => 'teacher']))
+            getJson(route('admin.users.index', ['filter[role]' => UserRole::TEACHER->value]))
                 ->assertOk()
                 ->assertJsonFragment(['id' => $teacher->id])
                 ->assertJsonMissing(['id' => $user->id]);
@@ -133,7 +134,6 @@ describe('Admin -> TeacherController -> index', function () {
         });
 
         it('filters users by banned status', function () {
-
             $admin = User::factory()->admin()->create();
             Sanctum::actingAs($admin);
 

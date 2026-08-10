@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Auth;
 
 use App\Models\User;
@@ -10,8 +12,6 @@ readonly class SendEmailVerificationNotificationAction
     /**
      * Send the email verification notification to the specified user.
      *
-     * @param User $user
-     * @return void
      * @throws ValidationException
      */
     public function handle(User $user): void

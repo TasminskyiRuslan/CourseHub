@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Course;
 
 use App\Models\Course;
@@ -8,9 +10,6 @@ use Stripe\StripeClient;
 
 readonly class SyncCourseWithStripeAction
 {
-    /**
-     * @param StripeClient $stripe
-     */
     public function __construct(
         private StripeClient $stripe
     ) {}
@@ -18,8 +17,6 @@ readonly class SyncCourseWithStripeAction
     /**
      * Synchronizes the course with the Stripe service.
      *
-     * @param Course $course
-     * @return Course
      * @throws ApiErrorException
      */
     public function handle(Course $course): Course
@@ -48,13 +45,11 @@ readonly class SyncCourseWithStripeAction
     /**
      * Create or update a Stripe product.
      *
-     * @param Course $course
-     * @return string
      * @throws ApiErrorException
      */
     private function resolveProductId(Course $course): string
     {
-        if (!$course->stripe_product_id) {
+        if (! $course->stripe_product_id) {
             $product = $this->stripe->products->create([
                 'name' => $course->title,
                 'metadata' => [
@@ -75,9 +70,6 @@ readonly class SyncCourseWithStripeAction
     /**
      * Return an existing or create a Stripe price ID.
      *
-     * @param Course $course
-     * @param string $productId
-     * @return string
      * @throws ApiErrorException
      */
     private function resolvePriceId(Course $course, string $productId): string
@@ -91,6 +83,10 @@ readonly class SyncCourseWithStripeAction
             if ($currentPrice->unit_amount === $amount && $currentPrice->currency === $currency) {
                 return $course->stripe_price_id;
             }
+
+            $this->stripe->prices->update($course->stripe_price_id, [
+                'active' => false,
+            ]);
         }
 
         $price = $this->stripe->prices->create([

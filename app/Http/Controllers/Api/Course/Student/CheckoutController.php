@@ -1,30 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\Course\Student;
 
 use App\Actions\Course\CheckoutCourseAction;
-use App\Finders\Course\Public\FindCourseBySlug;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Course\Student\CheckoutResource;
+use App\Models\Course;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class CheckoutController extends Controller
 {
     use AuthorizesRequests;
 
     #[OA\Post(
-        path: '/student/courses/{course}/checkout',
+        path: '/student/courses/{publicCourse}/checkout',
         description: 'Check out the specified course for the authenticated user.',
         summary: '[Student] Check out course',
         security: [['sanctum' => []]],
         tags: ['Course'],
         parameters: [
             new OA\Parameter(
-                name: 'course',
+                name: 'publicCourse',
                 description: 'Course identifier (slug).',
                 in: 'path',
                 required: true,
@@ -32,7 +34,7 @@ class CheckoutController extends Controller
                     type: 'string',
                     example: 'math-101'
                 )
-            )
+            ),
         ],
         responses: [
             new OA\Response(
@@ -43,7 +45,7 @@ class CheckoutController extends Controller
                         new OA\Property(
                             property: 'data',
                             ref: '#/components/schemas/CourseCheckoutResponse'
-                        )
+                        ),
                     ]
                 )
             ),
@@ -62,27 +64,19 @@ class CheckoutController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
                 description: 'Validation error.'
-            )
+            ),
         ]
     )]
     /**
      * Check out the specified course for the authenticated user.
-     *
-     * @param Request $request
-     * @param FindCourseBySlug $finder
-     * @param CheckoutCourseAction $action
-     * @param string $course
-     * @return JsonResponse
      */
-    public function __invoke(Request $request, FindCourseBySlug $finder, CheckoutCourseAction $action, string $course): JsonResponse
+    public function __invoke(Request $request, CheckoutCourseAction $action, Course $publicCourse): JsonResponse
     {
-        $gottenCourse = $finder->handle($course);
-
-        $this->authorize('checkout', $gottenCourse);
+        $this->authorize('checkout', $publicCourse);
 
         $currentUser = $request->user();
 
-        $checkoutResultData = $action->handle($currentUser, $gottenCourse);
+        $checkoutResultData = $action->handle($currentUser, $publicCourse);
 
         return CheckoutResource::make($checkoutResultData)
             ->response()

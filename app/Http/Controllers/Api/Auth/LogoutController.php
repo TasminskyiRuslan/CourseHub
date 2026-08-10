@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\RevokeCurrentTokenAction;
@@ -25,15 +27,11 @@ class LogoutController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNAUTHORIZED,
                 description: 'User is unauthenticated.'
-            )
+            ),
         ]
     )]
     /**
      * Revoke the current access token for an authenticated user.
-     *
-     * @param Request $request
-     * @param RevokeCurrentTokenAction $action
-     * @return Response
      */
     public function __invoke(Request $request, RevokeCurrentTokenAction $action): Response
     {

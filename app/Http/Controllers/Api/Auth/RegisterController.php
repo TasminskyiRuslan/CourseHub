@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\RegisterUserAction;
@@ -31,7 +33,7 @@ class RegisterController extends Controller
                         new OA\Property(
                             property: 'data',
                             ref: '#/components/schemas/AuthResponse'
-                        )
+                        ),
                     ]
                 )
             ),
@@ -44,16 +46,13 @@ class RegisterController extends Controller
     /**
      * Register a new user and issue an access token.
      *
-     * @param RegisterUserData $data
-     * @param RegisterUserAction $action
-     * @return JsonResponse
      * @throws Throwable
      */
     public function __invoke(RegisterUserData $data, RegisterUserAction $action): JsonResponse
     {
-        $authData = $action->handle($data);
+        $registeredAuthData = $action->handle($data);
 
-        return AuthResource::make($authData)
+        return AuthResource::make($registeredAuthData)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_CREATED);
     }

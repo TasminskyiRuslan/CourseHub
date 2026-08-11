@@ -27,7 +27,7 @@ class CourseUnbannedNotification extends Notification implements ShouldQueue
      *
      * @return array<int, string>
      */
-    public function via(mixed $notifiable): array
+    public function via(object $notifiable): array
     {
         return ['mail'];
     }
@@ -35,11 +35,11 @@ class CourseUnbannedNotification extends Notification implements ShouldQueue
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail(mixed $notifiable): MailMessage
+    public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->line('Course Unbanned')
-            ->markdown('emails.course.unban', [
+            ->subject('Course Unbanned')
+            ->markdown('emails.course.unbanned', [
                 'user' => $notifiable,
                 'course' => $this->course,
                 'url' => route('teacher.courses.show', $this->course->slug),

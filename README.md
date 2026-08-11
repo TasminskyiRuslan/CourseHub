@@ -1,84 +1,183 @@
-# CourseHub API 🎓
+# 🎓 CourseHub API
 
-![Laravel](https://img.shields.io/badge/Laravel-12.x-red)
-![PHP](https://img.shields.io/badge/PHP-8.4-blue)
-![Swagger](https://img.shields.io/badge/Docs-Swagger-green)
-![Testing](https://img.shields.io/badge/Tests-Pest-purple)
-![License](https://img.shields.io/badge/license-MIT-brightgreen)
+A production-style **Learning Management System (LMS)** RESTful API built with **Laravel 12**.
 
-**CourseHub** is a robust LMS (Learning Management System) RESTful API built with Laravel.
-It handles course creation, lesson management, user authentication with email verification, and uses a modern
-Docker-based infrastructure.
+The project demonstrates modern backend development practices, including role-based authorization, Stripe payment integration, DTO-driven validation, clean architecture, Dockerized development, and comprehensive API testing.
+
+---
+
+## ✨ Highlights
+
+- RESTful API following Laravel best practices
+- Token-based authentication with Laravel Sanctum
+- Email verification & password recovery
+- Role & permission based authorization (Student, Teacher, Admin)
+- Stripe Checkout integration with webhook processing
+- Polymorphic lesson system (Video, Online, Offline)
+- Course publishing workflow
+- DTO-based validation using Spatie Laravel Data
+- Dynamic filtering & sorting with Spatie Query Builder
+- Swagger / OpenAPI documentation
+- Redis queues & caching
+- Dockerized development environment
+- Feature & Unit tests with Pest
+
+---
+
+## 📚 API Modules
+
+```text
+🌐 Public
+• Browse published courses
+• View course details
+• Browse teachers
+• View teacher profiles
+
+🔐 Authentication
+• User registration
+• User authentication
+• Email verification
+• Password recovery
+• Session management
+
+👤 Account
+• Profile management
+• Avatar management
+
+🎓 Student
+• Course enrollment
+• Access enrolled courses
+• Lesson access
+• Stripe payment processing
+
+👨‍🏫 Teacher
+• Course management
+• Lesson management
+• Course publication
+• Course image management
+
+🛡 Administrator
+• User management
+• Role management
+• Course moderation
+• User moderation
+```
+
+---
+
+## 💳 Payments
+
+Paid courses are purchased through **Stripe Checkout**.
+
+The payment flow is fully automated:
+
+```text
+Paid Course
+      │
+      ▼
+Stripe Checkout
+      │
+      ▼
+Stripe Webhook
+      │
+      ▼
+Enrollment
+      │
+      ▼
+Student gains access to lessons
+```
+
+Free courses are enrolled instantly without payment.
+
+---
+
+## 📖 Lesson Types
+
+The platform supports multiple lesson types through Laravel's polymorphic relationships.
+
+- 🎥 Video lessons
+- 💻 Online lessons
+- 🏫 Offline lessons
+
+---
+
+## 🏗 Architecture
+
+The project follows a layered architecture that separates HTTP handling, business logic, and infrastructure concerns.
+
+- Controllers handle HTTP requests
+- Actions encapsulate single business operations
+- Services coordinate complex workflows
+- DTOs (Spatie Laravel Data) validate and transform input
+- Policies & Permissions provide authorization
+- API Resources format responses
+- Jobs process background tasks
+- Events & Listeners handle asynchronous workflows
+- Query Builder provides filtering and sorting
 
 ---
 
 ## 🛠 Tech Stack
 
-* **Framework:** Laravel 12
-* **Language:** PHP 8.4
-* **Database:** MySQL 8.0
-* **Cache & Queue:** Redis 7
-* **Server:** Nginx (Alpine)
-* **API Docs:** L5-Swagger (OpenAPI 3)
-* **Testing:** Pest PHP
-* **Utilities:**
-
-    * Spatie Query Builder
-    * Spatie Data
-    * Spatie Sluggable
-
----
-
-## 🐳 Prerequisites
-
-Ensure you have installed:
-
-* Docker
-* Docker Compose
+| Category | Technology |
+|----------|------------|
+| Framework | Laravel 12 |
+| Language | PHP 8.4 |
+| Database | MySQL |
+| Cache & Queue | Redis |
+| Authentication | Laravel Sanctum |
+| Payments | Stripe Checkout |
+| API Documentation | Swagger / OpenAPI |
+| Testing | Pest |
+| Containerization | Docker |
+| Web Server | Nginx |
+| DTOs | Spatie Laravel Data |
+| Filtering | Spatie Query Builder |
+| Authorization | Spatie Permission |
 
 ---
 
-## 🚀 Installation & Setup
+## 🚀 Getting Started
 
-### 1. Clone repository
+### Clone the repository
 
 ```bash
 git clone https://github.com/TasminskyiRuslan/CourseHub.git
+
 cd CourseHub
 ```
 
-### 2. Configure environment
+### Configure environment
 
 ```bash
 cp .env.example .env
-
-# Sync your local user ID with Docker to avoid permission issues
-echo "UID=$(id -u)" >> .env
-echo "GID=$(id -g)" >> .env
 ```
 
-The default configuration works out-of-the-box with Docker.
-
-### 3. Start containers
+### Build containers
 
 ```bash
 docker compose up -d --build
 ```
 
-### 4. Install dependencies
+### Install dependencies
 
 ```bash
 docker compose exec app composer install
 ```
 
-### 5. Setup application
+### Generate application key
 
 ```bash
 docker compose exec app php artisan key:generate
+```
+
+### Run migrations & seeders
+
+```bash
 docker compose exec app php artisan migrate --seed
 ```
 
-### 6. Generate Swagger documentation
+### Generate Swagger documentation
 
 ```bash
 docker compose exec app php artisan l5-swagger:generate
@@ -86,17 +185,19 @@ docker compose exec app php artisan l5-swagger:generate
 
 ---
 
-## 📚 API Documentation
+## 📄 API Documentation
 
-Swagger / OpenAPI documentation is available once the server is running.
+Swagger documentation is available after starting the application.
 
-👉 **[View API Documentation](http://localhost/api/documentation)**
+```
+http://localhost/api/documentation
+```
 
 ---
 
 ## 🧪 Running Tests
 
-Run full test suite:
+Run the complete test suite:
 
 ```bash
 docker compose exec app php artisan test
@@ -104,90 +205,6 @@ docker compose exec app php artisan test
 
 ---
 
-## ✨ Key Features
+## 📜 License
 
-### Authentication & User Management
-
-* **Sanctum:** Token-based authentication (Bearer)
-* **Flow:** Register, Login, Logout, Password Reset
-* **Verification:** Email verification required for specific actions (verified middleware)
-* **Admin:** Protected role management via Seeders
-
-### Courses
-
-* **CRUD:** Create, Read, Update, Delete courses
-* **Publishing:** Unpublish/Publish workflow
-* **Media:** Dedicated endpoints for course image management
-* **Filtering:** Advanced filtering using `spatie/laravel-query-builder`
-* **Slugs:** SEO-friendly URLs via `spatie/laravel-sluggable`
-
-### Lessons
-
-* Full CRUD for lessons nested within courses
-* Optimized for course structure management
-
----
-
-## 📂 Project Structure
-
-```text
-app/Http/Controllers/Api   # Handles API requests and returns responses
-app/Models                 # Contains all Eloquent models
-app/Http/Resources/Api     # API Resources for output formatting
-app/Data                   # Defines structured input data for the API (DTOs)
-app/Actions                # Performs single operations and business logic
-app/Services               # Reusable services for complex logic
-app/Policies               # Authorization logic / Permissions
-app/Notifications          # Email and System notifications
-app/Swagger/               # Swagger annotations and definitions
-database/factories         # Model factories for testing
-database/migrations        # Database structure changes
-database/seeders           # Initial data population
-routes/api.php             # API Routes definitions
-docker/                    # Docker configuration files
-tests/                     # Feature and Unit tests (Pest)
-```
-
----
-
-## 🔑 Default Credentials
-
-Running migrations with seeders creates a default **Admin** user (not available via registration):
-
-| Role  | Email                                             | Password |
-|-------|---------------------------------------------------|----------|
-| admin | [admin@coursehub.com](mailto:admin@coursehub.com) | secret   |
-
-> ⚠ Registration is available only for **STUDENT** and **TEACHER** roles.
-
----
-
-## 📊 Database Design
-
-### Entities
-
-* **User:** Registered user with role (`STUDENT`, `TEACHER`, `ADMIN`) and mandatory email verification.
-* **Course:** Educational course created by a Teacher (author).
-* **Lesson:** Course lesson with ordering (`position`) and polymorphic content.
-* **OnlineLesson:** Scheduled online lesson with meeting link.
-* **OfflineLesson:** Scheduled physical lesson with address and room number.
-* **VideoLesson:** Pre-recorded video lesson with provider information.
-
----
-
-### Relations
-
-* **User (TEACHER)** `hasMany` **Course** (as author)
-* **Course** `belongsTo` **User** (author)
-* **Course** `hasMany` **Lesson**
-* **Lesson** `belongsTo` **Course**
-* **Lesson** `morphTo` **Lessonable**
-* **OnlineLesson** `morphOne` **Lesson**
-* **OfflineLesson** `morphOne` **Lesson**
-* **VideoLesson** `morphOne` **Lesson**
-
----
-
-## 📄 License
-
-This project is open-sourced software licensed under the [MIT license](https://opensource.org/license/MIT).
+This project is licensed under the MIT License.

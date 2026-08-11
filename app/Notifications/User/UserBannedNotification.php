@@ -26,7 +26,7 @@ class UserBannedNotification extends Notification implements ShouldQueue
      *
      * @return array<int, string>
      */
-    public function via(mixed $notifiable): array
+    public function via(object $notifiable): array
     {
         return ['mail'];
     }
@@ -34,10 +34,10 @@ class UserBannedNotification extends Notification implements ShouldQueue
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail(mixed $notifiable): MailMessage
+    public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
             ->subject('Auth Banned')
-            ->markdown('emails.user.ban', ['user' => $notifiable]);
+            ->markdown('emails.user.banned', ['user' => $notifiable]);
     }
 }

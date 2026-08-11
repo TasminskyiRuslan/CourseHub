@@ -26,7 +26,7 @@ class UserUnbannedNotification extends Notification implements ShouldQueue
      *
      * @return array<int, string>
      */
-    public function via(mixed $notifiable): array
+    public function via(object $notifiable): array
     {
         return ['mail'];
     }
@@ -34,10 +34,10 @@ class UserUnbannedNotification extends Notification implements ShouldQueue
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail(mixed $notifiable): MailMessage
+    public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
             ->subject('Auth Unbanned')
-            ->markdown('emails.user.unban', ['user' => $notifiable]);
+            ->markdown('emails.user.unbanned', ['user' => $notifiable]);
     }
 }

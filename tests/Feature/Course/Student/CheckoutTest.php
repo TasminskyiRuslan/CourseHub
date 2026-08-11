@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\CheckoutStatus;
 use App\Models\Course;
 use App\Models\User;
+use App\Notifications\Course\CourseEnrolledNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -109,6 +110,8 @@ describe('Student -> CheckoutController', function () {
         });
 
         it('instantly enrolls user if the course is free', function () {
+            Notification::fake();
+
             $user = User::factory()->create();
             Sanctum::actingAs($user);
 
@@ -131,6 +134,8 @@ describe('Student -> CheckoutController', function () {
                 'user_id' => $user->id,
                 'course_id' => $freeCourse->id,
             ]);
+
+            Notification::assertSentTo($user, CourseEnrolledNotification::class);
         });
 
         it('generates a stripe checkout url with correct metadata for paid courses', function () {

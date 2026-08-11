@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\CourseType;
 use App\Notifications\Course\CourseBannedNotification;
+use App\Notifications\Course\CourseEnrolledNotification;
 use App\Notifications\Course\CourseUnbannedNotification;
 use App\Observers\Course\CourseObserver;
 use Database\Factories\CourseFactory;
@@ -267,6 +268,14 @@ class Course extends Model
     public function sendUnbanNotification(): void
     {
         $this->author->notify(new CourseUnbannedNotification($this));
+    }
+
+    /**
+     * Send course enrolled notification.
+     */
+    public function sendEnrollmentNotification(User $student): void
+    {
+        $student->notify(new CourseEnrolledNotification($this));
     }
 
     /**

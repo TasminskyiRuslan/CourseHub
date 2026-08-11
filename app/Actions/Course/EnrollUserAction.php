@@ -18,6 +18,8 @@ readonly class EnrollUserAction
             $course->id,
         ]);
 
+        $course->sendEnrollmentNotification($user);
+
         return $course;
     }
 }

@@ -6,11 +6,13 @@ namespace Tests\Feature\Listeners;
 
 use App\Models\Course;
 use App\Models\User;
+use App\Notifications\Course\CourseEnrolledNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SuperAdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Cashier\Events\WebhookReceived;
+use Notification;
 
 uses(RefreshDatabase::class);
 
@@ -22,6 +24,8 @@ describe('StripeCheckoutCompletedListener', function () {
     });
 
     it('enrolls user to the course when checkout.session.completed event is dispatched', function () {
+        Notification::fake();
+
         $user = User::factory()->create();
         $course = Course::factory()->create();
 
@@ -45,6 +49,8 @@ describe('StripeCheckoutCompletedListener', function () {
         ]);
 
         expect($user->fresh()->isEnrolledIn($course))->toBeTrue();
+
+        Notification::assertSentTo($user, CourseEnrolledNotification::class);
     });
 
     it('does not enroll user when receiving unrelated stripe event', function () {

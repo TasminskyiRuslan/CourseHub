@@ -43,7 +43,7 @@ class EmailVerificationNotification extends VerifyEmail implements ShouldQueue
 
         return (new MailMessage)
             ->subject('Verify Your Email Address')
-            ->markdown('emails.auth.verify', [
+            ->markdown('emails.auth.verified', [
                 'url' => $verificationUrl,
                 'user' => $notifiable,
             ]);

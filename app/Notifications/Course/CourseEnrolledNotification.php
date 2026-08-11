@@ -2,21 +2,22 @@
 
 declare(strict_types=1);
 
-namespace App\Notifications\Auth;
+namespace App\Notifications\Course;
 
+use App\Models\Course;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class PasswordResetNotification extends Notification implements ShouldQueue
+class CourseEnrolledNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(public string $token)
+    public function __construct(protected Course $course)
     {
         $this->onQueue('high');
     }
@@ -36,14 +37,11 @@ class PasswordResetNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $resetUrl = url('/password/reset?token='.$this->token);
-
         return (new MailMessage)
-            ->subject('Reset Password')
-            ->markdown('emails.auth.reset', [
-                'url' => $resetUrl,
-                'token' => $this->token,
+            ->subject('Course Enrollment Confirmation')
+            ->markdown('emails.course.enrolled', [
                 'user' => $notifiable,
+                'course' => $this->course,
             ]);
     }
 }
